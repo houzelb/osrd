@@ -3,6 +3,7 @@ package fr.sncf.osrd.sim_infra.api
 import fr.sncf.osrd.geom.LineString
 import fr.sncf.osrd.sim_infra.impl.ChunkPath
 import fr.sncf.osrd.sim_infra.impl.PathPropertiesImpl
+import fr.sncf.osrd.sim_infra.impl.TemporarySpeedLimitManager
 import fr.sncf.osrd.sim_infra.impl.buildChunkPath
 import fr.sncf.osrd.utils.DistanceRangeMap
 import fr.sncf.osrd.utils.indexing.DirStaticIdxList
@@ -43,7 +44,10 @@ interface PathProperties {
     fun getNeutralSections(): DistanceRangeMap<NeutralSection>
 
     @JvmName("getSpeedLimitProperties")
-    fun getSpeedLimitProperties(trainTag: String?): DistanceRangeMap<SpeedLimitProperty>
+    fun getSpeedLimitProperties(
+        trainTag: String?,
+        temporarySpeedLimitManager: TemporarySpeedLimitManager?
+    ): DistanceRangeMap<SpeedLimitProperty>
 
     fun getZones(): DistanceRangeMap<ZoneId>
 
@@ -74,7 +78,7 @@ fun buildPathPropertiesFrom(
     chunks: DirStaticIdxList<TrackChunk>,
     pathBeginOffset: Offset<Path>,
     pathEndOffset: Offset<Path>,
-    routes: List<RouteId>? = null
+    routes: List<RouteId>? = null,
 ): PathProperties {
     val chunkPath = buildChunkPath(infra, chunks, pathBeginOffset, pathEndOffset)
     return makePathProperties(infra, chunkPath, routes)
@@ -84,7 +88,8 @@ fun buildPathPropertiesFrom(
 fun makePathProperties(
     infra: RawSignalingInfra,
     chunkPath: ChunkPath,
-    routes: List<RouteId>? = null
+    routes: List<RouteId>? = null,
+    temporarySpeedLimitManager: TemporarySpeedLimitManager? = null,
 ): PathProperties {
     return PathPropertiesImpl(infra, chunkPath, routes)
 }

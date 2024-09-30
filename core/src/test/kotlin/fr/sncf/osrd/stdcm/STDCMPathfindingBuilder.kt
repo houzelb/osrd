@@ -9,6 +9,7 @@ import fr.sncf.osrd.graph.PathfindingEdgeLocationId
 import fr.sncf.osrd.railjson.schema.rollingstock.Comfort
 import fr.sncf.osrd.sim_infra.api.Block
 import fr.sncf.osrd.sim_infra.api.BlockId
+import fr.sncf.osrd.sim_infra.impl.TemporarySpeedLimitManager
 import fr.sncf.osrd.stdcm.graph.findPath
 import fr.sncf.osrd.stdcm.preprocessing.DummyBlockAvailability
 import fr.sncf.osrd.stdcm.preprocessing.OccupancySegment
@@ -42,6 +43,7 @@ data class STDCMPathfindingBuilder(
     var tag: String = "",
     var standardAllowance: AllowanceValue? = null,
     var blockAvailability: BlockAvailabilityInterface? = null,
+    var temporarySpeedLimitManager: TemporarySpeedLimitManager = TemporarySpeedLimitManager(),
 ) {
     // endregion OPTIONAL
     // region SETTERS
@@ -142,6 +144,15 @@ data class STDCMPathfindingBuilder(
         this.blockAvailability = availability
         return this
     }
+
+    /** Sets the temporary speed limit manager to be used. */
+    fun setTemporarySpeedLimitManager(
+        temporarySpeedLimitManager: TemporarySpeedLimitManager
+    ): STDCMPathfindingBuilder {
+        this.temporarySpeedLimitManager = temporarySpeedLimitManager
+        return this
+    }
+
     // endregion SETTERS
     /** Runs the pathfinding request with the given parameters */
     fun run(): STDCMResult? {
@@ -164,7 +175,8 @@ data class STDCMPathfindingBuilder(
             maxRunTime,
             tag,
             standardAllowance,
-            pathfindingTimeout
+            pathfindingTimeout,
+            temporarySpeedLimitManager,
         )
     }
 }

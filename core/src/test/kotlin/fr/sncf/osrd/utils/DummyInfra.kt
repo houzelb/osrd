@@ -240,6 +240,10 @@ class DummyInfra : RawInfra, BlockInfra {
         return blockPool[zonePath.index].exit
     }
 
+    override fun findDetector(detectorName: String): DetectorId? {
+        TODO("Not yet implemented")
+    }
+
     override fun getZonePathLength(zonePath: ZonePathId): Length<ZonePath> {
         return Length(blockPool[zonePath.index].length)
     }

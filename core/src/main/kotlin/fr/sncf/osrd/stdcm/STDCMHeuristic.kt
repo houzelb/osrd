@@ -5,6 +5,7 @@ import fr.sncf.osrd.sim_infra.api.Block
 import fr.sncf.osrd.sim_infra.api.BlockId
 import fr.sncf.osrd.sim_infra.api.BlockInfra
 import fr.sncf.osrd.sim_infra.api.RawInfra
+import fr.sncf.osrd.sim_infra.impl.TemporarySpeedLimitManager
 import fr.sncf.osrd.sim_infra.utils.getBlockEntry
 import fr.sncf.osrd.stdcm.graph.STDCMEdge
 import fr.sncf.osrd.utils.CachedBlockMRSPBuilder
@@ -41,9 +42,12 @@ class STDCMHeuristicBuilder(
     private val steps: List<STDCMStep>,
     private val maxRunningTime: Double,
     private val rollingStock: PhysicsRollingStock,
+    private val temporarySpeedLimitManager: TemporarySpeedLimitManager =
+        TemporarySpeedLimitManager()
 ) {
     private val logger: Logger = LoggerFactory.getLogger("STDCMHeuristic")
-    private val mrspBuilder = CachedBlockMRSPBuilder(rawInfra, blockInfra, rollingStock)
+    private val mrspBuilder =
+        CachedBlockMRSPBuilder(rawInfra, blockInfra, rollingStock, temporarySpeedLimitManager)
 
     /** Runs all the pre-processing and initialize the STDCM A* heuristic. */
     @WithSpan(value = "Initializing STDCM heuristic", kind = SpanKind.SERVER)

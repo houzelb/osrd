@@ -4,6 +4,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import fr.sncf.osrd.api.api_v2.DirectionalTrackRange
 import fr.sncf.osrd.api.api_v2.TrackLocation
 import fr.sncf.osrd.api.api_v2.WorkSchedule
 import fr.sncf.osrd.api.api_v2.conflicts.TrainRequirementsRequest
@@ -53,6 +54,14 @@ class STDCMRequestV2(
     /// Margin to apply to the whole train.
     val margin: MarginValue,
     @Json(name = "work_schedules") val workSchedules: Collection<WorkSchedule> = listOf(),
+    /// Temporary speed limits which are active between the train departure and arrival.
+    @Json(name = "temporary_speed_limits")
+    val temporarySpeedLimits: Collection<STDCMTemporarySpeedLimit>,
+)
+
+data class STDCMTemporarySpeedLimit(
+    @Json(name = "speed_limit") val speedLimit: Double,
+    @Json(name = "track_ranges") val trackRanges: List<DirectionalTrackRange>,
 )
 
 class STDCMPathItem(

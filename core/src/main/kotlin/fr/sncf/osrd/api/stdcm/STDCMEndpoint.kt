@@ -16,6 +16,7 @@ import fr.sncf.osrd.railjson.schema.schedule.RJSTrainStop.RJSReceptionSignal.SHO
 import fr.sncf.osrd.reporting.exceptions.ErrorType
 import fr.sncf.osrd.reporting.exceptions.OSRDError
 import fr.sncf.osrd.reporting.warnings.DiagnosticRecorderImpl
+import fr.sncf.osrd.sim_infra.impl.TemporarySpeedLimitManager
 import fr.sncf.osrd.standalone_sim.result.ResultEnvelopePoint
 import fr.sncf.osrd.standalone_sim.result.ResultTrain
 import fr.sncf.osrd.standalone_sim.result.StandaloneSimResult
@@ -80,7 +81,8 @@ class STDCMEndpoint(private val infraManager: InfraManager) : Take {
                     request.maximumRunTime,
                     tag,
                     standardAllowance,
-                    Pathfinding.TIMEOUT
+                    Pathfinding.TIMEOUT,
+                    TemporarySpeedLimitManager(),
                 )
             if (res == null) {
                 val error = OSRDError(ErrorType.PathfindingGenericError)
@@ -90,7 +92,7 @@ class STDCMEndpoint(private val infraManager: InfraManager) : Take {
             // Build the response
             val simResult = StandaloneSimResult()
             simResult.speedLimits.add(
-                ResultEnvelopePoint.from(computeMRSP(res.trainPath, rollingStock, false, tag))
+                ResultEnvelopePoint.from(computeMRSP(res.trainPath, rollingStock, false, tag, null))
             )
             simResult.baseSimulations.add(
                 run(

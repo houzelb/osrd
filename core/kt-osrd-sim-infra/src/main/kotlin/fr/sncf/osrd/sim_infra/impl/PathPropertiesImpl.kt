@@ -42,7 +42,7 @@ data class ChunkPath(
 data class PathPropertiesImpl(
     val infra: RawSignalingInfra,
     val chunkPath: ChunkPath,
-    val pathRoutes: List<RouteId>?
+    val pathRoutes: List<RouteId>?,
 ) : PathProperties {
     override fun getSlopes(): DistanceRangeMap<Double> {
         return getRangeMap { dirChunkId -> infra.getTrackChunkSlope(dirChunkId) }
@@ -84,7 +84,10 @@ data class PathPropertiesImpl(
         return getRangeMap { dirChunkId -> infra.getTrackChunkNeutralSections(dirChunkId) }
     }
 
-    override fun getSpeedLimitProperties(trainTag: String?): DistanceRangeMap<SpeedLimitProperty> {
+    override fun getSpeedLimitProperties(
+        trainTag: String?,
+        temporarySpeedLimitManager: TemporarySpeedLimitManager?
+    ): DistanceRangeMap<SpeedLimitProperty> {
         assert(pathRoutes != null) {
             "the routes on a path should be set when attempting to compute a speed limit"
         }
@@ -103,7 +106,23 @@ data class PathPropertiesImpl(
             //           \
             // - start - - - commonChunk - ->
             val route = routeOnChunk.firstOrNull()?.let { routeId -> infra.getRouteName(routeId) }
-            infra.getTrackChunkSpeedLimitProperties(dirChunkId, trainTag, route)
+            val permanentSpeedLimits =
+                infra.getTrackChunkSpeedLimitProperties(dirChunkId, trainTag, route)
+            if (temporarySpeedLimitManager != null) {
+                temporarySpeedLimitManager.speedLimits[dirChunkId]?.let { applicableSpeedLimits ->
+                    permanentSpeedLimits.updateMap(
+                        applicableSpeedLimits,
+                        { s1, s2 ->
+                            if (s1.speed < s2.speed) {
+                                s1
+                            } else {
+                                s2
+                            }
+                        }
+                    )
+                }
+            }
+            permanentSpeedLimits
         }
     }
 
@@ -113,7 +132,8 @@ data class PathPropertiesImpl(
             if (zoneId != null) {
                 val chunkLength = infra.getTrackChunkLength(chunkId).distance
                 distanceRangeMapOf(
-                    listOf(DistanceRangeMap.RangeMapEntry(Distance.ZERO, chunkLength, zoneId))
+                    *listOf(DistanceRangeMap.RangeMapEntry(Distance.ZERO, chunkLength, zoneId))
+                        .toTypedArray()
                 )
             } else {
                 distanceRangeMapOf()

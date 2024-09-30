@@ -22,6 +22,7 @@ import fr.sncf.osrd.sim_infra.api.Block
 import fr.sncf.osrd.sim_infra.api.BlockId
 import fr.sncf.osrd.sim_infra.api.BlockInfra
 import fr.sncf.osrd.sim_infra.api.RawSignalingInfra
+import fr.sncf.osrd.sim_infra.impl.TemporarySpeedLimitManager
 import fr.sncf.osrd.stdcm.BacktrackingSelfTypeHolder
 import fr.sncf.osrd.stdcm.infra_exploration.InfraExplorer
 import fr.sncf.osrd.train.RollingStock
@@ -49,6 +50,7 @@ class STDCMSimulations {
         comfort: Comfort?,
         timeStep: Double,
         trainTag: String?,
+        temporarySpeedLimitManager: TemporarySpeedLimitManager?,
         infraExplorer: InfraExplorer,
         blockParams: BlockSimulationParameters
     ): Envelope? {
@@ -64,7 +66,8 @@ class STDCMSimulations {
                 comfort,
                 timeStep,
                 blockParams.stop,
-                trainTag
+                trainTag,
+                temporarySpeedLimitManager,
             )
         simulatedEnvelopes[blockParams] = SoftReference(simulatedEnvelope)
         return simulatedEnvelope
@@ -87,7 +90,8 @@ class STDCMSimulations {
         comfort: Comfort?,
         timeStep: Double,
         stopPosition: Offset<Block>?,
-        trainTag: String?
+        trainTag: String?,
+        temporarySpeedLimitManager: TemporarySpeedLimitManager?,
     ): Envelope? {
         if (stopPosition != null && stopPosition == Offset<Block>(0.meters))
             return makeSinglePointEnvelope(0.0)
@@ -102,7 +106,14 @@ class STDCMSimulations {
         val path = infraExplorer.getCurrentEdgePathProperties(start, simLength)
         val envelopePath = EnvelopeTrainPath.from(rawInfra, path)
         val context = build(rollingStock, envelopePath, timeStep, comfort)
-        val mrsp = computeMRSP(path, rollingStock, false, trainTag)
+        val mrsp =
+            computeMRSP(
+                path,
+                rollingStock,
+                false,
+                trainTag,
+                temporarySpeedLimitManager,
+            )
         return try {
             val maxSpeedEnvelope = MaxSpeedEnvelope.from(context, stops, mrsp)
             MaxEffortEnvelope.from(context, initialSpeed, maxSpeedEnvelope)

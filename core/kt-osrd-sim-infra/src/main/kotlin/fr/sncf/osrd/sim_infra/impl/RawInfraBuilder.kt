@@ -471,12 +471,10 @@ class RawInfraBuilder {
     ): TrackChunkId {
         val initSpeedSections = {
             distanceRangeMapOf(
-                listOf(
-                    DistanceRangeMap.RangeMapEntry(
-                        0.meters,
-                        length.distance,
-                        SpeedSection(Double.POSITIVE_INFINITY.metersPerSecond, mapOf(), mapOf())
-                    )
+                DistanceRangeMap.RangeMapEntry(
+                    0.meters,
+                    length.distance,
+                    SpeedSection(Double.POSITIVE_INFINITY.metersPerSecond, mapOf(), mapOf())
                 )
             )
         }
@@ -499,7 +497,8 @@ class RawInfraBuilder {
                 loadingGaugeConstraints,
                 // Electrifications will be filled later on
                 distanceRangeMapOf(
-                    listOf(DistanceRangeMap.RangeMapEntry(0.meters, length.distance, ""))
+                    *listOf(DistanceRangeMap.RangeMapEntry(0.meters, length.distance, ""))
+                        .toTypedArray()
                 ),
                 // NeutralSections will be filled later on
                 DirectionalMap(distanceRangeMapOf(), distanceRangeMapOf()),

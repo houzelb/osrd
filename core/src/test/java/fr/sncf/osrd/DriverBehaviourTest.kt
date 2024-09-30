@@ -23,7 +23,7 @@ class DriverBehaviourTest {
         val path: PathProperties = makePathProps(infra, infra, blocks, Length(0.meters), listOf())
         val testRollingStock = TestTrains.VERY_SHORT_FAST_TRAIN
         val driverBehaviour = DriverBehaviour(2.0, 3.0)
-        var mrsp = computeMRSP(path, testRollingStock, true, null)
+        var mrsp = computeMRSP(path, testRollingStock, true, null, null)
         mrsp = driverBehaviour.applyToMRSP(mrsp)
         Assertions.assertEquals(20.0, mrsp.interpolateSpeedRightDir(0.0, 1.0))
         Assertions.assertEquals(10.0, mrsp.interpolateSpeedRightDir((100 - 3).toDouble(), 1.0))

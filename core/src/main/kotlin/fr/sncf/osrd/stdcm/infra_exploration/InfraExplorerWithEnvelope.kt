@@ -89,14 +89,14 @@ fun initInfraExplorerWithEnvelope(
     location: PathfindingEdgeLocationId<Block>,
     rollingStock: PhysicsRollingStock,
     stops: List<Collection<PathfindingEdgeLocationId<Block>>> = listOf(setOf()),
-    constraints: List<PathfindingConstraint<Block>> = listOf()
+    constraints: List<PathfindingConstraint<Block>> = listOf(),
 ): Collection<InfraExplorerWithEnvelope> {
     return initInfraExplorer(
             fullInfra.rawInfra,
             fullInfra.blockInfra,
             location,
             stops = stops,
-            constraints
+            constraints,
         )
         .map { explorer ->
             InfraExplorerWithEnvelopeImpl(

@@ -33,7 +33,7 @@ interface TrackInfra {
 /** A directional detector encodes a direction over a detector */
 typealias DirDetectorId = DirStaticIdx<Detector>
 
-/** A directional detector encodes a direction over a track chunk */
+/** A directional track chunk encodes a direction over a track chunk */
 typealias DirTrackChunkId = DirStaticIdx<TrackChunk>
 
 typealias OptDirTrackChunkId = OptDirStaticIdx<TrackChunk>

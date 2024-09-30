@@ -64,10 +64,17 @@ fun runStandaloneSimulation(
 ): SimulationSuccess {
     // MRSP & SpeedLimits
     val safetySpeedRanges = makeSafetySpeedRanges(infra, chunkPath, routes, schedule)
-    val mrsp = computeMRSP(pathProps, rollingStock, true, speedLimitTag, safetySpeedRanges)
+    val mrsp = computeMRSP(pathProps, rollingStock, true, speedLimitTag, null, safetySpeedRanges)
     // We don't use speed safety ranges in the MRSP displayed in the front
     // (just like we don't add the train length)
-    val speedLimits = computeMRSP(pathProps, rollingStock, false, speedLimitTag)
+    val speedLimits =
+        computeMRSP(
+            pathProps,
+            rollingStock,
+            false,
+            speedLimitTag,
+            null,
+        )
 
     // Build paths and contexts
     val envelopeSimPath = EnvelopeTrainPath.from(infra.rawInfra, pathProps, electricalProfileMap)

@@ -21,7 +21,7 @@ class TestDistanceRangeMap {
         rangeMapMany.putMany(entries)
         assertEquals(expected, rangeMapMany.asList())
 
-        val rangeMapCtor = distanceRangeMapOf<T>(entries)
+        val rangeMapCtor = DistanceRangeMapImpl(entries)
         assertEquals(expected, rangeMapCtor.asList())
     }
 
@@ -247,7 +247,7 @@ class TestDistanceRangeMap {
 
         val mark3 = timeSource.markNow()
         val mark4 = mark3 + oneSecond
-        val rangeMapCtor = distanceRangeMapOf<Int>(entries)
+        val rangeMapCtor = DistanceRangeMapImpl(entries)
         assert(!mark4.hasPassedNow())
         assertEquals(entries, rangeMapCtor.asList())
     }
@@ -263,10 +263,8 @@ class TestDistanceRangeMap {
     fun testMergeDistanceRangeMapsSimple() {
         val inputMap =
             distanceRangeMapOf<Int>(
-                listOf(
-                    DistanceRangeMap.RangeMapEntry(Distance(0), Distance(50), 1),
-                    DistanceRangeMap.RangeMapEntry(Distance(50), Distance(100), 2),
-                )
+                DistanceRangeMap.RangeMapEntry(Distance(0), Distance(50), 1),
+                DistanceRangeMap.RangeMapEntry(Distance(50), Distance(100), 2),
             )
         val distances = listOf(Distance(100))
 
@@ -299,7 +297,7 @@ class TestDistanceRangeMap {
                         i * n + it
                     )
                 }
-            maps.add(distanceRangeMapOf<Int>(entries))
+            maps.add(DistanceRangeMapImpl<Int>(entries))
         }
         val mergedEntries =
             List(n * n) {

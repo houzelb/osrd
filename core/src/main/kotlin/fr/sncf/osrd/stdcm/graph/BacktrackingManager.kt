@@ -59,6 +59,7 @@ class BacktrackingManager(private val graph: STDCMGraph) {
                 graph.comfort,
                 graph.timeStep,
                 graph.tag,
+                graph.temporarySpeedLimitManager,
                 old.infraExplorer,
                 BlockSimulationParameters(
                     old.infraExplorer.getCurrentBlock(),

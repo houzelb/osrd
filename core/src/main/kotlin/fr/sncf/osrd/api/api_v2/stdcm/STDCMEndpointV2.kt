@@ -16,11 +16,15 @@ import fr.sncf.osrd.envelope_sim_infra.EnvelopeTrainPath
 import fr.sncf.osrd.envelope_sim_infra.computeMRSP
 import fr.sncf.osrd.graph.Pathfinding
 import fr.sncf.osrd.graph.PathfindingEdgeLocationId
+import fr.sncf.osrd.railjson.schema.common.graph.EdgeDirection
 import fr.sncf.osrd.railjson.schema.rollingstock.Comfort
 import fr.sncf.osrd.reporting.exceptions.ErrorType
 import fr.sncf.osrd.reporting.exceptions.OSRDError
 import fr.sncf.osrd.reporting.warnings.DiagnosticRecorderImpl
 import fr.sncf.osrd.sim_infra.api.Block
+import fr.sncf.osrd.sim_infra.api.DirTrackChunkId
+import fr.sncf.osrd.sim_infra.api.SpeedLimitProperty
+import fr.sncf.osrd.sim_infra.impl.TemporarySpeedLimitManager
 import fr.sncf.osrd.sim_infra.utils.chunksToRoutes
 import fr.sncf.osrd.standalone_sim.makeElectricalProfiles
 import fr.sncf.osrd.standalone_sim.makeMRSPResponse
@@ -35,16 +39,17 @@ import fr.sncf.osrd.stdcm.preprocessing.implementation.makeBlockAvailability
 import fr.sncf.osrd.train.RollingStock
 import fr.sncf.osrd.train.TrainStop
 import fr.sncf.osrd.utils.Direction
-import fr.sncf.osrd.utils.units.Offset
-import fr.sncf.osrd.utils.units.TimeDelta
-import fr.sncf.osrd.utils.units.meters
-import fr.sncf.osrd.utils.units.seconds
+import fr.sncf.osrd.utils.DistanceRangeMap
+import fr.sncf.osrd.utils.DistanceRangeMap.RangeMapEntry
+import fr.sncf.osrd.utils.distanceRangeMapOf
+import fr.sncf.osrd.utils.units.*
 import java.io.File
 import java.time.Duration.between
 import java.time.Duration.ofMillis
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.Throws
 import org.takes.Request
 import org.takes.Response
 import org.takes.Take
@@ -76,9 +81,10 @@ class STDCMEndpointV2(private val infraManager: InfraManager) : Take {
                     it.println(stdcmRequestAdapter.indent("    ").toJson(request))
                 }
             }
-
             // parse input data
             val infra = infraManager.getInfra(request.infra, request.expectedVersion, recorder)
+            val temporarySpeedLimitManager =
+                buildTemporarySpeedLimitManager(infra, request.temporarySpeedLimits)
             val rollingStock =
                 parseRawRollingStock(
                     request.rollingStock,
@@ -114,7 +120,8 @@ class STDCMEndpointV2(private val infraManager: InfraManager) : Take {
                     request.maximumRunTime.seconds,
                     request.speedLimitTag,
                     parseMarginValue(request.margin),
-                    Pathfinding.TIMEOUT
+                    Pathfinding.TIMEOUT,
+                    temporarySpeedLimitManager,
                 )
             if (path == null) {
                 val response = PathNotFound()
@@ -123,7 +130,14 @@ class STDCMEndpointV2(private val infraManager: InfraManager) : Take {
             val pathfindingResponse = runPathfindingBlockPostProcessing(infra, path.blocks)
 
             val simulationResponse =
-                buildSimResponse(infra, path, rollingStock, request.speedLimitTag, request.comfort)
+                buildSimResponse(
+                    infra,
+                    path,
+                    rollingStock,
+                    request.speedLimitTag,
+                    temporarySpeedLimitManager,
+                    request.comfort
+                )
 
             // Check for conflicts
             checkForConflicts(trainsRequirements, simulationResponse, path.departureTime)
@@ -143,6 +157,7 @@ class STDCMEndpointV2(private val infraManager: InfraManager) : Take {
         path: STDCMResult,
         rollingStock: RollingStock,
         speedLimitTag: String?,
+        temporarySpeedLimitManager: TemporarySpeedLimitManager?,
         comfort: Comfort,
     ): SimulationSuccess {
         val reportTrain =
@@ -166,7 +181,14 @@ class STDCMEndpointV2(private val infraManager: InfraManager) : Take {
                 reportTrain.energyConsumption,
                 reportTrain.pathItemTimes
             )
-        val speedLimits = computeMRSP(path.trainPath, rollingStock, false, speedLimitTag)
+        val speedLimits =
+            computeMRSP(
+                path.trainPath,
+                rollingStock,
+                false,
+                speedLimitTag,
+                temporarySpeedLimitManager
+            )
 
         // All simulations are the same for now
         return SimulationSuccess(
@@ -198,6 +220,63 @@ class STDCMEndpointV2(private val infraManager: InfraManager) : Take {
             ElectrificationRange.from(curvesAndConditions.conditions, electrificationMap)
         return makeElectricalProfiles(electrificationRanges)
     }
+}
+
+fun buildTemporarySpeedLimitManager(
+    infra: FullInfra,
+    speedLimits: Collection<STDCMTemporarySpeedLimit>
+): TemporarySpeedLimitManager {
+    var outputSpeedLimits: MutableMap<DirTrackChunkId, DistanceRangeMap<SpeedLimitProperty>> =
+        mutableMapOf()
+    for (speedLimit in speedLimits) {
+        for (trackRange in speedLimit.trackRanges) {
+            val trackSection =
+                infra.rawInfra.getTrackSectionFromName(trackRange.trackSection) ?: continue
+            val trackChunks = infra.rawInfra.getTrackSectionChunks(trackSection)
+            for (trackChunkId in trackChunks) {
+                val trackChunkLength = infra.rawInfra.getTrackChunkLength(trackChunkId).distance
+                val chunkStartOffset = infra.rawInfra.getTrackChunkOffset(trackChunkId)
+                val chunkEndOffset = chunkStartOffset + trackChunkLength
+                if (chunkEndOffset < trackRange.begin || trackRange.end < chunkStartOffset) {
+                    continue
+                }
+                var startOffset = Distance.max(0.meters, trackRange.begin - chunkStartOffset)
+                var endOffset = Distance.min(trackChunkLength, trackRange.end - chunkStartOffset)
+                var direction =
+                    when (trackRange.direction) {
+                        EdgeDirection.START_TO_STOP -> Direction.INCREASING
+                        EdgeDirection.STOP_TO_START -> Direction.DECREASING
+                    }
+                val dirTrackChunkId = DirTrackChunkId(trackChunkId, direction)
+                val chunkSpeedLimitRangeMap =
+                    distanceRangeMapOf(
+                        RangeMapEntry(
+                            startOffset,
+                            endOffset,
+                            SpeedLimitProperty(
+                                Speed.fromMetersPerSecond(speedLimit.speedLimit),
+                                null
+                            )
+                        )
+                    )
+                if (outputSpeedLimits.contains(dirTrackChunkId)) {
+                    outputSpeedLimits[dirTrackChunkId]!!.updateMap(
+                        chunkSpeedLimitRangeMap,
+                        { s1, s2 ->
+                            if (s1.speed < s2.speed) {
+                                s1
+                            } else {
+                                s2
+                            }
+                        }
+                    )
+                } else {
+                    outputSpeedLimits.put(dirTrackChunkId, chunkSpeedLimitRangeMap)
+                }
+            }
+        }
+    }
+    return TemporarySpeedLimitManager(outputSpeedLimits)
 }
 
 private fun parseSteps(
