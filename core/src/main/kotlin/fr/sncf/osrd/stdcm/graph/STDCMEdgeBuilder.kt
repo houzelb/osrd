@@ -90,6 +90,7 @@ internal constructor(
                     graph.comfort,
                     graph.timeStep,
                     graph.tag,
+                    graph.temporarySpeedLimitManager,
                     infraExplorer,
                     BlockSimulationParameters(
                         infraExplorer.getCurrentBlock(),

@@ -18,7 +18,11 @@ data class NeutralSection(
 data class SpeedLimitProperty(
     val speed: Speed,
     val source: SpeedLimitSource? // if train-tag used, source of the speed-limit
-)
+) : Comparable<SpeedLimitProperty> {
+    override fun compareTo(other: SpeedLimitProperty): Int {
+        return this.speed.compareTo(other.speed)
+    }
+}
 
 sealed class SpeedLimitSource : SelfTypeHolder {
     override val selfType: Class<out SelfTypeHolder>

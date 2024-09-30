@@ -467,7 +467,7 @@ class PathPropertiesTests {
         rjsInfra.speedSections.add(speedSection)
         val infra = Helpers.fullInfraFromRJS(rjsInfra)
         val path = makePathProps(infra.blockInfra, infra.rawInfra, BlockId(0U), routes = listOf())
-        val speedLimits = path.getSpeedLimitProperties("trainTag")
+        val speedLimits = path.getSpeedLimitProperties("trainTag", null)
         assertThat(speedLimits.asList())
             .containsExactlyElementsOf(
                 listOf(
@@ -528,7 +528,7 @@ class PathPropertiesTests {
         Default speed for all known tags (unused currently): 8.333
         */
 
-        val speedLimitsMA100 = path.getSpeedLimitProperties("MA100")
+        val speedLimitsMA100 = path.getSpeedLimitProperties("MA100", null)
         assertThat(speedLimitsMA100.asList())
             .containsExactlyElementsOf(
                 listOf(
@@ -555,7 +555,7 @@ class PathPropertiesTests {
                 )
             )
 
-        val speedLimitsME100 = path.getSpeedLimitProperties("ME100")
+        val speedLimitsME100 = path.getSpeedLimitProperties("ME100", null)
         assertThat(speedLimitsME100.asList())
             .containsExactlyElementsOf(
                 listOf(
@@ -582,7 +582,7 @@ class PathPropertiesTests {
                 )
             )
 
-        val speedLimitsE32C = path.getSpeedLimitProperties("E32C")
+        val speedLimitsE32C = path.getSpeedLimitProperties("E32C", null)
         assertThat(speedLimitsE32C.asList())
             .containsExactlyElementsOf(
                 listOf(
@@ -609,7 +609,7 @@ class PathPropertiesTests {
                 )
             )
 
-        val speedLimitsHLP = path.getSpeedLimitProperties("HLP")
+        val speedLimitsHLP = path.getSpeedLimitProperties("HLP", null)
         assertThat(speedLimitsHLP.asList())
             .containsExactlyElementsOf(
                 listOf(
@@ -636,7 +636,7 @@ class PathPropertiesTests {
                 )
             )
 
-        val speedLimitsNull = path.getSpeedLimitProperties(null)
+        val speedLimitsNull = path.getSpeedLimitProperties(null, null)
         assertThat(speedLimitsNull.asList())
             .containsExactlyElementsOf(
                 listOf(
@@ -686,10 +686,10 @@ class PathPropertiesTests {
                     SpeedLimitProperty(3.0.metersPerSecond, UnknownTag())
                 )
             )
-        val speedLimitsMA90 = path.getSpeedLimitProperties("MA90")
+        val speedLimitsMA90 = path.getSpeedLimitProperties("MA90", null)
         assertThat(speedLimitsMA90.asList()).containsExactlyElementsOf(expectedSpeedLimitsMA90)
 
-        val speedLimitsMA80 = path.getSpeedLimitProperties("MA80")
+        val speedLimitsMA80 = path.getSpeedLimitProperties("MA80", null)
         assertThat(speedLimitsMA80.asList()).containsExactlyElementsOf(expectedSpeedLimitsMA90)
     }
 

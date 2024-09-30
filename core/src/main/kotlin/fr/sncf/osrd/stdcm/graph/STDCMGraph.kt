@@ -7,6 +7,7 @@ import fr.sncf.osrd.envelope_sim.allowances.utils.AllowanceValue
 import fr.sncf.osrd.envelope_sim.allowances.utils.AllowanceValue.FixedTime
 import fr.sncf.osrd.graph.Graph
 import fr.sncf.osrd.railjson.schema.rollingstock.Comfort
+import fr.sncf.osrd.sim_infra.impl.TemporarySpeedLimitManager
 import fr.sncf.osrd.stdcm.STDCMAStarHeuristic
 import fr.sncf.osrd.stdcm.STDCMHeuristicBuilder
 import fr.sncf.osrd.stdcm.STDCMStep
@@ -37,7 +38,8 @@ class STDCMGraph(
     minScheduleTimeStart: Double,
     val steps: List<STDCMStep>,
     val tag: String?,
-    val standardAllowance: AllowanceValue?
+    val standardAllowance: AllowanceValue?,
+    val temporarySpeedLimitManager: TemporarySpeedLimitManager = TemporarySpeedLimitManager(),
 ) : Graph<STDCMNode, STDCMEdge, STDCMEdge> {
     val rawInfra = fullInfra.rawInfra!!
     val blockInfra = fullInfra.blockInfra!!
@@ -65,7 +67,8 @@ class STDCMGraph(
                     fullInfra.rawInfra,
                     steps,
                     maxRunTime,
-                    rollingStock
+                    rollingStock,
+                    temporarySpeedLimitManager,
                 )
                 .build()
         remainingTimeEstimator = heuristicBuilderResult.first

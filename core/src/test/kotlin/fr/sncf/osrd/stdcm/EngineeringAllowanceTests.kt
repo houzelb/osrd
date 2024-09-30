@@ -44,6 +44,7 @@ class EngineeringAllowanceTests {
                 Comfort.STANDARD,
                 2.0,
                 null,
+                null,
                 null
             )!!
         val secondBlockEnvelope =
@@ -55,6 +56,7 @@ class EngineeringAllowanceTests {
                 TestTrains.REALISTIC_FAST_TRAIN,
                 Comfort.STANDARD,
                 2.0,
+                null,
                 null,
                 null
             )!!
@@ -124,6 +126,7 @@ class EngineeringAllowanceTests {
                 Comfort.STANDARD,
                 2.0,
                 null,
+                null,
                 null
             )!!
         val secondBlockEnvelope =
@@ -135,6 +138,7 @@ class EngineeringAllowanceTests {
                 TestTrains.REALISTIC_FAST_TRAIN,
                 Comfort.STANDARD,
                 2.0,
+                null,
                 null,
                 null
             )!!
@@ -207,6 +211,7 @@ class EngineeringAllowanceTests {
                 Comfort.STANDARD,
                 2.0,
                 null,
+                null,
                 null
             )!!
         val secondBlockEnvelope =
@@ -218,6 +223,7 @@ class EngineeringAllowanceTests {
                 TestTrains.REALISTIC_FAST_TRAIN,
                 Comfort.STANDARD,
                 2.0,
+                null,
                 null,
                 null
             )!!

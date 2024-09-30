@@ -63,6 +63,8 @@ interface RawSignalingInfra : RoutingInfra {
     fun getRawParameters(signal: LogicalSignalId): RawSignalParameters
 
     fun getNextSignalingSystemIds(signal: LogicalSignalId): List<String>
+
+    fun findDetector(detectorName: String): DetectorId?
 }
 
 fun RawSignalingInfra.getLogicalSignalName(signal: LogicalSignalId): String? {

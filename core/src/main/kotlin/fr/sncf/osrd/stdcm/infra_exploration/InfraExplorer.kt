@@ -114,7 +114,7 @@ fun initInfraExplorer(
     blockInfra: BlockInfra,
     location: PathfindingEdgeLocationId<Block>,
     stops: List<Collection<PathfindingEdgeLocationId<Block>>> = listOf(setOf()),
-    constraints: List<PathfindingConstraint<Block>> = listOf()
+    constraints: List<PathfindingConstraint<Block>> = listOf(),
 ): Collection<InfraExplorer> {
     val infraExplorers = mutableListOf<InfraExplorer>()
     val block = location.edge
@@ -134,7 +134,7 @@ fun initInfraExplorer(
                 incrementalPath,
                 blockToPathProperties,
                 stops = stops,
-                constraints = constraints
+                constraints = constraints,
             )
         val infraExtended = infraExplorer.extend(it, location)
         if (infraExtended) infraExplorers.add(infraExplorer)
@@ -155,7 +155,7 @@ private class InfraExplorerImpl(
     //       collection of locations
     private val stops: List<Collection<PathfindingEdgeLocationId<Block>>>,
     private var predecessorLength: Length<Path> = Length(0.meters), // to avoid re-computing it
-    private var constraints: List<PathfindingConstraint<Block>>
+    private var constraints: List<PathfindingConstraint<Block>>,
 ) : InfraExplorer {
 
     override fun getIncrementalPath(): IncrementalPath {
@@ -171,7 +171,7 @@ private class InfraExplorerImpl(
         // We also can't set a first route for sure in initInfraExplorer, but we set the first cache
         // entry.
         // So we have to correct that here now that we now which route we're on.
-        val path =
+        var path =
             pathPropertiesCache.getOrElse(getCurrentBlock()) {
                 makePathProps(
                     blockInfra,
@@ -259,7 +259,7 @@ private class InfraExplorerImpl(
             this.currentIndex,
             this.stops,
             this.predecessorLength,
-            this.constraints
+            this.constraints,
         )
     }
 

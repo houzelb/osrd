@@ -13,6 +13,7 @@ import fr.sncf.osrd.railjson.schema.rollingstock.Comfort
 import fr.sncf.osrd.railjson.schema.schedule.RJSTrainStop.RJSReceptionSignal.SHORT_SLIP_STOP
 import fr.sncf.osrd.sim_infra.api.*
 import fr.sncf.osrd.sim_infra.impl.ChunkPath
+import fr.sncf.osrd.sim_infra.impl.TemporarySpeedLimitManager
 import fr.sncf.osrd.standalone_sim.EnvelopeStopWrapper
 import fr.sncf.osrd.standalone_sim.StandaloneSim
 import fr.sncf.osrd.standalone_sim.result.ResultTrain.SpacingRequirement
@@ -113,7 +114,8 @@ fun getBlocksRunTime(infra: FullInfra, blocks: List<BlockId>): Double {
                 Comfort.STANDARD,
                 2.0,
                 null,
-                null
+                null,
+                null,
             )!!
         time += envelope.totalTime
         speed = envelope.endSpeed
@@ -131,7 +133,8 @@ fun simulateBlock(
     comfort: Comfort?,
     timeStep: Double,
     stopPosition: Offset<Block>?,
-    trainTag: String?
+    trainTag: String?,
+    temporarySpeedLimitManager: TemporarySpeedLimitManager?,
 ): Envelope? {
     val sim = STDCMSimulations()
     val res =
@@ -144,7 +147,8 @@ fun simulateBlock(
             comfort,
             timeStep,
             stopPosition,
-            trainTag
+            trainTag,
+            temporarySpeedLimitManager,
         )
     sim.logWarnings()
     return res

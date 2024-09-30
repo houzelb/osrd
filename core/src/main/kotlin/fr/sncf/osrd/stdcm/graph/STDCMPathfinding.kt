@@ -11,6 +11,7 @@ import fr.sncf.osrd.railjson.schema.rollingstock.Comfort
 import fr.sncf.osrd.reporting.exceptions.ErrorType
 import fr.sncf.osrd.reporting.exceptions.OSRDError
 import fr.sncf.osrd.sim_infra.api.Block
+import fr.sncf.osrd.sim_infra.impl.TemporarySpeedLimitManager
 import fr.sncf.osrd.stdcm.ProgressLogger
 import fr.sncf.osrd.stdcm.STDCMResult
 import fr.sncf.osrd.stdcm.STDCMStep
@@ -54,7 +55,8 @@ fun findPath(
     maxRunTime: Double,
     tag: String?,
     standardAllowance: AllowanceValue?,
-    pathfindingTimeout: Double
+    pathfindingTimeout: Double,
+    temporarySpeedLimitManager: TemporarySpeedLimitManager,
 ): STDCMResult? {
     return STDCMPathfinding(
             fullInfra,
@@ -68,7 +70,8 @@ fun findPath(
             maxRunTime,
             tag,
             standardAllowance,
-            pathfindingTimeout
+            pathfindingTimeout,
+            temporarySpeedLimitManager,
         )
         .findPath()
 }
@@ -85,7 +88,8 @@ class STDCMPathfinding(
     private val maxRunTime: Double,
     tag: String?,
     standardAllowance: AllowanceValue?,
-    private val pathfindingTimeout: Double = Pathfinding.TIMEOUT
+    private val pathfindingTimeout: Double = Pathfinding.TIMEOUT,
+    private val temporarySpeedLimitManager: TemporarySpeedLimitManager,
 ) {
 
     private var starts: Set<STDCMNode> = HashSet()
@@ -101,7 +105,8 @@ class STDCMPathfinding(
             startTime,
             steps,
             tag,
-            standardAllowance
+            standardAllowance,
+            temporarySpeedLimitManager,
         )
 
     @WithSpan(value = "STDCM pathfinding", kind = SpanKind.SERVER)
@@ -134,7 +139,8 @@ class STDCMPathfinding(
                     comfort,
                     maxRunTime,
                     blockAvailability,
-                    graph.tag
+                    graph.tag,
+                    temporarySpeedLimitManager,
                 ) ?: return null
         logger.info(
             "departure time = +${res.departureTime.toInt()}s, " +
@@ -251,7 +257,13 @@ class STDCMPathfinding(
         assert(!firstStep.stop)
         for (location in firstStep.locations) {
             val infraExplorers =
-                initInfraExplorerWithEnvelope(fullInfra, location, rollingStock, stops, constraints)
+                initInfraExplorerWithEnvelope(
+                    fullInfra,
+                    location,
+                    rollingStock,
+                    stops,
+                    constraints,
+                )
             val extended = infraExplorers.flatMap { extendLookaheadUntil(it, 3) }
             for (explorer in extended) {
                 val node =

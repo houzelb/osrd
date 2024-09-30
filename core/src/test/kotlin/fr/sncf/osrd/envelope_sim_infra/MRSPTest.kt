@@ -221,7 +221,7 @@ class MRSPTest {
         trainTag: String?,
         expectedEnvelope: Envelope?
     ) {
-        val mrsp = computeMRSP(path, rollingStock, addRollingStockLength, trainTag)
+        val mrsp = computeMRSP(path, rollingStock, addRollingStockLength, trainTag, null)
         EnvelopeTestUtils.assertEquals(expectedEnvelope, mrsp, 0.001)
     }
 

@@ -8,6 +8,7 @@ import fr.sncf.osrd.envelope_sim.PhysicsRollingStock
 import fr.sncf.osrd.sim_infra.api.PathProperties
 import fr.sncf.osrd.sim_infra.api.SpeedLimitProperty
 import fr.sncf.osrd.sim_infra.api.SpeedLimitSource.UnknownTag
+import fr.sncf.osrd.sim_infra.impl.TemporarySpeedLimitManager
 import fr.sncf.osrd.utils.DistanceRangeMap
 import fr.sncf.osrd.utils.SelfTypeHolder
 import fr.sncf.osrd.utils.distanceRangeMapOf
@@ -36,6 +37,7 @@ fun computeMRSP(
     rollingStock: PhysicsRollingStock,
     addRollingStockLength: Boolean,
     trainTag: String?,
+    temporarySpeedLimitManager: TemporarySpeedLimitManager?,
     safetySpeedRanges: DistanceRangeMap<Speed>? = null,
 ): Envelope {
     return computeMRSP(
@@ -44,6 +46,7 @@ fun computeMRSP(
         rollingStock.getLength(),
         addRollingStockLength,
         trainTag,
+        temporarySpeedLimitManager,
         safetySpeedRanges,
     )
 }
@@ -67,13 +70,14 @@ fun computeMRSP(
     rsLength: Double,
     addRollingStockLength: Boolean,
     trainTag: String?,
+    temporarySpeedLimitManager: TemporarySpeedLimitManager?,
     safetySpeedRanges: DistanceRangeMap<Speed>? = null,
 ): Envelope {
     val builder = MRSPEnvelopeBuilder()
     val pathLength = toMeters(path.getLength())
 
     val offset = if (addRollingStockLength) rsLength else 0.0
-    val speedLimitProperties = path.getSpeedLimitProperties(trainTag)
+    val speedLimitProperties = path.getSpeedLimitProperties(trainTag, temporarySpeedLimitManager)
     for (speedLimitPropertyRange in speedLimitProperties) {
         // Compute where this limit is active from and to
         val start = toMeters(speedLimitPropertyRange.lower)
@@ -166,7 +170,9 @@ fun makeSpeedLimitAttributes(
     baseAttrs: List<SelfTypeHolder?>,
 ): DistanceRangeMap<List<SelfTypeHolder?>> {
     val result: DistanceRangeMap<List<SelfTypeHolder?>> =
-        distanceRangeMapOf(listOf(DistanceRangeMap.RangeMapEntry(lower, upper, baseAttrs)))
+        distanceRangeMapOf(
+            *listOf(DistanceRangeMap.RangeMapEntry(lower, upper, baseAttrs)).toTypedArray()
+        )
 
     // Add important attributes from the old speed ranges
     val attrsWithMissingRange = baseAttrs.toMutableList()

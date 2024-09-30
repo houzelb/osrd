@@ -67,7 +67,7 @@ public class ConflictDetectionTest {
                 List.of("rt.buffer_stop.1->DA0", "rt.DA0->DA5", "rt.DA5->DC5"),
                 makeTrackLocation(getTrackSectionFromNameOrThrow("TA1", rawInfra), fromMeters(146.6269028126681)),
                 makeTrackLocation(getTrackSectionFromNameOrThrow("TC1", rawInfra), fromMeters(444.738508351214)));
-        var pathProps = makePathProperties(rawInfra, chunkPath, null);
+        var pathProps = makePathProperties(rawInfra, chunkPath, null, null);
 
         var simResult = simpleSim(fullInfra, pathProps, chunkPath, 0, Double.POSITIVE_INFINITY, List.of());
         var spacingRequirements = simResult.train.spacingRequirements;
@@ -123,13 +123,13 @@ public class ConflictDetectionTest {
                 List.of("rt.buffer_stop.0->DA2", "rt.DA2->DA5"),
                 makeTrackLocation(ta0, fromMeters(1795)),
                 makeTrackLocation(ta0, fromMeters(1825)));
-        var pathPropsA = makePathProperties(rawInfra, chunkPathA, null);
+        var pathPropsA = makePathProperties(rawInfra, chunkPathA, null, null);
         var chunkPathB = chunkPathFromRoutes(
                 rawInfra,
                 List.of("rt.DD0->DC0", "rt.DC0->DA3"),
                 makeTrackLocation(tc0, fromMeters(205)),
                 makeTrackLocation(tc0, fromMeters(175)));
-        var pathPropsB = makePathProperties(rawInfra, chunkPathB, null);
+        var pathPropsB = makePathProperties(rawInfra, chunkPathB, null, null);
 
         var simResultA = simpleSim(fullInfra, pathPropsA, chunkPathA, 0, Double.POSITIVE_INFINITY, List.of());
         var simResultB = simpleSim(fullInfra, pathPropsB, chunkPathB, 0, Double.POSITIVE_INFINITY, List.of());
@@ -173,14 +173,14 @@ public class ConflictDetectionTest {
                 List.of("rt.DA2->DA5", "rt.DA5->DC4"),
                 makeTrackLocation(ta6, 0),
                 makeTrackLocation(tc0, fromMeters(600)));
-        var pathPropsA = makePathProperties(rawInfra, chunkPathA, null);
+        var pathPropsA = makePathProperties(rawInfra, chunkPathA, null, null);
         // path that continues on
         var chunkPathB = chunkPathFromRoutes(
                 rawInfra,
                 List.of("rt.DA2->DA5", "rt.DA5->DC5", "rt.DC5->DD2"),
                 makeTrackLocation(ta6, 0),
                 makeTrackLocation(td0, fromMeters(8500)));
-        var pathPropsB = makePathProperties(rawInfra, chunkPathB, null);
+        var pathPropsB = makePathProperties(rawInfra, chunkPathB, null, null);
 
         var simResultA = simpleSim(
                 fullInfra, pathPropsA, chunkPathA, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, List.of());
@@ -234,13 +234,13 @@ public class ConflictDetectionTest {
                 List.of("rt.DA5->DC5", "rt.DC5->DD2"),
                 makeTrackLocation(tc1, fromMeters(185)), // cut path after PC1
                 makeTrackLocation(td0, fromMeters(24820)));
-        var pathPropsA = makePathProperties(rawInfra, chunkPathA, null);
+        var pathPropsA = makePathProperties(rawInfra, chunkPathA, null, null);
         var chunkPathB = chunkPathFromRoutes(
                 rawInfra,
                 List.of("rt.DA5->DC4", "rt.DC4->DD2"),
                 makeTrackLocation(tc0, fromMeters(185)), // cut path after PC0
                 makeTrackLocation(td0, fromMeters(24820)));
-        var pathPropsB = makePathProperties(rawInfra, chunkPathB, null);
+        var pathPropsB = makePathProperties(rawInfra, chunkPathB, null, null);
 
         var simResultA = simpleSim(fullInfra, pathPropsA, chunkPathA, 0, Double.POSITIVE_INFINITY, List.of());
         var simResultB = simpleSim(fullInfra, pathPropsB, chunkPathB, 0, Double.POSITIVE_INFINITY, List.of());
@@ -310,13 +310,13 @@ public class ConflictDetectionTest {
                 List.of("rt.DA5->DC5", "rt.DC5->DD2"),
                 makeTrackLocation(tc1, fromMeters(185)), // cut path after PC1
                 makeTrackLocation(td0, fromMeters(24820)));
-        var pathPropsA = makePathProperties(rawInfra, chunkPathA, null);
+        var pathPropsA = makePathProperties(rawInfra, chunkPathA, null, null);
         var chunkPathB = chunkPathFromRoutes(
                 rawInfra,
                 List.of("rt.DA5->DC4", "rt.DC4->DD2"),
                 makeTrackLocation(tc0, fromMeters(185)), // cut path after PC0
                 makeTrackLocation(td0, fromMeters(24820)));
-        var pathPropsB = makePathProperties(rawInfra, chunkPathB, null);
+        var pathPropsB = makePathProperties(rawInfra, chunkPathB, null, null);
 
         var simResultB = simpleSim(fullInfra, pathPropsB, chunkPathB, 0, Double.POSITIVE_INFINITY, List.of());
 
@@ -374,13 +374,13 @@ public class ConflictDetectionTest {
                 List.of("rt.DG1->DD7", "rt.DD7->DD4", "rt.DD4->DD0"),
                 makeTrackLocation(tg0, fromMeters(800)),
                 makeTrackLocation(td0, fromMeters(23000)));
-        var pathPropsA = makePathProperties(rawInfra, chunkPathA, null);
+        var pathPropsA = makePathProperties(rawInfra, chunkPathA, null, null);
         var chunkPathB = chunkPathFromRoutes(
                 rawInfra,
                 List.of("rt.buffer_stop.4->DD5", "rt.DD5->DE1"),
                 makeTrackLocation(tf1, fromMeters(3700)),
                 makeTrackLocation(te0, fromMeters(400)));
-        var pathPropsB = makePathProperties(rawInfra, chunkPathB, null);
+        var pathPropsB = makePathProperties(rawInfra, chunkPathB, null, null);
 
         var simResultB = simpleSim(fullInfra, pathPropsB, chunkPathB, 0, Double.POSITIVE_INFINITY, List.of());
 
@@ -440,13 +440,13 @@ public class ConflictDetectionTest {
                 List.of("rt.DA0->DA5", "rt.DA5->DC5", "rt.DC5->DD2"),
                 makeTrackLocation(ta6, fromMeters(1000)), // start after DA3
                 makeTrackLocation(td0, fromMeters(24820)));
-        var pathPropsCenter = makePathProperties(rawInfra, chunkPathCenter, null);
+        var pathPropsCenter = makePathProperties(rawInfra, chunkPathCenter, null, null);
         var chunkPathNorth = chunkPathFromRoutes(
                 rawInfra,
                 List.of("rt.DA0->DA5", "rt.DA5->DC4", "rt.DC4->DD2"),
                 makeTrackLocation(ta6, fromMeters(1000)),
                 makeTrackLocation(td0, fromMeters(24820)));
-        var pathPropsNorth = makePathProperties(rawInfra, chunkPathNorth, null);
+        var pathPropsNorth = makePathProperties(rawInfra, chunkPathNorth, null, null);
 
         var stop = new TrainStop(9700, 600, receptionSignal);
         var simResultCenterWithStop =
@@ -481,13 +481,13 @@ public class ConflictDetectionTest {
                 List.of("rt.DA0->DA5", "rt.DA5->DC5", "rt.DC5->DD2"),
                 makeTrackLocation(ta6, fromMeters(1000)), // start after DA3
                 makeTrackLocation(td0, fromMeters(24820)));
-        var pathPropsCenter = makePathProperties(rawInfra, chunkPathCenter, null);
+        var pathPropsCenter = makePathProperties(rawInfra, chunkPathCenter, null, null);
         var chunkPathNorth = chunkPathFromRoutes(
                 rawInfra,
                 List.of("rt.DA0->DA5", "rt.DA5->DC4", "rt.DC4->DD2"),
                 makeTrackLocation(ta6, fromMeters(1000)),
                 makeTrackLocation(td0, fromMeters(24820)));
-        var pathPropsNorth = makePathProperties(rawInfra, chunkPathNorth, null);
+        var pathPropsNorth = makePathProperties(rawInfra, chunkPathNorth, null, null);
 
         var stop = new TrainStop(9700, 600, receptionSignal);
         var simResultCenterWithStop =

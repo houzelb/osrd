@@ -47,7 +47,7 @@ class StandaloneSimulationTest {
     private val pathLength = pathProps.getLength()
 
     // Build a reference max speed envelope
-    private val mrsp = computeMRSP(pathProps, rollingStock, true, null)
+    private val mrsp = computeMRSP(pathProps, rollingStock, true, null, null)
     private val envelopeSimPath =
         EnvelopeTrainPath.from(infra.rawInfra, pathProps, ElectricalProfileMapping())
     private val electrificationMap =
@@ -165,19 +165,20 @@ class StandaloneSimulationTest {
             listOf(
                 distanceRangeMapOf(),
                 distanceRangeMapOf(
-                    listOf(
-                        DistanceRangeMap.RangeMapEntry(0.meters, pathLength / 3.0, "Restrict1"),
-                        DistanceRangeMap.RangeMapEntry(
-                            pathLength / 3.0,
-                            pathLength * 2.0 / 3.0,
-                            "Restrict2"
-                        ),
-                        DistanceRangeMap.RangeMapEntry(
-                            pathLength * 2.0 / 3.0,
-                            pathLength,
-                            "Restrict1"
+                    *listOf(
+                            DistanceRangeMap.RangeMapEntry(0.meters, pathLength / 3.0, "Restrict1"),
+                            DistanceRangeMap.RangeMapEntry(
+                                pathLength / 3.0,
+                                pathLength * 2.0 / 3.0,
+                                "Restrict2"
+                            ),
+                            DistanceRangeMap.RangeMapEntry(
+                                pathLength * 2.0 / 3.0,
+                                pathLength,
+                                "Restrict1"
+                            )
                         )
-                    )
+                        .toTypedArray()
                 )
             )
 
@@ -319,21 +320,22 @@ class StandaloneSimulationTest {
             makeSafetySpeedRanges(infra, chunkPath, routes.toIdxList(), schedule)
         val expected =
             distanceRangeMapOf(
-                listOf(
-                    DistanceRangeMap.RangeMapEntry(0.meters, 50.meters, 30.kilometersPerHour),
-                    DistanceRangeMap.RangeMapEntry(50.meters, 150.meters, 10.kilometersPerHour),
-                    DistanceRangeMap.RangeMapEntry(
-                        10_200.meters,
-                        10_300.meters,
-                        30.kilometersPerHour
-                    ),
-                    // Last buffer stop short slip range
-                    DistanceRangeMap.RangeMapEntry(
-                        10_300.meters,
-                        10_400.meters,
-                        10.kilometersPerHour
-                    ),
-                ),
+                *listOf(
+                        DistanceRangeMap.RangeMapEntry(0.meters, 50.meters, 30.kilometersPerHour),
+                        DistanceRangeMap.RangeMapEntry(50.meters, 150.meters, 10.kilometersPerHour),
+                        DistanceRangeMap.RangeMapEntry(
+                            10_200.meters,
+                            10_300.meters,
+                            30.kilometersPerHour
+                        ),
+                        // Last buffer stop short slip range
+                        DistanceRangeMap.RangeMapEntry(
+                            10_300.meters,
+                            10_400.meters,
+                            10.kilometersPerHour
+                        ),
+                    )
+                    .toTypedArray(),
             )
         assertEquals(expected, safetySpeedRanges)
     }
@@ -344,12 +346,11 @@ class StandaloneSimulationTest {
         // Distance range spans across two mrsp sections, one below and one above 30km/h
         val safetySpeeds =
             distanceRangeMapOf(
-                listOf(
-                    DistanceRangeMap.RangeMapEntry(100.meters, 5_000.meters, 30.kilometersPerHour)
-                )
+                DistanceRangeMap.RangeMapEntry(100.meters, 5_000.meters, 30.kilometersPerHour)
             )
         val offsetEndSafetySpeed = 5_000.0
-        val mrspWithSafetySpeed = computeMRSP(pathProps, rollingStock, true, null, safetySpeeds)
+        val mrspWithSafetySpeed =
+            computeMRSP(pathProps, rollingStock, true, null, null, safetySpeeds)
         assertEquals(mrsp.endPos, mrspWithSafetySpeed.endPos)
         var position = 0.0
         while (position < mrsp.endPos) {

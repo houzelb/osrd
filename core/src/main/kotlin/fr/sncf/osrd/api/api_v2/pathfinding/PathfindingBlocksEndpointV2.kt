@@ -198,7 +198,14 @@ private fun getStartLocations(
     val firstStep = waypoints[0]
     val stops = listOf(waypoints.last())
     for (location in firstStep) {
-        val infraExplorers = initInfraExplorer(rawInfra, blockInfra, location, stops, constraints)
+        val infraExplorers =
+            initInfraExplorer(
+                rawInfra,
+                blockInfra,
+                location,
+                stops = stops,
+                constraints = constraints
+            )
         val extended = infraExplorers.flatMap { extendLookaheadUntil(it, 1) }
         for (explorer in extended) {
             val edge = PathfindingEdge(explorer)

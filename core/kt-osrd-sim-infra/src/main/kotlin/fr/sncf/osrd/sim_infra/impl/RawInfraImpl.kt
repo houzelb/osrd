@@ -216,6 +216,7 @@ class RawInfraImpl(
     private val dirDetExitToRouteMap: Map<DirDetectorId, StaticIdxList<Route>>,
 ) : RawInfra {
     private val zoneNameMap: HashMap<String, ZoneId> = HashMap()
+    private val detectorNameMap: HashMap<String, DetectorId> = HashMap()
     private val cachePerDirTrackChunk = IdxMap<DirTrackChunkId, MutableList<TrackChunkSignal>>()
     private val cachePerZonePath: StaticPool<ZonePath, ZonePathCache>
     private val trackChunksBounds =
@@ -266,6 +267,10 @@ class RawInfraImpl(
         return chunkDescriptor.offset + chunkDescriptor.length.distance
     }
 
+    override fun findDetector(detectorName: String): DetectorId? {
+        return detectorNameMap[detectorName]
+    }
+
     private fun findChunkOffset(
         trackSection: TrackSectionId,
         chunkIndex: Int,
@@ -296,6 +301,9 @@ class RawInfraImpl(
             if (nextZone != null) zoneDetectors[nextZone]!!.add(detector.increasing)
             val prevZone = getNextZone(detector.decreasing)
             if (prevZone != null) zoneDetectors[prevZone]!!.add(detector.decreasing)
+            for (detectorName in detectorPool[detector].names) {
+                detectorNameMap.put(detectorName, detector)
+            }
         }
 
         // initialize zone names

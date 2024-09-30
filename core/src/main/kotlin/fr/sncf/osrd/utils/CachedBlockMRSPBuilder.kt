@@ -8,6 +8,7 @@ import fr.sncf.osrd.sim_infra.api.Block
 import fr.sncf.osrd.sim_infra.api.BlockId
 import fr.sncf.osrd.sim_infra.api.BlockInfra
 import fr.sncf.osrd.sim_infra.api.RawInfra
+import fr.sncf.osrd.sim_infra.impl.TemporarySpeedLimitManager
 import fr.sncf.osrd.utils.units.Offset
 import fr.sncf.osrd.utils.units.meters
 
@@ -17,25 +18,41 @@ data class CachedBlockMRSPBuilder(
     val blockInfra: BlockInfra,
     private val rsMaxSpeed: Double,
     private val rsLength: Double,
+    val temporarySpeedLimitManager: TemporarySpeedLimitManager = TemporarySpeedLimitManager(),
 ) {
     private val mrspCache = mutableMapOf<BlockId, Envelope>()
 
     constructor(
         rawInfra: RawInfra,
         blockInfra: BlockInfra,
-        rollingStock: PhysicsRollingStock?
+        rollingStock: PhysicsRollingStock?,
+        temporarySpeedLimitManager: TemporarySpeedLimitManager = TemporarySpeedLimitManager(),
     ) : this(
         rawInfra,
         blockInfra,
         rollingStock?.maxSpeed ?: DEFAULT_MAX_ROLLING_STOCK_SPEED,
-        rollingStock?.length ?: 0.0
+        rollingStock?.length ?: 0.0,
+        temporarySpeedLimitManager,
     )
 
     /** Returns the speed limits for the given block (cached). */
     fun getMRSP(block: BlockId): Envelope {
         return mrspCache.computeIfAbsent(block) {
-            val pathProps = makePathProps(blockInfra, rawInfra, block, routes = listOf())
-            computeMRSP(pathProps, rsMaxSpeed, rsLength, false, null)
+            val pathProps =
+                makePathProps(
+                    blockInfra,
+                    rawInfra,
+                    block,
+                    routes = listOf(),
+                )
+            computeMRSP(
+                pathProps,
+                rsMaxSpeed,
+                rsLength,
+                false,
+                null,
+                temporarySpeedLimitManager,
+            )
         }
     }
 

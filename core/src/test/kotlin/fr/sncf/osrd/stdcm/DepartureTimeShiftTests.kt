@@ -184,7 +184,8 @@ class DepartureTimeShiftTests {
                 Comfort.STANDARD,
                 2.0,
                 null,
-                null
+                null,
+                null,
             )!!
         val occupancyGraph =
             ImmutableMultimap.of(

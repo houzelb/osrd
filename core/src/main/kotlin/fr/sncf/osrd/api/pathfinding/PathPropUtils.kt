@@ -25,14 +25,14 @@ fun makePathProps(
     blockIdx: BlockId,
     beginOffset: Offset<Block> = Offset(0.meters),
     endOffset: Offset<Block> = blockInfra.getBlockLength(blockIdx),
-    routes: List<String>? = null
+    routes: List<String>? = null,
 ): PathProperties {
     return buildPathPropertiesFrom(
         rawInfra,
         blockInfra.getTrackChunksFromBlock(blockIdx),
         beginOffset.cast(),
         endOffset.cast(),
-        routes?.map { r -> rawInfra.getRouteFromName(r) }
+        routes?.map { r -> rawInfra.getRouteFromName(r) },
     )
 }
 

@@ -35,6 +35,7 @@ class BacktrackingTests {
                 Comfort.STANDARD,
                 2.0,
                 null,
+                null,
                 null
             )!!
         val runTime = firstBlockEnvelope.totalTime
@@ -77,6 +78,7 @@ class BacktrackingTests {
                 Comfort.STANDARD,
                 2.0,
                 null,
+                null,
                 null
             )!!
         val runTime = firstBlockEnvelope.totalTime
@@ -116,6 +118,7 @@ class BacktrackingTests {
                 TestTrains.REALISTIC_FAST_TRAIN,
                 Comfort.STANDARD,
                 2.0,
+                null,
                 null,
                 null
             )!!

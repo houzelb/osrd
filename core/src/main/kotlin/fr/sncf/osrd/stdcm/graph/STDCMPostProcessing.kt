@@ -21,6 +21,7 @@ import fr.sncf.osrd.sim_infra.api.Block
 import fr.sncf.osrd.sim_infra.api.PathProperties
 import fr.sncf.osrd.sim_infra.api.RawSignalingInfra
 import fr.sncf.osrd.sim_infra.api.makePathProperties
+import fr.sncf.osrd.sim_infra.impl.TemporarySpeedLimitManager
 import fr.sncf.osrd.stdcm.STDCMResult
 import fr.sncf.osrd.stdcm.preprocessing.interfaces.BlockAvailabilityInterface
 import fr.sncf.osrd.train.RollingStock
@@ -51,14 +52,15 @@ class STDCMPostProcessing(private val graph: STDCMGraph) {
         comfort: Comfort?,
         maxRunTime: Double,
         blockAvailability: BlockAvailabilityInterface,
-        trainTag: String?
+        trainTag: String?,
+        temporarySpeedLimitManager: TemporarySpeedLimitManager,
     ): STDCMResult? {
         val edges = path.edges
         val blockRanges = makeBlockRanges(edges)
         val blockWaypoints = makeBlockWaypoints(path)
         val chunkPath = makeChunkPathFromEdges(graph, edges)
         val routes = edges.last().infraExplorer.getExploredRoutes()
-        val trainPath = makePathProperties(infra, chunkPath, routes)
+        val trainPath = makePathProperties(infra, chunkPath, routes, temporarySpeedLimitManager)
         val physicsPath = EnvelopeTrainPath.from(infra, trainPath)
         // val departureTime = computeDepartureTime(edges, startTime)
         val updatedTimeData = computeTimeData(edges)
@@ -72,6 +74,7 @@ class STDCMPostProcessing(private val graph: STDCMGraph) {
                 timeStep,
                 comfort,
                 trainTag,
+                temporarySpeedLimitManager,
                 areSpeedsEqual(0.0, edges.last().endSpeed)
             )
         val withAllowance =
@@ -116,10 +119,18 @@ class STDCMPostProcessing(private val graph: STDCMGraph) {
         timeStep: Double,
         comfort: Comfort?,
         trainTag: String?,
+        temporarySpeedLimitManager: TemporarySpeedLimitManager?,
         stopAtEnd: Boolean,
     ): Envelope {
         val context = build(rollingStock, physicsPath, timeStep, comfort)
-        val mrsp = computeMRSP(trainPath, rollingStock, false, trainTag)
+        val mrsp =
+            computeMRSP(
+                trainPath,
+                rollingStock,
+                false,
+                trainTag,
+                temporarySpeedLimitManager,
+            )
         val stopPositions = stops.map { it.position }.toMutableList()
         if (stopAtEnd) stopPositions.add(physicsPath.length)
         val maxSpeedEnvelope = MaxSpeedEnvelope.from(context, stopPositions.toDoubleArray(), mrsp)

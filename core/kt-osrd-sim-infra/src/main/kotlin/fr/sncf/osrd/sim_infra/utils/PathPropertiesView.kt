@@ -2,6 +2,7 @@ package fr.sncf.osrd.sim_infra.utils
 
 import fr.sncf.osrd.geom.LineString
 import fr.sncf.osrd.sim_infra.api.*
+import fr.sncf.osrd.sim_infra.impl.TemporarySpeedLimitManager
 import fr.sncf.osrd.utils.DistanceRangeMap
 import fr.sncf.osrd.utils.units.Distance
 import fr.sncf.osrd.utils.units.Offset
@@ -56,8 +57,11 @@ data class PathPropertiesView(
         return sliceRangeMap(base.getNeutralSections())
     }
 
-    override fun getSpeedLimitProperties(trainTag: String?): DistanceRangeMap<SpeedLimitProperty> {
-        return sliceRangeMap(base.getSpeedLimitProperties(trainTag))
+    override fun getSpeedLimitProperties(
+        trainTag: String?,
+        temporarySpeedLimitManager: TemporarySpeedLimitManager?
+    ): DistanceRangeMap<SpeedLimitProperty> {
+        return sliceRangeMap(base.getSpeedLimitProperties(trainTag, temporarySpeedLimitManager))
     }
 
     override fun getZones(): DistanceRangeMap<ZoneId> {
