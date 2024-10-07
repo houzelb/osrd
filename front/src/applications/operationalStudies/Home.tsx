@@ -14,13 +14,14 @@ import NavBarSNCF from 'common/BootstrapSNCF/NavBarSNCF';
 import OptionsSNCF from 'common/BootstrapSNCF/OptionsSNCF';
 import { Spinner } from 'common/Loaders';
 import SelectionToolbar from 'common/SelectionToolbar';
+import AddOrEditProjectModal from 'modules/project/components/AddOrEditProjectModal';
 import ProjectCard from 'modules/project/components/ProjectCard';
-import ProjectCardEmpty from 'modules/project/components/ProjectCardEmpty';
 import cleanLocalStorageByProject from 'modules/project/helpers/cleanLocalStorageByProject';
 import { getUserSafeWord } from 'reducers/user/userSelectors';
 import { useAppDispatch } from 'store';
 import { getLogo } from 'utils/logo';
 
+import AddNewCard from './components/AddNewCard';
 import useMultiSelection from './hooks/useMultiSelection';
 
 type SortOptions =
@@ -129,7 +130,13 @@ const HomeOperationalStudies = () => {
     return !isLoading ? (
       <div className="projects-list row">
         <div className="col-hdp-2 col-lg-3 col-md-4 col-sm-6">
-          <ProjectCardEmpty />
+          <AddNewCard
+            translationNamespaces="operationalStudies/home"
+            testId="addProject"
+            className="project-card empty"
+            modalComponent={<AddOrEditProjectModal />}
+            legendTranslationKey="createProject"
+          />
         </div>
         {projectsList.map((project) => (
           <div

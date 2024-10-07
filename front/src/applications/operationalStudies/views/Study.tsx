@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import nextId from 'react-id-generator';
 import { useParams } from 'react-router-dom';
 
+import AddNewCard from 'applications/operationalStudies/components/AddNewCard';
 import BreadCrumbs from 'applications/operationalStudies/components/BreadCrumbs';
 import FilterTextField from 'applications/operationalStudies/components/FilterTextField';
 import DateBox from 'applications/operationalStudies/components/Study/DateBox';
@@ -20,8 +21,8 @@ import NavBarSNCF from 'common/BootstrapSNCF/NavBarSNCF';
 import OptionsSNCF from 'common/BootstrapSNCF/OptionsSNCF';
 import { Loader, Spinner } from 'common/Loaders';
 import SelectionToolbar from 'common/SelectionToolbar';
+import AddOrEditScenarioModal from 'modules/scenario/components/AddOrEditScenarioModal';
 import ScenarioCard from 'modules/scenario/components/ScenarioCard';
-import ScenarioCardEmpty from 'modules/scenario/components/ScenarioCardEmpty';
 import { cleanScenarioLocalStorage } from 'modules/scenario/helpers/utils';
 import AddOrEditStudyModal from 'modules/study/components/AddOrEditStudyModal';
 import { budgetFormat } from 'utils/numbers';
@@ -177,7 +178,13 @@ const Study = () => {
     return !isLoading ? (
       <div className="row no-gutters">
         <div className="col-hdp-3 col-hd-4 col-lg-6">
-          <ScenarioCardEmpty />
+          <AddNewCard
+            translationNamespaces="operationalStudies/study"
+            testId="addScenario"
+            className="scenario-card empty"
+            modalComponent={<AddOrEditScenarioModal />}
+            legendTranslationKey="createScenario"
+          />
         </div>
         {scenariosList.map((scenario) => (
           <div
