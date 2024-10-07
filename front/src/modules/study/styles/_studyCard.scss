@@ -19,6 +19,10 @@
       opacity: 1 !important;
     }
   }
+  &[aria-disabled='true'] {
+    pointer-events: none;
+    opacity: 0.5;
+  }
   &.selected {
     border-color: var(--purple);
     .selected-mark {

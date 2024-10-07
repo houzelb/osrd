@@ -1,6 +1,9 @@
 import { Bug } from '@osrd-project/ui-icons';
 import cx from 'classnames';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+
+import { getIsSuperUser } from 'reducers/user/userSelectors';
 
 type StdcmHeaderProps = {
   isDebugMode: boolean;
@@ -9,6 +12,7 @@ type StdcmHeaderProps = {
 
 const StdcmHeader = ({ isDebugMode, onDebugModeToggle }: StdcmHeaderProps) => {
   const { t } = useTranslation('stdcm');
+  const isSuperUser = useSelector(getIsSuperUser);
 
   return (
     <div className="stdcm-header d-flex">
@@ -18,16 +22,18 @@ const StdcmHeader = ({ isDebugMode, onDebugModeToggle }: StdcmHeaderProps) => {
           {t('notificationTitle')}
         </span>
       </div>
-      <div className="stdcm-header_debug">
-        <button
-          type="button"
-          aria-label="stdcm-debug"
-          className={cx({ 'debug-on': isDebugMode, 'debug-off': !isDebugMode })}
-          onClick={() => onDebugModeToggle(!isDebugMode)}
-        >
-          <Bug />
-        </button>
-      </div>
+      {isSuperUser && (
+        <div className="stdcm-header_debug">
+          <button
+            type="button"
+            aria-label="stdcm-debug"
+            className={cx({ 'debug-on': isDebugMode, 'debug-off': !isDebugMode })}
+            onClick={() => onDebugModeToggle(!isDebugMode)}
+          >
+            <Bug />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
