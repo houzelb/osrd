@@ -13,6 +13,7 @@ use utoipa::ToSchema;
 
 use super::conflict_detection::Conflict;
 use super::conflict_detection::TrainRequirements;
+use super::pathfinding::PathfindingResult;
 use super::pathfinding::PathfindingResultSuccess;
 use super::pathfinding::TrackRange;
 use super::simulation::PhysicsRollingStock;
