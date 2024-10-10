@@ -61,11 +61,7 @@ const SimulationResults = ({
     useState(SPEED_SPACE_CHART_HEIGHT);
   const [mapCanvas, setMapCanvas] = useState<string>();
 
-  const {
-    operationalPoints,
-    loading: formattedOpPointsLoading,
-    baseOrEco,
-  } = useFormattedOperationalPoints(
+  const { operationalPoints, loading: formattedOpPointsLoading } = useFormattedOperationalPoints(
     selectedTrainSchedule,
     trainSimulation,
     pathProperties,
@@ -204,41 +200,6 @@ const SimulationResults = ({
                 }
               : undefined
           }
-        />
-      </div>
-
-      {/* TIME STOPS TABLE */}
-      {selectedTrainSchedule &&
-        trainSimulation.status === 'success' &&
-        pathProperties &&
-        operationalPoints &&
-        infraId && (
-          <div className="time-stop-outputs">
-            <TimesStopsOutput
-              simulatedTrain={trainSimulation}
-              pathProperties={pathProperties}
-              operationalPoints={operationalPoints.finalOutput}
-              selectedTrainSchedule={selectedTrainSchedule}
-              path={path}
-              dataIsLoading={formattedOpPointsLoading}
-            />
-          </div>
-        )}
-
-      {/* SIMULATION : MAP */}
-      <div className="simulation-map">
-        <SimulationResultsMap
-          setExtViewport={setExtViewport}
-          geometry={pathProperties?.geometry}
-          trainSimulation={
-            selectedTrainSchedule && trainSimulation
-              ? {
-                  ...trainSimulation,
-                  trainId: selectedTrainSchedule.id,
-                  startTime: selectedTrainSchedule.start_time,
-                }
-              : undefined
-          }
           setMapCanvas={setMapCanvas}
         />
       </div>
@@ -249,7 +210,7 @@ const SimulationResults = ({
         pathProperties &&
         operationalPoints &&
         infraId && (
-          <div className="osrd-simulation-container mb-2">
+          <div className="time-stop-outputs">
             <TimesStopsOutput
               simulatedTrain={trainSimulation}
               pathProperties={pathProperties}
@@ -276,7 +237,6 @@ const SimulationResults = ({
             simulatedTrain={trainSimulation}
             pathElectrifications={pathProperties.electrifications}
             operationalPoints={operationalPoints}
-            baseOrEco={baseOrEco}
             rollingStock={selectedTrainRollingStock}
             mapCanvas={mapCanvas}
           />
