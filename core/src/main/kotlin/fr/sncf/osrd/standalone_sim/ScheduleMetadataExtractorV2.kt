@@ -22,10 +22,7 @@ import fr.sncf.osrd.train.TrainStop
 import fr.sncf.osrd.utils.CurveSimplification
 import fr.sncf.osrd.utils.indexing.StaticIdxList
 import fr.sncf.osrd.utils.indexing.mutableStaticIdxArrayListOf
-import fr.sncf.osrd.utils.units.Offset
-import fr.sncf.osrd.utils.units.TimeDelta
-import fr.sncf.osrd.utils.units.meters
-import fr.sncf.osrd.utils.units.seconds
+import fr.sncf.osrd.utils.units.*
 import kotlin.math.abs
 
 /** Use an already computed envelope to extract various metadata about a trip. */
@@ -101,6 +98,12 @@ fun runScheduleMetadataExtractor(
             ZoneUpdate(rawInfra.getZoneName(it.zone), it.time, it.offset, it.isEntry)
         }
 
+    val pathStops =
+        schedule.map {
+            PathStop(pathOffsetBuilder.fromTravelledPath(it.pathOffset), it.receptionSignal)
+        }
+    val closedSignalStops = pathStops.filter { it.receptionSignal.isStopOnClosedSignal }
+
     val signalSightings = mutableListOf<SignalSighting>()
     for ((i, pathSignal) in pathSignals.withIndex()) {
         val physicalSignal = loadedSignalInfra.getPhysicalSignal(pathSignal.signal)
@@ -137,10 +140,6 @@ fun runScheduleMetadataExtractor(
             envelopeAdapter,
             incrementalPath
         )
-    val pathStops =
-        schedule.map {
-            PathStop(pathOffsetBuilder.fromTravelledPath(it.pathOffset), it.receptionSignal)
-        }
     incrementalPath.extend(
         PathFragment(
             routePath,
@@ -162,7 +161,7 @@ fun runScheduleMetadataExtractor(
             routePath,
             blockPath,
             detailedBlockPath,
-            pathStops,
+            closedSignalStops,
             loadedSignalInfra,
             blockInfra,
             envelopeWithStops,
