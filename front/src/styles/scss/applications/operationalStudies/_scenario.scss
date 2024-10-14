@@ -426,6 +426,17 @@
           }
         }
 
+        .scenario-timetable-departure-date {
+          height: 2rem;
+          line-height: 1.8rem;
+          text-align: center;
+          background-color: var(--black5);
+          border-top: 0.0625rem solid var(--white75);
+          border-bottom: 0.0625rem solid var(--black25);
+          color: var(--grey50);
+          font-size: 14px;
+        }
+
         .invalid-trains {
           display: flex;
           background: var(--warning5);
