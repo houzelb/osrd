@@ -117,14 +117,12 @@ const StdcmOpSchedule = ({
       </div>
       {opScheduleTimeType === 'preciseTime' && (
         <div className="schedule">
-          {/* TODO: Remove empty onChange events once we fix the warning on ui-core side */}
           <DatePicker
             inputProps={{
               id: `date-${opId}`,
               label: t('trainPath.date'),
               name: 'op-date',
               disabled,
-              onChange: () => {},
             }}
             selectableSlot={selectableSlot}
             value={arrivalDate}

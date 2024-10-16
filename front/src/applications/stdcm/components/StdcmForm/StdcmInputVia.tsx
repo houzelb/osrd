@@ -45,7 +45,7 @@ const StdcmInputVia = ({ stopType, stopDuration, updatePathStepStopTime }: Stdcm
 
   return (
     stopType !== StdcmStopTypes.PASSAGE_TIME && (
-      <div className="stdcm-v2-via-stop-for stop-time">
+      <div className="stop-time">
         <Input
           id="stdcm-via-stop-time"
           type="text"

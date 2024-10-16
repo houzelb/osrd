@@ -16,18 +16,22 @@
   },
   "departureTime": "Horaire de départ",
   "destinationTime": "Horaire de destination",
+  "find": "Trouver",
   "form": {
     "datePickerErrors": {
       "invalidInput": "Saississez une date au format dd/mm/yy",
       "invalidDate": "Renseignez une date entre le {{startDate}} et le {{endDate}}"
     }
   },
+  "indicateAnteriorPath": "Indiquer le sillon antérieur",
+  "indicatePosteriorPath": "Indiquer le sillon postérieur",
   "leaveAt": "Partir à {{ time }}",
   "loaderImageLegend": "Vue matinale du relais de locomotives du dépôt du Bourget",
   "noConfigurationFound": {
     "title": "Un problème de configuration vous empêche de faire une recherche",
     "text": "Veuillez contacter l'équipe de maintenance pour qu'elle puisse vous remettre sur les rails."
   },
+  "noCorrespondingResults": "Aucun résultat ne correspond à votre recherche.",
   "notificationTitle": "Phase 1 : de J-7 à J-1 17h, sur l’axe Perrigny—Miramas.",
   "pleaseWait": "Veuillez patientez…",
   "simulation": {
@@ -84,12 +88,14 @@
   "stdcmSimulationReport": "Fiche simulation",
   "trainPath": {
     "addVia": "Ajouter un PR intermédiaire",
+    "anteriorPath": "Sillon antérieur",
     "asSoonAsPossible": "dès que possible",
     "ch": "CH",
     "ci": "CI",
     "date": "Date",
     "destination": "Destination",
     "origin": "Origine",
+    "posteriorPath": "Sillon postérieur",
     "preciseTime": "horaire précis",
     "stopFor": "Temps d'arrêt minimum",
     "stopType": {

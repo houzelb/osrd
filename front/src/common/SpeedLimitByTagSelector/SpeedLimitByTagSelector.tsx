@@ -34,7 +34,7 @@ export default function SpeedLimitByTagSelector({
   if (!speedLimitsTagsList.length) return null;
 
   return (
-    <div className="osrd-config-item mb-3">
+    <div className="osrd-config-item">
       <div
         className={
           (cx('osrd-config-item-container', {

@@ -1,7 +1,12 @@
 import type { Feature, Position } from 'geojson';
 
 import type { PowerRestriction } from 'applications/operationalStudies/types';
-import type { AllowanceValue, ArrivalTimeTypes, StdcmStopTypes } from 'applications/stdcm/types';
+import type {
+  AllowanceValue,
+  ArrivalTimeTypes,
+  LinkedPaths,
+  StdcmStopTypes,
+} from 'applications/stdcm/types';
 import type {
   Comfort,
   Distribution,
@@ -51,6 +56,7 @@ export interface OsrdStdcmConfState extends OsrdConfState {
   totalLength?: number;
   maxSpeed?: number;
   towedRollingStockID?: number;
+  linkedPaths: LinkedPaths;
 }
 
 export type PathStep = PathItemLocation & {

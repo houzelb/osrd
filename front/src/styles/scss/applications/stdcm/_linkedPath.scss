@@ -1,0 +1,81 @@
+.stdcm-linked-path-search-container {
+  align-self: flex-end;
+
+  &.anterior-linked-path {
+    margin-bottom: 18px;
+  }
+
+  &.posterior-linked-path {
+    margin-top: 18px;
+  }
+
+  .stdcm-card__header {
+    button {
+      font-size: 0.875rem;
+      color: var(--primary60);
+      font-weight: 500;
+    }
+  }
+
+  .linked-path {
+    .stdcm-linked-path-button {
+      text-align: center;
+      width: 402px;
+      height: 40px;
+      background-color: var(--grey10);
+      color: var(--primary50);
+      border-radius: 6px;
+      margin: 21px 0 13px 15px;
+      &.white {
+        background-color: var(--white);
+      }
+      .stdcm-linked-path-loading {
+        color: var(--primary90);
+        align-self: center;
+      }
+    }
+
+    .stdcm-linked-path-results {
+      padding: 10px 17px 0;
+      border-top: 1px solid var(--grey20);
+      margin-top: 21px;
+
+      .linked-path-result-infos {
+        width: 100%;
+        margin-bottom: 7px;
+
+        &:not(:first-child) {
+          padding-top: 12px;
+          border-top: 1px solid var(--grey20);
+        }
+
+        .train-name {
+          font-size: 1rem;
+          padding-top: 4px;
+          margin-bottom: 4px;
+        }
+        .opDetails {
+          font-size: 0.875rem;
+          line-height: 20px;
+          margin-bottom: 4px;
+
+          &:not(:last-child) {
+            margin-right: 8px;
+          }
+
+          &.grey50 {
+            color: var(--grey50);
+          }
+
+          &.grey80 {
+            color: var(--grey80);
+          }
+
+          &.info60 {
+            color: var(--info60);
+          }
+        }
+      }
+    }
+  }
+}

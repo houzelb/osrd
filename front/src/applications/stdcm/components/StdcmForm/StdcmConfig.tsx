@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Button } from '@osrd-project/ui-core';
+import { ArrowDown, ArrowUp } from '@osrd-project/ui-icons';
 import cx from 'classnames';
 import { compact } from 'lodash';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +16,7 @@ import { useAppDispatch } from 'store';
 
 import StdcmConsist from './StdcmConsist';
 import StdcmDestination from './StdcmDestination';
+import StdcmLinkedPathSearch from './StdcmLinkedPathSearch';
 import StdcmOrigin from './StdcmOrigin';
 import useStaticPathfinding from '../../hooks/useStaticPathfinding';
 import type { StdcmConfigErrors } from '../../types';
@@ -139,35 +141,49 @@ const StdcmConfig = ({
           <StdcmSimulationParams {...{ disabled, projectID, studyID, scenarioID }} />
         </div>
       )}
-
       <div className="d-flex">
-        <div className="stdcm-simulation-inputs">
-          <div className="stdcm-consist-container">
-            <StdcmConsist disabled={disabled} />
-          </div>
-          <div className="stdcm__separator" />
-          <div className="stdcm-simulation-itinerary">
-            {/* //TODO: use them when we implement this feature #403 */}
-            {/* <StdcmDefaultCard text="Indiquer le sillon antérieur" Icon={<ArrowUp size="lg" />} /> */}
-            <StdcmOrigin disabled={disabled} />
-            <StdcmVias disabled={disabled} />
-            <StdcmDestination disabled={disabled} />
-            {/* <StdcmDefaultCard text="Indiquer le sillon postérieur" Icon={<ArrowDown size="lg" />} /> */}
-            <div
-              className={cx('stdcm-launch-request', {
-                'wizz-effect': pathfinding?.status !== 'success' || formErrors,
-              })}
-            >
-              {showBtnToLaunchSimulation && (
-                <Button label={t('simulation.getSimulation')} onClick={startSimulation} />
-              )}
-              {formErrors && (
-                <StdcmWarningBox
-                  errorInfos={formErrors}
-                  removeOriginArrivalTime={removeOriginArrivalTime}
-                  removeDestinationArrivalTime={removeDestinationArrivalTime}
-                />
-              )}
+        <div className="d-flex flex-column">
+          <StdcmLinkedPathSearch
+            disabled={disabled}
+            defaultCardText={t('indicateAnteriorPath')}
+            cardName={t('trainPath.anteriorPath')}
+            cardIcon={<ArrowUp size="lg" />}
+            className="anterior-linked-path"
+            linkedOp={{ extremityType: 'destination', id: origin.id }}
+          />
+          <div className="stdcm-simulation-inputs">
+            <div className="stdcm-consist-container">
+              <StdcmConsist disabled={disabled} />
+            </div>
+            <div className="stdcm__separator" />
+            <div className="stdcm-simulation-itinerary">
+              <StdcmOrigin disabled={disabled} />
+              <StdcmVias disabled={disabled} />
+              <StdcmDestination disabled={disabled} />
+              <StdcmLinkedPathSearch
+                disabled={disabled}
+                defaultCardText={t('indicatePosteriorPath')}
+                cardName={t('trainPath.posteriorPath')}
+                cardIcon={<ArrowDown size="lg" />}
+                className="posterior-linked-path"
+                linkedOp={{ extremityType: 'origin', id: destination.id }}
+              />
+              <div
+                className={cx('stdcm-launch-request', {
+                  'wizz-effect': pathfinding?.status !== 'success' || formErrors,
+                })}
+              >
+                {showBtnToLaunchSimulation && (
+                  <Button label={t('simulation.getSimulation')} onClick={startSimulation} />
+                )}
+                {formErrors && (
+                  <StdcmWarningBox
+                    errorInfos={formErrors}
+                    removeOriginArrivalTime={removeOriginArrivalTime}
+                    removeDestinationArrivalTime={removeDestinationArrivalTime}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -182,7 +198,6 @@ const StdcmConfig = ({
             simulationPathSteps={pathSteps}
           />
         </div>
-        <div />
       </div>
     </div>
   );

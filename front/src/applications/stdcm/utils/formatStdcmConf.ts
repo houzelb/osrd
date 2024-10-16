@@ -17,7 +17,6 @@ import { ISO8601Duration2sec, sec2ms } from 'utils/timeManipulation';
 
 import createMargin from './createMargin';
 
-// TODO: DROP STDCM V1: remove formattedStartTime, startTime and latestStartTime
 type ValidStdcmConfig = {
   rollingStockId: number;
   towedRollingStockID?: number;

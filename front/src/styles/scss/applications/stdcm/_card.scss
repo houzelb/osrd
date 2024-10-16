@@ -18,15 +18,15 @@
     }
     .icon-bundle {
       img {
-        width: 2.8125rem;
+        width: 45px;
       }
     }
     .icon-index {
       position: absolute;
-      width: 2.812rem;
+      width: 44.992px;
       text-align: center;
-      right: 1.02rem;
-      top: 0.32rem;
+      right: 16.32px;
+      top: 5.12px;
       font-size: 0.7rem;
     }
   }
@@ -35,7 +35,7 @@
     content: '';
     position: absolute;
     top: 100%;
-    left: 0.75rem;
+    left: 12px;
     border-top: 8px solid transparent;
     border-top-color: rgba(255, 255, 255, 1);
     border-left: 12px solid transparent;
@@ -48,32 +48,38 @@
     box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.75) inset;
     background-color: rgba(235, 235, 234, 1);
     color: rgba(0, 0, 0, 1);
-    font-size: 18px;
+    font-size: 1.125rem;
     font-weight: 600;
     letter-spacing: 0px;
     text-align: left;
     line-height: 24px;
     padding: 7px 16px 0px 16px;
-    height: 2.5rem;
+    height: 40px;
     span {
       padding-bottom: 6px;
     }
   }
 
   .stdcm-card__body {
-    padding: 0.875rem 1.5rem 1.5rem 0.5rem;
+    padding: 14px 24px 24px 8px;
+
+    &.add-linked-path,
+    &.linked-path {
+      width: 450px;
+      padding: 11px 8px 13px;
+    }
 
     .stdcm-simulation-params {
-      height: 7.1875rem;
-      padding-left: 1rem;
+      height: 115px;
+      padding-left: 16px;
     }
 
     .location-line {
-      padding-left: 1rem;
+      padding-left: 16px;
       display: flex;
 
       .ci-input {
-        padding-inline: 0 0.625rem;
+        padding-inline: 0 10px;
       }
     }
 
@@ -88,20 +94,20 @@
 
     .date-picker {
       .feed-back {
-        padding-inline: 1rem 0.625rem;
+        padding-inline: 16px 10px;
       }
     }
 
     .time-picker {
       .feed-back {
-        padding-right: 0.625rem;
-        width: 7.5rem;
+        padding-right: 10px;
+        width: 120px;
       }
     }
 
     .tolerance-picker {
       .feed-back {
-        width: 7.5rem;
+        width: 120px;
       }
     }
 
@@ -109,14 +115,14 @@
       .suggestions-list {
         width: 99%;
         left: 0;
-        margin-top: 1rem;
+        margin-top: 16px;
       }
     }
 
     // cards styles
     &.consist {
-      padding-left: 1.5rem;
-      padding-bottom: 0.5rem;
+      padding-left: 24px;
+      padding-bottom: 15px;
 
       .towed-rolling-stock {
         margin-top: 0.6875rem;
@@ -124,12 +130,19 @@
 
       .stdcm-consist__properties {
         display: grid;
-        grid-template-columns: 7.4375rem 7.938rem;
+        grid-template-columns: 119px 127.008px;
         justify-content: space-between;
-        padding-block: 0.6875rem;
+        padding-block: 8px;
 
         .osrd-config-item {
-          padding-right: 0.188rem;
+          padding-right: 3.008px;
+        }
+        .weight {
+          width: 119px;
+        }
+
+        .length {
+          width: 127px;
         }
 
         * > .base-label-wrapper > label {
@@ -138,51 +151,51 @@
       }
 
       .speed-limit-by-tag-selector {
-        padding-right: 0.1875rem;
+        padding-right: 3px;
       }
     }
 
     &.extremity {
-      padding-bottom: 1.5rem;
+      padding-bottom: 24px;
 
       .arrival-type-select {
-        padding: 2.125rem 0 0 1rem;
+        padding: 34px 0 0 16px;
       }
 
       .schedule {
         display: flex;
         flex-direction: row;
-        padding-top: 1rem;
+        padding-top: 16px;
       }
     }
 
     &.via {
-      padding-right: 0.5rem;
-      padding-bottom: 0.8125rem;
+      padding-right: 8px;
+      padding-bottom: 13px;
 
       .location-line {
-        padding-right: 1rem;
+        padding-right: 16px;
       }
 
       .stop-type-selector {
-        padding: 0.8125rem 1rem;
+        padding: 13px 16px;
       }
 
       .stop-time {
         .feed-back {
-          padding: 0 1rem 0.8125rem 1rem;
+          padding: 0 16px 13px 16px;
         }
       }
     }
 
     &.add-via {
-      padding: 0.6875rem 1.5rem 0.8125rem 0.75rem;
+      padding: 11px 24px 13px 12px;
     }
 
     .stdcm-default-card-button {
       color: var(--primary60);
-      line-height: 1.5rem;
-      margin-left: 0.75rem;
+      line-height: 24px;
+      margin-left: 12px;
     }
 
     button:focus {
@@ -197,7 +210,7 @@
   }
 
   &-via-button {
-    padding: 0.5rem;
+    padding: 8px;
   }
 }
 

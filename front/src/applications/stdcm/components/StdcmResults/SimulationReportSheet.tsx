@@ -16,6 +16,7 @@ import type { SimulationReportSheetProps } from '../../types';
 import { base64ToJpeg, getStopDurationTime } from '../../utils/formatSimulationReportSheet';
 
 const SimulationReportSheet = ({
+  stdcmLinkedPaths,
   stdcmData,
   consist,
   simulationReportSheetNumber,
@@ -26,6 +27,7 @@ const SimulationReportSheet = ({
   let renderedIndex = 0;
 
   const { rollingStock, speedLimitByTag, departure_time: departureTime, creationDate } = stdcmData;
+  const { anteriorPath, posteriorPath } = stdcmLinkedPaths;
 
   const convoyMass = consist?.totalMass ?? rollingStock.mass / 1000;
   const convoyLength = consist?.totalLength ?? rollingStock.length;
@@ -158,8 +160,13 @@ const SimulationReportSheet = ({
               <View style={styles.convoyAndRoute.fromBox}>
                 <Text style={styles.convoyAndRoute.from}>{t('from')}</Text>
               </View>
-              <Text style={styles.convoyAndRoute.fromNumber}>{fakeInformation.path_number1}</Text>
-              <Text style={styles.convoyAndRoute.fromScheduled} />
+              <Text style={styles.convoyAndRoute.fromNumber}>
+                {anteriorPath?.trainName || fakeInformation.path_number1}
+              </Text>
+              <Text style={styles.convoyAndRoute.fromScheduled}>
+                {anteriorPath &&
+                  t('scheduledArrival', { date: anteriorPath.date, time: anteriorPath.time })}
+              </Text>
             </View>
             <View style={styles.convoyAndRoute.stopTableContainer}>
               <Table style={styles.convoyAndRoute.stopTable}>
@@ -228,8 +235,13 @@ const SimulationReportSheet = ({
             </View>
             {/* TODO: Add path number and date from reference path when it becomes avalaible */}
             <View style={styles.convoyAndRoute.forBanner}>
-              <Text style={styles.convoyAndRoute.forScheduled} />
-              <Text style={styles.convoyAndRoute.forNumber}>{fakeInformation.path_number2}</Text>
+              <Text style={styles.convoyAndRoute.forScheduled}>
+                {posteriorPath &&
+                  t('scheduledDeparture', { date: posteriorPath.date, time: posteriorPath.time })}
+              </Text>
+              <Text style={styles.convoyAndRoute.forNumber}>
+                {posteriorPath?.trainName || fakeInformation.path_number2}
+              </Text>
               <View style={styles.convoyAndRoute.forBox}>
                 <Text style={styles.convoyAndRoute.for}>{t('for')}</Text>
               </View>
