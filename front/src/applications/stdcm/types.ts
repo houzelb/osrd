@@ -4,6 +4,7 @@ import type {
 } from 'applications/operationalStudies/types';
 import type { STDCM_REQUEST_STATUS } from 'applications/stdcm/consts';
 import type {
+  GeoJsonPoint,
   LightRollingStock,
   PostTimetableByIdStdcmApiResponse,
   RollingStockWithLiveries,
@@ -28,6 +29,7 @@ export type StdcmSuccessResponse = Omit<
 };
 
 export type SimulationReportSheetProps = {
+  stdcmLinkedPaths: LinkedPaths;
   stdcmData: StdcmSuccessResponse;
   consist: StdcmSimulationInputs['consist'];
   simulationReportSheetNumber: string;
@@ -54,6 +56,19 @@ export type StdcmResults = {
   stdcmResponse: StdcmSuccessResponse;
   speedSpaceChartData: SpeedSpaceChartData | null;
   spaceTimeData: TrainSpaceTimeData[] | null;
+};
+
+export type LinkedPaths = {
+  anteriorPath?: {
+    date: string;
+    time: string;
+    trainName: string;
+  };
+  posteriorPath?: {
+    date: string;
+    time: string;
+    trainName: string;
+  };
 };
 
 export type AllowanceValue =
@@ -85,6 +100,7 @@ export type StdcmSimulationInputs = {
     maxSpeed?: number;
     speedLimitByTag?: string;
   };
+  linkedPaths: LinkedPaths;
 };
 
 export type StdcmSimulationOutputs = {
@@ -134,3 +150,23 @@ export enum StdcmStopTypes {
   DRIVER_SWITCH = 'driverSwitch',
   SERVICE_STOP = 'serviceStop',
 }
+
+export type StdcmLinkedPathStep = {
+  ch: string;
+  date: string;
+  geographic: GeoJsonPoint;
+  isoArrivalTime: string;
+  name: string;
+  obj_id: string;
+  time: string;
+  trigram: string;
+  uic: number;
+};
+
+export type StdcmLinkedPathResult = {
+  destination: StdcmLinkedPathStep;
+  origin: StdcmLinkedPathStep;
+  trainName: string;
+};
+
+export type ExtremityPathStepType = 'origin' | 'destination';

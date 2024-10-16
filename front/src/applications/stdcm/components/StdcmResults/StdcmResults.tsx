@@ -89,6 +89,7 @@ const StcdmResults = ({
                   <PDFDownloadLink
                     document={
                       <SimulationReportSheet
+                        stdcmLinkedPaths={selectedSimulation.inputs.linkedPaths}
                         stdcmData={selectedSimulation.outputs.results}
                         consist={selectedSimulation.inputs.consist}
                         simulationReportSheetNumber={simulationReportSheetNumber}

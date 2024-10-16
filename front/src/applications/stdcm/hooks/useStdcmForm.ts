@@ -11,18 +11,27 @@ import { extractDateAndTimefromISO } from 'utils/date';
 import type { StdcmSimulationInputs } from '../types';
 
 const useStdcmForm = (): StdcmSimulationInputs => {
-  const { getStdcmPathSteps, getSpeedLimitByTag, getTotalMass, getTotalLength, getMaxSpeed } =
-    useOsrdConfSelectors() as StdcmConfSelectors;
+  const {
+    getStdcmPathSteps,
+    getSpeedLimitByTag,
+    getTotalMass,
+    getTotalLength,
+    getMaxSpeed,
+    getLinkedPaths,
+    getStdcmOrigin,
+  } = useOsrdConfSelectors() as StdcmConfSelectors;
+
   const pathSteps = useSelector(getStdcmPathSteps);
   const speedLimitByTag = useSelector(getSpeedLimitByTag);
   const totalMass = useSelector(getTotalMass);
   const totalLength = useSelector(getTotalLength);
   const maxSpeed = useSelector(getMaxSpeed);
+  const linkedPaths = useSelector(getLinkedPaths);
+  const origin = useSelector(getStdcmOrigin);
   const { rollingStock } = useStoreDataForRollingStockSelector();
   const towedRollingStock = useStdcmTowedRollingStock();
 
   const currentSimulationInputs = useMemo(() => {
-    const origin = pathSteps.at(0);
     const originArrival = origin?.arrival ? extractDateAndTimefromISO(origin.arrival) : undefined;
 
     return {
@@ -37,6 +46,7 @@ const useStdcmForm = (): StdcmSimulationInputs => {
         maxSpeed,
         speedLimitByTag,
       },
+      linkedPaths,
     };
   }, [
     pathSteps,
@@ -46,6 +56,7 @@ const useStdcmForm = (): StdcmSimulationInputs => {
     totalMass,
     totalLength,
     maxSpeed,
+    linkedPaths,
   ]);
 
   return currentSimulationInputs;

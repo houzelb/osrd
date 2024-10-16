@@ -2,7 +2,12 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { Draft } from 'immer';
 import nextId from 'react-id-generator';
 
-import { ArrivalTimeTypes, StdcmStopTypes } from 'applications/stdcm/types';
+import {
+  ArrivalTimeTypes,
+  StdcmStopTypes,
+  type ExtremityPathStepType,
+  type StdcmLinkedPathStep,
+} from 'applications/stdcm/types';
 import { defaultCommonConf, buildCommonConfReducers } from 'reducers/osrdconf/osrdConfCommon';
 import type { OsrdStdcmConfState, StdcmPathStep } from 'reducers/osrdconf/types';
 import { addElementAtIndex } from 'utils/array';
@@ -19,6 +24,10 @@ export const stdcmConfInitialState: OsrdStdcmConfState = {
   totalLength: undefined,
   maxSpeed: undefined,
   towedRollingStockID: undefined,
+  linkedPaths: {
+    anteriorPath: undefined,
+    posteriorPath: undefined,
+  },
   ...defaultCommonConf,
 };
 
@@ -143,6 +152,42 @@ export const stdcmConfSlice = createSlice({
       state.stdcmPathSteps = state.stdcmPathSteps.filter(
         (pathStep) => pathStep.id !== action.payload
       );
+    },
+    updateLinkedPathStep(
+      state: Draft<OsrdStdcmConfState>,
+      action: PayloadAction<{
+        linkedPathStep: ExtremityPathStepType;
+        trainName: string;
+        pathStep: StdcmLinkedPathStep;
+        pathStepId: string;
+      }>
+    ) {
+      const { linkedPathStep, trainName, pathStep, pathStepId } = action.payload;
+      const { name, ch, uic, geographic, isoArrivalTime, date, time, trigram } = pathStep;
+      const newPathStep = {
+        name,
+        ch,
+        id: pathStepId,
+        uic,
+        coordinates: geographic.coordinates,
+        arrival: isoArrivalTime,
+        trigram,
+        ...(linkedPathStep === 'origin' && { arrivalType: ArrivalTimeTypes.PRECISE_TIME }),
+      };
+
+      const newLinkedPath = { date, time, trainName };
+
+      if (linkedPathStep === 'destination') {
+        state.linkedPaths.anteriorPath = newLinkedPath;
+      } else {
+        state.linkedPaths.posteriorPath = newLinkedPath;
+      }
+      const newPathSteps = state.stdcmPathSteps.map((step) =>
+        step.id === action.payload.pathStepId
+          ? ({ ...step, ...newPathStep } as StdcmPathStep)
+          : step
+      );
+      state.stdcmPathSteps = newPathSteps;
     },
   },
 });

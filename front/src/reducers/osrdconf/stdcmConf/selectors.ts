@@ -34,6 +34,7 @@ const buildStdcmConfSelectors = () => {
       }
       return destination!;
     },
+    getLinkedPaths: makeOsrdConfSelector('linkedPaths'),
   };
 };
 

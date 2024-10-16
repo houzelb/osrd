@@ -3,7 +3,7 @@ import { useEffect, useMemo } from 'react';
 import { Select, ComboBox } from '@osrd-project/ui-core';
 import { useTranslation } from 'react-i18next';
 
-import type { SearchResultItemOperationalPoint } from 'common/api/osrdEditoastApi';
+import { type SearchResultItemOperationalPoint } from 'common/api/osrdEditoastApi';
 import useSearchOperationalPoint from 'common/Map/Search/useSearchOperationalPoint';
 import { useOsrdConfActions } from 'common/osrdContext';
 import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';

@@ -244,7 +244,8 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
       const newPoint = action.payload
         ? {
             ...action.payload,
-            arrivalType: prevOriginArrivalType || ArrivalTimeTypes.PRECISE_TIME,
+            arrivalType:
+              action.payload.arrivalType || prevOriginArrivalType || ArrivalTimeTypes.PRECISE_TIME,
           }
         : null;
       state.pathSteps = updateOriginPathStep(state.pathSteps, newPoint, true);
@@ -254,7 +255,8 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
       const newPoint = action.payload
         ? {
             ...action.payload,
-            arrivalType: prevDestinationArrivalType || ArrivalTimeTypes.ASAP,
+            arrivalType:
+              action.payload.arrivalType || prevDestinationArrivalType || ArrivalTimeTypes.ASAP,
           }
         : null;
       state.pathSteps = updateDestinationPathStep(state.pathSteps, newPoint, true);

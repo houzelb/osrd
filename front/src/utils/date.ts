@@ -172,6 +172,13 @@ export function addDurationToIsoDate(
   return dayjs(startTime).add(ISO8601Duration2sec(duration), 'second').format();
 }
 
+export function substractDurationToIsoDate(
+  startTime: IsoDateTimeString,
+  duration: IsoDurationString
+): IsoDateTimeString {
+  return dayjs(startTime).subtract(ISO8601Duration2sec(duration), 'second').format();
+}
+
 /**
  * Parses a date string in 'DD/MM/YYYY HH:mm:ss' format to a Date object.
  * @param {string} dateTime - The date-time string to be parsed.
@@ -198,10 +205,10 @@ export function serializeDateTimeWithoutYear(date: Date): string {
  * @param {string} arrivalTime - Arrival time at which the train should arrive at the location. (Format: 'YYYY-MM-DDTHH:mm:ss+HH:mm')
  * @returns {object} An object containing the parsed date and time.
  */
-export function extractDateAndTimefromISO(arrivalTime: string) {
+export function extractDateAndTimefromISO(arrivalTime: string, dateFormat: string = 'YYYY-MM-DD') {
   const dayjsDate = dayjs(arrivalTime);
   return {
-    arrivalDate: dayjsDate.format('YYYY-MM-DD'), // ISO date part
+    arrivalDate: dayjsDate.format(dateFormat), // ISO date part
     arrivalTime: dayjsDate.format('HH:mm'), // ISO time part
     arrivalTimehours: dayjsDate.hour(),
     arrivalTimeMinutes: dayjsDate.minute(),
@@ -242,3 +249,8 @@ export const formatDateString = (date?: Date | null) => {
   if (!date) return '';
   return dayjs(date).format('DD/MM/YY');
 };
+
+export const formatLocaleDate = (date: Date) => date.toLocaleString().substring(0, 10);
+
+export const isEqualDate = (searchDate: Date, startDate: Date) =>
+  formatLocaleDate(searchDate) === formatLocaleDate(startDate);
