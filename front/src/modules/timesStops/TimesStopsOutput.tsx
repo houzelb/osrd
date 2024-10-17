@@ -59,7 +59,7 @@ const TimesStopsOutput = ({
           'warning-margin': negativeDiffMargins,
         });
       }}
-      headerRowHeight={65}
+      headerRowHeight={40}
     />
   );
 };

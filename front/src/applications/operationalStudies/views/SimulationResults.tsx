@@ -211,6 +211,7 @@ const SimulationResults = ({
         operationalPoints &&
         infraId && (
           <div className="time-stop-outputs">
+            <p className="mt-2 mb-3 ml-3 font-weight-bold">{t('timetableOutput')}</p>
             <TimesStopsOutput
               simulatedTrain={trainSimulation}
               pathProperties={pathProperties}
