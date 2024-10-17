@@ -86,7 +86,8 @@ impl<'de> Deserialize<'de> for TemporarySpeedLimitItemForm {
             obj_id,
         } = Internal::deserialize(deserializer)?;
 
-        // Check dates
+        // Validation checks
+
         if end_date_time <= start_date_time {
             return Err(SerdeError::custom(format!(
                 "The temporary_speed_limit start date '{}' must be before the end date '{}'",
@@ -172,9 +173,13 @@ async fn create_temporary_speed_limit_group(
 #[cfg(test)]
 mod tests {
     use crate::{
-        models::temporary_speed_limits::TemporarySpeedLimitGroup, List, Retrieve, SelectionSettings,
+        models::temporary_speed_limits::TemporarySpeedLimitGroup, views::test_app::TestApp, List,
+        Retrieve, SelectionSettings,
     };
     use axum::http::StatusCode;
+    use axum_test::TestRequest;
+    use chrono::{Duration, NaiveDateTime, Utc};
+    use editoast_schemas::infra::{Direction, DirectionalTrackRange};
     use rstest::rstest;
     use serde_json::json;
     use uuid::Uuid;
@@ -186,6 +191,94 @@ mod tests {
         },
     };
 
+    struct TimePeriod {
+        start_date_time: NaiveDateTime,
+        end_date_time: NaiveDateTime,
+    }
+
+    impl TestApp {
+        fn create_temporary_speed_limit_group_request(
+            &self,
+            RequestParameters {
+                group_name,
+                obj_id,
+                time_period:
+                    TimePeriod {
+                        start_date_time,
+                        end_date_time,
+                    },
+                track_ranges,
+            }: RequestParameters,
+        ) -> TestRequest {
+            self.post("/temporary_speed_limit_group").json(&json!(
+                    {
+                        "speed_limit_group_name": group_name,
+                        "speed_limits": [                    {
+                            "start_date_time": start_date_time,
+                            "end_date_time": end_date_time,
+                            "track_ranges": track_ranges,
+                            "speed_limit": 80.,
+                            "obj_id": obj_id,
+                        }]
+                    }
+            ))
+        }
+    }
+
+    struct RequestParameters {
+        group_name: String,
+        obj_id: String,
+        time_period: TimePeriod,
+        track_ranges: Vec<DirectionalTrackRange>,
+    }
+
+    impl RequestParameters {
+        fn new() -> Self {
+            RequestParameters {
+                group_name: Uuid::new_v4().to_string(),
+                obj_id: Uuid::new_v4().to_string(),
+                time_period: TimePeriod {
+                    start_date_time: Utc::now().naive_utc(),
+                    end_date_time: Utc::now().naive_utc() + Duration::days(1),
+                },
+                track_ranges: vec![
+                    DirectionalTrackRange {
+                        track: "TA0".into(),
+                        begin: 0.,
+                        end: 2000.,
+                        direction: Direction::StartToStop,
+                    },
+                    DirectionalTrackRange {
+                        track: "TA1".into(),
+                        begin: 0.,
+                        end: 1950.,
+                        direction: Direction::StartToStop,
+                    },
+                ],
+            }
+        }
+
+        fn with_group_name(mut self, group_name: String) -> Self {
+            self.group_name = group_name;
+            self
+        }
+
+        fn with_obj_id(mut self, obj_id: String) -> Self {
+            self.obj_id = obj_id;
+            self
+        }
+
+        fn with_time_period(mut self, time_period: TimePeriod) -> Self {
+            self.time_period = time_period;
+            self
+        }
+
+        fn with_track_ranges(mut self, track_ranges: Vec<DirectionalTrackRange>) -> Self {
+            self.track_ranges = track_ranges;
+            self
+        }
+    }
+
     #[rstest]
     async fn create_temporary_speed_limits_succeeds() {
         let app = TestAppBuilder::default_app();
@@ -193,26 +286,17 @@ mod tests {
 
         let group_name = Uuid::new_v4().to_string();
         let request_obj_id = Uuid::new_v4().to_string();
-        let request_speed_limit = 80.;
-        let request = app.post("/temporary_speed_limit_group").json(&json!(
-            {
-                "speed_limit_group_name": group_name,
-                "speed_limits": [
-                {
-                    "start_date_time": "2024-01-01T08:00:00",
-                    "end_date_time": "2024-01-01T09:00:00",
-                    "track_ranges": [],
-                    "speed_limit": request_speed_limit,
-                    "obj_id": request_obj_id,
-                }]
-            }
-        ));
+
+        let request = app.create_temporary_speed_limit_group_request(
+            RequestParameters::new()
+                .with_group_name(group_name.clone())
+                .with_obj_id(request_obj_id.clone()),
+        );
 
         // Speed limit group checks
 
         let TemporarySpeedLimitCreateResponse { group_id } =
             app.fetch(request).assert_status(StatusCode::OK).json_into();
-
         let created_group = TemporarySpeedLimitGroup::retrieve(&mut pool.get_ok(), group_id)
             .await
             .expect("Failed to retrieve the created temporary speed limit group")
@@ -239,52 +323,17 @@ mod tests {
         let app = TestAppBuilder::default_app();
 
         let group_name = Uuid::new_v4().to_string();
-        let request = app.post("/temporary_speed_limit_group").json(&json!(
-            {
-                "speed_limit_group_name": group_name,
-                "speed_limits": [
-                {
-                    "start_date_time": "2024-01-01T08:00:00",
-                    "end_date_time": "2024-01-01T09:00:00",
-                    "track_ranges": [],
-                    "speed_limit": 80,
-                    "obj_id": Uuid::new_v4().to_string(),
-                }]
-            }
-        ));
-
+        let request = app.create_temporary_speed_limit_group_request(
+            RequestParameters::new().with_group_name(group_name.clone()),
+        );
         let _ = app.fetch(request).assert_status(StatusCode::OK);
 
-        let request = app.post("/temporary_speed_limit_group").json(&json!(
-            {
-                "speed_limit_group_name": Uuid::new_v4().to_string(),
-                "speed_limits": [
-                {
-                    "start_date_time": "2024-01-01T08:00:00",
-                    "end_date_time": "2024-01-01T09:00:00",
-                    "track_ranges": [],
-                    "speed_limit": 80,
-                    "obj_id": Uuid::new_v4().to_string(),
-                }]
-            }
-        ));
-
+        let request = app.create_temporary_speed_limit_group_request(RequestParameters::new());
         let _ = app.fetch(request).assert_status(StatusCode::OK);
 
-        let request = app.post("/temporary_speed_limit_group").json(&json!(
-            {
-                "speed_limit_group_name": group_name,
-                "speed_limits": [
-                {
-                    "start_date_time": "2024-01-01T08:00:00",
-                    "end_date_time": "2024-01-01T09:00:00",
-                    "track_ranges": [],
-                    "speed_limit": 80,
-                    "obj_id": Uuid::new_v4().to_string(),
-                }]
-            }
-        ));
-
+        let request = app.create_temporary_speed_limit_group_request(
+            RequestParameters::new().with_group_name(group_name.clone()),
+        );
         let _ = app.fetch(request).assert_status(StatusCode::BAD_REQUEST);
     }
 
@@ -292,19 +341,28 @@ mod tests {
     async fn create_ltv_with_invalid_invalid_time_period_fails() {
         let app = TestAppBuilder::default_app();
 
-        let request = app.post("/temporary_speed_limit_group").json(&json!(
-            {
-                "speed_limit_group_name": Uuid::new_v4().to_string(),
-                "speed_limits": [
-                {
-                    "start_date_time": "2024-01-01T08:00:00",
-                    "end_date_time": "2023-01-01T09:00:00",
-                    "track_ranges": [],
-                    "speed_limit": 80,
-                    "obj_id": Uuid::new_v4().to_string(),
-                },
-            ]}
-        ));
+        let time_period = TimePeriod {
+            start_date_time: Utc::now().naive_utc() + Duration::days(1),
+            end_date_time: Utc::now().naive_utc(),
+        };
+
+        let request = app.create_temporary_speed_limit_group_request(
+            RequestParameters::new().with_time_period(time_period),
+        );
+
+        let _ = app
+            .fetch(request)
+            .assert_status(StatusCode::UNPROCESSABLE_ENTITY);
+    }
+
+    #[rstest]
+    #[ignore] // TODO is this something we want to enforce ?
+    async fn create_ltv_with_no_tracks_fails() {
+        let app = TestAppBuilder::default_app();
+
+        let request = app.create_temporary_speed_limit_group_request(
+            RequestParameters::new().with_track_ranges(vec![]),
+        );
 
         let _ = app
             .fetch(request)

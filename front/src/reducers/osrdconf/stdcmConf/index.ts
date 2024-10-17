@@ -68,6 +68,7 @@ export const stdcmConfSlice = createSlice({
           | 'timetableID'
           | 'electricalProfileSetId'
           | 'workScheduleGroupId'
+          | 'temporarySpeedLimitGroupId'
           | 'searchDatetimeWindow'
         >
       >
@@ -78,6 +79,9 @@ export const stdcmConfSlice = createSlice({
       state.searchDatetimeWindow = action.payload.searchDatetimeWindow;
       if (action.payload.workScheduleGroupId) {
         state.workScheduleGroupId = action.payload.workScheduleGroupId;
+      }
+      if (action.payload.temporarySpeedLimitGroupId) {
+        state.temporarySpeedLimitGroupId = action.payload.temporarySpeedLimitGroupId;
       }
     },
     updateOriginArrival(

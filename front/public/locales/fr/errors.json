@@ -50,6 +50,9 @@
       "ConnectionDoesNotExist": "Core: file d'attente de messages: connexion non établie",
       "PoolChannelFail": "Core: file d'attente de messages: erreur de pool des channels rabbitmq"
     },
+    "delimited_area": {
+      "InvalidLocations": "Certaines localisations sont invalides"
+    },
     "document": {
       "NotFound": "Document '{{document_key}}' non trouvé"
     },

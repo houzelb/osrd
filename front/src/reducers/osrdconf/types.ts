@@ -25,6 +25,7 @@ export interface OsrdConfState extends InfraState {
   timetableID?: number;
   electricalProfileSetId?: number;
   workScheduleGroupId?: number;
+  temporarySpeedLimitGroupId?: number;
   searchDatetimeWindow?: { begin: Date; end: Date };
   rollingStockID?: number;
   speedLimitByTag?: string;

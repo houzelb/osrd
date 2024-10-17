@@ -31,6 +31,8 @@ use crate::models::Scenario;
 use crate::models::Study;
 use crate::models::Tags;
 
+use super::temporary_speed_limits::TemporarySpeedLimitGroup;
+
 pub fn project_changeset(name: &str) -> Changeset<Project> {
     Project::changeset()
         .name(name.to_owned())
@@ -294,6 +296,17 @@ pub async fn create_work_schedule_group(conn: &mut DbConnection) -> WorkSchedule
         .create(conn)
         .await
         .expect("Failed to create empty work schedule group")
+}
+
+pub async fn create_temporary_speed_limit_group(
+    conn: &mut DbConnection,
+) -> TemporarySpeedLimitGroup {
+    TemporarySpeedLimitGroup::changeset()
+        .name("Empty temporary speed limit group".to_string())
+        .creation_date(Utc::now().naive_utc())
+        .create(conn)
+        .await
+        .expect("Failed to create empty temporary speed limit group")
 }
 
 pub async fn create_work_schedules_fixture_set(

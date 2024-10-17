@@ -6,6 +6,7 @@ export const addTagTypes = [
   'electrical_profiles',
   'infra',
   'rolling_stock',
+  'delimited_area',
   'pathfinding',
   'routes',
   'layers',
@@ -218,6 +219,16 @@ const injectedRtkApi = api
           params: { name: queryArg.name },
         }),
         invalidatesTags: ['infra'],
+      }),
+      getInfraByInfraIdDelimitedArea: build.query<
+        GetInfraByInfraIdDelimitedAreaApiResponse,
+        GetInfraByInfraIdDelimitedAreaApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/infra/${queryArg.infraId}/delimited_area`,
+          body: queryArg.body,
+        }),
+        providesTags: ['delimited_area'],
       }),
       getInfraByInfraIdErrors: build.query<
         GetInfraByInfraIdErrorsApiResponse,
@@ -1082,6 +1093,17 @@ export type PostInfraByInfraIdCloneApiArg = {
   infraId: number;
   /** The name of the new infra */
   name: string;
+};
+export type GetInfraByInfraIdDelimitedAreaApiResponse =
+  /** status 200 The track ranges between a list entries and exits. */ {
+    track_ranges: DirectionalTrackRange[];
+  };
+export type GetInfraByInfraIdDelimitedAreaApiArg = {
+  /** An existing infra ID */
+  infraId: number;
+  body: {
+    track_ranges: DirectionalTrackRange[];
+  };
 };
 export type GetInfraByInfraIdErrorsApiResponse =
   /** status 200 A paginated list of errors */ PaginationStats & {
@@ -3026,6 +3048,7 @@ export type StdcmSearchEnvironment = {
   infra_id: number;
   search_window_begin: string;
   search_window_end: string;
+  temporary_speed_limit_group_id?: number;
   timetable_id: number;
   work_schedule_group_id?: number;
 };
@@ -3034,6 +3057,7 @@ export type StdcmSearchEnvironmentCreateForm = {
   infra_id: number;
   search_window_begin: string;
   search_window_end: string;
+  temporary_speed_limit_group_id?: number | null;
   timetable_id: number;
   work_schedule_group_id?: number | null;
 };

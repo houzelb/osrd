@@ -31,6 +31,7 @@ type ValidStdcmConfig = {
   gridMarginBefore?: number;
   gridMarginAfter?: number;
   workScheduleGroupId?: number;
+  temporarySpeedLimitGroupId?: number;
   electricalProfileSetId?: number;
 };
 
@@ -51,6 +52,7 @@ export const checkStdcmConf = (
     gridMarginAfter,
     searchDatetimeWindow,
     workScheduleGroupId,
+    temporarySpeedLimitGroupId,
     electricalProfileSetId,
     totalLength,
     totalMass,
@@ -195,6 +197,7 @@ export const checkStdcmConf = (
     gridMarginBefore,
     gridMarginAfter,
     workScheduleGroupId,
+    temporarySpeedLimitGroupId,
     electricalProfileSetId,
   };
 };
@@ -219,6 +222,7 @@ export const formatStdcmPayload = (
     time_gap_after: toMsOrUndefined(validConfig.gridMarginBefore),
     time_gap_before: toMsOrUndefined(validConfig.gridMarginAfter),
     work_schedule_group_id: validConfig.workScheduleGroupId,
+    temporary_speed_limit_group_id: validConfig.temporarySpeedLimitGroupId,
     electrical_profile_set_id: validConfig.electricalProfileSetId,
   },
 });

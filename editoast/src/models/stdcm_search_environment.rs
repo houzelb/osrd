@@ -30,6 +30,9 @@ pub struct StdcmSearchEnvironment {
     pub timetable_id: i64,
     pub search_window_begin: NaiveDateTime,
     pub search_window_end: NaiveDateTime,
+    #[schema(nullable = false)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub temporary_speed_limit_group_id: Option<i64>,
 }
 
 impl StdcmSearchEnvironment {
@@ -69,9 +72,10 @@ pub mod test {
     use super::*;
     use crate::models::electrical_profiles::ElectricalProfileSet;
     use crate::models::fixtures::{
-        create_electrical_profile_set, create_empty_infra, create_timetable,
-        create_work_schedule_group,
+        create_electrical_profile_set, create_empty_infra, create_temporary_speed_limit_group,
+        create_timetable, create_work_schedule_group,
     };
+    use crate::models::temporary_speed_limits::TemporarySpeedLimitGroup;
     use crate::models::timetable::Timetable;
     use crate::models::work_schedules::WorkScheduleGroup;
     use crate::models::Infra;
@@ -80,16 +84,24 @@ pub mod test {
 
     pub async fn stdcm_search_env_fixtures(
         conn: &mut DbConnection,
-    ) -> (Infra, Timetable, WorkScheduleGroup, ElectricalProfileSet) {
+    ) -> (
+        Infra,
+        Timetable,
+        WorkScheduleGroup,
+        TemporarySpeedLimitGroup,
+        ElectricalProfileSet,
+    ) {
         let infra = create_empty_infra(conn).await;
         let timetable = create_timetable(conn).await;
         let work_schedule_group = create_work_schedule_group(conn).await;
+        let temporary_speed_limit_group = create_temporary_speed_limit_group(conn).await;
         let electrical_profile_set = create_electrical_profile_set(conn).await;
 
         (
             infra,
             timetable,
             work_schedule_group,
+            temporary_speed_limit_group,
             electrical_profile_set,
         )
     }
@@ -101,13 +113,19 @@ pub mod test {
             StdcmSearchEnvironment::count(&mut db_pool.get_ok(), Default::default())
                 .await
                 .expect("failed to count STDCM envs");
-        let (infra, timetable, work_schedule_group, electrical_profile_set) =
-            stdcm_search_env_fixtures(&mut db_pool.get_ok()).await;
+        let (
+            infra,
+            timetable,
+            work_schedule_group,
+            temporary_speed_limit_group,
+            electrical_profile_set,
+        ) = stdcm_search_env_fixtures(&mut db_pool.get_ok()).await;
 
         let changeset_1 = StdcmSearchEnvironment::changeset()
             .infra_id(infra.id)
             .electrical_profile_set_id(Some(electrical_profile_set.id))
             .work_schedule_group_id(Some(work_schedule_group.id))
+            .temporary_speed_limit_group_id(Some(temporary_speed_limit_group.id))
             .timetable_id(timetable.id)
             .search_window_begin(NaiveDate::from_ymd_opt(2024, 1, 1).unwrap().into())
             .search_window_end(NaiveDate::from_ymd_opt(2024, 1, 15).unwrap().into());
@@ -158,13 +176,19 @@ pub mod test {
         StdcmSearchEnvironment::delete_all(&mut db_pool.get_ok())
             .await
             .expect("failed to delete envs");
-        let (infra, timetable, work_schedule_group, electrical_profile_set) =
-            stdcm_search_env_fixtures(&mut db_pool.get_ok()).await;
+        let (
+            infra,
+            timetable,
+            work_schedule_group,
+            temporary_speed_limit_group,
+            electrical_profile_set,
+        ) = stdcm_search_env_fixtures(&mut db_pool.get_ok()).await;
 
         let too_old = StdcmSearchEnvironment::changeset()
             .infra_id(infra.id)
             .electrical_profile_set_id(Some(electrical_profile_set.id))
             .work_schedule_group_id(Some(work_schedule_group.id))
+            .temporary_speed_limit_group_id(Some(temporary_speed_limit_group.id))
             .timetable_id(timetable.id)
             .search_window_begin(NaiveDate::from_ymd_opt(2024, 1, 1).unwrap().into())
             .search_window_end(NaiveDate::from_ymd_opt(2024, 1, 15).unwrap().into());

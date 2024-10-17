@@ -29,6 +29,7 @@ export default function useStdcmEnvironment() {
           timetableID: data.timetable_id,
           electricalProfileSetId: data.electrical_profile_set_id,
           workScheduleGroupId: data.work_schedule_group_id,
+          temporarySpeedLimitGroupId: data.temporary_speed_limit_group_id,
           searchDatetimeWindow: {
             begin: new Date(data.search_window_begin),
             end: new Date(data.search_window_end),

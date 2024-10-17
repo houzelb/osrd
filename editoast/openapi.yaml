@@ -674,6 +674,51 @@ paths:
                 minimum: 0
         '404':
           description: Infra ID not found
+  /infra/{infra_id}/delimited_area:
+    get:
+      tags:
+      - delimited_area
+      summary: Computes all tracks between a set of `entries` locations and a set of `exits` locations
+      description: |-
+        Returns any track between one of the `entries` and one of the `exits`, i.e. any track that can
+        be reached from an entry before reaching an exit.
+        To prevent a missing exit to cause the graph traversal to never stop exploring, the exploration
+        stops when a maximum distance is reached and no exit has been found.
+      parameters:
+      - name: infra_id
+        in: path
+        description: An existing infra ID
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - track_ranges
+              properties:
+                track_ranges:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/DirectionalTrackRange'
+        required: true
+      responses:
+        '200':
+          description: The track ranges between a list entries and exits.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - track_ranges
+                properties:
+                  track_ranges:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DirectionalTrackRange'
   /infra/{infra_id}/errors:
     get:
       tags:
@@ -3486,6 +3531,15 @@ components:
         force:
           type: boolean
           description: force the deletion even if it's used
+    DelimitedAreaResponse:
+      type: object
+      required:
+      - track_ranges
+      properties:
+        track_ranges:
+          type: array
+          items:
+            $ref: '#/components/schemas/DirectionalTrackRange'
     Detector:
       type: object
       required:
@@ -3519,6 +3573,22 @@ components:
           maxLength: 255
           minLength: 1
       additionalProperties: false
+    DirectedLocation:
+      type: object
+      required:
+      - track
+      - position
+      - direction
+      properties:
+        direction:
+          $ref: '#/components/schemas/Direction'
+        position:
+          type: number
+          format: double
+        track:
+          type: string
+          maxLength: 255
+          minLength: 1
     Direction:
       type: string
       enum:
@@ -4061,6 +4131,30 @@ components:
           type: string
           enum:
           - editoast:DatabaseAccessError
+    EditoastDelimitedAreaErrorInvalidLocations:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+          required:
+          - invalid_locations
+          properties:
+            invalid_locations:
+              type: array
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 400
+        type:
+          type: string
+          enum:
+          - editoast:delimited_area:InvalidLocations
     EditoastDocumentErrorsNotFound:
       type: object
       required:
@@ -4213,6 +4307,7 @@ components:
       - $ref: '#/components/schemas/EditoastCoreErrorGenericCoreError'
       - $ref: '#/components/schemas/EditoastCoreErrorUnparsableErrorOutput'
       - $ref: '#/components/schemas/EditoastDatabaseAccessErrorDatabaseAccessError'
+      - $ref: '#/components/schemas/EditoastDelimitedAreaErrorInvalidLocations'
       - $ref: '#/components/schemas/EditoastDocumentErrorsNotFound'
       - $ref: '#/components/schemas/EditoastEditionErrorInfraIsLocked'
       - $ref: '#/components/schemas/EditoastEditionErrorSplitTrackSectionBadOffset'
@@ -6538,6 +6633,33 @@ components:
         properties:
           state:
             $ref: '#/components/schemas/InfraState'
+    InputError:
+      oneOf:
+      - type: object
+        required:
+        - TrackDoesNotExist
+        properties:
+          TrackDoesNotExist:
+            type: string
+      - type: object
+        required:
+        - LocationOutOfBounds
+        properties:
+          LocationOutOfBounds:
+            type: object
+            required:
+            - track
+            - position
+            - track_length
+            properties:
+              position:
+                type: number
+                format: double
+              track:
+                type: string
+              track_length:
+                type: number
+                format: double
     InternalError:
       type: object
       required:
@@ -9916,6 +10038,9 @@ components:
         search_window_end:
           type: string
           format: date-time
+        temporary_speed_limit_group_id:
+          type: integer
+          format: int64
         timetable_id:
           type: integer
           format: int64
@@ -9943,6 +10068,10 @@ components:
         search_window_end:
           type: string
           format: date-time
+        temporary_speed_limit_group_id:
+          type: integer
+          format: int64
+          nullable: true
         timetable_id:
           type: integer
           format: int64
