@@ -1,5 +1,6 @@
 mod attached;
 mod auto_fixes;
+mod delimited_area;
 mod edition;
 mod errors;
 mod lines;
@@ -60,6 +61,7 @@ crate::routes! {
             &attached,
             &edition,
             &errors,
+            &delimited_area,
 
             get,
             "/load" => load,
@@ -77,6 +79,7 @@ crate::routes! {
 
 editoast_common::schemas! {
     pathfinding::schemas(),
+    delimited_area::schemas(),
     InfraState,
     InfraWithState,
 }

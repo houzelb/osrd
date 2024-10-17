@@ -608,6 +608,7 @@ diesel::table! {
         timetable_id -> Int8,
         search_window_begin -> Timestamptz,
         search_window_end -> Timestamptz,
+        temporary_speed_limit_group_id -> Nullable<Int8>,
     }
 }
 
@@ -799,6 +800,7 @@ diesel::joinable!(search_signal -> infra_object_signal (id));
 diesel::joinable!(search_study -> study (id));
 diesel::joinable!(stdcm_search_environment -> electrical_profile_set (electrical_profile_set_id));
 diesel::joinable!(stdcm_search_environment -> infra (infra_id));
+diesel::joinable!(stdcm_search_environment -> temporary_speed_limit_group (temporary_speed_limit_group_id));
 diesel::joinable!(stdcm_search_environment -> timetable (timetable_id));
 diesel::joinable!(stdcm_search_environment -> work_schedule_group (work_schedule_group_id));
 diesel::joinable!(study -> project (project_id));

@@ -40,6 +40,7 @@ struct StdcmSearchEnvironmentCreateForm {
     infra_id: i64,
     electrical_profile_set_id: Option<i64>,
     work_schedule_group_id: Option<i64>,
+    temporary_speed_limit_group_id: Option<i64>,
     timetable_id: i64,
     search_window_begin: NaiveDateTime, // TODO: move to DateTime<Utc>
     search_window_end: NaiveDateTime,
@@ -56,6 +57,7 @@ impl<'de> Deserialize<'de> for StdcmSearchEnvironmentCreateForm {
             infra_id: i64,
             electrical_profile_set_id: Option<i64>,
             work_schedule_group_id: Option<i64>,
+            temporary_speed_limit_group_id: Option<i64>,
             timetable_id: i64,
             search_window_begin: NaiveDateTime,
             search_window_end: NaiveDateTime,
@@ -74,6 +76,7 @@ impl<'de> Deserialize<'de> for StdcmSearchEnvironmentCreateForm {
             infra_id: internal.infra_id,
             electrical_profile_set_id: internal.electrical_profile_set_id,
             work_schedule_group_id: internal.work_schedule_group_id,
+            temporary_speed_limit_group_id: internal.temporary_speed_limit_group_id,
             timetable_id: internal.timetable_id,
             search_window_begin: internal.search_window_begin,
             search_window_end: internal.search_window_end,
@@ -87,6 +90,7 @@ impl From<StdcmSearchEnvironmentCreateForm> for Changeset<StdcmSearchEnvironment
             .infra_id(form.infra_id)
             .electrical_profile_set_id(form.electrical_profile_set_id)
             .work_schedule_group_id(form.work_schedule_group_id)
+            .temporary_speed_limit_group_id(form.temporary_speed_limit_group_id)
             .timetable_id(form.timetable_id)
             .search_window_begin(form.search_window_begin)
             .search_window_end(form.search_window_end)
@@ -172,13 +176,19 @@ pub mod tests {
         let app = TestAppBuilder::default_app();
         let pool = app.db_pool();
 
-        let (infra, timetable, work_schedule_group, electrical_profile_set) =
-            stdcm_search_env_fixtures(&mut pool.get_ok()).await;
+        let (
+            infra,
+            timetable,
+            work_schedule_group,
+            temporary_speed_limit_group,
+            electrical_profile_set,
+        ) = stdcm_search_env_fixtures(&mut pool.get_ok()).await;
 
         let form = StdcmSearchEnvironmentCreateForm {
             infra_id: infra.id,
             electrical_profile_set_id: Some(electrical_profile_set.id),
             work_schedule_group_id: Some(work_schedule_group.id),
+            temporary_speed_limit_group_id: Some(temporary_speed_limit_group.id),
             timetable_id: timetable.id,
             search_window_begin: NaiveDate::from_ymd_opt(2024, 1, 1).unwrap().into(),
             search_window_end: NaiveDate::from_ymd_opt(2024, 1, 15).unwrap().into(),
@@ -211,8 +221,13 @@ pub mod tests {
             .await
             .expect("failed to delete envs");
 
-        let (infra, timetable, work_schedule_group, electrical_profile_set) =
-            stdcm_search_env_fixtures(&mut pool.get_ok()).await;
+        let (
+            infra,
+            timetable,
+            work_schedule_group,
+            temporary_speed_limit_group,
+            electrical_profile_set,
+        ) = stdcm_search_env_fixtures(&mut pool.get_ok()).await;
 
         let begin = NaiveDate::from_ymd_opt(2024, 1, 1).unwrap().into();
         let end = NaiveDate::from_ymd_opt(2024, 1, 15).unwrap().into();
@@ -221,6 +236,7 @@ pub mod tests {
             .infra_id(infra.id)
             .electrical_profile_set_id(Some(electrical_profile_set.id))
             .work_schedule_group_id(Some(work_schedule_group.id))
+            .temporary_speed_limit_group_id(Some(temporary_speed_limit_group.id))
             .timetable_id(timetable.id)
             .search_window_begin(begin)
             .search_window_end(end)
@@ -244,6 +260,7 @@ pub mod tests {
                 infra_id: infra.id,
                 electrical_profile_set_id: Some(electrical_profile_set.id),
                 work_schedule_group_id: Some(work_schedule_group.id),
+                temporary_speed_limit_group_id: Some(temporary_speed_limit_group.id),
                 timetable_id: timetable.id,
                 search_window_begin: begin,
                 search_window_end: end,

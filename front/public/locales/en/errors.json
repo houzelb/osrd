@@ -51,6 +51,9 @@
       "PoolChannelFail": "Core: message queue: channel failure"
     },
     "DatabaseAccessError": "Database access fatal error",
+    "delimited_area": {
+      "InvalidLocations": "Some locations are invalid"
+    },
     "document": {
       "NotFound": "Document '{{document_key}}' not found"
     },
