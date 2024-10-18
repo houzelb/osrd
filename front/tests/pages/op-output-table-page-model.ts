@@ -14,7 +14,7 @@ class OperationalStudiesOutputTablePage {
   constructor(page: Page) {
     this.page = page;
     this.columnHeaders = page.locator(
-      '[class="dsg-cell dsg-cell-header"] .dsg-cell-header-container'
+      '.dsg-cell.dsg-cell-header:not(.dsg-cell-gutter) .dsg-cell-header-container'
     );
     this.tableRows = page.locator('.time-stop-outputs .time-stops-datasheet .dsg-row');
   }
@@ -69,9 +69,12 @@ class OperationalStudiesOutputTablePage {
         calculatedDeparture,
       ] = await Promise.all([
         await OperationalStudiesOutputTablePage.getCellValue(
-          cells.nth(headerIndexMap[translations.name])
+          cells.nth(headerIndexMap[translations.name]),
+          false
         ),
-        await OperationalStudiesOutputTablePage.getCellValue(cells.nth(headerIndexMap.Ch)),
+        await OperationalStudiesOutputTablePage.getCellValue(
+          cells.nth(headerIndexMap[translations.ch])
+        ),
         await OperationalStudiesOutputTablePage.getCellValue(
           cells.nth(headerIndexMap[translations.arrivalTime]),
           false
