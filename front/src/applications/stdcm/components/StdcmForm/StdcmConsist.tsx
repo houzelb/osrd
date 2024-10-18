@@ -3,13 +3,15 @@ import { useEffect } from 'react';
 import { Input, ComboBox } from '@osrd-project/ui-core';
 import { useTranslation } from 'react-i18next';
 
-import type { LightRollingStockWithLiveries } from 'common/api/osrdEditoastApi';
+import useStdcmTowedRollingStock from 'applications/stdcm/hooks/useStdcmTowedRollingStock';
+import type { LightRollingStockWithLiveries, TowedRollingStock } from 'common/api/osrdEditoastApi';
 import { useOsrdConfActions } from 'common/osrdContext';
 import SpeedLimitByTagSelector from 'common/SpeedLimitByTagSelector/SpeedLimitByTagSelector';
 import { useStoreDataForSpeedLimitByTagSelector } from 'common/SpeedLimitByTagSelector/useStoreDataForSpeedLimitByTagSelector';
 import RollingStock2Img from 'modules/rollingStock/components/RollingStock2Img';
 import { useStoreDataForRollingStockSelector } from 'modules/rollingStock/components/RollingStockSelector/useStoreDataForRollingStockSelector';
 import useFilterRollingStock from 'modules/rollingStock/hooks/useFilterRollingStock';
+import useFilterTowedRollingStock from 'modules/towedRollingStock/hooks/useFilterTowedRollingStock';
 import { type StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
 import { useAppDispatch } from 'store';
 
@@ -36,10 +38,12 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
   const { speedLimitByTag, speedLimitsByTags, dispatchUpdateSpeedLimitByTag } =
     useStoreDataForSpeedLimitByTagSelector({ isStdcm: true });
 
-  const { updateRollingStockID } = useOsrdConfActions() as StdcmConfSliceActions;
+  const { updateRollingStockID, updateTowedRollingStockID } =
+    useOsrdConfActions() as StdcmConfSliceActions;
   const dispatch = useAppDispatch();
 
   const { rollingStock } = useStoreDataForRollingStockSelector();
+  const towedRollingStock = useStdcmTowedRollingStock();
 
   const {
     totalMass,
@@ -52,6 +56,21 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
 
   const { filters, searchRollingStock, searchRollingStockById, filteredRollingStockList } =
     useFilterRollingStock({ isStdcm: true });
+
+  const {
+    filteredTowedRollingStockList,
+    searchTowedRollingStock,
+    searchTowedRollingStockById,
+    filters: towedRsFilters,
+  } = useFilterTowedRollingStock();
+
+  useEffect(() => {
+    if (towedRollingStock) {
+      searchTowedRollingStock(towedRollingStock.name);
+    } else {
+      searchTowedRollingStock('');
+    }
+  }, [towedRollingStock]);
 
   const getLabel = (rs: LightRollingStockWithLiveries) => {
     let res = '';
@@ -116,6 +135,31 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           suggestions={filteredRollingStockList}
           getSuggestionLabel={(suggestion: LightRollingStockWithLiveries) => getLabel(suggestion)}
           onSelectSuggestion={onSelectSuggestion}
+        />
+      </div>
+      <div className="towed-rolling-stock">
+        <ComboBox
+          id="towedRollingStock"
+          label={t('consist.towedRollingStock')}
+          value={towedRsFilters.text.toUpperCase()}
+          onClick={() => {
+            if (towedRollingStock?.id !== undefined) {
+              searchTowedRollingStockById(towedRollingStock.id);
+            }
+          }}
+          onChange={(e) => {
+            searchTowedRollingStock(e.target.value);
+            if (e.target.value.trim().length === 0) {
+              updateTowedRollingStockID(undefined);
+            }
+          }}
+          autoComplete="off"
+          disabled={disabled}
+          suggestions={filteredTowedRollingStockList}
+          getSuggestionLabel={(suggestion: TowedRollingStock) => suggestion.name}
+          onSelectSuggestion={(towed) => {
+            dispatch(updateTowedRollingStockID(towed?.id));
+          }}
         />
       </div>
       <div className="stdcm-consist__properties">

@@ -129,7 +129,9 @@ const SimulationReportSheet = ({
                 <Text style={styles.convoyAndRoute.convoyInfoTitles}>{t('speedLimitByTag')}</Text>
                 <Text style={styles.convoyAndRoute.convoyInfoData}>{speedLimitByTag || '-'}</Text>
                 <Text style={styles.convoyAndRoute.convoyInfoTitles}>{t('towedMaterial')}</Text>
-                <Text style={styles.convoyAndRoute.convoyInfoData}>-</Text>
+                <Text style={styles.convoyAndRoute.convoyInfoData}>
+                  {consist?.towedRollingStock?.name ?? '-'}
+                </Text>
                 <Text style={styles.convoyAndRoute.convoyInfoTitles}>{t('maxSpeed')}</Text>
                 <Text style={styles.convoyAndRoute.convoyInfoData}>
                   {`${Math.floor(convoyMaxSpeed)} km/h`}

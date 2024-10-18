@@ -16,6 +16,7 @@ const buildStdcmConfSelectors = () => {
     getTotalMass: makeOsrdConfSelector('totalMass'),
     getTotalLength: makeOsrdConfSelector('totalLength'),
     getMaxSpeed: makeOsrdConfSelector('maxSpeed'),
+    getTowedRollingStockID: makeOsrdConfSelector('towedRollingStockID'),
     getStdcmPathSteps,
     getStdcmOrigin: (state: RootState) => {
       const pathSteps = getStdcmPathSteps(state);

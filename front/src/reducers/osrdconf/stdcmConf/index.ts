@@ -18,6 +18,7 @@ export const stdcmConfInitialState: OsrdStdcmConfState = {
   totalMass: undefined,
   totalLength: undefined,
   maxSpeed: undefined,
+  towedRollingStockID: undefined,
   ...defaultCommonConf,
 };
 
@@ -29,6 +30,10 @@ export const stdcmConfSlice = createSlice({
     resetStdcmConfig(state: Draft<OsrdStdcmConfState>) {
       state.rollingStockID = stdcmConfInitialState.rollingStockID;
       state.stdcmPathSteps = stdcmConfInitialState.stdcmPathSteps;
+      state.towedRollingStockID = stdcmConfInitialState.towedRollingStockID;
+      state.totalLength = stdcmConfInitialState.totalLength;
+      state.totalMass = stdcmConfInitialState.totalMass;
+      state.maxSpeed = stdcmConfInitialState.maxSpeed;
       state.speedLimitByTag = stdcmConfInitialState.speedLimitByTag;
     },
     updateTotalMass(
@@ -49,23 +54,31 @@ export const stdcmConfSlice = createSlice({
     ) {
       state.maxSpeed = action.payload;
     },
+    updateTowedRollingStockID(
+      state: Draft<OsrdStdcmConfState>,
+      action: PayloadAction<OsrdStdcmConfState['towedRollingStockID']>
+    ) {
+      state.towedRollingStockID = action.payload;
+    },
     updateStdcmConfigWithData(
       state: Draft<OsrdStdcmConfState>,
       action: PayloadAction<
         Pick<
           OsrdStdcmConfState,
           | 'rollingStockID'
-          | 'totalMass'
-          | 'totalLength'
-          | 'maxSpeed'
+          | 'towedRollingStockID'
           | 'pathSteps'
           | 'speedLimitByTag'
+          | 'totalLength'
+          | 'totalMass'
+          | 'maxSpeed'
         >
       >
     ) {
       state.rollingStockID = action.payload.rollingStockID;
-      state.totalMass = action.payload.totalMass;
+      state.towedRollingStockID = action.payload.towedRollingStockID;
       state.totalLength = action.payload.totalLength;
+      state.totalMass = action.payload.totalMass;
       state.maxSpeed = action.payload.maxSpeed;
       state.pathSteps = action.payload.pathSteps;
       state.speedLimitByTag = action.payload.speedLimitByTag;
