@@ -20,6 +20,7 @@ import createMargin from './createMargin';
 // TODO: DROP STDCM V1: remove formattedStartTime, startTime and latestStartTime
 type ValidStdcmConfig = {
   rollingStockId: number;
+  towedRollingStockID?: number;
   timetableId: number;
   infraId: number;
   rollingStockComfort: TrainScheduleBase['comfort'];
@@ -47,6 +48,7 @@ export const checkStdcmConf = (
     rollingStockComfort,
     infraID,
     rollingStockID,
+    towedRollingStockID,
     standardStdcmAllowance,
     gridMarginBefore,
     gridMarginAfter,
@@ -164,6 +166,7 @@ export const checkStdcmConf = (
     totalMass,
     totalLength,
     maxSpeed,
+    towedRollingStockID,
     margin: standardStdcmAllowance,
     gridMarginBefore,
     gridMarginAfter,
@@ -184,6 +187,7 @@ export const formatStdcmPayload = (
     comfort: validConfig.rollingStockComfort || 'STANDARD',
     margin: createMargin(validConfig.margin),
     rolling_stock_id: validConfig.rollingStockId,
+    towed_rolling_stock_id: validConfig.towedRollingStockID,
     speed_limit_tags: validConfig.speedLimitByTag,
     total_mass: validConfig.totalMass ? tToKg(validConfig.totalMass) : undefined,
     max_speed: validConfig.maxSpeed ? kmhToMs(validConfig.maxSpeed) : undefined,
@@ -193,5 +197,6 @@ export const formatStdcmPayload = (
     time_gap_before: toMsOrUndefined(validConfig.gridMarginAfter),
     work_schedule_group_id: validConfig.workScheduleGroupId,
     electrical_profile_set_id: validConfig.electricalProfileSetId,
+    loading_gauge_type: 'GA', // default value as the user can't select one
   },
 });

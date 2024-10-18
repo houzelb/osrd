@@ -1534,6 +1534,7 @@ export type PostTimetableByIdStdcmApiArg = {
   body: {
     comfort: Comfort;
     electrical_profile_set_id?: number | null;
+    loading_gauge_type?: LoadingGaugeType | null;
     /** Can be a percentage `X%`, a time in minutes per 100 kilometer `Xmin/100km` */
     margin?: string | null;
     /** Maximum speed of the consist in km/h */
@@ -1565,6 +1566,7 @@ export type PostTimetableByIdStdcmApiArg = {
     total_length?: number | null;
     /** Total mass of the consist in kg */
     total_mass?: number | null;
+    towed_rolling_stock_id?: number | null;
     work_schedule_group_id?: number | null;
   };
 };
@@ -2587,8 +2589,11 @@ export type RollingStockMetadata = {
   unit: string;
 };
 export type RollingResistance = {
+  /** Solid friction in kN */
   A: number;
+  /** Viscosity friction in kN/(km/h) */
   B: number;
+  /** Aerodynamic drag in kN/(km/h)² */
   C: number;
   type: string;
 };

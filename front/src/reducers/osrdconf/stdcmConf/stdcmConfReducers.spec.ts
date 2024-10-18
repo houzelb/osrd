@@ -130,6 +130,11 @@ describe('stdcmConfReducers', () => {
       const state = store.getState()[stdcmConfSlice.name];
       expect(state.maxSpeed).toEqual(110);
     });
+    it('should handle towedRollingStockID', () => {
+      store.dispatch(stdcmConfSliceActions.updateTowedRollingStockID(11));
+      const state = store.getState()[stdcmConfSlice.name];
+      expect(state.towedRollingStockID).toEqual(11);
+    });
   });
 
   describe('StdcmPathStep updates', () => {

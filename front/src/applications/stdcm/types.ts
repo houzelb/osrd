@@ -8,6 +8,7 @@ import type {
   PostTimetableByIdStdcmApiResponse,
   RollingStockWithLiveries,
   SimulationResponse,
+  TowedRollingStock,
 } from 'common/api/osrdEditoastApi';
 import type { SpeedSpaceChartData } from 'modules/simulationResult/types';
 import type { PathStep } from 'reducers/osrdconf/types';
@@ -75,6 +76,7 @@ export type StdcmSimulationInputs = {
   pathSteps: (PathStep | null)[];
   consist?: {
     tractionEngine?: RollingStockWithLiveries;
+    towedRollingStock?: TowedRollingStock;
     /** In ton */
     totalMass?: number;
     /** In meters */
