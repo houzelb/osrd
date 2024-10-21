@@ -169,7 +169,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await opTimetablePage.verifyTimeStopsDataSheetVisibility();
     await opTimetablePage.getTrainArrivalTime('11:52');
     await opTimetablePage.clickOnScenarioCollapseButton();
-    await scrollContainer(page, '.osrd-simulation-container .time-stops-datasheet .dsg-container');
+    await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(
       expectedCellDataElectricalProfileON,
       selectedLanguage
@@ -230,7 +230,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await opTimetablePage.verifyTimeStopsDataSheetVisibility();
     await opTimetablePage.getTrainArrivalTime('12:02');
     await opTimetablePage.clickOnScenarioCollapseButton();
-    await scrollContainer(page, '.osrd-simulation-container .time-stops-datasheet .dsg-container');
+    await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataCodeCompoON, selectedLanguage);
     await opTimetablePage.clickOnTimetableCollapseButton();
     // Remove the composition code option and verify the changes
@@ -294,7 +294,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await opTimetablePage.verifyTimeStopsDataSheetVisibility();
     await opTimetablePage.getTrainArrivalTime('11:54');
     await opTimetablePage.clickOnScenarioCollapseButton();
-    await scrollContainer(page, '.osrd-simulation-container .time-stops-datasheet .dsg-container');
+    await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataLinearMargin, selectedLanguage);
     await opTimetablePage.clickOnTimetableCollapseButton();
     // Modify the margin to 'Mareco' and verify the changes
@@ -359,7 +359,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await opTimetablePage.verifyTimeStopsDataSheetVisibility();
     await opTimetablePage.getTrainArrivalTime('12:05');
     await opTimetablePage.clickOnScenarioCollapseButton();
-    await scrollContainer(page, '.osrd-simulation-container .time-stops-datasheet .dsg-container');
+    await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataForAllSettings, selectedLanguage);
   });
 });

@@ -161,7 +161,7 @@ test.describe('Times and Stops Tab Verification', () => {
     await opTimetablePage.clickOnScenarioCollapseButton();
     await opTimetablePage.verifyTimeStopsDataSheetVisibility();
     // Scroll and extract data from output table
-    await scrollContainer(page, '.osrd-simulation-container .time-stops-datasheet .dsg-container');
+    await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(outputExpectedCellData, selectedLanguage);
   });
 

@@ -16,7 +16,7 @@ class OperationalStudiesOutputTablePage {
     this.columnHeaders = page.locator(
       '[class="dsg-cell dsg-cell-header"] .dsg-cell-header-container'
     );
-    this.tableRows = page.locator('.osrd-simulation-container .time-stops-datasheet .dsg-row');
+    this.tableRows = page.locator('.time-stop-outputs .time-stops-datasheet .dsg-row');
   }
 
   // Retrieve the cell value based on the locator type
