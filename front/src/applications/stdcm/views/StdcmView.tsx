@@ -34,9 +34,11 @@ const StdcmView = () => {
     cancelStdcmRequest,
     isPending,
     isRejected,
-    isStdcmResultsEmpty,
     stdcmResults,
     pathProperties,
+    stdcmTrainConflicts,
+    hasConflicts,
+    isCalculationFailed,
   } = useStdcm({ showFailureNotification: false });
 
   const { loading, error, loadStdcmEnvironment } = useStdcmEnvironment();
@@ -46,8 +48,8 @@ const StdcmView = () => {
     useOsrdConfActions() as StdcmConfSliceActions;
 
   const selectedSimulation = simulationsList[selectedSimulationIndex];
-  const isCalculationFailed = isRejected && !isStdcmResultsEmpty;
-  const showResults = !isPending && (showStatusBanner || simulationsList.length > 0);
+  const showResults =
+    !isPending && (showStatusBanner || simulationsList.length > 0 || hasConflicts);
   const loaderRef = useRef<HTMLDivElement>(null);
 
   const handleRetainSimulation = () => setRetainedSimulationIndex(selectedSimulationIndex);
@@ -113,10 +115,9 @@ const StdcmView = () => {
      */
     const lastSimulation = simulationsList[simulationsList.length - 1];
     const isSimulationAlreadyListed = isEqual(lastSimulation?.inputs, currentSimulationInputs);
-    const isSimulationOutputsComplete =
-      stdcmResults?.stdcmResponse && stdcmResults?.speedSpaceChartData?.formattedPathProperties;
+    const isSimulationOutputsComplete = stdcmResults?.stdcmResponse || hasConflicts;
 
-    if (isSimulationOutputsComplete || isStdcmResultsEmpty) {
+    if (isSimulationOutputsComplete) {
       const newSimulation = {
         ...(isSimulationAlreadyListed
           ? { ...lastSimulation }
@@ -125,36 +126,40 @@ const StdcmView = () => {
               creationDate: new Date(),
               inputs: currentSimulationInputs,
             }),
-        ...(stdcmResults?.stdcmResponse &&
-          stdcmResults.speedSpaceChartData &&
-          pathProperties && {
-            outputs: {
-              pathProperties,
-              results: stdcmResults.stdcmResponse,
-              speedSpaceChartData: stdcmResults.speedSpaceChartData,
-            },
-          }),
+        ...(pathProperties && {
+          outputs: {
+            pathProperties,
+            ...(stdcmResults?.stdcmResponse &&
+              stdcmResults?.speedSpaceChartData && {
+                results: stdcmResults.stdcmResponse,
+                speedSpaceChartData: stdcmResults.speedSpaceChartData,
+              }),
+            ...(stdcmTrainConflicts && {
+              conflicts: stdcmTrainConflicts,
+            }),
+          },
+        }),
       };
 
       const updateSimulationsList = isSimulationAlreadyListed
         ? replaceElementAtIndex(simulationsList, simulationsList.length - 1, newSimulation)
         : [...simulationsList, newSimulation];
 
-      setSimulationsList(updateSimulationsList);
+      setSimulationsList(updateSimulationsList as StdcmSimulation[]);
       setShowStatusBanner(true);
     }
   }, [
     pathProperties,
-    isStdcmResultsEmpty,
     stdcmResults?.speedSpaceChartData?.formattedPathProperties,
+    stdcmTrainConflicts,
   ]);
 
   // We have a simulation with an error.
   useEffect(() => {
-    if (isRejected && !isStdcmResultsEmpty) {
+    if (isRejected) {
       setShowStatusBanner(true);
     }
-  }, [isRejected, isStdcmResultsEmpty]);
+  }, [isRejected]);
 
   // select the last simulation in the list
   useEffect(() => {
@@ -194,7 +199,7 @@ const StdcmView = () => {
 
           {showResults && (
             <div className="stdcm-results">
-              {selectedSimulationIndex > -1 && (
+              {(selectedSimulationIndex > -1 || hasConflicts) && (
                 <StdcmResults
                   isCalculationFailed={isCalculationFailed}
                   isDebugMode={isDebugMode}

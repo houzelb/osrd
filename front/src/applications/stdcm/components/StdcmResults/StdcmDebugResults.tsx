@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 
 import { STDCM_TRAIN_ID } from 'applications/stdcm/consts';
 import useProjectedTrainsForStdcm from 'applications/stdcm/hooks/useProjectedTrainsForStdcm';
-import type { StdcmSimulationOutputs } from 'applications/stdcm/types';
+import type { StdcmResultsOutput } from 'applications/stdcm/types';
 import { osrdEditoastApi, type TrackRange } from 'common/api/osrdEditoastApi';
 import { useOsrdConfSelectors } from 'common/osrdContext';
 import i18n from 'i18n';
@@ -17,7 +17,7 @@ const HANDLE_TAB_RESIZE_HEIGHT = 20;
 
 type StdcmDebugResultsProps = {
   pathTrackRanges: TrackRange[];
-  simulationOutputs: StdcmSimulationOutputs;
+  simulationOutputs: StdcmResultsOutput;
 };
 
 const StdcmDebugResults = ({

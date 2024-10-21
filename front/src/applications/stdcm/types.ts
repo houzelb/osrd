@@ -1,17 +1,18 @@
-import type {
-  ManageTrainSchedulePathProperties,
-  TrainSpaceTimeData,
-} from 'applications/operationalStudies/types';
+import type { TrainSpaceTimeData } from 'applications/operationalStudies/types';
 import type { STDCM_REQUEST_STATUS } from 'applications/stdcm/consts';
 import type {
   GeoJsonPoint,
+  Conflict,
   LightRollingStock,
+  PathfindingResultSuccess,
   PostTimetableByIdStdcmApiResponse,
   RollingStockWithLiveries,
   SimulationResponse,
   TowedRollingStock,
+  PathProperties,
 } from 'common/api/osrdEditoastApi';
 import type { SpeedSpaceChartData } from 'modules/simulationResult/types';
+import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import type { PathStep } from 'reducers/osrdconf/types';
 import type { ValueOf } from 'utils/types';
 
@@ -26,6 +27,28 @@ export type StdcmSuccessResponse = Omit<
   creationDate: Date;
   speedLimitByTag?: string;
   simulationPathSteps: PathStep[];
+};
+
+export type StdcmConflictsResponse = Extract<
+  PostTimetableByIdStdcmApiResponse,
+  { status: 'conflicts' }
+> & {
+  rollingStock: LightRollingStock;
+  creationDate: Date;
+  speedLimitByTag?: string;
+  simulationPathSteps: PathStep[];
+  path: PathfindingResultSuccess;
+};
+
+export type StdcmResponse = StdcmConflictsResponse | StdcmSuccessResponse;
+
+export type OperationalPoint = NonNullable<PathProperties['operational_points']>[number];
+
+export type StdcmPathProperties = {
+  manchetteOperationalPoints?: OperationalPoint[];
+  geometry: NonNullable<PathProperties['geometry']>;
+  suggestedOperationalPoints: SuggestedOP[];
+  zones: NonNullable<PathProperties['zones']>;
 };
 
 export type SimulationReportSheetProps = {
@@ -103,11 +126,18 @@ export type StdcmSimulationInputs = {
   linkedPaths: LinkedPaths;
 };
 
-export type StdcmSimulationOutputs = {
+export type StdcmResultsOutput = {
+  pathProperties: StdcmPathProperties;
   results: StdcmSuccessResponse;
-  pathProperties: ManageTrainSchedulePathProperties;
   speedSpaceChartData: SpeedSpaceChartData;
 };
+
+export type StdcmConflictsOutput = {
+  pathProperties: StdcmPathProperties;
+  conflicts: Conflict[];
+};
+
+export type StdcmSimulationOutputs = StdcmResultsOutput | StdcmConflictsOutput;
 
 export type StdcmSimulation = {
   id: number;

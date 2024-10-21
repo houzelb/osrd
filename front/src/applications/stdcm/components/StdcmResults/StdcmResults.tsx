@@ -2,13 +2,15 @@ import { useMemo, useState } from 'react';
 
 import { Button } from '@osrd-project/ui-core';
 import { PDFDownloadLink } from '@react-pdf/renderer';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 
+import useConflictsMessages from 'applications/stdcm/hooks/useConflictsMessages';
 import type { StdcmSimulation } from 'applications/stdcm/types';
 import {
   generateCodeNumber,
   getOperationalPointsWithTimes,
 } from 'applications/stdcm/utils/formatSimulationReportSheet';
+import { hasConflicts, hasResults } from 'applications/stdcm/utils/simulationOutputUtils';
 import { type TrackRange } from 'common/api/osrdEditoastApi';
 import { Map } from 'modules/trainschedule/components/ManageTrainSchedule';
 
@@ -43,25 +45,31 @@ const StcdmResults = ({
   pathTrackRanges,
 }: StcdmResultsProps) => {
   const { t } = useTranslation('stdcm', { keyPrefix: 'simulation.results' });
-
   const [mapCanvas, setMapCanvas] = useState<string>();
 
   const selectedSimulation = simulationsList[selectedSimulationIndex];
-  const simulationReportSheetNumber = generateCodeNumber();
+  const { outputs } = selectedSimulation || {};
 
+  const hasConflictResults = hasConflicts(outputs);
+  const hasSimulationResults = hasResults(outputs);
+
+  const { trackConflicts, workConflicts } = useConflictsMessages(t, outputs);
+
+  const simulationReportSheetNumber = generateCodeNumber();
   const isSelectedSimulationRetained = selectedSimulationIndex === retainedSimulationIndex;
 
   const operationalPointsList = useMemo(() => {
-    if (!selectedSimulation || !selectedSimulation.outputs) {
-      return [];
-    }
-
+    if (!hasSimulationResults) return [];
     return getOperationalPointsWithTimes(
-      selectedSimulation.outputs.pathProperties?.suggestedOperationalPoints || [],
-      selectedSimulation.outputs.results.simulation,
-      selectedSimulation.outputs.results.departure_time
+      outputs.pathProperties?.suggestedOperationalPoints || [],
+      outputs.results.simulation,
+      outputs.results.departure_time
     );
-  }, [selectedSimulation]);
+  }, [outputs]);
+
+  const simulationPathSteps = hasSimulationResults
+    ? outputs.results.simulationPathSteps
+    : undefined;
 
   return (
     <>
@@ -74,10 +82,10 @@ const StcdmResults = ({
         retainedSimulationIndex={retainedSimulationIndex}
       />
       <div className="simulation-results">
-        {selectedSimulation.outputs ? (
+        {hasSimulationResults && !hasConflictResults ? (
           <div className="results-and-sheet">
             <StcdmResultsTable
-              stdcmData={selectedSimulation.outputs.results}
+              stdcmData={outputs.results}
               consist={selectedSimulation.inputs.consist}
               isSimulationRetained={isSelectedSimulationRetained}
               operationalPointsList={operationalPointsList}
@@ -90,7 +98,7 @@ const StcdmResults = ({
                     document={
                       <SimulationReportSheet
                         stdcmLinkedPaths={selectedSimulation.inputs.linkedPaths}
-                        stdcmData={selectedSimulation.outputs.results}
+                        stdcmData={outputs.results}
                         consist={selectedSimulation.inputs.consist}
                         simulationReportSheetNumber={simulationReportSheetNumber}
                         mapCanvas={mapCanvas}
@@ -114,7 +122,34 @@ const StcdmResults = ({
         ) : (
           <div className="simulation-failure">
             <span className="title">{t('notFound')}</span>
-            <span className="change-criteria">{t('changeCriteria')}</span>
+            <span className="change-criteria">{t('conflictsTitle')}</span>
+
+            {trackConflicts.length > 0 && (
+              <ul>
+                {trackConflicts.map((message, index) => (
+                  <li key={index}>
+                    <span>
+                      <Trans>&bull; {message}</Trans>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {trackConflicts.length > 0 && workConflicts.length > 0 && <br />}
+
+            {workConflicts.length > 0 && (
+              <ul>
+                {workConflicts.map((message, index) => (
+                  <li key={index}>
+                    <span>
+                      <Trans>&bull; {message}</Trans>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <span>{t('changeSearchCriteria')}</span>
           </div>
         )}
         <div className="osrd-config-item-container osrd-config-item-container-map map-results no-pointer-events">
@@ -123,17 +158,15 @@ const StcdmResults = ({
             isReadOnly
             hideAttribution
             showStdcmAssets
+            isFeasible={!hasConflictResults}
             setMapCanvas={setMapCanvas}
-            pathGeometry={selectedSimulation.outputs?.pathProperties.geometry}
-            simulationPathSteps={selectedSimulation.outputs?.results.simulationPathSteps}
+            pathGeometry={outputs?.pathProperties?.geometry}
+            simulationPathSteps={simulationPathSteps}
           />
         </div>
       </div>
-      {isDebugMode && pathTrackRanges && selectedSimulation.outputs && (
-        <StdcmDebugResults
-          pathTrackRanges={pathTrackRanges}
-          simulationOutputs={selectedSimulation.outputs}
-        />
+      {isDebugMode && pathTrackRanges && hasSimulationResults && (
+        <StdcmDebugResults pathTrackRanges={pathTrackRanges} simulationOutputs={outputs} />
       )}
     </>
   );
