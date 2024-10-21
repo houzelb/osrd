@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import useHorizontalScroll from 'applications/stdcm/hooks/useHorizontalScroll';
 import type { StdcmSimulation } from 'applications/stdcm/types';
+import { hasConflicts } from 'applications/stdcm/utils/simulationOutputUtils';
 import { formatDateToString } from 'utils/date';
 
 export const SIMULATION_ITEM_CLASSNAME = 'simulation-item';
@@ -66,7 +67,7 @@ const StdcmSimulationNavigator = ({
             >
               <div className="simulation-name">
                 <div>
-                  {outputs
+                  {outputs && !hasConflicts(outputs)
                     ? t('simulationName.withOutputs', { id })
                     : t('simulationName.withoutOutputs')}
                 </div>

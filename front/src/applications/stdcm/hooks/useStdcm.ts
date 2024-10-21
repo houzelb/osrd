@@ -4,11 +4,19 @@ import { useTranslation } from 'react-i18next';
 import nextId from 'react-id-generator';
 import { useSelector } from 'react-redux';
 
-import type { ManageTrainSchedulePathProperties } from 'applications/operationalStudies/types';
 import { STDCM_REQUEST_STATUS, STDCM_TRAIN_ID } from 'applications/stdcm/consts';
-import type { StdcmRequestStatus, StdcmSuccessResponse } from 'applications/stdcm/types';
-import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
-import type { TrainScheduleResult } from 'common/api/osrdEditoastApi';
+import type {
+  StdcmRequestStatus,
+  StdcmSuccessResponse,
+  StdcmResponse,
+  StdcmConflictsResponse,
+  StdcmPathProperties,
+} from 'applications/stdcm/types';
+import {
+  osrdEditoastApi,
+  type Conflict,
+  type TrainScheduleResult,
+} from 'common/api/osrdEditoastApi';
 import { useOsrdConfSelectors } from 'common/osrdContext';
 import { useStoreDataForSpeedLimitByTagSelector } from 'common/SpeedLimitByTagSelector/useStoreDataForSpeedLimitByTagSelector';
 import { setFailure } from 'reducers/main';
@@ -32,12 +40,12 @@ const useStdcm = ({
   showFailureNotification = true,
 }: { showFailureNotification?: boolean } = {}) => {
   const [stdcmTrainResult, setStdcmTrainResult] = useState<TrainScheduleResult>();
-  const [stdcmResponse, setStdcmResponse] = useState<StdcmSuccessResponse>();
+  const [stdcmTrainConflicts, setStdcmTrainConflicts] = useState<Conflict[]>();
+  const [stdcmResponse, setStdcmResponse] = useState<StdcmResponse>();
   const [currentStdcmRequestStatus, setCurrentStdcmRequestStatus] = useState<StdcmRequestStatus>(
     STDCM_REQUEST_STATUS.idle
   );
-  const [pathProperties, setPathProperties] = useState<ManageTrainSchedulePathProperties>();
-  const [isStdcmResultsEmpty, setIsStdcmResultsEmpty] = useState(false);
+  const [pathProperties, setPathProperties] = useState<StdcmPathProperties>();
 
   const dispatch = useAppDispatch();
   const { t } = useTranslation(['translation', 'stdcm']);
@@ -70,14 +78,15 @@ const useStdcm = ({
 
   const launchStdcmRequest = async () => {
     setCurrentStdcmRequestStatus(STDCM_REQUEST_STATUS.pending);
-    setIsStdcmResultsEmpty(false);
     setStdcmResponse(undefined);
+    setStdcmTrainConflicts(undefined);
 
     const validConfig = checkStdcmConf(dispatch, t, osrdconf);
     if (validConfig) {
       const payload = formatStdcmPayload(validConfig);
       try {
         const response = await postTimetableByIdStdcm(payload).unwrap();
+
         if (
           response.status === 'success' &&
           response.simulation.status === 'success' &&
@@ -104,9 +113,18 @@ const useStdcm = ({
           };
           setStdcmTrainResult(stdcmTrain);
           dispatch(updateSelectedTrainId(STDCM_TRAIN_ID));
+        } else if (response.status === 'conflicts') {
+          setStdcmResponse({
+            ...response,
+            rollingStock: stdcmRollingStock,
+            creationDate: new Date(),
+            speedLimitByTag,
+            simulationPathSteps: osrdconf.pathSteps,
+            path: response.pathfinding_result,
+          } as StdcmConflictsResponse);
+          setStdcmTrainConflicts(response.conflicts); // Set conflicts
+          setCurrentStdcmRequestStatus(STDCM_REQUEST_STATUS.success); // Conflicts but still success in this case
         } else {
-          // When the back-end send back result with status 'path_not_found' we consider that the result is empty
-          setIsStdcmResultsEmpty(response.status === 'path_not_found');
           setCurrentStdcmRequestStatus(STDCM_REQUEST_STATUS.rejected);
           triggerShowFailureNotification({
             name: t('stdcm:stdcmErrors.requestFailed'),
@@ -116,7 +134,10 @@ const useStdcm = ({
       } catch (e) {
         setCurrentStdcmRequestStatus(STDCM_REQUEST_STATUS.rejected);
         triggerShowFailureNotification(
-          castErrorToFailure(e, { name: t('stdcm:stdcmErrors.requestFailed') })
+          castErrorToFailure(e, {
+            name: t('stdcm:stdcmErrors.requestFailed'),
+            message: t('translation:common.error'),
+          })
         );
       }
     } else {
@@ -132,20 +153,20 @@ const useStdcm = ({
   };
 
   const isPending = currentStdcmRequestStatus === STDCM_REQUEST_STATUS.pending;
-  const isSuccessful = currentStdcmRequestStatus === STDCM_REQUEST_STATUS.success;
   const isRejected = currentStdcmRequestStatus === STDCM_REQUEST_STATUS.rejected;
+  const hasConflicts = (stdcmTrainConflicts?.length ?? 0) > 0;
 
   return {
     stdcmResults,
     launchStdcmRequest,
-    currentStdcmRequestStatus,
     cancelStdcmRequest,
     pathProperties,
     setPathProperties,
     isPending,
-    isSuccessful,
     isRejected,
-    isStdcmResultsEmpty,
+    stdcmTrainConflicts,
+    hasConflicts,
+    isCalculationFailed: isRejected,
   };
 };
 

@@ -20,6 +20,13 @@ const IGNORE_MISSING: RegExp[] = [
   /translation:departureTime/,
   /translation:destinationTime/,
   /translation:leaveAt/,
+  /stdcm:simulation.results/,
+  /translation:remainingTrackConflicts/,
+  /translation:remainingWorkConflicts/,
+  /translation:trackConflict/,
+  /translation:trackConflictSameDay/,
+  /translation:workConflict/,
+  /translation:workConflictSameDay/,
 ];
 const IGNORE_UNUSED: RegExp[] = [
   /.*-generated$/,
