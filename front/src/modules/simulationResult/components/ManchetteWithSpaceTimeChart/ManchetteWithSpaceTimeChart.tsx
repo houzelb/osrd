@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 
 import { KebabHorizontal } from '@osrd-project/ui-icons';
-import { Manchette } from '@osrd-project/ui-manchette';
+import Manchette, { type WaypointMenuData } from '@osrd-project/ui-manchette';
 import { useManchettesWithSpaceTimeChart } from '@osrd-project/ui-manchette-with-spacetimechart';
 import {
   ConflictLayer,
@@ -11,11 +11,13 @@ import {
   OccupancyBlockLayer,
 } from '@osrd-project/ui-spacetimechart';
 import type { Conflict } from '@osrd-project/ui-spacetimechart';
+import cx from 'classnames';
 import { compact } from 'lodash';
 
 import type { OperationalPoint, TrainSpaceTimeData } from 'applications/operationalStudies/types';
 import upward from 'assets/pictures/workSchedules/ScheduledMaintenanceUp.svg';
 import type { PostWorkSchedulesProjectPathApiResponse } from 'common/api/osrdEditoastApi';
+import OSRDMenu from 'common/OSRDMenu';
 import cutSpaceTimeRect from 'modules/simulationResult/components/SpaceTimeChart/helpers/utils';
 import { ASPECT_LABELS_COLORS } from 'modules/simulationResult/consts';
 import type {
@@ -27,6 +29,7 @@ import type {
 import SettingsPanel from './SettingsPanel';
 import ManchetteMenuButton from '../SpaceTimeChart/ManchetteMenuButton';
 import ProjectionLoadingMessage from '../SpaceTimeChart/ProjectionLoadingMessage';
+import useWaypointMenu from '../SpaceTimeChart/useWaypointMenu';
 import WaypointsPanel from '../SpaceTimeChart/WaypointsPanel';
 
 type ManchetteWithSpaceTimeChartProps = {
@@ -55,6 +58,7 @@ const ManchetteWithSpaceTimeChartWrapper = ({
   projectionLoaderData: { totalTrains, allTrainsProjected },
   height = MANCHETTE_WITH_SPACE_TIME_CHART_DEFAULT_HEIGHT,
 }: ManchetteWithSpaceTimeChartProps) => {
+  const manchetteWithSpaceTimeCharWrappertRef = useRef<HTMLDivElement>(null);
   const manchetteWithSpaceTimeChartRef = useRef<HTMLDivElement>(null);
 
   const [waypointsPanelIsOpen, setWaypointsPanelIsOpen] = useState(false);
@@ -178,8 +182,26 @@ const ManchetteWithSpaceTimeChartWrapper = ({
     }));
   });
 
+  const waypointMenuData = useWaypointMenu(waypointsPanelData);
+
+  const manchettePropsWithWaypointMenu = useMemo(
+    () => ({
+      ...manchetteProps,
+      waypoints: manchetteProps.waypoints.map((waypoint) => ({
+        ...waypoint,
+        onClick: waypointMenuData.handleWaypointClick,
+      })),
+      waypointMenuData: {
+        menu: <OSRDMenu menuRef={waypointMenuData.menuRef} items={waypointMenuData.menuItems} />,
+        activeWaypointId: waypointMenuData.activeWaypointId,
+        manchetteWrapperRef: manchetteWithSpaceTimeCharWrappertRef,
+      } as WaypointMenuData,
+    }),
+    [manchetteProps, waypointMenuData]
+  );
+
   return (
-    <div className="manchette-space-time-chart-wrapper">
+    <div ref={manchetteWithSpaceTimeCharWrappertRef} className="manchette-space-time-chart-wrapper">
       <div className="header">
         {waypointsPanelData && (
           <>
@@ -204,11 +226,13 @@ const ManchetteWithSpaceTimeChartWrapper = ({
       <div className="header-separator" />
       <div
         ref={manchetteWithSpaceTimeChartRef}
-        className="manchette flex"
+        className={cx('manchette flex', {
+          'no-scroll': !!waypointMenuData.activeWaypointId,
+        })}
         style={{ height }}
         onScroll={handleScroll}
       >
-        <Manchette {...manchetteProps} height={height} />
+        <Manchette {...manchettePropsWithWaypointMenu} height={height} />
         <div
           className="space-time-chart-container"
           style={{

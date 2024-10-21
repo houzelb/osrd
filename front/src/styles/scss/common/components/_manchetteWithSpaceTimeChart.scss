@@ -4,6 +4,7 @@
     0 4px 9px rgba(0, 0, 0, 0.06),
     0 1px 2px rgba(0, 0, 0, 0.19);
   background-color: var(--white100);
+  position: relative;
 
   .header {
     position: relative;
@@ -37,6 +38,15 @@
   .manchette {
     overflow-y: auto;
     overflow-x: hidden;
+
+    &.no-scroll {
+      overflow-y: clip;
+    }
+
+    .osrd-menu {
+      width: 305px;
+      transform: translateY(-2px);
+    }
   }
 
   .space-time-chart-container {
