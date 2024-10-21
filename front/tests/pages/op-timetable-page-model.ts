@@ -53,7 +53,7 @@ class OperationalStudiesTimetablePage {
     this.speedSpaceChart = page.locator('#container-SpeedSpaceChart');
     this.spaceTimeChart = page.locator('.space-time-chart-container');
     this.timeStopsDataSheet = page.locator('.time-stops-datasheet');
-    this.simulationMap = page.locator('.osrd-simulation-map');
+    this.simulationMap = page.locator('.simulation-map');
     this.simulationDriverTrainSchedule = page.locator('.simulation-driver-train-schedule');
     this.timetableFilterButton = page.getByTestId('timetable-filter-button');
     this.timetableFilterButtonClose = page.getByTestId('timetable-filter-button-close');
