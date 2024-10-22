@@ -3,11 +3,6 @@ package fr.sncf.osrd.cli
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.rabbitmq.client.*
-import com.rabbitmq.client.AMQP
-import com.rabbitmq.client.Channel
-import com.rabbitmq.client.ConnectionFactory
-import com.rabbitmq.client.DeliverCallback
-import com.rabbitmq.client.Delivery
 import fr.sncf.osrd.api.*
 import fr.sncf.osrd.api.api_v2.conflicts.ConflictDetectionEndpointV2
 import fr.sncf.osrd.api.api_v2.path_properties.PathPropEndpoint
@@ -154,141 +149,153 @@ class WorkerCommand : CliCommand {
         factory.setSharedExecutor(executor)
         factory.setMaxInboundMessageBodySize(WORKER_MAX_MSG_SIZE)
         val connection = factory.newConnection()
-        connection.createChannel().use { channel -> reportActivity(channel, "started") }
 
-        if (!ALL_INFRA) {
-            infraManager.load(infraId, null, diagnosticRecorder)
-        }
+        connection.use { connection ->
+            connection.createChannel().use { channel -> reportActivity(channel, "started") }
 
-        connection.createChannel().use { channel -> reportActivity(channel, "ready") }
-
-        val activityChannel = connection.createChannel()
-        val channel = connection.createChannel()
-        val callback =
-            fun(message: Delivery) {
-                reportActivity(activityChannel, "request-received")
-
-                val replyTo = message.properties.replyTo
-                val correlationId = message.properties.correlationId
-                val body = message.body
-                val path =
-                    if (message.properties.headers["x-rpc-path"] is LongString) {
-                        message.properties.headers["x-rpc-path"].toString()
-                    } else {
-                        (message.properties.headers["x-rpc-path"] as? ByteArray?)?.decodeToString()
-                    }
-                if (path == null) {
-                    logger.error("missing x-rpc-path header")
-                    channel.basicReject(message.envelope.deliveryTag, false)
-                    if (replyTo != null) {
-                        // TODO: response format to handle protocol error
-                        channel.basicPublish(
-                            "",
-                            replyTo,
-                            null,
-                            "missing x-rpc-path header".toByteArray()
-                        )
-                    }
-
-                    return
-                }
-                logger.info("received request for path {}", path)
-
-                val endpoint = endpoints[path]
-                if (endpoint == null) {
-                    logger.error("unknown path {}", path)
-                    channel.basicReject(message.envelope.deliveryTag, false)
-                    if (replyTo != null) {
-                        // TODO: response format to handle protocol error
-                        channel.basicPublish("", replyTo, null, "unknown path $path".toByteArray())
-                    }
-
-                    return
-                }
-
-                class RabbitMQTextMapGetter : TextMapGetter<Map<String, Any>> {
-                    override fun keys(carrier: Map<String, Any>): Iterable<String> {
-                        return carrier.keys
-                    }
-
-                    override fun get(carrier: Map<String, Any>?, key: String): String? {
-                        return (carrier?.get(key) as ByteArray?)?.decodeToString()
-                    }
-                }
-
-                val context =
-                    GlobalOpenTelemetry.getPropagators()
-                        .textMapPropagator
-                        .extract(
-                            Context.current(),
-                            message.properties.headers,
-                            RabbitMQTextMapGetter()
-                        )
-                val span = tracer.spanBuilder(path).setParent(context).startSpan()
-
-                var payload: ByteArray
-                var status: ByteArray
-                try {
-                    span.makeCurrent().use { scope ->
-                        val response = endpoint.act(MQRequest(path, body))
-                        payload =
-                            response
-                                .body()
-                                .readAllBytes() // TODO: check the response code too to catch
-                        val httpHeader = response.head().first()
-                        val statusCode = httpHeader.split(" ")[1]
-                        status =
-                            (if (statusCode[0] == '2') "ok" else "core_error").encodeToByteArray()
-                    }
-                } catch (t: Throwable) {
-                    span.recordException(t)
-                    payload =
-                        "ERROR, exception received"
-                            .toByteArray() // TODO: have a valid payload for uncaught exceptions
-                    status = "core_error".encodeToByteArray()
-                } finally {
-                    span.end()
-                }
-
-                if (replyTo != null) {
-                    val properties =
-                        AMQP.BasicProperties()
-                            .builder()
-                            .correlationId(correlationId)
-                            .headers(mapOf("x-status" to status))
-                            .build()
-                    channel.basicPublish("", replyTo, properties, payload)
-                }
-
-                channel.basicAck(message.envelope.deliveryTag, false)
-                logger.info("request for path {} processed", path)
+            if (!ALL_INFRA) {
+                infraManager.load(infraId, null, diagnosticRecorder)
             }
-        channel.basicConsume(
-            WORKER_REQUESTS_QUEUE,
-            false,
-            mapOf(),
-            DeliverCallback { _, message ->
-                if (executor.queue.count() >= WORKER_THREADS * 4) {
-                    // We directly process the message with no dispatch if there's too many locally
-                    // queued tasks. Prevents the worker from consuming all the rabbitmq at once,
-                    // which would mess with the stats and automatic scaling.
-                    callback(message)
-                } else {
-                    executor.execute { callback(message) }
+
+            connection.createChannel().use { channel -> reportActivity(channel, "ready") }
+
+            val activityChannel = connection.createChannel()
+            val channel = connection.createChannel()
+            val callback =
+                fun(message: Delivery) {
+                    reportActivity(activityChannel, "request-received")
+
+                    val replyTo = message.properties.replyTo
+                    val correlationId = message.properties.correlationId
+                    val body = message.body
+                    val path =
+                        if (message.properties.headers["x-rpc-path"] is LongString) {
+                            message.properties.headers["x-rpc-path"].toString()
+                        } else {
+                            (message.properties.headers["x-rpc-path"] as? ByteArray?)
+                                ?.decodeToString()
+                        }
+                    if (path == null) {
+                        logger.error("missing x-rpc-path header")
+                        channel.basicReject(message.envelope.deliveryTag, false)
+                        if (replyTo != null) {
+                            // TODO: response format to handle protocol error
+                            channel.basicPublish(
+                                "",
+                                replyTo,
+                                null,
+                                "missing x-rpc-path header".toByteArray()
+                            )
+                        }
+
+                        return
+                    }
+                    logger.info("received request for path {}", path)
+
+                    val endpoint = endpoints[path]
+                    if (endpoint == null) {
+                        logger.error("unknown path {}", path)
+                        channel.basicReject(message.envelope.deliveryTag, false)
+                        if (replyTo != null) {
+                            // TODO: response format to handle protocol error
+                            channel.basicPublish(
+                                "",
+                                replyTo,
+                                null,
+                                "unknown path $path".toByteArray()
+                            )
+                        }
+
+                        return
+                    }
+
+                    class RabbitMQTextMapGetter : TextMapGetter<Map<String, Any>> {
+                        override fun keys(carrier: Map<String, Any>): Iterable<String> {
+                            return carrier.keys
+                        }
+
+                        override fun get(carrier: Map<String, Any>?, key: String): String? {
+                            return (carrier?.get(key) as ByteArray?)?.decodeToString()
+                        }
+                    }
+
+                    val context =
+                        GlobalOpenTelemetry.getPropagators()
+                            .textMapPropagator
+                            .extract(
+                                Context.current(),
+                                message.properties.headers,
+                                RabbitMQTextMapGetter()
+                            )
+                    val span = tracer.spanBuilder(path).setParent(context).startSpan()
+
+                    var payload: ByteArray
+                    var status: ByteArray
+                    try {
+                        span.makeCurrent().use { scope ->
+                            val response = endpoint.act(MQRequest(path, body))
+                            payload =
+                                response
+                                    .body()
+                                    .readAllBytes() // TODO: check the response code too to catch
+                            val httpHeader = response.head().first()
+                            val statusCode = httpHeader.split(" ")[1]
+                            status =
+                                (if (statusCode[0] == '2') "ok" else "core_error")
+                                    .encodeToByteArray()
+                        }
+                    } catch (t: Throwable) {
+                        span.recordException(t)
+                        payload =
+                            "ERROR, exception received"
+                                .toByteArray() // TODO: have a valid payload for uncaught exceptions
+                        status = "core_error".encodeToByteArray()
+                    } finally {
+                        span.end()
+                    }
+
+                    if (replyTo != null) {
+                        val properties =
+                            AMQP.BasicProperties()
+                                .builder()
+                                .correlationId(correlationId)
+                                .headers(mapOf("x-status" to status))
+                                .build()
+                        channel.basicPublish("", replyTo, properties, payload)
+                    }
+
+                    channel.basicAck(message.envelope.deliveryTag, false)
+                    logger.info("request for path {} processed", path)
                 }
-            },
-            { _ -> logger.error("consumer cancelled") },
-            { consumerTag, e -> logger.info("consume shutdown: {}, {}", consumerTag, e.toString()) }
-        )
+            channel.basicConsume(
+                WORKER_REQUESTS_QUEUE,
+                false,
+                mapOf(),
+                DeliverCallback { _, message ->
+                    if (executor.queue.count() >= WORKER_THREADS * 4) {
+                        // We directly process the message with no dispatch if there's too many
+                        // locally queued tasks. Prevents the worker from consuming all the rabbitmq
+                        // at once, which would mess with the stats and automatic scaling.
+                        callback(message)
+                    } else {
+                        executor.execute { callback(message) }
+                    }
+                },
+                { _ -> logger.error("consumer cancelled") },
+                { consumerTag, e ->
+                    logger.info("consume shutdown: {}, {}", consumerTag, e.toString())
+                }
+            )
 
-        logger.info("consume ended")
+            logger.info("consume ended")
 
-        while (true) {
-            Thread.sleep(100)
-            if (!channel.isOpen()) break
+            while (true) {
+                Thread.sleep(100)
+                if (!channel.isOpen()) break
+            }
+
+            return 0
         }
-
-        return 0
     }
 
     private fun reportActivity(activityChannel: Channel, event: String) {
