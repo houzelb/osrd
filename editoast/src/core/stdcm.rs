@@ -13,12 +13,12 @@ use utoipa::ToSchema;
 
 use super::conflict_detection::Conflict;
 use super::conflict_detection::TrainRequirements;
-use super::pathfinding::PathfindingResult;
 use super::pathfinding::PathfindingResultSuccess;
 use super::pathfinding::TrackRange;
 use super::simulation::PhysicsRollingStock;
 use super::simulation::SimulationResponse;
-use crate::core::{AsCoreRequest, Json};
+use crate::core::AsCoreRequest;
+use crate::core::Json;
 use crate::views::path::pathfinding::PathfindingResult;
 
 #[derive(Debug, Serialize)]
