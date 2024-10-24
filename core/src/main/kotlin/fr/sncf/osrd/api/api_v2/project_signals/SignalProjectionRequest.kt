@@ -5,7 +5,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import fr.sncf.osrd.api.api_v2.DirectionalTrackRange
-import fr.sncf.osrd.api.api_v2.SignalSighting
+import fr.sncf.osrd.api.api_v2.SpacingRequirement
 import fr.sncf.osrd.api.api_v2.ZoneUpdate
 import fr.sncf.osrd.utils.json.UnitAdapterFactory
 import fr.sncf.osrd.utils.units.TimeDelta
@@ -21,7 +21,7 @@ class SignalProjectionRequest(
 )
 
 class TrainSimulation(
-    @Json(name = "signal_sightings") val signalSightings: Collection<SignalSighting>,
+    @Json(name = "spacing_requirements") val spacingRequirements: Collection<SpacingRequirement>,
     @Json(name = "zone_updates") val zoneUpdates: Collection<ZoneUpdate>,
     @Json(name = "simulation_end_time") val simulationEndTime: TimeDelta,
 )

@@ -29,7 +29,6 @@ use crate::core::pathfinding::PathfindingResultSuccess;
 use crate::core::simulation::CompleteReportTrain;
 use crate::core::simulation::PhysicsConsistParameters;
 use crate::core::simulation::ReportTrain;
-use crate::core::simulation::SignalSighting;
 use crate::core::simulation::SimulationMargins;
 use crate::core::simulation::SimulationPath;
 use crate::core::simulation::SimulationPowerRestrictionItem;

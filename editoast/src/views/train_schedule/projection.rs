@@ -26,6 +26,7 @@ use crate::core::signal_projection::SignalUpdate;
 use crate::core::signal_projection::SignalUpdatesRequest;
 use crate::core::signal_projection::TrainSimulation;
 use crate::core::simulation::SimulationResponse;
+use crate::core::simulation::SpacingRequirement;
 use crate::core::AsCoreRequest;
 use crate::core::CoreClient;
 use crate::error::Result;
@@ -39,7 +40,6 @@ use crate::views::path::projection::TrackLocationFromPath;
 use crate::views::train_schedule::train_simulation_batch;
 use crate::views::train_schedule::CompleteReportTrain;
 use crate::views::train_schedule::ReportTrain;
-use crate::views::train_schedule::SignalSighting;
 use crate::views::train_schedule::ZoneUpdate;
 use crate::views::AuthenticationExt;
 use crate::views::AuthorizationError;
@@ -208,7 +208,7 @@ async fn project_path(
 
         let CompleteReportTrain {
             report_train,
-            signal_sightings,
+            spacing_requirements,
             zone_updates,
             ..
         } = match sim {
@@ -222,7 +222,7 @@ async fn project_path(
         let train_details = TrainSimulationDetails {
             positions,
             times,
-            signal_sightings,
+            spacing_requirements,
             zone_updates,
             train_path: track_ranges,
         };
@@ -334,7 +334,7 @@ struct TrainSimulationDetails {
     positions: Vec<u64>,
     times: Vec<u64>,
     train_path: Vec<TrackRange>,
-    signal_sightings: Vec<SignalSighting>,
+    spacing_requirements: Vec<SpacingRequirement>,
     zone_updates: Vec<ZoneUpdate>,
 }
 
@@ -362,7 +362,7 @@ async fn compute_batch_signal_updates<'a>(
                 (
                     *id,
                     TrainSimulation {
-                        signal_sightings: &details.signal_sightings,
+                        spacing_requirements: &details.spacing_requirements,
                         zone_updates: &details.zone_updates,
                         simulation_end_time: details.times[details.times.len() - 1],
                     },
@@ -586,7 +586,7 @@ mod tests {
             positions,
             times,
             train_path,
-            signal_sightings: vec![],
+            spacing_requirements: vec![],
             zone_updates: vec![],
         };
 
@@ -620,7 +620,7 @@ mod tests {
             positions: positions.clone(),
             times: times.clone(),
             train_path,
-            signal_sightings: vec![],
+            spacing_requirements: vec![],
             zone_updates: vec![],
         };
 
@@ -657,7 +657,7 @@ mod tests {
             positions,
             times,
             train_path,
-            signal_sightings: vec![],
+            spacing_requirements: vec![],
             zone_updates: vec![],
         };
 

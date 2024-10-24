@@ -322,7 +322,7 @@ pub struct SignalSighting {
     pub state: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, PartialEq, Hash, Serialize, Deserialize, ToSchema)]
 pub struct SpacingRequirement {
     pub zone: String,
     // Time in ms

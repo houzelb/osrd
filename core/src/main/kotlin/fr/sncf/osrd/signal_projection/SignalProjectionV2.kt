@@ -1,7 +1,7 @@
 package fr.sncf.osrd.signal_projection
 
 import fr.sncf.osrd.api.FullInfra
-import fr.sncf.osrd.api.api_v2.SignalSighting
+import fr.sncf.osrd.api.api_v2.SpacingRequirement
 import fr.sncf.osrd.api.api_v2.ZoneUpdate
 import fr.sncf.osrd.api.api_v2.project_signals.SignalUpdate
 import fr.sncf.osrd.conflicts.TravelledPath
@@ -11,9 +11,15 @@ import fr.sncf.osrd.signaling.SignalingSimulator
 import fr.sncf.osrd.signaling.ZoneStatus
 import fr.sncf.osrd.sim_infra.api.*
 import fr.sncf.osrd.sim_infra.impl.ChunkPath
-import fr.sncf.osrd.standalone_sim.*
+import fr.sncf.osrd.standalone_sim.PathOffsetBuilder
+import fr.sncf.osrd.standalone_sim.PathSignal
+import fr.sncf.osrd.standalone_sim.pathSignalsInRange
+import fr.sncf.osrd.standalone_sim.trainPathBlockOffset
 import fr.sncf.osrd.utils.indexing.StaticIdxList
-import fr.sncf.osrd.utils.units.*
+import fr.sncf.osrd.utils.units.Duration
+import fr.sncf.osrd.utils.units.Length
+import fr.sncf.osrd.utils.units.TimeDelta
+import fr.sncf.osrd.utils.units.meters
 import java.awt.Color
 
 data class SignalAspectChangeEventV2(val newAspect: String, val time: TimeDelta)
@@ -23,7 +29,7 @@ fun projectSignals(
     chunkPath: ChunkPath,
     blockPath: StaticIdxList<Block>,
     routePath: StaticIdxList<Route>,
-    signalSightings: Collection<SignalSighting>,
+    spacingRequirements: Collection<SpacingRequirement>,
     zoneUpdates: Collection<ZoneUpdate>,
     simulationEndTime: TimeDelta
 ): List<SignalUpdate> {
@@ -56,7 +62,7 @@ fun projectSignals(
     var zoneCount = 0
     for (block in blockPath) {
         for (zonePath in blockInfra.getBlockPath(block)) {
-            val zone = rawInfra.getNextZone(rawInfra.getZonePathEntry(zonePath))!!
+            val zone = rawInfra.getZonePathZone(zonePath)
             val zoneName = rawInfra.getZoneName(zone)
             zoneMap[zoneName] = zoneCount
             zoneCount++
@@ -78,8 +84,8 @@ fun projectSignals(
         )
     if (pathSignals.isEmpty()) return emptyList()
 
-    val signalAspectChangeEvents =
-        computeSignalAspectChangeEvents(
+    val signalAspectChangeInfos =
+        computeSignalAspectChangeInfos(
             blockPath,
             routePath,
             zoneMap,
@@ -91,21 +97,28 @@ fun projectSignals(
             loadedSignalInfra,
             leastConstrainingStates,
         )
+    val zoneSpacingRequirementStarts =
+        spacingRequirements.associateBy({ it.zone }, { it.beginTime })
     val signalUpdates =
         signalUpdates(
             pathSignals,
-            signalAspectChangeEvents,
+            signalAspectChangeInfos,
             loadedSignalInfra,
             sigSystemManager,
             rawInfra,
-            signalSightings,
+            zoneSpacingRequirementStarts,
             Length(chunkPath.endOffset - chunkPath.beginOffset),
             simulationEndTime
         )
     return signalUpdates
 }
 
-private fun computeSignalAspectChangeEvents(
+data class SignalAspectChangeInfo(
+    val farthestProtectedZoneName: String?,
+    val events: List<SignalAspectChangeEventV2>,
+)
+
+private fun computeSignalAspectChangeInfos(
     blockPath: StaticIdxList<Block>,
     routePath: StaticIdxList<Route>,
     zoneToPathIndexMap: Map<String, Int>,
@@ -116,7 +129,7 @@ private fun computeSignalAspectChangeEvents(
     rawInfra: RawInfra,
     loadedSignalInfra: LoadedSignalInfra,
     leastConstrainingStates: Map<SignalingSystemId, SigState>,
-): Map<PathSignal, MutableList<SignalAspectChangeEventV2>> {
+): Map<PathSignal, SignalAspectChangeInfo> {
     val routes = routePath.toList()
     val zoneCount = blockPath.sumOf { blockInfra.getBlockPath(it).size }
     val zoneStates = ArrayList<ZoneStatus>(zoneCount)
@@ -149,10 +162,11 @@ private fun computeSignalAspectChangeEvents(
 
     val signalAspectChangeEvents =
         pathSignals.associateBy({ it }, { mutableListOf<SignalAspectChangeEventV2>() })
+    val signalFarthestProtectedZoneName = mutableMapOf<PathSignal, String>()
     for (event in zoneUpdates) {
         if (!zoneToPathIndexMap.containsKey(event.zone)) continue
-        if (event.isEntry) zoneStates[zoneToPathIndexMap[event.zone]!!] = ZoneStatus.OCCUPIED
-        else zoneStates[zoneToPathIndexMap[event.zone]!!] = ZoneStatus.CLEAR
+        zoneStates[zoneToPathIndexMap[event.zone]!!] =
+            if (event.isEntry) ZoneStatus.OCCUPIED else ZoneStatus.CLEAR
 
         val simulatedSignalStates =
             simulator.evaluate(
@@ -171,6 +185,10 @@ private fun computeSignalAspectChangeEvents(
             val signal = pathSignal.signal
             val aspect = simulatedAspects[signal] ?: continue
             if (signalAspects[signal]!! == aspect) continue
+            // Remember the zone that triggers the first signal change
+            if (signalAspectChangeEvents[pathSignal]!!.isEmpty()) {
+                signalFarthestProtectedZoneName[pathSignal] = event.zone
+            }
             signalAspectChangeEvents[pathSignal]!!.add(
                 SignalAspectChangeEventV2(aspect, event.time)
             )
@@ -178,18 +196,21 @@ private fun computeSignalAspectChangeEvents(
         }
     }
     return signalAspectChangeEvents
+        .map { it.key to SignalAspectChangeInfo(signalFarthestProtectedZoneName[it.key], it.value) }
+        .toMap()
 }
 
 private fun signalUpdates(
     signalsOnPath: List<PathSignal>,
-    signalAspectChangeEvents: Map<PathSignal, MutableList<SignalAspectChangeEventV2>>,
+    signalAspectChangeInfos: Map<PathSignal, SignalAspectChangeInfo>,
     loadedSignalInfra: LoadedSignalInfra,
     sigSystemManager: SigSystemManager,
     rawInfra: RawInfra,
-    signalSightings: Collection<SignalSighting>,
+    zoneSpacingRequirementStarts: Map<String, TimeDelta>,
     travelledPathLength: Length<TravelledPath>,
     simulationEndTime: TimeDelta,
 ): MutableList<SignalUpdate> {
+
     val signalUpdates = mutableListOf<SignalUpdate>()
 
     // Let's generate signal updates for the SNCF GET
@@ -221,13 +242,12 @@ private fun signalUpdates(
         }
     }
 
-    val signalSightingMap = signalSightings.associateBy { it.signal }
-
     val nextSignal = mutableMapOf<LogicalSignalId, PathSignal>()
-    for (i in 0 until signalsOnPath.size - 1) nextSignal[signalsOnPath[i].signal] =
-        signalsOnPath[i + 1]
+    for (i in 0 until signalsOnPath.size - 1) {
+        nextSignal[signalsOnPath[i].signal] = signalsOnPath[i + 1]
+    }
 
-    for ((pathSignal, events) in signalAspectChangeEvents) {
+    for ((pathSignal, info) in signalAspectChangeInfos) {
         val signal = pathSignal.signal
         val signalingSystem = loadedSignalInfra.getSignalingSystem(signal)
         val signalingSystemName = sigSystemManager.getName(signalingSystem)
@@ -238,16 +258,17 @@ private fun signalUpdates(
             if (nextSignal.contains(signal)) nextSignal[signal]!!.pathOffset
             else travelledPathLength
 
-        if (events.isEmpty()) continue
+        if (info.events.isEmpty()) continue
 
         // Compute the "green" section
         // It happens before the first event
         if (
-            events.first().time != Duration.ZERO && signalSightingMap.contains(physicalSignalName)
+            info.events.first().time != Duration.ZERO &&
+                zoneSpacingRequirementStarts.contains(info.farthestProtectedZoneName)
         ) {
-            val event = events.first()
+            val event = info.events.first()
             val timeEnd = event.time
-            val timeStart = signalSightingMap[physicalSignalName]!!.time
+            val timeStart = zoneSpacingRequirementStarts[info.farthestProtectedZoneName]!!
             if (timeEnd > timeStart) {
                 signalUpdates.add(
                     SignalUpdate(
@@ -265,9 +286,9 @@ private fun signalUpdates(
             }
         }
 
-        for (i in 0 until events.size - 1) {
-            val event = events[i]
-            val nextEvent = events[i + 1]
+        for (i in 0 until info.events.size - 1) {
+            val event = info.events[i]
+            val nextEvent = info.events[i + 1]
             signalUpdates.add(
                 SignalUpdate(
                     physicalSignalName!!,
@@ -284,8 +305,8 @@ private fun signalUpdates(
         }
 
         // The last event only generates an update if the signal doesn't return to VL
-        if (events.last().newAspect != "VL" && events.last().newAspect != "300VL") {
-            val event = events.last()
+        if (info.events.last().newAspect != "VL" && info.events.last().newAspect != "300VL") {
+            val event = info.events.last()
             val timeStart = event.time
             signalUpdates.add(
                 SignalUpdate(

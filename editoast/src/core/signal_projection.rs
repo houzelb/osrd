@@ -4,11 +4,11 @@ use serde::Serialize;
 use std::collections::HashMap;
 use utoipa::ToSchema;
 
-use crate::core::simulation::SignalSighting;
 use crate::core::simulation::ZoneUpdate;
 use crate::core::{AsCoreRequest, Json};
 
 use super::pathfinding::TrackRange;
+use super::simulation::SpacingRequirement;
 
 #[derive(Debug, Serialize)]
 pub struct SignalUpdatesRequest<'a> {
@@ -51,7 +51,7 @@ pub struct SignalUpdate {
 
 #[derive(Debug, Serialize)]
 pub struct TrainSimulation<'a> {
-    pub signal_sightings: &'a Vec<SignalSighting>,
+    pub spacing_requirements: &'a Vec<SpacingRequirement>,
     pub zone_updates: &'a Vec<ZoneUpdate>,
     pub simulation_end_time: u64,
 }
