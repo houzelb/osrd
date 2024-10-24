@@ -72,7 +72,6 @@ class RollingStockSelectorPage extends CommonPage {
       });
     this.electricRollingStockFirstIcon = this.electricRollingStockIcons.first();
     this.thermalRollingStockFirstIcon = this.thermalRollingStockIcons.first();
-    // this.rollingStockList = page.locator('.rollingstock-editor-list .rollingstock-title');
     this.noRollingStockResult = page.locator('.rollingstock-empty');
     this.comfortHeatingButton = page.getByTestId('comfort-heating-button');
     this.comfortACButton = page.getByTestId('comfort-ac-button');
@@ -85,7 +84,7 @@ class RollingStockSelectorPage extends CommonPage {
   }
 
   async isAnyRollingstockFound() {
-    const resultFound = (await this.resultsFound.textContent()) as string;
+    const resultFound = (await this.resultsFound.textContent())!;
     expect(Number(resultFound.slice(0, 1)) >= 1).toBeTruthy();
   }
 
@@ -124,7 +123,7 @@ class RollingStockSelectorPage extends CommonPage {
     return extractNumberFromString(await this.rollingStockSearchResult.innerText());
   }
 
-  // Clicks to open the empty rolling stock selector.
+  // Click to open the empty rolling stock selector.
   async openEmptyRollingStockSelector() {
     await this.emptyRollingStockSelector.click();
   }

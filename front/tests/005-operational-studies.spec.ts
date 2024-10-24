@@ -2,6 +2,7 @@ import { expect } from '@playwright/test';
 
 import type { LightRollingStock, Project, Scenario, Study } from 'common/api/osrdEditoastApi';
 
+import { electricRollingStockName } from './assets/project_const';
 import RoutePage from './pages/op-route-page-model';
 import OperationalStudiesPage from './pages/operational-studies-page-model';
 import RollingStockSelectorPage from './pages/rollingstock-selector-page-model';
@@ -17,7 +18,7 @@ test.describe('Verify simulation configuration in operational studies', () => {
   let rollingStock: LightRollingStock;
 
   test.beforeAll('Fetch rolling stock ', async () => {
-    rollingStock = await getRollingStock('electric_rolling_stock_test_e2e');
+    rollingStock = await getRollingStock(electricRollingStockName);
   });
 
   test.beforeEach('Set up the project, study, and scenario', async () => {

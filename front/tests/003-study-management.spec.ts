@@ -30,7 +30,8 @@ test.describe('Validate the Study creation workflow', () => {
   /** *************** Test 1 **************** */
   test('Create a new study', async ({ page }) => {
     const studyPage = new StudyPage(page);
-    await page.goto(`/operational-studies/projects/${project.id}`); // Navigate to project page
+    // Navigate to project page
+    await page.goto(`/operational-studies/projects/${project.id}`);
 
     // Set translations based on the language
     const translations = OSRDLanguage === 'English' ? enTranslations : frTranslations;
@@ -71,11 +72,11 @@ test.describe('Validate the Study creation workflow', () => {
 
   /** *************** Test 2 **************** */
   test('Update an existing study', async ({ page }) => {
+    const studyPage = new StudyPage(page);
     // Create a study
     study = await createStudy(project.id, generateUniqueName(studyData.name));
-    const studyPage = new StudyPage(page);
-    await page.goto(`/operational-studies/projects/${project.id}/studies/${study.id}`); // Navigate to study page
-
+    // Navigate to study page
+    await page.goto(`/operational-studies/projects/${project.id}/studies/${study.id}`);
     const translations = OSRDLanguage === 'English' ? enTranslations : frTranslations;
     const tomorrowDateISO = new Date(Date.now() + 86400000).toISOString().split('T')[0]; // Get tomorrow's date in ISO format
     const expectedDate = formatDateToDayMonthYear(tomorrowDateISO);

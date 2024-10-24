@@ -66,21 +66,21 @@ class OperationalStudiesTimetablePage {
 
   // Function to wait for an element to be visible and then assert its visibility
   static async waitForElementVisibility(locator: Locator): Promise<void> {
-    await locator.waitFor({ state: 'visible' });
+    await locator.waitFor({ state: 'visible', timeout: 30 * 1000 });
     await expect(locator).toBeVisible();
   }
 
-  // Gets the button locator of a train element.
+  // Get the button locator of a train element.
   static getTrainButton(trainSelector: Locator): Locator {
     return trainSelector.getByTestId('scenario-timetable-train-button');
   }
 
-  // Waits for the simulation results to be in the DOM
+  // Wait for the simulation results to be in the DOM
   async waitForSimulationResults(): Promise<void> {
     await this.page.waitForSelector('.simulation-results', { state: 'attached' });
   }
 
-  // Verifies that the message "The timetable contains invalid trains" is visible
+  // Verify that the message "The timetable contains invalid trains" is visible
   async verifyInvalidTrainsMessageVisibility(selectedLanguage: string): Promise<void> {
     const translations = selectedLanguage === 'English' ? enTranslations : frTranslations;
     const invalidTrainsMessageText = await this.invalidTrainsMessage.innerText();
@@ -113,14 +113,14 @@ class OperationalStudiesTimetablePage {
     );
   }
 
-  // Clicks the train validity filter button based on the provided translation
+  // Click the train validity filter button based on the provided translation
   async clickValidityTrainFilterButton(filterTranslation: string): Promise<void> {
     // TODO: use id on the Select element
     const filterButtonLocator = this.page.locator('#train-validity-and-label select');
     await filterButtonLocator.selectOption({ label: filterTranslation });
   }
 
-  // Clicks the train honored filter button based on the provided translation
+  // Click the train honored filter button based on the provided translation
   async clickHonoredTrainFilterButton(filterTranslation: string): Promise<void> {
     // TODO: use id on the Select element
     const filterButtonLocator = this.page.locator(
@@ -150,7 +150,7 @@ class OperationalStudiesTimetablePage {
     await this.timetableFilterButtonClose.click();
   }
 
-  // Verifies that the imported train number is correct
+  // Verify that the imported train number is correct
   async verifyTrainCount(trainCount: number): Promise<void> {
     await this.page.waitForLoadState('networkidle');
     expect(this.timetableTrains).toHaveCount(trainCount);
@@ -212,9 +212,9 @@ class OperationalStudiesTimetablePage {
   }
 
   async verifyTimeStopsDataSheetVisibility(timeout = 60 * 1000): Promise<void> {
-    await this.timeStopsDataSheet.scrollIntoViewIfNeeded();
     // Wait for the Times and Stops simulation dataSheet to be fully loaded with a specified timeout (default: 60 seconds)
     await expect(this.timeStopsDataSheet).toBeVisible({ timeout });
+    await this.timeStopsDataSheet.scrollIntoViewIfNeeded();
   }
 
   async clickOnEditTrain() {

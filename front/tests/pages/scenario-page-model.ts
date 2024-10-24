@@ -12,7 +12,6 @@ type ScenarioDetails = {
 };
 
 class ScenarioPage extends CommonPage {
-  // Page Locators
   readonly scenarioUpdateButton: Locator;
 
   readonly scenarioConfirmDeleteButton: Locator;
@@ -67,7 +66,7 @@ class ScenarioPage extends CommonPage {
     this.scenarioTagsLabel = page.getByTestId('scenario-details-tag');
   }
 
-  // Creates a scenario based on the provided details.
+  // Create a scenario based on the provided details.
   async createScenario(details: ScenarioDetails) {
     expect(this.addScenarioButton).toBeVisible();
     await this.addScenarioButton.click();
@@ -76,7 +75,7 @@ class ScenarioPage extends CommonPage {
     await this.page.waitForURL('**/scenarios/*');
   }
 
-  // Updates a scenario based on the provided details.
+  // Update a scenario based on the provided details.
   async updateScenario(details: ScenarioDetails) {
     await this.clickOnUpdateScenario();
     await this.fillScenarioDetails(details);
@@ -84,7 +83,7 @@ class ScenarioPage extends CommonPage {
     await this.page.waitForURL('**/scenarios/*');
   }
 
-  // Fills the scenario details in the form inputs.
+  // Fill the scenario details in the form inputs.
   private async fillScenarioDetails({
     name,
     description,
@@ -111,7 +110,7 @@ class ScenarioPage extends CommonPage {
     }
   }
 
-  // Validates if all scenario details are displayed correctly.
+  // Validate if all scenario details are displayed correctly.
   async validateScenarioData({
     name,
     description,
@@ -132,26 +131,26 @@ class ScenarioPage extends CommonPage {
     }
   }
 
-  // Retrieves a scenario by its name.
+  // Retrieve a scenario by its name.
   getScenarioByName(name: string) {
     return this.page.locator(`text=${name}`);
   }
 
-  // Retrieves scenario tags by ID.
+  // Retrieve scenario tags by ID.
   getScenarioTags(id: string) {
     return this.page.getByTestId(`scenario-card-${id}`).locator('.scenario-card-tags');
   }
 
-  // Opens a Scenario by its test ID (The Test ID is the same as the Name).
+  // Open a Scenario by its test ID (The Test ID is the same as the Name).
   async openScenarioByTestId(scenarioTestId: string) {
     await this.page.getByTestId(scenarioTestId).first().hover({ trial: true });
     await this.page.getByTestId(scenarioTestId).getByTestId('openScenario').click();
   }
 
-  // Sets the scenario electric profile by name.
+  // Set the scenario electric profile by name.
   async setScenarioElectricProfileByName(electricProfileName: string) {
     await this.scenarioElectricProfileSelect.click();
-    await this.page.locator('#-selecttoggle').getByText(electricProfileName).click();
+    await this.page.locator('#select-toggle').getByText(electricProfileName).click();
   }
 
   // Click on the update scenario button.
@@ -160,7 +159,7 @@ class ScenarioPage extends CommonPage {
     await this.scenarioUpdateButton.click();
   }
 
-  // Deletes a scenario.
+  // Delete a scenario.
   async deleteScenario() {
     await this.scenarioConfirmDeleteButton.click();
     await expect(this.scenarioConfirmDeleteButton).not.toBeVisible();

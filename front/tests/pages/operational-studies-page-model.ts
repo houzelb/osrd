@@ -55,7 +55,7 @@ class OperationalStudiesPage extends CommonPage {
       .locator('.scenario-timetable-train');
   }
 
-  // Clicks on the button to add a scenario train.
+  // Click on the button to add a scenario train.
   async clickOnAddTrainButton() {
     await this.addScenarioTrainButton.click();
   }
@@ -80,13 +80,13 @@ class OperationalStudiesPage extends CommonPage {
     await this.simulationSettingsTab.click();
   }
 
-  // Verifies that the Rolling Stock and Route tabs have warning classes.
+  // Verify that the Rolling Stock and Route tabs have warning classes.
   async verifyTabWarningPresence() {
     await expect(this.rollingStockTab).toHaveClass(/warning/);
     await expect(this.routeTab).toHaveClass(/warning/);
   }
 
-  // Verifies that the Rolling Stock and Route tabs do not have warning classes.
+  // Verify that the Rolling Stock and Route tabs do not have warning classes.
   async verifyTabWarningAbsence() {
     await expect(this.rollingStockTab).not.toHaveClass(/warning/);
     await expect(this.routeTab).not.toHaveClass(/warning/);

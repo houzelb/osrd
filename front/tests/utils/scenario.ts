@@ -15,7 +15,7 @@ interface SetupResult {
 }
 
 /**
- * Sets up a scenario by fetching required infrastructure, project, study, and creating a new scenario.
+ * Set up a scenario by fetching required infrastructure, project, study, and creating a new scenario.
  *
  * @param {number | null} [electricalProfileId=null] - Optional electrical profile ID for the scenario.
  * @returns {Promise<SetupResult>} - The setup result containing the infrastructure, project, study, scenario, and timetable result.
@@ -51,11 +51,11 @@ export default async function createScenario(
   }
 
   // Create a new timetable result
-  const timetableResult = await postApiRequest(`/api/timetable/`);
+  const timetableResult = await postApiRequest(`/api/timetable`);
 
   // Create a new scenario with a unique name using UUID
   const scenario: Scenario = await postApiRequest(
-    `/api/projects/${project.id}/studies/${study.id}/scenarios/`,
+    `/api/projects/${project.id}/studies/${study.id}/scenarios`,
     {
       ...scenarioData,
       name: `${scenarioData.name} ${uuidv4()}`, // Generating a unique name

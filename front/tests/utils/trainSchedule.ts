@@ -5,7 +5,7 @@ import type { TrainScheduleResult } from 'common/api/osrdEditoastApi';
 import { getApiContext, handleErrorResponse, postApiRequest } from './api-setup';
 
 /**
- * Sends train schedules to the API for a specific timetable and returns the result.
+ * Send train schedules to the API for a specific timetable and returns the result.
  *
  * @param {number} timetableId - The ID of the timetable for which the train schedules are being sent.
  * @param {object} body - The request payload containing train schedule data.
@@ -32,7 +32,7 @@ export async function sendTrainSchedules(
 }
 
 /**
- * Extracts the train IDs from an array of train schedule results.
+ * Extract the train IDs from an array of train schedule results.
  *
  * @param {TrainScheduleResult[]} trainSchedules - An array of train schedule results.
  * @returns {number[]} - An array of train IDs extracted from the train schedules.
@@ -42,7 +42,7 @@ export function getTrainIds(trainSchedules: TrainScheduleResult[]) {
 }
 
 /**
- * Posts a simulation summary for the provided train IDs and infrastructure ID.
+ * Post a simulation summary for the provided train IDs and infrastructure ID.
  *
  * @param {TrainScheduleResult[]} response - The train schedule results from which to extract train IDs.
  * @param {number} infraId - The infrastructure ID for the simulation.

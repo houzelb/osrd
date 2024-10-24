@@ -1,5 +1,6 @@
 import type { Project, Scenario, Study } from 'common/api/osrdEditoastApi';
 
+import { electricRollingStockName } from './assets/project_const';
 import HomePage from './pages/home-page-model';
 import RoutePage from './pages/op-route-page-model';
 import OperationalStudiesPage from './pages/operational-studies-page-model';
@@ -9,11 +10,11 @@ import createScenario from './utils/scenario';
 import { deleteScenario } from './utils/teardown-utils';
 
 test.describe('Route Tab Verification', () => {
+  test.slow();
   let project: Project;
   let study: Study;
   let scenario: Scenario;
   let OSRDLanguage: string;
-  const electricRollingStockName = 'electric_rolling_stock_test_e2e';
 
   test.beforeAll('Set up the scenario', async () => {
     ({ project, study, scenario } = await createScenario());
@@ -106,8 +107,6 @@ test.describe('Route Tab Verification', () => {
     page,
     browserName,
   }) => {
-    test.slow(browserName === 'webkit', 'This test is slow on Safari');
-
     const routePage = new RoutePage(page);
 
     // Perform pathfinding by station trigrams and verify map markers in Chromium

@@ -171,7 +171,7 @@ function SelectImproved<T extends string | SelectOptionObject>({
             </div>
           )}
           <div
-            id="-selecttoggle"
+            id="select-toggle"
             className={cx('select-menu', {
               'add-border-top': noTogglingHeader,
               'position-relative': blockMenu,
