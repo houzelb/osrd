@@ -180,7 +180,7 @@ const Study = () => {
         <div className="col-hdp-3 col-hd-4 col-lg-6">
           <AddNewCard
             translationNamespaces="operationalStudies/study"
-            testId="addScenario"
+            testId="add-scenario-button"
             className="scenario-card empty"
             modalComponent={<AddOrEditScenarioModal />}
             legendTranslationKey="createScenario"
