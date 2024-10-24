@@ -3,19 +3,21 @@ import { type Page } from 'playwright';
 interface ScrollOptions {
   stepSize?: number;
   timeout?: number;
+  scrollOffsetThreshold?: number;
 }
+
 /**
- * Scrolls a specified container element horizontally by the given step size, with a delay between steps.
+ * Scroll a specified container element horizontally by the given step size, with a delay between steps.
  *
  * @param {Page} page - The Playwright page object.
  * @param {string} containerSelector - The CSS selector for the scrollable container element.
- * @param {ScrollOptions} [options={}] - Optional scroll configuration including step size and timeout.
+ * @param {ScrollOptions} [options={}] - Optional scroll configuration including step size, timeout, and scroll offset threshold.
  * @returns {Promise<void>} - Resolves once the container has been fully scrolled.
  */
 const scrollContainer = async (
   page: Page,
   containerSelector: string,
-  { stepSize = 300, timeout = 20 }: ScrollOptions = {}
+  { stepSize = 300, timeout = 20, scrollOffsetThreshold = 200 }: ScrollOptions = {}
 ): Promise<void> => {
   // Locate the scrollable container on the page
   const container = await page.evaluateHandle(
@@ -36,7 +38,7 @@ const scrollContainer = async (
   );
 
   // Exit early if there's little or no scrollable content
-  if (scrollWidth <= clientWidth + 200) {
+  if (scrollWidth <= clientWidth + scrollOffsetThreshold) {
     await container.dispose();
     return;
   }

@@ -3,6 +3,7 @@ import { expect } from '@playwright/test';
 import type { ElectricalProfileSet, Project, Scenario, Study } from 'common/api/osrdEditoastApi';
 
 import scenarioData from './assets/operationStudies/scenario.json';
+import { infrastructureName } from './assets/project_const';
 import ScenarioPage from './pages/scenario-page-model';
 import test from './test-logger';
 import { generateUniqueName } from './utils';
@@ -39,7 +40,7 @@ test.describe('Validate the Scenario creation workflow', () => {
     await scenarioPage.createScenario({
       name: scenarioName,
       description: scenarioData.description,
-      infraName: 'small_infra_test_e2e',
+      infraName: infrastructureName,
       tags: scenarioData.tags,
       electricProfileName: electricalProfileSet.name,
     });
@@ -48,7 +49,7 @@ test.describe('Validate the Scenario creation workflow', () => {
     await scenarioPage.validateScenarioData({
       name: scenarioName,
       description: scenarioData.description,
-      infraName: 'small_infra_test_e2e',
+      infraName: infrastructureName,
     });
     await deleteScenario(project.id, study.id, scenarioName);
   });
@@ -85,7 +86,7 @@ test.describe('Validate the Scenario creation workflow', () => {
     await scenarioPage.validateScenarioData({
       name: updatedScenarioName,
       description: `${scenario.description} (updated)`,
-      infraName: 'small_infra_test_e2e',
+      infraName: infrastructureName,
     });
 
     // Delete the scenario

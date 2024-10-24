@@ -18,8 +18,6 @@ type StudyDetails = {
 };
 
 class StudyPage extends CommonPage {
-  // Page Locators
-
   readonly studyUpdateButton: Locator;
 
   readonly studyName: Locator;
@@ -76,7 +74,6 @@ class StudyPage extends CommonPage {
 
   constructor(page: Page) {
     super(page);
-    // Page locators
     this.studyName = page.getByTestId('study-name-info');
     this.studyType = page.locator('.study-details-type');
     this.studyState = page.getByTestId('study-state-step-label');
@@ -114,7 +111,7 @@ class StudyPage extends CommonPage {
     );
   }
 
-  // Fills the study details in the form inputs.
+  // Fill the study details in the form inputs.
   private async fillStudyDetails(details: StudyDetails) {
     const {
       name,
@@ -142,7 +139,7 @@ class StudyPage extends CommonPage {
     for (const tag of tags) await this.setTag(tag);
   }
 
-  // Creates a study based on the provided details.
+  // Create a study based on the provided details.
   async createStudy(details: StudyDetails) {
     await expect(this.addStudyButton).toBeVisible();
     await this.addStudyButton.click();
@@ -151,7 +148,7 @@ class StudyPage extends CommonPage {
     await this.page.waitForURL('**/studies/*');
   }
 
-  // Updates a study based on the provided details.
+  // Update a study based on the provided details.
   async updateStudy(details: StudyDetails) {
     await this.studyUpdateButton.click();
     await this.fillStudyDetails(details);
@@ -159,7 +156,7 @@ class StudyPage extends CommonPage {
     await this.page.waitForURL('**/studies/*');
   }
 
-  // Validates that the study details match the expected values.
+  // Validate that the study details match the expected values.
   async validateStudyData(details: StudyDetails & { isUpdate?: boolean }) {
     const {
       name,
@@ -184,7 +181,7 @@ class StudyPage extends CommonPage {
     await expect(this.studyDescription).toHaveText(description);
     await expect(this.studyType).toHaveText(type);
 
-    // Verify study state based on whether it's an update or new creation
+    // Verify study state based on whether it's an update or a new creation.
     const stateLocator = isUpdate ? this.studyState.nth(1) : this.studyState.first();
     await expect(stateLocator).toHaveText(status);
 
@@ -198,7 +195,7 @@ class StudyPage extends CommonPage {
     return this.page.locator(`text=${name}`);
   }
 
-  // Opens a study by its test ID (The Test ID is the same as the Name).
+  // Open a study by its test ID (The Test ID is the same as the Name).
   async openStudyByTestId(studyTestId: string | RegExp) {
     await this.page.getByTestId(studyTestId).first().hover();
     await this.page.getByTestId(studyTestId).getByTestId('openStudy').click();
@@ -211,16 +208,16 @@ class StudyPage extends CommonPage {
 
   async setStudyStatusByText(status: string) {
     await this.studyStatusSelect.click();
-    await this.page.locator('#-selecttoggle').getByText(status).click();
+    await this.page.locator('#select-toggle').getByText(status).click();
   }
 
-  // Validates if the study's financial budget matches the expected value.
+  // Validate if the study's financial budget matches the expected value.
   async validateNumericBudget(expectedBudget: string) {
     const budgetText = await this.studyFinancialAmount.textContent();
     expect(budgetText?.replace(/[^0-9]/g, '')).toEqual(expectedBudget);
   }
 
-  // Deletes a study by its name.
+  // Delete a study by its name.
   async deleteStudy(name: string) {
     await this.openStudyByTestId(name);
     await this.studyUpdateButton.click();

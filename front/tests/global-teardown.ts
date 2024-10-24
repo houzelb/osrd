@@ -1,19 +1,14 @@
 import { test as teardown } from '@playwright/test';
 
+import ROLLING_STOCK_NAMES, { infrastructureName, globalProjectName } from './assets/project_const';
 import { deleteInfra, deleteProject, deleteRollingStocks } from './utils/teardown-utils';
 
 teardown('teardown', async () => {
   try {
     await Promise.all([
-      deleteInfra('small_infra_test_e2e'),
-      deleteProject('project_test_e2e'),
-      deleteRollingStocks([
-        'electric_rolling_stock_test_e2e',
-        'dual-mode_rolling_stock_test_e2e',
-        'slow_rolling_stock_test_e2e',
-        'fast_rolling_stock_test_e2e',
-        'improbable_rolling_stock_test_e2e',
-      ]),
+      deleteInfra(infrastructureName),
+      deleteProject(globalProjectName),
+      deleteRollingStocks(ROLLING_STOCK_NAMES),
     ]);
     console.info('Test data teardown completed successfully.');
   } catch (error) {

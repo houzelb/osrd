@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test';
 
+import { dualModeRollingStockName, electricRollingStockName } from './assets/project_const';
 import RollingstockEditorPage from './pages/rollingstock-editor-page-model';
 import RollingStockSelectorPage from './pages/rollingstock-selector-page-model';
 import test from './test-logger';
@@ -18,11 +19,8 @@ test.describe('Rollingstock editor page tests', () => {
 
   const rollingstockDetails = readJsonFile('./tests/assets/rollingStock/rollingstockDetails.json');
 
-  const dualModeRollingStockName = 'dual-mode_rolling_stock_test_e2e';
-  const electricRollingStockName = 'electric_rolling_stock_test_e2e';
-
   test.beforeEach(
-    'Generate unique names and ensure any existing RS are deleted',
+    'Generate unique names and ensure all existing RS are deleted',
     async ({ page }) => {
       const rollingStockEditorPage = new RollingstockEditorPage(page);
       uniqueRollingStockName = generateUniqueName('RSN');

@@ -37,25 +37,25 @@ test.describe('Home page OSRD', () => {
   });
 
   /** *************** Test 2 **************** */
-  test('Verify redirection to to the Operational Studies page', async () => {
+  test('Verify redirection to the Operational Studies page', async () => {
     await homePage.goToOperationalStudiesPage();
     await expect(homePage.page).toHaveURL(/.*\/operational-studies/); // Check the URL
   });
 
   /** *************** Test 3 **************** */
-  test('Verify redirection toto the Map page', async () => {
+  test('Verify redirection to the Map page', async () => {
     await homePage.goToCartoPage();
     await expect(homePage.page).toHaveURL(/.*\/map/);
   });
 
   /** *************** Test 4 **************** */
-  test('Verify redirection to to the Infrastructure editor page', async () => {
+  test('Verify redirection to the Infrastructure editor page', async () => {
     await homePage.goToEditorPage();
     await expect(homePage.page).toHaveURL(/.*\/editor\/*/);
   });
 
   /** *************** Test 5 **************** */
-  test('Verify redirection to to the STDCM page', async ({ context }) => {
+  test('Verify redirection to the STDCM page', async ({ context }) => {
     const stdcmPage = await homePage.goToSTDCMPage(context);
     await expect(stdcmPage).toHaveURL(/.*\/stdcm/);
   });

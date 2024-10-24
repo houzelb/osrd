@@ -4,7 +4,7 @@ import { type Locator, type Page, expect } from '@playwright/test';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
- * Fills the input field identified by ID or TestID with the specified value and verifies it.
+ * Fill the input field identified by ID or TestID with the specified value and verifies it.
  *
  * @param {Page} page - The Playwright page object.
  * @param {string} inputId - The ID or TestID of the input field.
@@ -25,7 +25,7 @@ export async function fillAndCheckInputById(
 }
 
 /**
- * Verifies the content of the input field identified by ID or TestID.
+ * Verify the content of the input field identified by ID or TestID.
  *
  * @param {Page} page - The Playwright page object.
  * @param {string} inputId - The ID or TestID of the input field.
@@ -44,7 +44,7 @@ export async function verifyAndCheckInputById(
 }
 
 /**
- * Generates a unique name by appending a truncated UUID to the base name.
+ * Generate a unique name by appending a truncated UUID to the base name.
  *
  * @param {string} baseName - The base name to append the UUID segment to.
  * @returns {string} - The generated unique name.
@@ -55,8 +55,8 @@ export const generateUniqueName = (baseName: string): string => {
 };
 
 /**
- * Extracts the first sequence of digits found in a string and returns it as a number.
- * Returns 0 if no digits are found.
+ * Extract the first sequence of digits found in a string and returns it as a number.
+ * Return 0 if no digits are found.
  *
  * @param {string} input - The string to extract the number from.
  * @returns {Promise<number>} - The extracted number or 0 if none found.
@@ -67,7 +67,7 @@ export async function extractNumberFromString(input: string): Promise<number> {
 }
 
 /**
- * Reads a JSON file from the specified path and returns its parsed content.
+ * Read a JSON file from the specified path and returns its parsed content.
  *
  * @param {string} path - The file path of the JSON file.
  * @returns {any} - The parsed JSON content.
@@ -75,20 +75,20 @@ export async function extractNumberFromString(input: string): Promise<number> {
 export const readJsonFile = (path: string) => JSON.parse(fs.readFileSync(path, 'utf8'));
 
 /**
- * Clicks on the specified element and waits for a specified delay after the click.
+ * Click on the specified element and waits for a specified delay after the click.
  *
  * @param {Locator} element - locator object representing the element to click.
  * @param {number} [delay=500] - Optional. The delay in milliseconds to wait after clicking the element. Defaults to 500ms.
  *
  * @returns {Promise<void>} - A promise that resolves after the element is clicked and the delay has passed.
  */
-export async function clickWithDelay(element: Locator, delay: number = 500): Promise<void> {
+export async function clickWithDelay(element: Locator, delay = 500): Promise<void> {
   await element.click();
   await element.page().waitForTimeout(delay);
 }
 
 /**
- * Converts a date string from YYYY-MM-DD format to "DD mmm YYYY" format.
+ * Convert a date string from YYYY-MM-DD format to "DD mmm YYYY" format.
  * @param dateString - The input date string in YYYY-MM-DD format.
  * @returns The formatted date string in "DD mmm YYYY" format.
  */
