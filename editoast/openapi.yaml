@@ -10274,6 +10274,7 @@ components:
       required:
       - id
       - name
+      - label
       - railjson_version
       - locked
       - mass
@@ -10295,6 +10296,8 @@ components:
         inertia_coefficient:
           type: number
           format: double
+        label:
+          type: string
         length:
           type: number
           format: double
@@ -10327,6 +10330,7 @@ components:
       type: object
       required:
       - name
+      - label
       - locked
       - mass
       - length
@@ -10344,6 +10348,8 @@ components:
         inertia_coefficient:
           type: number
           format: double
+        label:
+          type: string
         length:
           type: number
           format: double
