@@ -24,6 +24,7 @@ const StdcmLoader = forwardRef(
           </div>
           <div className="stdcm-loader__cancel-btn">
             <Button
+              data-testid="cancel-simulation-button"
               variant="Cancel"
               label={t('simulation.stopCalculation')}
               size="small"

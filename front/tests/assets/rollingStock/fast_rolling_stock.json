@@ -83,7 +83,7 @@
     "default_mode": "thermal"
   },
   "metadata": {
-    "detail": "fast_rolling_stock",
+    "detail": "fast",
     "family": "",
     "type": "",
     "grouping": "",
@@ -91,7 +91,7 @@
     "subseries": "",
     "unit": "",
     "number": "",
-    "reference": "fast_rolling_stock"
+    "reference": "fast"
   },
   "length": 45.56,
   "max_speed": 61.111111111111114,

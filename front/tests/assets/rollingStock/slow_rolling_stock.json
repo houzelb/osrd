@@ -42,7 +42,7 @@
     "default_mode": "thermal"
   },
   "metadata": {
-    "detail": "slow_rolling_stock",
+    "detail": "slow",
     "family": "",
     "type": "",
     "grouping": "",
@@ -50,7 +50,7 @@
     "subseries": "",
     "unit": "",
     "number": "",
-    "reference": "slow_rolling_stock"
+    "reference": "slow"
   },
   "length": 11.0,
   "max_speed": 18.055555555555557,

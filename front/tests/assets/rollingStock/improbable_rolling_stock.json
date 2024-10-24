@@ -902,7 +902,7 @@
     "default_mode": "1500V"
   },
   "metadata": {
-    "detail": "",
+    "detail": "improbable",
     "family": "",
     "type": "",
     "grouping": "",
@@ -910,7 +910,7 @@
     "subseries": "",
     "unit": "",
     "number": "",
-    "reference": "UniqueRollingStock"
+    "reference": "improbable"
   },
   "length": 400.0,
   "max_speed": 80.0,
