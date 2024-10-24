@@ -3241,6 +3241,7 @@ export type TowedRollingStock = {
   gamma: Gamma;
   id: number;
   inertia_coefficient: number;
+  label: string;
   length: number;
   locked: boolean;
   mass: number;
@@ -3253,6 +3254,7 @@ export type TowedRollingStockForm = {
   comfort_acceleration: number;
   gamma: Gamma;
   inertia_coefficient: number;
+  label: string;
   length: number;
   locked: boolean;
   mass: number;
