@@ -65,7 +65,7 @@ class HomePage extends CommonPage {
   }
 
   async goToSTDCMPage(context: BrowserContext) {
-    // Start waiting for the new page to be created
+    // Wait for the new page to be created
     const [stdcmPage] = await Promise.all([context.waitForEvent('page'), this.STDCMLink.click()]);
 
     // Ensure the new page is fully loaded before proceeding

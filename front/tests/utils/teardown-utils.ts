@@ -13,7 +13,7 @@ import {
 } from './api-setup';
 
 /**
- * Deletes infrastructure by name if it exists.
+ * Delete infrastructure by name if it exists.
  *
  * @param {string} infraName - The name of the infrastructure to delete.
  * @returns {Promise<void>} - A promise that resolves when the infrastructure is deleted or if not found.
@@ -22,14 +22,14 @@ export async function deleteInfra(infraName: string): Promise<void> {
   const infra = await getInfra(infraName);
 
   if (infra) {
-    await deleteApiRequest(`/api/infra/${infra.id}/`);
+    await deleteApiRequest(`/api/infra/${infra.id}`);
   } else {
     console.warn(`Infra "${infraName}" not found for deletion.`);
   }
 }
 
 /**
- * Deletes a project by name if it exists.
+ * Delete a project by name if it exists.
  *
  * @param {string} projectName - The name of the project to delete.
  * @returns {Promise<void>} - A promise that resolves when the project is deleted or if not found.
@@ -37,21 +37,21 @@ export async function deleteInfra(infraName: string): Promise<void> {
 export async function deleteProject(projectName: string): Promise<void> {
   const project = await getProject(projectName);
   if (project) {
-    await deleteApiRequest(`/api/projects/${project.id}/`);
+    await deleteApiRequest(`/api/projects/${project.id}`);
   } else {
     console.warn(`Project "${projectName}" not found for deletion.`);
   }
 }
 
 /**
- * Deletes rolling stocks by their names if they exist.
+ * Delete rolling stocks by their names if they exist.
  *
  * @param {string[]} rollingStockNames - The list of rolling stock names to delete.
  * @returns {Promise<void>} - A promise that resolves when the matching rolling stocks are deleted or if none are found.
  */
 export async function deleteRollingStocks(rollingStockNames: string[]): Promise<void> {
   const rollingStocks: GetLightRollingStockApiResponse = await getApiRequest(
-    '/api/light_rolling_stock/',
+    '/api/light_rolling_stock',
     { page_size: 500 }
   );
 
@@ -63,7 +63,7 @@ export async function deleteRollingStocks(rollingStockNames: string[]): Promise<
   if (rollingStockIds.length > 0) {
     // Delete each rolling stock by ID
     await Promise.all(
-      rollingStockIds.map((id: number) => deleteApiRequest(`/api/rolling_stock/${id}/`))
+      rollingStockIds.map((id: number) => deleteApiRequest(`/api/rolling_stock/${id}`))
     );
   } else {
     console.warn('No matching rolling stocks found for deletion.');
@@ -71,7 +71,7 @@ export async function deleteRollingStocks(rollingStockNames: string[]): Promise<
 }
 
 /**
- * Deletes a study by name if it exists.
+ * Delete a study by name if it exists.
  *
  * @param {string} studyName - The name of the study to delete.
  * @returns {Promise<void>} - A promise that resolves when the study is deleted or if not found.
@@ -87,7 +87,7 @@ export async function deleteStudy(projectId: number, studyName: string): Promise
 }
 
 /**
- * Deletes a scenario by name if it exists.
+ * Delete a scenario by name if it exists.
  *
  * @param {string} scenarioName - The name of the scenario to delete.
  * @returns {Promise<void>} - A promise that resolves when the scenario is deleted or if not found.

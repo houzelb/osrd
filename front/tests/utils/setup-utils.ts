@@ -13,18 +13,28 @@ import { getApiRequest, postApiRequest } from './api-setup';
 import createScenario from './scenario';
 import projectData from '../assets/operationStudies/project.json';
 import studyData from '../assets/operationStudies/study.json';
+import {
+  dualModeRollingStockName,
+  electricRollingStockName,
+  fastRollingStockName,
+  globalProjectName,
+  globalStudyName,
+  improbableRollingStockName,
+  infrastructureName,
+  slowRollingStockName,
+} from '../assets/project_const';
 
 /**
  * Helper function to create infrastructure using RailJson.
  *
- * @param {string} [infraName='small_infra_test_e2e'] - The name of the infrastructure to create.
+ * @param infraName - The name of the infrastructure to create.
  * @returns {Promise<Infra>} - The created infrastructure object.
  */
-async function createInfrastructure(infraName: string = 'small_infra_test_e2e'): Promise<Infra> {
+async function createInfrastructure(infraName = infrastructureName): Promise<Infra> {
   const smallInfraRailjson: RailJson = readJsonFile('./tests/assets/infra/infra.json');
 
   const createdInfra: PostInfraRailjsonApiResponse = await postApiRequest(
-    `/api/infra/railjson/`,
+    `/api/infra/railjson`,
     { ...smallInfraRailjson },
     {
       name: infraName,
@@ -40,29 +50,29 @@ async function createInfrastructure(infraName: string = 'small_infra_test_e2e'):
 
 /**
  * Helper function to create rolling stocks in parallel.
- * Creates multiple rolling stock entries by posting to the API.
+ * Create multiple rolling stock entries by posting to the API.
  */
 async function createRollingStocks(): Promise<void> {
   const rollingStocks = [
     {
       json: readJsonFile('./../tests/data/rolling_stocks/electric_rolling_stock.json'),
-      name: 'electric_rolling_stock_test_e2e',
+      name: electricRollingStockName,
     },
     {
       json: readJsonFile('./tests/assets/rollingStock/slow_rolling_stock.json'),
-      name: 'slow_rolling_stock_test_e2e',
+      name: slowRollingStockName,
     },
     {
       json: readJsonFile('./tests/assets/rollingStock/dual-mode_rolling_stock.json'),
-      name: 'dual-mode_rolling_stock_test_e2e',
+      name: dualModeRollingStockName,
     },
     {
       json: readJsonFile('./tests/assets/rollingStock/fast_rolling_stock.json'),
-      name: 'fast_rolling_stock_test_e2e',
+      name: fastRollingStockName,
     },
     {
       json: readJsonFile('./tests/assets/rollingStock/improbable_rolling_stock.json'),
-      name: 'improbable_rolling_stock_test_e2e',
+      name: improbableRollingStockName,
     },
   ];
 
@@ -70,7 +80,7 @@ async function createRollingStocks(): Promise<void> {
   await Promise.all(
     rollingStocks.map(({ json, name }) =>
       postApiRequest(
-        '/api/rolling_stock/',
+        '/api/rolling_stock',
         { ...json, name },
         undefined,
         'Failed to create rolling stocks'
@@ -82,12 +92,12 @@ async function createRollingStocks(): Promise<void> {
 /**
  * Helper function to create a project.
  *
- * @param {string} [projectName='project_test_e2e'] - The name of the project to create.
+ * @param projectName - The name of the project to create.
  * @returns {Promise<Project>} - The created project object.
  */
-export async function createProject(projectName: string = 'project_test_e2e'): Promise<Project> {
+export async function createProject(projectName = globalProjectName): Promise<Project> {
   const project: Project = await postApiRequest(
-    '/api/projects/',
+    '/api/projects',
     {
       ...projectData,
       name: projectName,
@@ -104,13 +114,10 @@ export async function createProject(projectName: string = 'project_test_e2e'): P
  * Helper function to create a study for a given project.
  *
  * @param {number} projectId - The ID of the project under which the study will be created.
- * @param {string} [studyName='study_test_e2e'] - The name of the study to create.
+ * @param  studyName - The name of the study to create.
  * @returns {Promise<Study>} - The created study object.
  */
-export async function createStudy(
-  projectId: number,
-  studyName: string = 'study_test_e2e'
-): Promise<Study> {
+export async function createStudy(projectId: number, studyName = globalStudyName): Promise<Study> {
   const study: Study = await postApiRequest(
     `/api/projects/${projectId}/studies`,
     {

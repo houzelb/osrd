@@ -16,7 +16,7 @@ class CommonPage {
   constructor(page: Page) {
     this.page = page;
     this.toastContainer = page.getByTestId('toast-SNCF');
-    this.toastTitle = this.toastContainer.locator('[data-testid="toast-SNCF-title"]');
+    this.toastTitle = this.toastContainer.getByTestId('toast-SNCF-title');
     this.tagField = page.getByTestId('chips-input');
     this.viteOverlay = page.locator('vite-plugin-checker-error-overlay');
     this.toastSNCF = page.getByTestId('toast-SNCF');
@@ -34,7 +34,7 @@ class CommonPage {
   }
 
   async removeViteOverlay() {
-    if ((await this.viteOverlay.count()) > 0) {
+    if (await this.viteOverlay.count()) {
       await this.viteOverlay.evaluate((node) => node.setAttribute('style', 'display:none;'));
     }
   }

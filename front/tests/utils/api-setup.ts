@@ -22,9 +22,10 @@ import type {
 } from 'common/api/osrdEditoastApi';
 
 import electricalProfileSet from '../assets/operationStudies/simulationSettings/electricalProfiles/electricalProfile.json';
+import { globalProjectName, globalStudyName, infrastructureName } from '../assets/project_const';
 
 /**
- * Initializes a new API request context with the base URL.
+ * Initialize a new API request context with the base URL.
  *
  * @returns {Promise<APIRequestContext>} - The API request context.
  */
@@ -34,7 +35,7 @@ export const getApiContext = async (): Promise<APIRequestContext> =>
   });
 
 /**
- * Sends a GET request to the specified API endpoint with optional query parameters.
+ * Send a GET request to the specified API endpoint with optional query parameters.
  *
  * @param {string} url - The API endpoint URL.
  * @param {object} [params] - Optional query parameters to include in the request.
@@ -49,23 +50,20 @@ export const getApiRequest = async (
 };
 
 /**
- * Handles API error responses by checking the status and throwing an error if the request failed.
+ * Handle API error responses by checking the status and throwing an error if the request failed.
  *
  * @param {APIResponse} response - The response object from the API request.
- * @param {string} [errorMessage='API Request Failed'] - Optional. The error message to throw if the request fails.
+ * @param errorMessage - Optional. The error message to throw if the request fails.
  * @throws {Error} - Throws an error if the response status is not OK.
  */
-export function handleErrorResponse(
-  response: APIResponse,
-  errorMessage: string = 'API Request Failed'
-) {
+export function handleErrorResponse(response: APIResponse, errorMessage = 'API Request Failed') {
   if (response.ok()) return;
 
   throw new Error(`${errorMessage}: ${response.status()} ${response.statusText()}`);
 }
 
 /**
- * Sends a POST request to the specified API endpoint with optional data and query parameters.
+ * Send a POST request to the specified API endpoint with optional data and query parameters.
  *
  * @template T
  * @param {string} url - The API endpoint URL.
@@ -87,7 +85,7 @@ export const postApiRequest = async <T>(
 };
 
 /**
- * Sends a DELETE request to the specified API endpoint.
+ * Send a DELETE request to the specified API endpoint.
  *
  * @param {string} url - The API endpoint URL.
  * @returns {Promise<APIResponse>} - The response from the API.
@@ -103,49 +101,46 @@ export const deleteApiRequest = async (
 };
 
 /**
- * Retrieves infrastructure data by name.
+ * Retrieve infrastructure data by name.
  *
- * @param {string} infraName - The name of the infrastructure to retrieve.
+ * @param  infraName - The name of the infrastructure to retrieve.
  * @returns {Promise<Infra>} - The matching infrastructure data.
  */
-export const getInfra = async (infraName: string = 'small_infra_test_e2e'): Promise<Infra> => {
-  const infras: GetInfraApiResponse = await getApiRequest('/api/infra/');
+export const getInfra = async (infraName = infrastructureName): Promise<Infra> => {
+  const infras: GetInfraApiResponse = await getApiRequest('/api/infra');
   const infra = infras.results.find((i: InfraWithState) => i.name === infraName);
   return infra as Infra;
 };
 
 /**
- * Retrieves project data by name.
+ * Retrieve project data by name.
  *
- * @param {string} projectName - The name of the project to retrieve.
+ * @param projectName - The name of the project to retrieve.
  * @returns {Promise<Project>} - The matching project data.
  */
-export const getProject = async (projectName: string = 'project_test_e2e'): Promise<Project> => {
-  const projects: GetProjectsApiResponse = await getApiRequest('/api/projects/');
+export const getProject = async (projectName = globalProjectName): Promise<Project> => {
+  const projects: GetProjectsApiResponse = await getApiRequest('/api/projects');
   const project = projects.results.find((p: ProjectWithStudies) => p.name === projectName);
   return project as Project;
 };
 
 /**
- * Retrieves study data by project ID and study name.
+ * Retrieve study data by project ID and study name.
  *
  * @param {number} projectId - The ID of the project.
- * @param {string} studyName - The name of the study to retrieve.
+ * @param  studyName - The name of the study to retrieve.
  * @returns {Promise<Study>} - The matching study data.
  */
-export const getStudy = async (
-  projectId: number,
-  studyName: string = 'study_test_e2e'
-): Promise<Study> => {
+export const getStudy = async (projectId: number, studyName = globalStudyName): Promise<Study> => {
   const studies: GetProjectsByProjectIdStudiesApiResponse = await getApiRequest(
-    `/api/projects/${projectId}/studies/`
+    `/api/projects/${projectId}/studies`
   );
   const study = studies.results.find((s: StudyWithScenarios) => s.name === studyName);
   return study as Study;
 };
 
 /**
- * Retrieves scenario data by project ID, study ID, and scenario name.
+ * Retrieve scenario data by project ID, study ID, and scenario name.
  *
  * @param {number} projectId - The ID of the project.
  * @param {number} studyId - The ID of the study.
@@ -164,14 +159,14 @@ export const getScenario = async (
 };
 
 /**
- * Retrieves rolling stock data by name.
+ * Retrieve rolling stock data by name.
  *
  * @param {string} rollingStockName - The name of the rolling stock to retrieve.
  * @returns {Promise<RollingStock>} - The matching rolling stock data.
  */
 export const getRollingStock = async (rollingStockName: string): Promise<LightRollingStock> => {
   const rollingStocks: GetLightRollingStockApiResponse = await getApiRequest(
-    '/api/light_rolling_stock/',
+    '/api/light_rolling_stock',
     { page_size: 500 }
   );
   const rollingStock = rollingStocks.results.find(
@@ -181,16 +176,16 @@ export const getRollingStock = async (rollingStockName: string): Promise<LightRo
 };
 
 /**
- * Retrieves electrical profile data by name.
+ * Retrieve electrical profile data by name.
  *
- * @param {string}  electricalProfileName - The name of the electrical profile  to retrieve.
- * @returns {Promise<ElectricalProfileSet>} - The matching electrical profile  data.
+ * @param {string}  electricalProfileName - The name of the electrical profile to retrieve.
+ * @returns {Promise<ElectricalProfileSet>} - The matching electrical profile data.
  */
 export const getElectricalProfile = async (
   electricalProfileName: string
 ): Promise<LightElectricalProfileSet> => {
   const electricalProfiles: LightElectricalProfileSet[] = await getApiRequest(
-    `/api/electrical_profile_set/`
+    `/api/electrical_profile_set`
   );
   const electricalProfile = electricalProfiles.find(
     (e: LightElectricalProfileSet) => e.name === electricalProfileName
@@ -199,7 +194,7 @@ export const getElectricalProfile = async (
 };
 
 /**
- * Sets a new electrical profile.
+ * Set a new electrical profile.
  */
 export const setElectricalProfile = async (): Promise<ElectricalProfileSet> => {
   const electricalProfile = await postApiRequest(

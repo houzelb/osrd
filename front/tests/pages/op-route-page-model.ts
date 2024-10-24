@@ -78,82 +78,82 @@ class RoutePage {
     this.missingParamMessage = page.getByTestId('missing-params-info');
   }
 
-  // Gets the name locator of a waypoint suggestion.
+  // Get the name locator of a waypoint suggestion.
   static getWaypointSuggestionNameLocator(waypointSuggestion: Locator): Locator {
     return waypointSuggestion.locator('.suggested-via-name');
   }
 
-  // Gets the CH locator of a waypoint suggestion.
+  // Get the CH locator of a waypoint suggestion.
   static getWaypointSuggestionChLocator(waypointSuggestion: Locator): Locator {
     return waypointSuggestion.locator('.suggested-via-ch');
   }
 
-  // Gets the UIC locator of a waypoint suggestion.
+  // Get the UIC locator of a waypoint suggestion.
   static getWaypointSuggestionUicLocator(waypointSuggestion: Locator): Locator {
     return waypointSuggestion.locator('.suggested-via-uic');
   }
 
-  // Gets the distance locator of a waypoint suggestion.
+  // Get the distance locator of a waypoint suggestion.
   static getWaypointSuggestionDistanceLocator(waypointSuggestion: Locator): Locator {
     return waypointSuggestion.getByTestId('suggested-via-distance');
   }
 
-  // Gets the name locator of a dropped waypoint.
+  // Get the name locator of a dropped waypoint.
   static getWaypointDroppedNameLocator(droppedWaypoint: Locator): Locator {
     return droppedWaypoint.getByTestId('via-dropped-name');
   }
 
-  // Gets the CH locator of a dropped waypoint.
+  // Get the CH locator of a dropped waypoint.
   static getWaypointDroppedChLocator(droppedWaypoint: Locator): Locator {
     return droppedWaypoint.getByTestId('via-dropped-ch');
   }
 
-  // Gets the UIC locator of a dropped waypoint.
+  // Get the UIC locator of a dropped waypoint.
   static getWaypointDroppedUicLocator(droppedWaypoint: Locator): Locator {
     return droppedWaypoint.getByTestId('via-dropped-uic');
   }
 
-  // Gets the locator of the origin by trigram.
+  // Get the locator of the origin by trigram.
   private getOriginLocatorByTrigram(trigram: string): Locator {
     return this.page.getByTestId(`typeandpath-op-${trigram}`);
   }
 
-  // Gets the locator of the destination by trigram.
+  // Get the locator of the destination by trigram.
   private getDestinationLocatorByTrigram(trigram: string): Locator {
     return this.page.getByTestId(`typeandpath-op-${trigram}`);
   }
 
-  // Gets the locator of the via by trigram.
+  // Get the locator of the via by trigram.
   private getViaLocatorByTrigram(trigram: string): Locator {
     return this.page.getByTestId(`typeandpath-op-${trigram}`);
   }
 
-  // Gets the add button locator by via name.
+  // Get the add button locator by via name.
   private getAddButtonLocatorByViaName(viaName: string): Locator {
     return this.page.getByTitle(viaName).getByTestId('suggested-via-add-button');
   }
 
-  // Gets the delete button locator by via name.
+  // Get the delete button locator by via name.
   private getDeleteButtonLocatorByViaName(viaName: string): Locator {
     return this.page.getByTitle(viaName).getByTestId('suggested-via-delete-button');
   }
 
-  // Gets the pathfinding marker on the map by marker name.
+  // Get the pathfinding marker on the map by marker name.
   private getMapPathfindingMarker(markerName: string): Locator {
     return this.page.locator('#map-container').getByText(markerName, { exact: true });
   }
 
-  // Clicks the button to submit the search by trigram.
+  // Click on the button to submit the search by trigram.
   async clickSearchByTrigramSubmitButton() {
     await this.searchByTrigramSubmit.click();
   }
 
-  // Clicks the button to delete the itinerary.
+  // Click the button to delete the itinerary.
   async clickDeleteItineraryButton() {
     await this.deleteItineraryButton.click();
   }
 
-  // Verifies that no route is selected and displays appropriate messages based on language.
+  // Verify that no route is selected and displays appropriate messages based on language.
   async verifyNoSelectedRoute(selectedLanguage: string) {
     const translations = selectedLanguage === 'English' ? enTranslations : frTranslations;
     const isNoOriginChosenVisible = await this.noOriginChosen.isVisible();
@@ -169,7 +169,7 @@ class RoutePage {
     }
   }
 
-  // Performs pathfinding by entering origin, destination, and optionally via trigrams.
+  // Perform pathfinding by entering origin, destination, and optionally via trigrams.
   async performPathfindingByTrigram(
     originTrigram: string,
     destinationTrigram: string,
@@ -200,12 +200,12 @@ class RoutePage {
     expect(await this.destinationInfo.innerText()).toEqual(expectedDestinationTrigram);
   }
 
-  // Clicks the button to reverse the itinerary.
+  // Click the button to reverse the itinerary.
   async clickOnReverseItinerary() {
     await this.reverseItineraryButton.click();
   }
 
-  // Clicks the buttons to delete origin, destination, and via waypoints and verifies missing parameters message.
+  // Click the buttons to delete origin, destination, and via waypoints and verifies missing parameters message.
   async clickOnDeleteOPButtons(selectedLanguage: string) {
     // Ensure all buttons are rendered and visible before proceeding
     await Promise.all([
@@ -228,7 +228,7 @@ class RoutePage {
     expect(actualMessage).toContain(expectedMessage);
   }
 
-  // Clicks the add buttons for the specified via names.
+  // Click the add buttons for the specified via names.
   async clickOnViaAddButtons(...viaNames: string[]) {
     for (const viaName of viaNames) {
       await clickWithDelay(this.getAddButtonLocatorByViaName(viaName));
@@ -236,14 +236,14 @@ class RoutePage {
     }
   }
 
-  // Verifies that the specified markers are visible on the map.
+  // Verify that the specified markers are visible on the map.
   async verifyMapMarkers(...markerNames: string[]) {
     for (const markerName of markerNames) {
       await expect(this.getMapPathfindingMarker(markerName)).toBeVisible();
     }
   }
 
-  // Validates the waypoint suggestions by checking the name, CH, UIC, and distance.
+  // Validate the waypoint suggestions by checking the name, CH, UIC, and distance.
   static async validateWaypointSuggestions(
     waypointSuggestion: Locator,
     expectedName: string,
@@ -265,7 +265,7 @@ class RoutePage {
     );
   }
 
-  // Validates the added waypoints by checking the name, CH, and UIC.
+  // Validate the added waypoints by checking the name, CH, and UIC.
   static async validateAddedWaypoint(
     droppedWaypoint: Locator,
     expectedName: string,
@@ -277,7 +277,7 @@ class RoutePage {
     await expect(RoutePage.getWaypointDroppedUicLocator(droppedWaypoint)).toHaveText(expectedUic);
   }
 
-  // Adds new waypoints by clicking the add button for suggested waypoints and verifying the added waypoints.
+  // Add new waypoints by clicking the add button for suggested waypoints and verifying the added waypoints.
   async addNewWaypoints(
     suggestedWaypointsCount: number,
     waypointToAddNames: string[],
@@ -287,7 +287,7 @@ class RoutePage {
     await expect(this.viaModal).toBeVisible();
     await expect(this.waypointSuggestions).toHaveCount(suggestedWaypointsCount);
 
-    let waypointSuggestionCount: number = 0;
+    let waypointSuggestionCount = 0;
 
     while (waypointSuggestionCount < expectedValues.length) {
       const waypointSuggestion = this.waypointSuggestions.nth(waypointSuggestionCount);
@@ -307,7 +307,7 @@ class RoutePage {
     await this.clickOnViaAddButtons(...waypointToAddNames);
     await this.closeViaModalButton.click();
 
-    let droppedWaypointCount: number = 0;
+    let droppedWaypointCount = 0;
 
     while (droppedWaypointCount < expectedValues.length) {
       const droppedWaypoint = this.droppedWaypoints.nth(droppedWaypointCount);

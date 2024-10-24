@@ -14,7 +14,6 @@ type ProjectDetails = {
 };
 
 class ProjectPage extends CommonPage {
-  // Page Locators
   readonly projectNameLabel: Locator;
 
   readonly updateProjectButton: Locator;
@@ -84,7 +83,7 @@ class ProjectPage extends CommonPage {
     await this.page.waitForURL('**/projects/*');
   }
 
-  // Fills the project details in the form inputs.
+  // Fill the project details in the form inputs.
   private async fillProjectDetails(details: ProjectDetails) {
     const { name, description, objectives, funders, budget, tags } = details;
 
@@ -99,19 +98,19 @@ class ProjectPage extends CommonPage {
     }
   }
 
-  // Validates if the project's financial budget matches the expected value.
+  // Validate if the project's financial budget matches the expected value.
   async validateNumericBudget(expectedBudget: string) {
     const budgetText = await this.projectFinancialAmountLabel.textContent();
     expect(budgetText?.replace(/[^0-9]/g, '')).toEqual(expectedBudget);
   }
 
-  // Validates if the project objectives match the expected objectives.
+  // Validate if the project objectives match the expected objectives.
   async validateObjectives(expectedObjectives: string) {
     const objectives = await this.projectObjectivesLabel.textContent();
     expect(cleanText(objectives)).toContain(cleanText(expectedObjectives));
   }
 
-  // Validates if all project details are displayed correctly.
+  // Validate if all project details are displayed correctly.
   async validateProjectData(details: ProjectDetails) {
     const { name, description, objectives, funders, budget, tags } = details;
 
@@ -123,18 +122,18 @@ class ProjectPage extends CommonPage {
     expect(await this.projectTagsLabel.textContent()).toContain(tags.join(''));
   }
 
-  // Opens a project by its test ID (The Test ID is the same as the Name)
+  // Open a project by its test ID (The Test ID is the same as the Name).
   async openProjectByTestId(projectTestId: string | RegExp) {
     await this.page.getByTestId(projectTestId).first().hover();
     await this.page.getByTestId(projectTestId).getByTestId('openProject').click();
   }
 
-  // Retrieves a project element by its name.
+  // Retrieve a project element by its name.
   getProjectByName(name: string) {
     return this.page.locator(`text=${name}`);
   }
 
-  // Deletes a project by its name.
+  // Delete a project by its name.
   async deleteProject(name: string) {
     await this.updateProjectButton.click();
     await expect(this.deleteConfirmButton).toBeVisible();
