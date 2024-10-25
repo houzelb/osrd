@@ -102,8 +102,10 @@
       "ObjectNotFound": "Objet '{{obj_id}}' non trouvé dans l'infrastructure '{{infra_id}}'"
     },
     "pagination": {
-      "InvalidPage": "Le numéro de page '{{page}}' est invalide",
-      "InvalidPageSize": "La taille de la page '{{provided_page_size}}' est invalide, il doit être un entier compris entre 0 et {{max_page_size}}"
+      "InvalidPageNumber": "Le numéro de page '{{page}}' doit être strictement positif",
+      "InvalidPageSize": "Le numéro de page '{{page_size}}' doit être strictement positif",
+      "PageSizeTooBig": "La taille de la page '{{provided_page_size}}' est plus grand que la taille maximum de page '{{max_page_size}}'",
+      "PageOutOfBound": "La page '{{page}}' ne contient pas d'éléments avec une taille de page de '{{page_size}}' (le nombre total d'éléments est '{{total_count}}')"
     },
     "pathfinding": {
       "ElectricalProfilesOverlap": "Des profils électriques se chevauchent",

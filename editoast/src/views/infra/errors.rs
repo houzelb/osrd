@@ -112,7 +112,7 @@ async fn list_errors(
         .into_iter()
         .map(|information| InfraErrorResponse { information })
         .collect::<Vec<_>>();
-    let stats = PaginationStats::new(results.len() as u64, total_count, page, page_size);
+    let stats = PaginationStats::new(results.len() as u64, total_count, page, page_size)?;
     Ok(Json(ErrorListResponse { stats, results }))
 }
 
