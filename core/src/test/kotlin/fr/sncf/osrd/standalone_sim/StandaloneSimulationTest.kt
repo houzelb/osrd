@@ -348,7 +348,7 @@ class StandaloneSimulationTest {
                     DistanceRangeMap.RangeMapEntry(100.meters, 5_000.meters, 30.kilometersPerHour)
                 )
             )
-        val offsetEndSafetySpeed = 5_000 + rollingStock.length
+        val offsetEndSafetySpeed = 5_000.0
         val mrspWithSafetySpeed = computeMRSP(pathProps, rollingStock, true, null, safetySpeeds)
         assertEquals(mrsp.endPos, mrspWithSafetySpeed.endPos)
         var position = 0.0

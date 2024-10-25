@@ -57,6 +57,8 @@ fun computeMRSP(
  * @param addRollingStockLength whether the rolling stock length should be taken into account in the
  *   computation.
  * @param trainTag corresponding train.
+ * @param safetySpeedRanges Extra speed ranges, used for safety speeds. Note: rolling stock length
+ *   is *not* added at the end of these ranges.
  * @return the corresponding MRSP as an Envelope.
  */
 fun computeMRSP(
@@ -120,7 +122,7 @@ fun computeMRSP(
             addSpeedSection(
                 builder,
                 range.lower,
-                Distance.min(range.upper + offset.meters, pathLength.meters),
+                Distance.min(range.upper, pathLength.meters),
                 speed,
                 newAttrs,
                 speedLimitProperties
