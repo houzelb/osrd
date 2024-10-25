@@ -69,4 +69,6 @@ ENV DYNAMIC_ASSETS_PATH=/assets
 
 # We use jemalloc to reduce allocation fragmentation
 ENV LD_PRELOAD="/usr/lib/libjemalloc.so.2"
+# tower_http in debug mode allows to capture span from `tower_http::trace::TraceLayer` middleware
+ENV RUST_LOG="info,tower_http=debug"
 CMD ["editoast", "runserver"]

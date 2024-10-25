@@ -81,12 +81,7 @@ fn init_tracing(mode: EditoastMode, telemetry_config: &client::TelemetryConfig) 
     let env_filter_layer = tracing_subscriber::EnvFilter::builder()
         // Set the default log level to 'info'
         .with_default_directive(tracing_subscriber::filter::LevelFilter::INFO.into())
-        .from_env_lossy()
-        .add_directive(
-            "tower_http=debug"
-                .parse()
-                .expect("valid 'RUST_LOG' directive"),
-        );
+        .from_env_lossy();
     let fmt_layer = tracing_subscriber::fmt::layer()
         .pretty()
         .with_file(true)
