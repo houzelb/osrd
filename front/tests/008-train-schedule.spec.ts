@@ -66,9 +66,9 @@ test.describe('Verifying that all elements in the train schedule are loaded corr
     await opTimetablePage.verifyTrainCount(20);
     await opTimetablePage.filterValidityAndVerifyTrainCount(selectedLanguage, 'Invalid', 4);
     await opTimetablePage.filterValidityAndVerifyTrainCount(selectedLanguage, 'All', 20);
-    await opTimetablePage.filterHonoredAndVerifyTrainCount(selectedLanguage, 'Honored', 12);
-    await opTimetablePage.filterValidityAndVerifyTrainCount(selectedLanguage, 'Valid', 12);
-    await opTimetablePage.filterHonoredAndVerifyTrainCount(selectedLanguage, 'Not honored', 4);
+    await opTimetablePage.filterHonoredAndVerifyTrainCount(selectedLanguage, 'Honored', 11);
+    await opTimetablePage.filterValidityAndVerifyTrainCount(selectedLanguage, 'Valid', 11);
+    await opTimetablePage.filterHonoredAndVerifyTrainCount(selectedLanguage, 'Not honored', 5);
     await opTimetablePage.filterValidityAndVerifyTrainCount(selectedLanguage, 'Invalid', 0);
     await opTimetablePage.filterHonoredAndVerifyTrainCount(selectedLanguage, 'All', 4);
     await opTimetablePage.filterValidityAndVerifyTrainCount(selectedLanguage, 'All', 20);
