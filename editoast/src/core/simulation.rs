@@ -350,7 +350,7 @@ impl AsCoreRequest<Json<SimulationResponse>> for SimulationRequest {
 }
 
 impl SimulationResponse {
-    pub fn simulation_run_time(self) -> Result<u64, Box<SimulationResponse>> {
+    pub fn simulation_run_time(self) -> Result<u64, Box<Self>> {
         match self {
             SimulationResponse::Success { provisional, .. } => {
                 Ok(*provisional.times.last().expect("empty simulation result"))

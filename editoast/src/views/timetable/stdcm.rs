@@ -28,14 +28,16 @@ use super::path_not_found_handler::PathNotFoundHandler;
 use super::stdcm_request_payload::convert_steps;
 use super::stdcm_request_payload::STDCMRequestPayload;
 use super::SelectionSettings;
+use crate::core::conflict_detection::Conflict;
 use crate::core::conflict_detection::TrainRequirements;
 use crate::core::pathfinding::InvalidPathItem;
 use crate::core::pathfinding::PathfindingInputError;
+use crate::core::pathfinding::PathfindingResultSuccess;
 use crate::core::simulation::PhysicsRollingStock;
 use crate::core::simulation::{RoutingRequirement, SimulationResponse, SpacingRequirement};
+use crate::core::stdcm::STDCMCoreResponse;
 use crate::core::stdcm::STDCMPathItem;
 use crate::core::stdcm::STDCMRequest;
-use crate::core::stdcm::STDCMResponse;
 use crate::core::stdcm::STDCMStepTimingData;
 use crate::core::AsCoreRequest;
 use crate::core::CoreClient;
@@ -60,6 +62,26 @@ use crate::ValkeyClient;
 
 crate::routes! {
     "/stdcm" => stdcm,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, ToSchema)]
+#[serde(tag = "status", rename_all = "snake_case")]
+// We accepted the difference of memory size taken by variants
+// Since there is only on success and others are error cases
+#[allow(clippy::large_enum_variant)]
+pub enum STDCMResponse {
+    Success {
+        simulation: SimulationResponse,
+        path: PathfindingResultSuccess,
+        departure_time: DateTime<Utc>,
+    },
+    Conflicts {
+        pathfinding_result: PathfindingResult,
+        conflicts: Vec<Conflict>,
+    },
+    PreprocessingSimulationError {
+        error: SimulationResponse,
+    },
 }
 
 #[derive(Debug, Error, EditoastError, Serialize)]
@@ -247,27 +269,38 @@ async fn stdcm(
 
     let stdcm_response = stdcm_request.fetch(core_client.as_ref()).await?;
 
-    // 8. Handle PathNotFound response of STDCM
-    if let STDCMResponse::PathNotFound = stdcm_response {
-        let path_not_found = PathNotFoundHandler {
-            core_client,
-            infra_id,
-            infra_version: infra.version,
-            train_schedules,
-            simulations,
-            work_schedules,
-            virtual_train_schedule,
-            virtual_train_sim_result,
-            virtual_train_pathfinding_result,
-            earliest_departure_time,
-            latest_simulation_end,
-        };
-        let stdcm_response = path_not_found.handle().await?;
-
-        return Ok(Json(stdcm_response));
+    // 8. Handle STDCM Core Response
+    match stdcm_response {
+        STDCMCoreResponse::Success {
+            simulation,
+            path,
+            departure_time,
+        } => Ok(Json(STDCMResponse::Success {
+            simulation,
+            path,
+            departure_time,
+        })),
+        STDCMCoreResponse::PreprocessingSimulationError { error } => {
+            Ok(Json(STDCMResponse::PreprocessingSimulationError { error }))
+        }
+        STDCMCoreResponse::PathNotFound => {
+            let path_not_found = PathNotFoundHandler {
+                core_client,
+                infra_id,
+                infra_version: infra.version,
+                train_schedules,
+                simulations,
+                work_schedules,
+                virtual_train_schedule,
+                virtual_train_sim_result,
+                virtual_train_pathfinding_result,
+                earliest_departure_time,
+                latest_simulation_end,
+            };
+            let stdcm_response = path_not_found.handle().await?;
+            Ok(Json(stdcm_response))
+        }
     }
-
-    Ok(Json(stdcm_response))
 }
 
 /// Build the list of scheduled train requirements, only including requirements
@@ -521,7 +554,6 @@ mod tests {
     use crate::core::simulation::SimulationParameters;
     use crate::core::simulation::SimulationResponse;
     use crate::core::simulation::SpeedLimitProperties;
-    use crate::core::stdcm::STDCMResponse;
     use crate::models::fixtures::create_fast_rolling_stock;
     use crate::models::fixtures::create_small_infra;
     use crate::models::fixtures::create_timetable;

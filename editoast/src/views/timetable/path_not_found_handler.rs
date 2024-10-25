@@ -6,13 +6,13 @@ use chrono::Utc;
 use crate::core::conflict_detection::ConflictDetectionRequest;
 use crate::core::conflict_detection::WorkSchedulesRequest;
 use crate::core::simulation::SimulationResponse;
-use crate::core::stdcm::STDCMResponse;
 use crate::core::AsCoreRequest;
 use crate::core::CoreClient;
 use crate::error::Result;
 use crate::models::train_schedule::TrainSchedule;
 use crate::models::work_schedules::WorkSchedule;
 use crate::views::path::pathfinding::PathfindingResult;
+use crate::views::timetable::stdcm::STDCMResponse;
 
 use super::map_to_core_work_schedule;
 use super::stdcm::build_train_requirements;

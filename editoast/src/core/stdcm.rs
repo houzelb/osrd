@@ -11,7 +11,6 @@ use serde::Deserialize;
 use serde::Serialize;
 use utoipa::ToSchema;
 
-use super::conflict_detection::Conflict;
 use super::conflict_detection::TrainRequirements;
 use super::pathfinding::PathfindingResultSuccess;
 use super::pathfinding::TrackRange;
@@ -19,7 +18,6 @@ use super::simulation::PhysicsRollingStock;
 use super::simulation::SimulationResponse;
 use crate::core::AsCoreRequest;
 use crate::core::Json;
-use crate::views::path::pathfinding::PathfindingResult;
 
 #[derive(Debug, Serialize)]
 pub struct STDCMRequest {
@@ -116,28 +114,24 @@ pub struct UndirectedTrackRange {
     pub end: u64,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, ToSchema)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(tag = "status", rename_all = "snake_case")]
 // We accepted the difference of memory size taken by variants
 // Since there is only on success and others are error cases
 #[allow(clippy::large_enum_variant)]
-pub enum STDCMResponse {
+pub enum STDCMCoreResponse {
     Success {
         simulation: SimulationResponse,
         path: PathfindingResultSuccess,
         departure_time: DateTime<Utc>,
     },
     PathNotFound,
-    Conflicts {
-        pathfinding_result: PathfindingResult,
-        conflicts: Vec<Conflict>,
-    },
     PreprocessingSimulationError {
         error: SimulationResponse,
     },
 }
 
-impl AsCoreRequest<Json<STDCMResponse>> for STDCMRequest {
+impl AsCoreRequest<Json<STDCMCoreResponse>> for STDCMRequest {
     const METHOD: reqwest::Method = reqwest::Method::POST;
     const URL_PATH: &'static str = "/v2/stdcm";
 
