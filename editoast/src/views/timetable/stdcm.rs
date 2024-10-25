@@ -334,7 +334,7 @@ async fn stdcm(
         work_schedules: filter_stdcm_work_schedules(
             &work_schedules,
             earliest_departure_time,
-            maximum_run_time,
+            latest_simulation_end,
         ),
         temporary_speed_limits,
         rolling_stock: PhysicsRollingStock::new(rolling_stock.into(), simulation_parameters),
@@ -351,7 +351,6 @@ async fn stdcm(
             virtual_train_sim_result,
             virtual_train_pathfinding_result,
             earliest_departure_time,
-            maximum_run_time,
             latest_simulation_end,
             &work_schedules,
             infra_id,
@@ -374,7 +373,6 @@ async fn handle_path_not_found(
     virtual_train_sim_result: SimulationResponse,
     virtual_train_pathfinding_result: PathfindingResult,
     earliest_departure_time: DateTime<Utc>,
-    maximum_run_time: u64,
     latest_simulation_end: DateTime<Utc>,
     work_schedules: &[WorkSchedule],
     infra_id: i64,
@@ -407,8 +405,11 @@ async fn handle_path_not_found(
 
     // Filter the provided work schedules to find those that conflict with the given parameters
     // This identifies any work schedules that may overlap with the earliest departure time and maximum run time.
-    let conflict_work_schedules =
-        filter_conflict_work_schedules(work_schedules, earliest_departure_time, maximum_run_time);
+    let conflict_work_schedules = make_work_schedules_request(
+        work_schedules,
+        earliest_departure_time,
+        latest_simulation_end,
+    );
 
     // Prepare the conflict detection request.
     let conflict_detection_request = ConflictDetectionRequest {
@@ -690,7 +691,7 @@ fn build_single_margin(margin: Option<MarginValue>) -> Margins {
     }
 }
 
-fn filter_core_work_schedule(
+fn map_to_core_work_schedule(
     ws: &WorkSchedule,
     start_time: DateTime<Utc>,
 ) -> crate::core::stdcm::WorkSchedule {
@@ -712,28 +713,30 @@ fn filter_core_work_schedule(
 fn filter_stdcm_work_schedules(
     work_schedules: &[WorkSchedule],
     start_time: DateTime<Utc>,
-    maximum_run_time: u64,
+    latest_simulation_end: DateTime<Utc>,
 ) -> Vec<crate::core::stdcm::WorkSchedule> {
+    let search_window_duration = (latest_simulation_end - start_time).num_milliseconds() as u64;
     work_schedules
         .iter()
-        .map(|ws| filter_core_work_schedule(ws, start_time))
-        .filter(|ws| ws.end_time > 0 && ws.start_time < maximum_run_time)
+        .map(|ws| map_to_core_work_schedule(ws, start_time))
+        .filter(|ws| ws.end_time > 0 && ws.start_time < search_window_duration)
         .collect()
 }
 
-fn filter_conflict_work_schedules(
+fn make_work_schedules_request(
     work_schedules: &[WorkSchedule],
     start_time: DateTime<Utc>,
-    maximum_run_time: u64,
+    latest_simulation_end: DateTime<Utc>,
 ) -> Option<WorkSchedulesRequest> {
     if work_schedules.is_empty() {
         return None;
     }
+    let search_window_duration = (latest_simulation_end - start_time).num_milliseconds() as u64;
 
     let work_schedule_requirements = work_schedules
         .iter()
-        .map(|ws| (ws.id, filter_core_work_schedule(ws, start_time)))
-        .filter(|(_, ws)| ws.end_time > 0 && ws.start_time < maximum_run_time)
+        .map(|ws| (ws.id, map_to_core_work_schedule(ws, start_time)))
+        .filter(|(_, ws)| ws.end_time > 0 && ws.start_time < search_window_duration)
         .collect();
 
     Some(WorkSchedulesRequest {
