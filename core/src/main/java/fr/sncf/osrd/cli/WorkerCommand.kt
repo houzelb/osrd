@@ -124,7 +124,6 @@ class WorkerCommand : CliCommand {
                     SimulationEndpoint(infraManager, electricalProfileSetManager),
                 "/v2/signal_projection" to SignalProjectionEndpointV2(infraManager),
                 "/v2/conflict_detection" to ConflictDetectionEndpointV2(infraManager),
-                "/cache_status" to InfraCacheStatusEndpoint(infraManager),
                 "/version" to VersionEndpoint(),
                 "/v2/stdcm" to STDCMEndpointV2(infraManager),
                 "/infra_load" to InfraLoadEndpoint(infraManager),
