@@ -1111,4 +1111,45 @@ mod tests {
             }
         );
     }
+
+    #[rstest]
+    // A day before the 'start_time' -> FILTERED OUT
+    #[case("2024-03-13 06:00:00", "2024-03-13 12:00:00", true)]
+    // Finishing just after the 'start_time' -> KEPT
+    #[case("2024-03-14 06:00:00", "2024-03-14 08:01:00", false)]
+    // Starting after the 'latest_simulation_end' -> FILTERED OUT
+    #[case("2024-03-14 10:01:00", "2024-03-14 12:00:00", true)]
+    // Starting before the 'latest_simulation_end' -> KEPT
+    #[case("2024-03-14 09:59:00", "2024-03-14 12:00:00", false)]
+    // Starting before the 'start_time' and finishing after 'latest_simulation_end' -> KEPT
+    #[case("2024-03-14 06:00:00", "2024-03-14 12:00:00", false)]
+    // Starting after the 'start_time' and finishing before 'latest_simulation_end' -> KEPT
+    #[case("2024-03-14 08:30:00", "2024-03-14 09:30:00", false)]
+    fn filter_stdcm_work_schedules_with_window(
+        #[case] ws_start_time: &str,
+        #[case] ws_end_time: &str,
+        #[case] filtered_out: bool,
+    ) {
+        // GIVEN
+        let work_schedules = [WorkSchedule {
+            id: rand::random::<i64>(),
+            start_date_time: NaiveDateTime::parse_from_str(ws_start_time, "%Y-%m-%d %H:%M:%S")
+                .unwrap(),
+            end_date_time: NaiveDateTime::parse_from_str(ws_end_time, "%Y-%m-%d %H:%M:%S").unwrap(),
+            ..Default::default()
+        }];
+        let start_time = DateTime::parse_from_rfc3339("2024-03-14T08:00:00Z")
+            .unwrap()
+            .to_utc();
+        let latest_simulation_end = DateTime::parse_from_rfc3339("2024-03-14T10:00:00Z")
+            .unwrap()
+            .to_utc();
+
+        // WHEN
+        let filtered =
+            filter_stdcm_work_schedules(&work_schedules, start_time, latest_simulation_end);
+
+        // THEN
+        assert!(filtered.is_empty() == filtered_out);
+    }
 }
