@@ -26,6 +26,7 @@ import type {
 
 import SettingsPanel from './SettingsPanel';
 import ManchetteMenuButton from '../SpaceTimeChart/ManchetteMenuButton';
+import ProjectionLoadingMessage from '../SpaceTimeChart/ProjectionLoadingMessage';
 import WaypointsPanel from '../SpaceTimeChart/WaypointsPanel';
 
 type ManchetteWithSpaceTimeChartProps = {
@@ -35,6 +36,10 @@ type ManchetteWithSpaceTimeChartProps = {
   waypointsPanelData?: WaypointsPanelData;
   conflicts?: Conflict[];
   workSchedules?: PostWorkSchedulesProjectPathApiResponse;
+  projectionLoaderData: {
+    totalTrains: number;
+    allTrainsProjected: boolean;
+  };
 };
 const DEFAULT_HEIGHT = 561;
 
@@ -45,6 +50,7 @@ const ManchetteWithSpaceTimeChartWrapper = ({
   waypointsPanelData,
   conflicts = [],
   workSchedules,
+  projectionLoaderData: { totalTrains, allTrainsProjected },
 }: ManchetteWithSpaceTimeChartProps) => {
   const [heightOfManchetteWithSpaceTimeChart] = useState(DEFAULT_HEIGHT);
   const manchetteWithSpaceTimeChartRef = useRef<HTMLDivElement>(null);
@@ -175,6 +181,12 @@ const ManchetteWithSpaceTimeChartWrapper = ({
               />
             )}
           </>
+        )}
+        {!allTrainsProjected && (
+          <ProjectionLoadingMessage
+            projectedTrainsNb={projectPathTrainResult.length}
+            totalTrains={totalTrains}
+          />
         )}
       </div>
       <div className="header-separator" />

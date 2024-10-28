@@ -33,7 +33,10 @@ export type ProjectionData = {
   projectedTrains: TrainSpaceTimeData[];
   path: PathfindingResultSuccess;
   geometry: PathProperties['geometry'];
-  allTrainsProjected: boolean;
+  projectionLoaderData: {
+    allTrainsProjected: boolean;
+    totalTrains: number;
+  };
 };
 
 export type WaypointsPanelData = {

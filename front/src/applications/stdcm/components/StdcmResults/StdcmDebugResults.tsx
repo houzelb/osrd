@@ -31,7 +31,7 @@ const StdcmDebugResults = ({
     useState(SPEED_SPACE_CHART_HEIGHT);
   const tWithoutPrefix = i18n.getFixedT(null, 'stdcm');
 
-  const spaceTimeData = useProjectedTrainsForStdcm(results);
+  const projectedData = useProjectedTrainsForStdcm(results);
 
   const { data: workSchedules } = osrdEditoastApi.endpoints.postWorkSchedulesProjectPath.useQuery(
     {
@@ -45,15 +45,16 @@ const StdcmDebugResults = ({
 
   return (
     <>
-      {spaceTimeData && spaceTimeData.length > 0 && pathProperties.manchetteOperationalPoints && (
+      {projectedData && pathProperties.manchetteOperationalPoints && (
         <div className="osrd-simulation-container mb-2">
           <p className="mt-2 mb-3 ml-4 font-weight-bold">{tWithoutPrefix('spaceTimeGraphic')}</p>
           <div className="chart-container mt-2">
             <ManchetteWithSpaceTimeChartWrapper
               operationalPoints={pathProperties.manchetteOperationalPoints}
-              projectPathTrainResult={spaceTimeData}
+              projectPathTrainResult={projectedData.spaceTimeData}
               selectedTrainScheduleId={STDCM_TRAIN_ID}
               workSchedules={workSchedules}
+              projectionLoaderData={projectedData.projectionLoaderData}
             />
           </div>
         </div>

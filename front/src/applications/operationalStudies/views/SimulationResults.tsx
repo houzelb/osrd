@@ -9,7 +9,6 @@ import type { Conflict } from 'common/api/osrdEditoastApi';
 import SimulationWarpedMap from 'common/Map/WarpedMap/SimulationWarpedMap';
 import ManchetteWithSpaceTimeChartWrapper from 'modules/simulationResult/components/ManchetteWithSpaceTimeChart/ManchetteWithSpaceTimeChart';
 import SimulationResultsMap from 'modules/simulationResult/components/SimulationResultsMap/SimulationResultsMap';
-import ProjectionLoadingMessage from 'modules/simulationResult/components/SpaceTimeChart/ProjectionLoadingMessage';
 import useGetProjectedTrainOperationalPoints from 'modules/simulationResult/components/SpaceTimeChart/useGetProjectedTrainOperationalPoints';
 import useProjectedConflicts from 'modules/simulationResult/components/SpaceTimeChart/useProjectedConflicts';
 import SpeedSpaceChartContainer from 'modules/simulationResult/components/SpeedSpaceChart/SpeedSpaceChartContainer';
@@ -31,7 +30,6 @@ type SimulationResultsProps = {
   infraId?: number;
   simulationResults: SimulationResultsData;
   projectionData?: ProjectionData;
-  timetableTrainNb: number;
   conflicts?: Conflict[];
 };
 
@@ -48,7 +46,6 @@ const SimulationResults = ({
     path,
   },
   projectionData,
-  timetableTrainNb,
   conflicts = [],
 }: SimulationResultsProps) => {
   const { t } = useTranslation('simulation');
@@ -142,12 +139,6 @@ const SimulationResults = ({
 
             <div className="osrd-simulation-container d-flex flex-grow-1 flex-shrink-1">
               <div className="chart-container">
-                {!projectionData.allTrainsProjected && (
-                  <ProjectionLoadingMessage
-                    projectedTrainsNb={projectionData.projectedTrains.length}
-                    totalTrains={timetableTrainNb}
-                  />
-                )}
                 <ManchetteWithSpaceTimeChartWrapper
                   operationalPoints={projectedOperationalPoints}
                   projectPathTrainResult={projectionData?.projectedTrains}
@@ -158,6 +149,7 @@ const SimulationResults = ({
                     projectionPath: projectionData.trainSchedule.path,
                   }}
                   conflicts={conflictZones}
+                  projectionLoaderData={projectionData.projectionLoaderData}
                 />
               </div>
             </div>

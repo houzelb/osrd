@@ -173,7 +173,10 @@ const useScenarioData = (
             trainSchedule: trainScheduleUsedForProjection,
             ...projectionPath,
             projectedTrains,
-            allTrainsProjected,
+            projectionLoaderData: {
+              allTrainsProjected,
+              totalTrains: timetable.train_ids.length,
+            },
           }
         : undefined,
     simulationResults,

@@ -57,7 +57,7 @@ const ScenarioContent = ({
     selectedTrainId,
     trainScheduleSummaries,
     trainSchedules,
-    projectionData: projection,
+    projectionData,
     simulationResults,
     conflicts,
     upsertTrainSchedules,
@@ -225,10 +225,9 @@ const ScenarioContent = ({
                   <SimulationResults
                     scenarioData={{ name: scenario.name, infraName: scenario.infra_name }}
                     collapsedTimetable={collapsedTimetable}
-                    projectionData={projection}
+                    projectionData={projectionData}
                     simulationResults={simulationResults}
                     infraId={infra.id}
-                    timetableTrainNb={timetable.train_ids.length}
                     conflicts={conflicts}
                   />
                 )
