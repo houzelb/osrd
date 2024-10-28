@@ -3,24 +3,17 @@ import { useMemo, useState } from 'react';
 import { Button } from '@osrd-project/ui-core';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 
-import { STDCM_TRAIN_ID } from 'applications/stdcm/consts';
-import useProjectedTrainsForStdcm from 'applications/stdcm/hooks/useProjectedTrainsForStdcm';
 import type { StdcmSimulation } from 'applications/stdcm/types';
 import {
   generateCodeNumber,
   getOperationalPointsWithTimes,
 } from 'applications/stdcm/utils/formatSimulationReportSheet';
-import { osrdEditoastApi, type TrackRange } from 'common/api/osrdEditoastApi';
-import { useOsrdConfSelectors } from 'common/osrdContext';
-import i18n from 'i18n';
-import ManchetteWithSpaceTimeChartWrapper from 'modules/simulationResult/components/ManchetteWithSpaceTimeChart/ManchetteWithSpaceTimeChart';
-import SpeedSpaceChartContainer from 'modules/simulationResult/components/SpeedSpaceChart/SpeedSpaceChartContainer';
+import { type TrackRange } from 'common/api/osrdEditoastApi';
 import { Map } from 'modules/trainschedule/components/ManageTrainSchedule';
-import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
 
 import SimulationReportSheet from './SimulationReportSheet';
+import StdcmDebugResults from './StdcmDebugResults';
 import StcdmResultsTable from './StdcmResultsTable';
 import StdcmSimulationNavigator from './StdcmSimulationNavigator';
 
@@ -37,9 +30,6 @@ type StcdmResultsProps = {
   pathTrackRanges?: TrackRange[];
 };
 
-const SPEED_SPACE_CHART_HEIGHT = 521.5;
-const HANDLE_TAB_RESIZE_HEIGHT = 20;
-
 const StcdmResults = ({
   isCalculationFailed,
   isDebugMode,
@@ -52,28 +42,11 @@ const StcdmResults = ({
   simulationsList,
   pathTrackRanges,
 }: StcdmResultsProps) => {
-  const { getWorkScheduleGroupId } = useOsrdConfSelectors() as StdcmConfSelectors;
-  const workScheduleGroupId = useSelector(getWorkScheduleGroupId);
-  const { data: workSchedules } = osrdEditoastApi.endpoints.postWorkSchedulesProjectPath.useQuery(
-    {
-      body: {
-        path_track_ranges: pathTrackRanges!,
-        work_schedule_group_id: workScheduleGroupId!,
-      },
-    },
-    { skip: !pathTrackRanges || !workScheduleGroupId }
-  );
   const { t } = useTranslation('stdcm', { keyPrefix: 'simulation.results' });
-  const tWithoutPrefix = i18n.getFixedT(null, 'stdcm');
 
   const [mapCanvas, setMapCanvas] = useState<string>();
-  const [speedSpaceChartContainerHeight, setSpeedSpaceChartContainerHeight] =
-    useState(SPEED_SPACE_CHART_HEIGHT);
 
   const selectedSimulation = simulationsList[selectedSimulationIndex];
-  const spaceTimeData = useProjectedTrainsForStdcm(selectedSimulation.outputs?.results);
-  const speedSpaceChartData = selectedSimulation?.outputs?.speedSpaceChartData;
-
   const simulationReportSheetNumber = generateCodeNumber();
 
   const isSelectedSimulationRetained = selectedSimulationIndex === retainedSimulationIndex;
@@ -153,50 +126,11 @@ const StcdmResults = ({
           />
         </div>
       </div>
-      {/* TODO: Replace this part with the spaceTimeChartWithManchette component once it's merged (ui-manchette #504) */}
-      {isDebugMode && (
-        <>
-          {spaceTimeData &&
-            spaceTimeData.length > 0 &&
-            selectedSimulation.outputs &&
-            selectedSimulation.outputs.pathProperties.manchetteOperationalPoints && (
-              <div className="osrd-simulation-container mb-2">
-                <p className="mt-2 mb-3 ml-4 font-weight-bold">
-                  {tWithoutPrefix('spaceTimeGraphic')}
-                </p>
-                <div className="chart-container mt-2">
-                  <ManchetteWithSpaceTimeChartWrapper
-                    operationalPoints={
-                      selectedSimulation.outputs?.pathProperties.manchetteOperationalPoints
-                    }
-                    projectPathTrainResult={spaceTimeData}
-                    selectedTrainScheduleId={STDCM_TRAIN_ID}
-                    workSchedules={workSchedules}
-                  />
-                </div>
-              </div>
-            )}
-
-          <div className="osrd-simulation-container my-2 speedspacechart-container">
-            <div
-              className="chart-container"
-              style={{
-                height: `${speedSpaceChartContainerHeight + HANDLE_TAB_RESIZE_HEIGHT}px`,
-              }}
-            >
-              {selectedSimulation.outputs && speedSpaceChartData && (
-                <SpeedSpaceChartContainer
-                  trainSimulation={selectedSimulation.outputs.results.simulation}
-                  selectedTrainPowerRestrictions={speedSpaceChartData.formattedPowerRestrictions}
-                  pathProperties={speedSpaceChartData.formattedPathProperties}
-                  heightOfSpeedSpaceChartContainer={speedSpaceChartContainerHeight}
-                  setHeightOfSpeedSpaceChartContainer={setSpeedSpaceChartContainerHeight}
-                  rollingStock={speedSpaceChartData.rollingStock}
-                />
-              )}
-            </div>
-          </div>
-        </>
+      {isDebugMode && pathTrackRanges && selectedSimulation.outputs && (
+        <StdcmDebugResults
+          pathTrackRanges={pathTrackRanges}
+          simulationOutputs={selectedSimulation.outputs}
+        />
       )}
     </>
   );
