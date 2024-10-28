@@ -9,26 +9,23 @@
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    alejandra = {
-      url = "github:kamadorueda/alejandra/3.0.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = {
-    nixpkgs,
-    fenix,
-    flake-utils,
-    alejandra,
-    ...
-  }:
+  outputs =
+    {
+      nixpkgs,
+      fenix,
+      flake-utils,
+      ...
+    }:
     flake-utils.lib.eachDefaultSystem (
-      system: let
+      system:
+      let
         pkgs = import nixpkgs {
           inherit system;
         };
 
-        pythonPackages = ps: (import ./nix/python_env.nix {inherit ps;});
+        pythonPackages = ps: (import ./nix/python_env.nix { inherit ps; });
 
         fixedNode = pkgs.nodejs_20;
         fixedNodePackages = pkgs.nodePackages.override {
@@ -45,57 +42,61 @@
           "rust-analyzer"
         ];
 
-        osrd-dev-scripts = pkgs.callPackage ./nix/scripts.nix {};
+        osrd-dev-scripts = pkgs.callPackage ./nix/scripts.nix { };
       in
-        with pkgs; {
-          devShells.default = mkShell {
-            nativeBuildInputs = [
-              # Rust
-              rustChan
-              # Linker
-              mold-wrapped
-              # Libs
-              geos
-              openssl
-              pkg-config
-              postgresql
-            ];
-            buildInputs =
+      with pkgs;
+      {
+        devShells.default = mkShell {
+          nativeBuildInputs = [
+            # Rust
+            rustChan
+            # Linker
+            mold-wrapped
+            # Libs
+            geos
+            openssl
+            pkg-config
+            postgresql
+          ];
+          buildInputs =
+            [
+              # Tools & Libs
+              diesel-cli
+              cargo-watch
+              osmium-tool
+              taplo
+
+              # API
+              (python311.withPackages pythonPackages)
+              ruff-lsp
+
+              # Core
+              gradle
+              jdk17
+
+              # Front
+              fixedNodePackages.create-react-app
+              fixedNodePackages.eslint
+              fixedNodePackages.yarn
+              fixedNode
+
+              # Nix formatter
+              nixfmt-rfc-style
+              nixd
+
+              # OSRD dev scripts
+              osrd-dev-scripts
+            ]
+            ++ lib.optionals stdenv.isDarwin (
+              with pkgs.darwin.apple_sdk.frameworks;
               [
-                # Tools & Libs
-                diesel-cli
-                cargo-watch
-                osmium-tool
-                taplo
-
-                # API
-                (python311.withPackages pythonPackages)
-                ruff-lsp
-
-                # Core
-                gradle
-                jdk17
-
-                # Front
-                fixedNodePackages.create-react-app
-                fixedNodePackages.eslint
-                fixedNodePackages.yarn
-                fixedNode
-
-                # Nix formatter
-                alejandra.defaultPackage.${system}
-                nixd
-
-                # OSRD dev scripts
-                osrd-dev-scripts
-              ]
-              ++ lib.optionals stdenv.isDarwin (with pkgs.darwin.apple_sdk.frameworks; [
                 CoreFoundation
                 SystemConfiguration
-              ]);
+              ]
+            );
 
-            RUSTFLAGS = "-C link-arg=-fuse-ld=mold";
-          };
-        }
+          RUSTFLAGS = "-C link-arg=-fuse-ld=mold";
+        };
+      }
     );
 }
