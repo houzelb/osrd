@@ -25,15 +25,15 @@ const useProjectedTrainsForStdcm = (stdcmResponse?: StdcmSuccessResponse) => {
     }
   );
 
-  const trainIds = timetable?.train_ids;
+  const trainIds = useMemo(() => timetable?.train_ids || [], [timetable]);
   const { currentData: trainSchedules } = osrdEditoastApi.endpoints.postTrainSchedule.useQuery(
     {
       body: {
-        ids: trainIds!,
+        ids: trainIds,
       },
     },
     {
-      skip: !trainIds || !trainIds.length,
+      skip: !trainIds.length,
     }
   );
 
@@ -41,6 +41,8 @@ const useProjectedTrainsForStdcm = (stdcmResponse?: StdcmSuccessResponse) => {
     () => (stdcmResponse ? formatStdcmTrainIntoSpaceTimeData(stdcmResponse) : undefined),
     [stdcmResponse]
   );
+
+  const allTrainsProjected = useMemo(() => trainIdsToProject.size === 0, [trainIdsToProject]);
 
   const { projectedTrainsById: projectedTimetableTrainsById } = useLazyProjectTrains({
     infraId,
@@ -65,7 +67,10 @@ const useProjectedTrainsForStdcm = (stdcmResponse?: StdcmSuccessResponse) => {
 
   if (!infraId || !stdcmResponse) return null;
 
-  return spaceTimeData;
+  return {
+    spaceTimeData,
+    projectionLoaderData: { allTrainsProjected, totalTrains: trainIds.length },
+  };
 };
 
 export default useProjectedTrainsForStdcm;
