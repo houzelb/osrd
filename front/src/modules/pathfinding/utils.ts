@@ -13,6 +13,8 @@ import type { PathStep } from 'reducers/osrdconf/types';
 import { addElementAtIndex } from 'utils/array';
 import { getPointCoordinates } from 'utils/geometry';
 
+import getStepLocation from './helpers/getStepLocation';
+
 export const formatSuggestedOperationalPoints = (
   operationalPoints: NonNullable<Required<PathProperties['operational_points']>>,
   geometry: GeoJsonLineString,
@@ -65,28 +67,9 @@ export const getPathfindingQuery = ({
 }): PostInfraByInfraIdPathfindingBlocksApiArg | null => {
   if (infraId && rollingStock && origin && destination) {
     // Only origin and destination can be null so we can compact and we want to remove any via that would be null
-    const pathItems: PathfindingInput['path_items'] = compact(pathSteps).map((step) => {
-      if ('uic' in step) {
-        return { uic: step.uic, secondary_code: step.ch };
-      }
-      if ('track' in step) {
-        return {
-          track: step.track,
-          // TODO: step offset should be in mm in the store /!\
-          // pathfinding blocks endpoint requires offsets in mm
-          offset: step.offset * 1000,
-        };
-      }
-      if ('operational_point' in step) {
-        return {
-          operational_point: step.operational_point,
-        };
-      }
-      return {
-        trigram: step.trigram,
-        secondary_code: step.ch,
-      };
-    });
+    const pathItems: PathfindingInput['path_items'] = compact(pathSteps).map((step) =>
+      getStepLocation(step)
+    );
 
     return {
       infraId,
