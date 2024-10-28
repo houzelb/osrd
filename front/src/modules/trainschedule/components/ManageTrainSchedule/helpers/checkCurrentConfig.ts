@@ -1,12 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { compact } from 'lodash';
 import type { Dispatch } from 'redux';
 
+import getStepLocation from 'modules/pathfinding/helpers/getStepLocation';
 import type { ValidConfig } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import { setFailure } from 'reducers/main';
 import type { OsrdConfState } from 'reducers/osrdconf/types';
 import { isInvalidFloatNumber } from 'utils/numbers';
-import { kmhToMs, mToMm } from 'utils/physics';
+import { kmhToMs } from 'utils/physics';
 
 import formatMargin from './formatMargin';
 import formatSchedule from './formatSchedule';
@@ -145,32 +145,7 @@ const checkCurrentConfig = (
     rollingStockComfort,
     initialSpeed: initialSpeed ? kmhToMs(initialSpeed) : 0,
     usingElectricalProfiles,
-    path: compact(pathSteps).map((step) => {
-      // TODO use lodash pick
-      const {
-        arrival,
-        locked,
-        stopFor,
-        positionOnPath,
-        coordinates,
-        name,
-        ch,
-        metadata,
-        kp,
-        receptionSignal,
-        theoreticalMargin,
-        ...stepLocation
-      } = step;
-
-      if ('track' in stepLocation) {
-        return {
-          ...stepLocation,
-          offset: mToMm(stepLocation.offset),
-        };
-      }
-      return { ...stepLocation, secondary_code: ch };
-    }),
-
+    path: compact(pathSteps).map((step) => ({ id: step.id, ...getStepLocation(step) })),
     margins: formatMargin(compact(pathSteps)),
     schedule: formatSchedule(compact(pathSteps)),
     powerRestrictions: powerRestriction,
