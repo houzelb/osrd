@@ -6,6 +6,7 @@ import type {
   StdcmSearchEnvironment,
 } from 'common/api/osrdEditoastApi';
 
+import HomePage from './pages/home-page-model';
 import STDCMPage from './pages/stdcm-page-model';
 import test from './test-logger';
 import { readJsonFile } from './utils';
@@ -16,22 +17,28 @@ import { deleteProject } from './utils/teardown-utils';
 import { postSimulation, sendTrainSchedules } from './utils/trainSchedule';
 
 test.describe('Verify train schedule elements and filters', () => {
-  test.slow();
   let project: Project;
   let study: Study;
   let scenario: Scenario;
   let infra: Infra;
+  let OSRDLanguage: string;
   const trainSchedulesJson = readJsonFile('./tests/assets/trainSchedule/train_schedules.json');
 
   test.beforeAll('Set up the STDCM environment ', async () => {
+    // Set timeout for initial setup
+    test.setTimeout(180000); // 3 minutes
+
+    // Set up infrastructure, project, study, and scenario for tests
     infra = await createInfrastructure('STDCM_infra_test_e2e');
     project = await createProject('STDCM_project_test_e2e');
     study = await createStudy(project.id, 'STDCM_study_test_e2e');
-    ({ scenario } = await createScenario(project.id, study.id, infra.id));
+    scenario = (await createScenario(project.id, study.id, infra.id)).scenario;
 
-    // Post train schedule and initiate simulation
+    // Post train schedules and start simulation for the created scenario
     const response = await sendTrainSchedules(scenario.timetable_id, trainSchedulesJson);
     await postSimulation(response, scenario.infra_id);
+
+    // Configure STDCM search environment for the tests
     await postApiRequest(
       '/api/stdcm/search_environment',
       {
@@ -45,20 +52,43 @@ test.describe('Verify train schedule elements and filters', () => {
     );
   });
 
-  test.afterAll('Delete the created project', async () => {
-    await deleteProject('STDCM_project_test_e2e');
+  test.afterAll('Clean up by deleting the created project', async () => {
+    await deleteProject(project.name);
   });
 
   test.beforeEach(' Navigate to the STDCM page', async ({ page }) => {
+    // Retrieve OSRD language and navigate to STDCM page
+    const homePage = new HomePage(page);
+    await homePage.goToHomePage();
+    OSRDLanguage = await homePage.getOSRDLanguage();
     await page.goto('/stdcm');
-    await page.waitForLoadState('networkidle', { timeout: 2 * 60 * 1000 });
+    await page.waitForLoadState('networkidle', { timeout: 120000 }); // 2 minutes
   });
 
   /** *************** Test 1 **************** */
   test('Empty STDCM page', async ({ page }) => {
+    // Verify visibility of STDCM elements and handle empty via fields
     const stdcmPage = new STDCMPage(page);
     await stdcmPage.verifyStdcmElementsVisibility();
     await stdcmPage.verifyAllFieldsEmpty();
     await stdcmPage.addAndDeleteEmptyVia();
+  });
+
+  /** *************** Test 2 **************** */
+  test('STDCM simulation with all stops', async ({ page }) => {
+    test.slow(); // Mark test as slow due to multiple steps
+
+    // Populate STDCM page with origin, destination, and via details, then verify
+    const stdcmPage = new STDCMPage(page);
+    await stdcmPage.fillConsistDetails();
+    await stdcmPage.fillAndVerifyOriginDetails();
+    await stdcmPage.fillAndVerifyDestinationDetails(OSRDLanguage);
+    await stdcmPage.fillAndVerifyViaDetails(1, 'mid_west');
+    await stdcmPage.fillAndVerifyViaDetails(2, 'mid_east');
+    await stdcmPage.fillAndVerifyViaDetails(3, 'sS', OSRDLanguage);
+
+    // Launch simulation and verify output data matches expected results
+    await stdcmPage.launchSimulation(OSRDLanguage);
+    await stdcmPage.verifyTableData('./tests/assets/stdcm/simulationResultTable.json');
   });
 });

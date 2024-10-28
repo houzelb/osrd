@@ -1,0 +1,52 @@
+[
+  {
+    "index": 1,
+    "operationalPoint": "North_West_station",
+    "code": "BC",
+    "endStop": "",
+    "passageStop": "",
+    "startStop": "00:55",
+    "weight": "900t",
+    "refEngine": ""
+  },
+  {
+    "index": 2,
+    "operationalPoint": "Mid_West_station",
+    "code": "BV",
+    "endStop": "",
+    "passageStop": "01:06",
+    "startStop": "",
+    "weight": "=",
+    "refEngine": "="
+  },
+  {
+    "index": 3,
+    "operationalPoint": "Mid_East_station",
+    "code": "BV",
+    "endStop": "01:12",
+    "passageStop": "3 min",
+    "startStop": "01:15",
+    "weight": "=",
+    "refEngine": "="
+  },
+  {
+    "index": 4,
+    "operationalPoint": "North_station",
+    "code": "BV",
+    "endStop": "01:23",
+    "passageStop": "9 min",
+    "startStop": "01:32",
+    "weight": "=",
+    "refEngine": "="
+  },
+  {
+    "index": 5,
+    "operationalPoint": "South_station",
+    "code": "BV",
+    "endStop": "01:36",
+    "passageStop": "",
+    "startStop": "",
+    "weight": "900t",
+    "refEngine": ""
+  }
+]

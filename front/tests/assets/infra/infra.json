@@ -6876,13 +6876,13 @@
       "extensions": {
         "sncf": {
           "ch": "BC",
-          "ci": 919,
+          "ci": 918,
           "trigram": "NWS",
           "ch_long_label": "NW Second Station",
           "ch_short_label": "NW Second Station"
         },
         "identifier": {
-          "uic": 123457,
+          "uic": 123456,
           "name": "North_West_station"
         }
       }
