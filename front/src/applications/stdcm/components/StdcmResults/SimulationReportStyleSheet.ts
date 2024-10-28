@@ -1,33 +1,23 @@
 import { StyleSheet, Font } from '@react-pdf/renderer';
 
-import IBMPlexMonoBold from 'assets/newFonts/IBM-Plex-Mono/IBMPlexMono-Bold.ttf';
-import IBMPlexMonoMedium from 'assets/newFonts/IBM-Plex-Mono/IBMPlexMono-Medium.ttf';
-import IBMPlexMonoRegular from 'assets/newFonts/IBM-Plex-Mono/IBMPlexMono-Regular.ttf';
-import IBMPlexMonoSemiBold from 'assets/newFonts/IBM-Plex-Mono/IBMPlexMono-SemiBold.ttf';
-import IBMPlexSansBold from 'assets/newFonts/IBM-Plex-Sans/IBMPlexSans-Bold.ttf';
-import IBMPlexSansItalic from 'assets/newFonts/IBM-Plex-Sans/IBMPlexSans-Italic.ttf';
-import IBMPlexSansMedium from 'assets/newFonts/IBM-Plex-Sans/IBMPlexSans-Medium.ttf';
-import IBMPlexSansRegular from 'assets/newFonts/IBM-Plex-Sans/IBMPlexSans-Regular.ttf';
-import IBMPlexSansSemiBold from 'assets/newFonts/IBM-Plex-Sans/IBMPlexSans-SemiBold.ttf';
-
 Font.register({
   family: 'IBM Plex Sans',
   fonts: [
-    { src: IBMPlexSansRegular, fontWeight: 'normal' },
-    { src: IBMPlexSansMedium, fontWeight: 'medium' },
-    { src: IBMPlexSansSemiBold, fontWeight: 'semibold' },
-    { src: IBMPlexSansBold, fontWeight: 'bold' },
-    { src: IBMPlexSansItalic, fontStyle: 'italic' },
+    { src: '/newFonts/IBM-Plex-Sans/IBMPlexSans-Regular.ttf', fontWeight: 'normal' },
+    { src: '/newFonts/IBM-Plex-Sans/IBMPlexSans-Medium.ttf', fontWeight: 'medium' },
+    { src: '/newFonts/IBM-Plex-Sans/IBMPlexSans-SemiBold.ttf', fontWeight: 'semibold' },
+    { src: '/newFonts/IBM-Plex-Sans/IBMPlexSans-Bold.ttf', fontWeight: 'bold' },
+    { src: '/newFonts/IBM-Plex-Sans/IBMPlexSans-Italic.ttf', fontStyle: 'italic' },
   ],
 });
 
 Font.register({
   family: 'IBM Plex Mono',
   fonts: [
-    { src: IBMPlexMonoRegular, fontWeight: 'normal' },
-    { src: IBMPlexMonoMedium, fontWeight: 'medium' },
-    { src: IBMPlexMonoSemiBold, fontWeight: 'semibold' },
-    { src: IBMPlexMonoBold, fontWeight: 'bold' },
+    { src: '/newFonts/IBM-Plex-Mono/IBMPlexMono-Regular.ttf', fontWeight: 'normal' },
+    { src: '/newFonts/IBM-Plex-Mono/IBMPlexMono-Medium.ttf', fontWeight: 'medium' },
+    { src: '/newFonts/IBM-Plex-Mono/IBMPlexMono-SemiBold.ttf', fontWeight: 'semibold' },
+    { src: '/newFonts/IBM-Plex-Mono/IBMPlexMono-Bold.ttf', fontWeight: 'bold' },
   ],
 });
 

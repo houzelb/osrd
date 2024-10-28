@@ -214,7 +214,7 @@ const SimulationResults = ({
             <TimesStopsOutput
               simulatedTrain={trainSimulation}
               pathProperties={pathProperties}
-              operationalPoints={operationalPoints.finalOutput}
+              operationalPoints={operationalPoints}
               selectedTrainSchedule={selectedTrainSchedule}
               path={path}
               dataIsLoading={formattedOpPointsLoading}
