@@ -1,7 +1,9 @@
-{ps}: let
+{ ps }:
+let
   kdTree = ./kdtree.nix;
   geojsonPydantic = ./geojson-pydantic.nix;
-in [
+in
+[
   ps.black
   ps.flake8
   ps.intervaltree
@@ -14,8 +16,8 @@ in [
   ps.pyyaml
   ps.requests
   ps.websockets
-  (ps.callPackage (import kdTree) {})
-  (ps.callPackage (import geojsonPydantic) {inherit (ps) pydantic;})
+  (ps.callPackage (import kdTree) { })
+  (ps.callPackage (import geojsonPydantic) { inherit (ps) pydantic; })
 
   # DATA SCIENCE
   ps.ipykernel

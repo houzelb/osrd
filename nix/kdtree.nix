@@ -15,7 +15,7 @@ buildPythonPackage rec {
   doCheck = false;
 
   meta = with lib; {
-    maintainers = with maintainers; [flomonster];
+    maintainers = with maintainers; [ flomonster ];
     description = "Kdtree";
   };
 }

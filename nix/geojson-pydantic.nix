@@ -15,10 +15,10 @@ buildPythonPackage rec {
 
   doCheck = false;
 
-  propagatedBuildInputs = [pydantic];
+  propagatedBuildInputs = [ pydantic ];
 
   meta = with lib; {
-    maintainers = with maintainers; [flomonster];
+    maintainers = with maintainers; [ flomonster ];
     description = "GeoJson support for pydantic";
   };
 }
