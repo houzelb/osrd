@@ -2648,14 +2648,14 @@ dependencies = [
 
 [[package]]
 name = "mvt"
-version = "0.9.3"
+version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea1c8ef49f93df94c6110f308faa91268e141e0c34b4041681e39c0a90902fc5"
+checksum = "531942c61427893bf0620903122ee9f67be5a732ff568c6760f3d1b2f5418a6b"
 dependencies = [
  "log",
  "num-traits",
  "pointy",
- "protobuf 3.4.0",
+ "protobuf 3.7.1",
  "thiserror",
 ]
 
@@ -3417,9 +3417,9 @@ checksum = "106dd99e98437432fed6519dedecfade6a06a73bb7b2a1e019fdd2bee5778d94"
 
 [[package]]
 name = "protobuf"
-version = "3.4.0"
+version = "3.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58678a64de2fced2bdec6bca052a6716a0efe692d6e3f53d1bda6a1def64cfc0"
+checksum = "a3a7c64d9bf75b1b8d981124c14c179074e8caa7dfe7b6a12e6222ddcd0c8f72"
 dependencies = [
  "once_cell",
  "protobuf-support",
@@ -3447,9 +3447,9 @@ dependencies = [
 
 [[package]]
 name = "protobuf-support"
-version = "3.4.0"
+version = "3.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1ed294a835b0f30810e13616b1cd34943c6d1e84a8f3b0dcfe466d256c3e7e7"
+checksum = "b088fd20b938a875ea00843b6faf48579462630015c3788d397ad6a786663252"
 dependencies = [
  "thiserror",
 ]
