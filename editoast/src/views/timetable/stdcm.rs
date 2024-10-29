@@ -23,7 +23,6 @@ use thiserror::Error;
 use utoipa::IntoParams;
 use utoipa::ToSchema;
 
-use super::map_to_core_work_schedule;
 use super::path_not_found_handler::PathNotFoundHandler;
 use super::stdcm_request_payload::convert_steps;
 use super::stdcm_request_payload::STDCMRequestPayload;
@@ -258,11 +257,12 @@ async fn stdcm(
         time_gap_after: stdcm_request.time_gap_after,
         margin: stdcm_request.margin,
         time_step: Some(2000),
-        work_schedules: filter_stdcm_work_schedules(
-            &work_schedules,
-            earliest_departure_time,
-            latest_simulation_end,
-        ),
+        work_schedules: work_schedules
+            .iter()
+            .filter_map(|ws| {
+                ws.make_stdcm_work_schedule(earliest_departure_time, latest_simulation_end)
+            })
+            .collect(),
         temporary_speed_limits,
         rolling_stock: PhysicsRollingStock::new(rolling_stock.into(), simulation_parameters),
     };
@@ -456,19 +456,6 @@ fn build_single_margin(margin: Option<MarginValue>) -> Margins {
             values: vec![m],
         },
     }
-}
-
-fn filter_stdcm_work_schedules(
-    work_schedules: &[WorkSchedule],
-    start_time: DateTime<Utc>,
-    latest_simulation_end: DateTime<Utc>,
-) -> Vec<crate::core::stdcm::WorkSchedule> {
-    let search_window_duration = (latest_simulation_end - start_time).num_milliseconds() as u64;
-    work_schedules
-        .iter()
-        .map(|ws| map_to_core_work_schedule(ws, start_time))
-        .filter(|ws| ws.end_time > 0 && ws.start_time < search_window_duration)
-        .collect()
 }
 
 /// Return the list of speed limits that are active at any point in a given time range
@@ -863,8 +850,10 @@ mod tests {
             .to_utc();
 
         // WHEN
-        let filtered =
-            filter_stdcm_work_schedules(&work_schedules, start_time, latest_simulation_end);
+        let filtered: Vec<_> = work_schedules
+            .iter()
+            .filter_map(|ws| ws.make_stdcm_work_schedule(start_time, latest_simulation_end))
+            .collect();
 
         // THEN
         assert!(filtered.is_empty() == filtered_out);

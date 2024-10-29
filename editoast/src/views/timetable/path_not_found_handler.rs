@@ -14,7 +14,6 @@ use crate::models::work_schedules::WorkSchedule;
 use crate::views::path::pathfinding::PathfindingResult;
 use crate::views::timetable::stdcm::STDCMResponse;
 
-use super::map_to_core_work_schedule;
 use super::stdcm::build_train_requirements;
 
 pub struct PathNotFoundHandler {
@@ -108,7 +107,7 @@ fn make_work_schedules_request(
 
     let work_schedule_requirements = work_schedules
         .iter()
-        .map(|ws| (ws.id, map_to_core_work_schedule(ws, start_time)))
+        .map(|ws| (ws.id, ws.map_to_core_work_schedule(start_time)))
         .filter(|(_, ws)| ws.end_time > 0 && ws.start_time < search_window_duration)
         .collect();
 
