@@ -52,90 +52,101 @@ const ManchetteWithSpaceTimeChartWrapper = ({
   const [waypointsPanelIsOpen, setWaypointsPanelIsOpen] = useState(false);
 
   // Cut the space time chart curves if the first or last waypoints are hidden
-  const spaceTimeChartLayersData = useMemo(() => {
-    let filteredProjectPathTrainResult = projectPathTrainResult;
-    let filteredConflicts = conflicts;
+  const { filteredProjectPathTrainResult: cutProjectedTrains, filteredConflicts: cutConflicts } =
+    useMemo(() => {
+      let filteredProjectPathTrainResult = projectPathTrainResult;
+      let filteredConflicts = conflicts;
 
-    if (!waypointsPanelData || waypointsPanelData.filteredWaypoints.length < 2)
-      return { filteredProjectPathTrainResult, filteredConflicts };
+      if (!waypointsPanelData || waypointsPanelData.filteredWaypoints.length < 2)
+        return { filteredProjectPathTrainResult, filteredConflicts };
 
-    const { filteredWaypoints } = waypointsPanelData;
-    const firstPosition = filteredWaypoints.at(0)!.position;
-    const lastPosition = filteredWaypoints.at(-1)!.position;
+      const { filteredWaypoints } = waypointsPanelData;
+      const firstPosition = filteredWaypoints.at(0)!.position;
+      const lastPosition = filteredWaypoints.at(-1)!.position;
 
-    if (firstPosition !== 0 || lastPosition !== operationalPoints.at(-1)!.position) {
-      filteredProjectPathTrainResult = projectPathTrainResult.map((train) => ({
-        ...train,
-        space_time_curves: train.space_time_curves.map(({ positions, times }) => {
-          const cutPositions: number[] = [];
-          const cutTimes: number[] = [];
+      if (firstPosition !== 0 || lastPosition !== operationalPoints.at(-1)!.position) {
+        filteredProjectPathTrainResult = projectPathTrainResult.map((train) => ({
+          ...train,
+          spaceTimeCurves: train.spaceTimeCurves.map(({ positions, times }) => {
+            const cutPositions: number[] = [];
+            const cutTimes: number[] = [];
 
-          for (let i = 1; i < positions.length; i += 1) {
-            const currentRange: LayerRangeData = {
-              spaceStart: positions[i - 1],
-              spaceEnd: positions[i],
-              timeStart: times[i - 1],
-              timeEnd: times[i],
-            };
+            for (let i = 1; i < positions.length; i += 1) {
+              const currentRange: LayerRangeData = {
+                spaceStart: positions[i - 1],
+                spaceEnd: positions[i],
+                timeStart: times[i - 1],
+                timeEnd: times[i],
+              };
 
-            const interpolatedRange = cutSpaceTimeRect(currentRange, firstPosition, lastPosition);
+              const interpolatedRange = cutSpaceTimeRect(currentRange, firstPosition, lastPosition);
 
-            // TODO : remove reformatting the datas when https://github.com/OpenRailAssociation/osrd-ui/issues/694 is merged
-            if (!interpolatedRange) continue;
+              // TODO : remove reformatting the datas when https://github.com/OpenRailAssociation/osrd-ui/issues/694 is merged
+              if (!interpolatedRange) continue;
 
-            if (i === 1 || cutPositions.length === 0) {
-              cutPositions.push(interpolatedRange.spaceStart);
-              cutTimes.push(interpolatedRange.timeStart);
+              if (i === 1 || cutPositions.length === 0) {
+                cutPositions.push(interpolatedRange.spaceStart);
+                cutTimes.push(interpolatedRange.timeStart);
+              }
+              cutPositions.push(interpolatedRange.spaceEnd);
+              cutTimes.push(interpolatedRange.timeEnd);
             }
-            cutPositions.push(interpolatedRange.spaceEnd);
-            cutTimes.push(interpolatedRange.timeEnd);
-          }
 
-          return {
-            positions: cutPositions,
-            times: cutTimes,
-          };
-        }),
-        signal_updates: compact(
-          train.signal_updates.map((signal) => {
-            const updatedSignalRange = cutSpaceTimeRect(
-              {
-                spaceStart: signal.position_start,
-                spaceEnd: signal.position_end,
-                timeStart: signal.time_start,
-                timeEnd: signal.time_end,
-              },
-              firstPosition,
-              lastPosition
-            );
-
-            if (!updatedSignalRange) return null;
-
-            // TODO : remove reformatting the datas when https://github.com/OpenRailAssociation/osrd-ui/issues/694 is merged
             return {
-              ...signal,
-              position_start: updatedSignalRange.spaceStart,
-              position_end: updatedSignalRange.spaceEnd,
-              time_start: updatedSignalRange.timeStart,
-              time_end: updatedSignalRange.timeEnd,
+              positions: cutPositions,
+              times: cutTimes,
             };
-          })
-        ),
-      }));
+          }),
+          signalUpdates: compact(
+            train.signalUpdates.map((signal) => {
+              const updatedSignalRange = cutSpaceTimeRect(
+                {
+                  spaceStart: signal.position_start,
+                  spaceEnd: signal.position_end,
+                  timeStart: signal.time_start,
+                  timeEnd: signal.time_end,
+                },
+                firstPosition,
+                lastPosition
+              );
 
-      filteredConflicts = compact(
-        conflicts.map((conflict) => cutSpaceTimeRect(conflict, firstPosition, lastPosition))
-      );
+              if (!updatedSignalRange) return null;
+
+              // TODO : remove reformatting the datas when https://github.com/OpenRailAssociation/osrd-ui/issues/694 is merged
+              return {
+                ...signal,
+                position_start: updatedSignalRange.spaceStart,
+                position_end: updatedSignalRange.spaceEnd,
+                time_start: updatedSignalRange.timeStart,
+                time_end: updatedSignalRange.timeEnd,
+              };
+            })
+          ),
+        }));
+
+        filteredConflicts = compact(
+          conflicts.map((conflict) => cutSpaceTimeRect(conflict, firstPosition, lastPosition))
+        );
+
+        return { filteredProjectPathTrainResult, filteredConflicts };
+      }
 
       return { filteredProjectPathTrainResult, filteredConflicts };
-    }
+    }, [waypointsPanelData?.filteredWaypoints, projectPathTrainResult, conflicts]);
 
-    return { filteredProjectPathTrainResult, filteredConflicts };
-  }, [waypointsPanelData?.filteredWaypoints, projectPathTrainResult, conflicts]);
+  const manchetteWaypoints = useMemo(() => {
+    const rawWaypoints = waypointsPanelData?.filteredWaypoints ?? operationalPoints;
+    return rawWaypoints.map((waypoint) => ({
+      id: waypoint.id,
+      position: waypoint.position,
+      name: waypoint.extensions?.identifier?.name,
+      secondaryCode: waypoint.extensions?.sncf?.ch,
+    }));
+  }, [waypointsPanelData, operationalPoints]);
 
   const { manchetteProps, spaceTimeChartProps, handleScroll } = useManchettesWithSpaceTimeChart(
-    waypointsPanelData?.filteredWaypoints ?? operationalPoints,
-    spaceTimeChartLayersData.filteredProjectPathTrainResult,
+    manchetteWaypoints,
+    cutProjectedTrains,
     manchetteWithSpaceTimeChartRef,
     selectedTrainScheduleId
   );
@@ -146,19 +157,17 @@ const ManchetteWithSpaceTimeChartWrapper = ({
     showSignalsStates: false,
   });
 
-  const occupancyBlocks = spaceTimeChartLayersData.filteredProjectPathTrainResult.flatMap(
-    (train) => {
-      const departureTime = new Date(train.departure_time).getTime();
+  const occupancyBlocks = cutProjectedTrains.flatMap((train) => {
+    const departureTime = train.departureTime.getTime();
 
-      return train.signal_updates.map((block) => ({
-        timeStart: departureTime + block.time_start,
-        timeEnd: departureTime + block.time_end,
-        spaceStart: block.position_start,
-        spaceEnd: block.position_end,
-        color: ASPECT_LABELS_COLORS[block.aspect_label as AspectLabel],
-      }));
-    }
-  );
+    return train.signalUpdates.map((block) => ({
+      timeStart: departureTime + block.time_start,
+      timeEnd: departureTime + block.time_end,
+      spaceStart: block.position_start,
+      spaceEnd: block.position_end,
+      color: ASPECT_LABELS_COLORS[block.aspect_label as AspectLabel],
+    }));
+  });
 
   return (
     <div className="manchette-space-time-chart-wrapper">
@@ -207,7 +216,7 @@ const ManchetteWithSpaceTimeChartWrapper = ({
             spaceOrigin={
               (waypointsPanelData?.filteredWaypoints ?? operationalPoints).at(0)?.position || 0
             }
-            timeOrigin={Math.min(...projectPathTrainResult.map((p) => +new Date(p.departure_time)))}
+            timeOrigin={Math.min(...projectPathTrainResult.map((p) => +p.departureTime))}
             {...spaceTimeChartProps}
           >
             {spaceTimeChartProps.paths.map((path) => (
@@ -224,9 +233,7 @@ const ManchetteWithSpaceTimeChartWrapper = ({
                 imageUrl={upward}
               />
             )}
-            {settings.showConflicts && (
-              <ConflictLayer conflicts={spaceTimeChartLayersData.filteredConflicts} />
-            )}
+            {settings.showConflicts && <ConflictLayer conflicts={cutConflicts} />}
             {settings.showSignalsStates && (
               <OccupancyBlockLayer occupancyBlocks={occupancyBlocks} />
             )}

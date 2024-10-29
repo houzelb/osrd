@@ -51,10 +51,7 @@ const useProjectedTrainsForStdcm = (stdcmResponse?: StdcmSuccessResponse) => {
   });
 
   useEffect(() => {
-    const projectedTimetableTrains = Array.from(projectedTimetableTrainsById.values());
-    const newSpaceTimeData = projectedTimetableTrains.filter(
-      (projectedTrain) => projectedTrain.space_time_curves.length > 0
-    );
+    const newSpaceTimeData = Array.from(projectedTimetableTrainsById.values());
 
     if (stdcmProjectedTrain) {
       newSpaceTimeData.push(stdcmProjectedTrain);
