@@ -7,10 +7,10 @@ import { Marker } from 'react-map-gl/maplibre';
 import { useSelector } from 'react-redux';
 
 import destinationSVG from 'assets/pictures/destination.svg';
+import stdcmDestination from 'assets/pictures/mapMarkers/destination.svg';
+import stdcmVia from 'assets/pictures/mapMarkers/intermediate-point.svg';
+import stdcmOrigin from 'assets/pictures/mapMarkers/start.svg';
 import originSVG from 'assets/pictures/origin.svg';
-import stdcmDestination from 'assets/pictures/stdcm/destination.svg';
-import stdcmVia from 'assets/pictures/stdcm/intermediate-point.svg';
-import stdcmOrigin from 'assets/pictures/stdcm/start.svg';
 import viaSVG from 'assets/pictures/via.svg';
 import { useOsrdConfSelectors } from 'common/osrdContext';
 import type { PathStep } from 'reducers/osrdconf/types';

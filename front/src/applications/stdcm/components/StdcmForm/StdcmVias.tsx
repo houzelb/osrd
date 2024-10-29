@@ -4,7 +4,7 @@ import { Location } from '@osrd-project/ui-icons';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
-import IntermediatePointIcon from 'assets/pictures/stdcm/intermediate-point.svg';
+import IntermediatePointIcon from 'assets/pictures/mapMarkers/intermediate-point.svg';
 import { useOsrdConfSelectors, useOsrdConfActions } from 'common/osrdContext';
 import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';

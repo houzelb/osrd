@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
-import DestinationIcon from 'assets/pictures/stdcm/destination.svg';
+import DestinationIcon from 'assets/pictures/mapMarkers/destination.svg';
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
