@@ -28,6 +28,7 @@ export type StdcmSuccessResponse = Omit<
 
 export type SimulationReportSheetProps = {
   stdcmData: StdcmSuccessResponse;
+  consist: StdcmSimulationInputs['consist'];
   simulationReportSheetNumber: string;
   mapCanvas?: string;
   operationalPointsList: StdcmResultsOperationalPointsList;
@@ -74,6 +75,12 @@ export type StdcmSimulationInputs = {
   pathSteps: (PathStep | null)[];
   consist?: {
     tractionEngine?: RollingStockWithLiveries;
+    /** In ton */
+    totalMass?: number;
+    /** In meters */
+    totalLength?: number;
+    /** In km/s */
+    maxSpeed?: number;
     speedLimitByTag?: string;
   };
 };

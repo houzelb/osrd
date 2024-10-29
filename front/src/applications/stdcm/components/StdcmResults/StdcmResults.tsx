@@ -78,6 +78,7 @@ const StcdmResults = ({
           <div className="results-and-sheet">
             <StcdmResultsTable
               stdcmData={selectedSimulation.outputs.results}
+              consist={selectedSimulation.inputs.consist}
               isSimulationRetained={isSelectedSimulationRetained}
               operationalPointsList={operationalPointsList}
               onRetainSimulation={onRetainSimulation}
@@ -89,6 +90,7 @@ const StcdmResults = ({
                     document={
                       <SimulationReportSheet
                         stdcmData={selectedSimulation.outputs.results}
+                        consist={selectedSimulation.inputs.consist}
                         simulationReportSheetNumber={simulationReportSheetNumber}
                         mapCanvas={mapCanvas}
                         operationalPointsList={operationalPointsList}

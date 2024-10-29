@@ -6,12 +6,14 @@ import { useTranslation } from 'react-i18next';
 
 import type {
   StdcmResultsOperationalPointsList,
+  StdcmSimulationInputs,
   StdcmSuccessResponse,
 } from 'applications/stdcm/types';
 import { getStopDurationTime } from 'applications/stdcm/utils/formatSimulationReportSheet';
 
 type SimulationTableProps = {
   stdcmData: StdcmSuccessResponse;
+  consist: StdcmSimulationInputs['consist'];
   isSimulationRetained: boolean;
   operationalPointsList: StdcmResultsOperationalPointsList;
   onRetainSimulation: () => void;
@@ -19,6 +21,7 @@ type SimulationTableProps = {
 
 const StcdmResultsTable = ({
   stdcmData,
+  consist,
   onRetainSimulation,
   isSimulationRetained,
   operationalPointsList,
@@ -55,6 +58,9 @@ const StcdmResultsTable = ({
             const isPathStep =
               isFirstStep || isLastStep || (isRequestedPathStep && step.duration === 0);
             const isNotExtremity = !isFirstStep && !isLastStep;
+
+            const mass = consist?.totalMass ?? stdcmData.rollingStock.mass / 1000;
+
             if (showAllOP || shouldRenderRow) {
               return (
                 <tr key={index}>
@@ -101,7 +107,7 @@ const StcdmResultsTable = ({
                     {isFirstStep || step.duration > 0 ? step.stopEndTime : ''}
                   </td>
                   <td className="weight" style={{ color: !isFirstStep ? '#797671' : '#312E2B' }}>
-                    {isNotExtremity ? '=' : `${Math.floor(stdcmData.rollingStock.mass / 1000)}t`}
+                    {isNotExtremity ? '=' : `${Math.floor(mass)}t`}
                   </td>
                   <td style={{ color: !isFirstStep ? '#797671' : '#312E2B' }}>
                     {isNotExtremity ? '=' : stdcmData.rollingStock.metadata?.reference}

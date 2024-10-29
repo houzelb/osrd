@@ -8,6 +8,7 @@ import iconAlert from 'assets/simulationReportSheet/icon_alert_fill.png';
 import logoSNCF from 'assets/simulationReportSheet/logo_sncf_reseau.png';
 import type { PathStep } from 'reducers/osrdconf/types';
 import { extractHHMM, formatDateToString, formatDay } from 'utils/date';
+import { msToKmh } from 'utils/physics';
 import { capitalizeFirstLetter } from 'utils/strings';
 
 import styles from './SimulationReportStyleSheet';
@@ -16,6 +17,7 @@ import { base64ToJpeg, getStopDurationTime } from '../../utils/formatSimulationR
 
 const SimulationReportSheet = ({
   stdcmData,
+  consist,
   simulationReportSheetNumber,
   mapCanvas,
   operationalPointsList,
@@ -24,6 +26,10 @@ const SimulationReportSheet = ({
   let renderedIndex = 0;
 
   const { rollingStock, speedLimitByTag, departure_time: departureTime, creationDate } = stdcmData;
+
+  const convoyMass = consist?.totalMass ?? rollingStock.mass / 1000;
+  const convoyLength = consist?.totalLength ?? rollingStock.length;
+  const convoyMaxSpeed = consist?.maxSpeed ?? msToKmh(rollingStock.max_speed);
 
   // TODO: Add RC information when it becomes avalaible, until that, we use fake ones
   const fakeInformation = {
@@ -126,22 +132,20 @@ const SimulationReportSheet = ({
                 <Text style={styles.convoyAndRoute.convoyInfoData}>-</Text>
                 <Text style={styles.convoyAndRoute.convoyInfoTitles}>{t('maxSpeed')}</Text>
                 <Text style={styles.convoyAndRoute.convoyInfoData}>
-                  {`${Math.floor(rollingStock.max_speed * 3.6)} km/h`}
+                  {`${Math.floor(convoyMaxSpeed)} km/h`}
                 </Text>
               </View>
               <View style={styles.convoyAndRoute.convoyInfoBox2}>
                 <Text style={styles.convoyAndRoute.convoyInfoTitles}>{t('maxWeight')}</Text>
                 <Text style={styles.convoyAndRoute.convoyInfoData}>
-                  {`${Math.floor(rollingStock.mass / 1000)} t`}
+                  {`${Math.floor(convoyMass)} t`}
                 </Text>
                 <Text style={styles.convoyAndRoute.convoyInfoTitles}>{t('referenceEngine')}</Text>
                 <Text style={styles.convoyAndRoute.convoyInfoData}>
                   {rollingStock.metadata?.reference || '-'}
                 </Text>
                 <Text style={styles.convoyAndRoute.convoyInfoTitles}>{t('maxLength')}</Text>
-                <Text
-                  style={styles.convoyAndRoute.convoyInfoData}
-                >{`${rollingStock.length} m`}</Text>
+                <Text style={styles.convoyAndRoute.convoyInfoData}>{`${convoyLength} m`}</Text>
               </View>
             </View>
           </View>
@@ -374,7 +378,7 @@ const SimulationReportSheet = ({
                     </View>
                     <View style={styles.simulation.weightWidth}>
                       <TD style={tdPassageStopStyle}>
-                        {!isFirstStep ? '=' : `${Math.floor(rollingStock.mass / 1000)} t`}
+                        {!isFirstStep ? '=' : `${Math.floor(convoyMass)} t`}
                       </TD>
                     </View>
                     <View style={styles.simulation.refEngineWidth}>

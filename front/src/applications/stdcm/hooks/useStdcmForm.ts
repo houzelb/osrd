@@ -10,9 +10,14 @@ import { extractDateAndTimefromISO } from 'utils/date';
 import type { StdcmSimulationInputs } from '../types';
 
 const useStdcmForm = (): StdcmSimulationInputs => {
-  const { getStdcmPathSteps, getSpeedLimitByTag } = useOsrdConfSelectors() as StdcmConfSelectors;
+  const { getStdcmPathSteps, getSpeedLimitByTag, getTotalMass, getTotalLength, getMaxSpeed } =
+    useOsrdConfSelectors() as StdcmConfSelectors;
+
   const pathSteps = useSelector(getStdcmPathSteps);
   const speedLimitByTag = useSelector(getSpeedLimitByTag);
+  const totalMass = useSelector(getTotalMass);
+  const totalLength = useSelector(getTotalLength);
+  const maxSpeed = useSelector(getMaxSpeed);
   const { rollingStock } = useStoreDataForRollingStockSelector();
 
   const currentSimulationInputs = useMemo(() => {
@@ -25,10 +30,13 @@ const useStdcmForm = (): StdcmSimulationInputs => {
       departureTime: originArrival?.arrivalTime,
       consist: {
         tractionEngine: rollingStock,
+        totalMass,
+        totalLength,
+        maxSpeed,
         speedLimitByTag,
       },
     };
-  }, [pathSteps, rollingStock, speedLimitByTag]);
+  }, [pathSteps, rollingStock, speedLimitByTag, totalMass, totalLength, maxSpeed]);
 
   return currentSimulationInputs;
 };

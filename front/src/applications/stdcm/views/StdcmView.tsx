@@ -73,6 +73,9 @@ const StdcmView = () => {
       dispatch(
         updateStdcmConfigWithData({
           rollingStockID: consist?.tractionEngine?.id,
+          totalMass: consist?.totalMass,
+          totalLength: consist?.totalLength,
+          maxSpeed: consist?.maxSpeed,
           speedLimitByTag: consist?.speedLimitByTag,
           pathSteps: [...pathSteps],
         })
