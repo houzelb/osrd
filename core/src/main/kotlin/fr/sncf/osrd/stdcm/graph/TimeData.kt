@@ -1,5 +1,7 @@
 package fr.sncf.osrd.stdcm.graph
 
+import kotlin.math.max
+
 /**
  * This class combines all the time-related elements of a node/edge.
  *
@@ -99,13 +101,15 @@ data class TimeData(
 
     /**
      * Return a copy of the current instance, with "shifted" time values. Used to create new edges.
-     * The shift is made by delaying the last departure (either by lengthening the last stop if any,
-     * or by making the train start at a later time).
+     * The shift can be made by delaying the last departure (either by lengthening the last stop if
+     * any, or by making the train start at a later time). Any remaining time delta is considered to
+     * be reached by making the train run slower (with engineering allowances).
      *
      * @param timeShift by how much we delay the new element compared to the earliest possible time.
      *   A value > 0 means that we want to arrive later (to avoid a conflict)
      * @param delayAddedToLastDeparture how much extra delay we add to the last departure (train
-     *   start time or last stop). This is one method to reach `timeShift`
+     *   start time or last stop). This is one method to reach `timeShift`. The remaining difference
+     *   is counted as extra running time.
      * @param timeOfNextConflictAtLocation when is the first conflict at the given location
      * @param maxDepartureDelayingWithoutConflict how much delay we can add at the given location
      *   without causing conflict
@@ -130,6 +134,7 @@ data class TimeData(
                 newStopData = stopDataCopy
             }
         }
+        val extraRunningTime = max(0.0, timeShift - delayAddedToLastDeparture)
         return copy(
             earliestReachableTime = earliestReachableTime + timeShift,
             maxDepartureDelayingWithoutConflict = maxDepartureDelayingWithoutConflict,
@@ -137,6 +142,7 @@ data class TimeData(
             delayAddedToLastDeparture = delayAddedToLastDeparture,
             stopTimeData = newStopData,
             departureTime = newDepartureTime,
+            totalRunningTime = totalRunningTime + extraRunningTime,
         )
     }
 
