@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 
-import { extractHHMMSS } from 'utils/date';
-
 import type { ConflictWithTrainNames } from '../types';
+
+const formatToLocalTime = (dateString: string) => dayjs.utc(dateString).local().format('HH:mm:ss');
 
 const ConflictCard = ({
   conflict,
@@ -13,8 +13,8 @@ const ConflictCard = ({
   onConflictClick: (conflict: ConflictWithTrainNames) => void;
 }) => {
   const { t } = useTranslation(['operationalStudies/scenario']);
-  const start_time = extractHHMMSS(conflict.start_time);
-  const end_time = extractHHMMSS(conflict.end_time);
+  const start_time = formatToLocalTime(conflict.start_time);
+  const end_time = formatToLocalTime(conflict.end_time);
   const start_date = dayjs(conflict.start_time).format('DD/MM/YYYY');
 
   return (
