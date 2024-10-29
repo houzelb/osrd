@@ -42,6 +42,13 @@ export type WaypointsPanelData = {
   projectionPath: TrainScheduleBase['path'];
 };
 
+export type LayerRangeData = {
+  spaceStart: number;
+  spaceEnd: number;
+  timeStart: number;
+  timeEnd: number;
+};
+
 export type AspectLabel =
   | 'VL'
   | '300VL'

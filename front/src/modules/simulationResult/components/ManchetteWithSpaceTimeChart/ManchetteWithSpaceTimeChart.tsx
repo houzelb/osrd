@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { KebabHorizontal } from '@osrd-project/ui-icons';
 import { Manchette } from '@osrd-project/ui-manchette';
@@ -11,12 +11,18 @@ import {
   OccupancyBlockLayer,
 } from '@osrd-project/ui-spacetimechart';
 import type { Conflict } from '@osrd-project/ui-spacetimechart';
+import { compact } from 'lodash';
 
 import type { OperationalPoint, TrainSpaceTimeData } from 'applications/operationalStudies/types';
 import upward from 'assets/pictures/workSchedules/ScheduledMaintenanceUp.svg';
 import type { PostWorkSchedulesProjectPathApiResponse } from 'common/api/osrdEditoastApi';
+import cutSpaceTimeRect from 'modules/simulationResult/components/SpaceTimeChart/helpers/utils';
 import { ASPECT_LABELS_COLORS } from 'modules/simulationResult/consts';
-import type { AspectLabel, WaypointsPanelData } from 'modules/simulationResult/types';
+import type {
+  AspectLabel,
+  LayerRangeData,
+  WaypointsPanelData,
+} from 'modules/simulationResult/types';
 
 import SettingsPanel from './SettingsPanel';
 import ManchetteMenuButton from '../SpaceTimeChart/ManchetteMenuButton';
@@ -45,9 +51,91 @@ const ManchetteWithSpaceTimeChartWrapper = ({
 
   const [waypointsPanelIsOpen, setWaypointsPanelIsOpen] = useState(false);
 
+  // Cut the space time chart curves if the first or last waypoints are hidden
+  const spaceTimeChartLayersData = useMemo(() => {
+    let filteredProjectPathTrainResult = projectPathTrainResult;
+    let filteredConflicts = conflicts;
+
+    if (!waypointsPanelData || waypointsPanelData.filteredWaypoints.length < 2)
+      return { filteredProjectPathTrainResult, filteredConflicts };
+
+    const { filteredWaypoints } = waypointsPanelData;
+    const firstPosition = filteredWaypoints.at(0)!.position;
+    const lastPosition = filteredWaypoints.at(-1)!.position;
+
+    if (firstPosition !== 0 || lastPosition !== operationalPoints.at(-1)!.position) {
+      filteredProjectPathTrainResult = projectPathTrainResult.map((train) => ({
+        ...train,
+        space_time_curves: train.space_time_curves.map(({ positions, times }) => {
+          const cutPositions: number[] = [];
+          const cutTimes: number[] = [];
+
+          for (let i = 1; i < positions.length; i += 1) {
+            const currentRange: LayerRangeData = {
+              spaceStart: positions[i - 1],
+              spaceEnd: positions[i],
+              timeStart: times[i - 1],
+              timeEnd: times[i],
+            };
+
+            const interpolatedRange = cutSpaceTimeRect(currentRange, firstPosition, lastPosition);
+
+            // TODO : remove reformatting the datas when https://github.com/OpenRailAssociation/osrd-ui/issues/694 is merged
+            if (!interpolatedRange) continue;
+
+            if (i === 1 || cutPositions.length === 0) {
+              cutPositions.push(interpolatedRange.spaceStart);
+              cutTimes.push(interpolatedRange.timeStart);
+            }
+            cutPositions.push(interpolatedRange.spaceEnd);
+            cutTimes.push(interpolatedRange.timeEnd);
+          }
+
+          return {
+            positions: cutPositions,
+            times: cutTimes,
+          };
+        }),
+        signal_updates: compact(
+          train.signal_updates.map((signal) => {
+            const updatedSignalRange = cutSpaceTimeRect(
+              {
+                spaceStart: signal.position_start,
+                spaceEnd: signal.position_end,
+                timeStart: signal.time_start,
+                timeEnd: signal.time_end,
+              },
+              firstPosition,
+              lastPosition
+            );
+
+            if (!updatedSignalRange) return null;
+
+            // TODO : remove reformatting the datas when https://github.com/OpenRailAssociation/osrd-ui/issues/694 is merged
+            return {
+              ...signal,
+              position_start: updatedSignalRange.spaceStart,
+              position_end: updatedSignalRange.spaceEnd,
+              time_start: updatedSignalRange.timeStart,
+              time_end: updatedSignalRange.timeEnd,
+            };
+          })
+        ),
+      }));
+
+      filteredConflicts = compact(
+        conflicts.map((conflict) => cutSpaceTimeRect(conflict, firstPosition, lastPosition))
+      );
+
+      return { filteredProjectPathTrainResult, filteredConflicts };
+    }
+
+    return { filteredProjectPathTrainResult, filteredConflicts };
+  }, [waypointsPanelData?.filteredWaypoints, projectPathTrainResult, conflicts]);
+
   const { manchetteProps, spaceTimeChartProps, handleScroll } = useManchettesWithSpaceTimeChart(
     waypointsPanelData?.filteredWaypoints ?? operationalPoints,
-    projectPathTrainResult,
+    spaceTimeChartLayersData.filteredProjectPathTrainResult,
     manchetteWithSpaceTimeChartRef,
     selectedTrainScheduleId
   );
@@ -58,17 +146,19 @@ const ManchetteWithSpaceTimeChartWrapper = ({
     showSignalsStates: false,
   });
 
-  const occupancyBlocks = projectPathTrainResult.flatMap((train) => {
-    const departureTime = new Date(train.departure_time).getTime();
+  const occupancyBlocks = spaceTimeChartLayersData.filteredProjectPathTrainResult.flatMap(
+    (train) => {
+      const departureTime = new Date(train.departure_time).getTime();
 
-    return train.signal_updates.map((block) => ({
-      timeStart: departureTime + block.time_start,
-      timeEnd: departureTime + block.time_end,
-      spaceStart: block.position_start,
-      spaceEnd: block.position_end,
-      color: ASPECT_LABELS_COLORS[block.aspect_label as AspectLabel],
-    }));
-  });
+      return train.signal_updates.map((block) => ({
+        timeStart: departureTime + block.time_start,
+        timeEnd: departureTime + block.time_end,
+        spaceStart: block.position_start,
+        spaceEnd: block.position_end,
+        color: ASPECT_LABELS_COLORS[block.aspect_label as AspectLabel],
+      }));
+    }
+  );
 
   return (
     <div className="manchette-space-time-chart-wrapper">
@@ -134,7 +224,9 @@ const ManchetteWithSpaceTimeChartWrapper = ({
                 imageUrl={upward}
               />
             )}
-            {settings.showConflicts && <ConflictLayer conflicts={conflicts} />}
+            {settings.showConflicts && (
+              <ConflictLayer conflicts={spaceTimeChartLayersData.filteredConflicts} />
+            )}
             {settings.showSignalsStates && (
               <OccupancyBlockLayer occupancyBlocks={occupancyBlocks} />
             )}
