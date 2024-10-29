@@ -3,6 +3,8 @@
   padding-bottom: 3rem;
 
   .osrd-simulation-sticky-bar {
+    // TODO: remove the `display none` when the design has been changed
+    display: none;
     position: sticky;
     border-radius: 4px;
     width: 100%;

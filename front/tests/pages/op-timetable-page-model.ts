@@ -13,7 +13,8 @@ class OperationalStudiesTimetablePage {
 
   readonly selectedTimetableTrain: Locator;
 
-  readonly simulationBar: Locator;
+  // TODO: remove this commented code when the design of simationBar has been changed
+  // readonly simulationBar: Locator;
 
   readonly manchetteSpaceTimeChart: Locator;
 
@@ -46,7 +47,8 @@ class OperationalStudiesTimetablePage {
     this.invalidTrainsMessage = page.getByTestId('invalid-trains-message');
     this.timetableTrains = page.getByTestId('scenario-timetable-train');
     this.selectedTimetableTrain = page.locator('[data-testid="scenario-timetable-train"].selected');
-    this.simulationBar = page.locator('.osrd-simulation-sticky-bar');
+    // TODO: remove this commented code when the design of simationBar has been changed
+    // this.simulationBar = page.locator('.osrd-simulation-sticky-bar');
     this.manchetteSpaceTimeChart = page.locator('.manchette-space-time-chart-wrapper');
     this.speedSpaceChart = page.locator('#container-SpeedSpaceChart');
     this.spaceTimeChart = page.locator('.space-time-chart-container');
@@ -96,7 +98,8 @@ class OperationalStudiesTimetablePage {
     await this.page.waitForLoadState('networkidle');
 
     const simulationResultsLocators = [
-      this.simulationBar,
+      // TODO: remove this commented code when the design of simationBar has been changed
+      // this.simulationBar,
       this.manchetteSpaceTimeChart,
       this.speedSpaceChart,
       this.spaceTimeChart,
