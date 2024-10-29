@@ -20,7 +20,7 @@ const userTimeZone = dayjs.tz.guess(); // Format : 'Europe/Paris'
  * @param dateTimeString date string in ISO format
  * @returns string "HH:MM:SS"
  */
-export function extractHHMMSS(dateTimeString?: string) {
+function extractHHMMSS(dateTimeString?: string) {
   if (!dateTimeString) {
     return '';
   }
