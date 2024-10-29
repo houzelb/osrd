@@ -632,6 +632,54 @@ class StopTests {
         assertEquals(15_000.0, arrivalTime, timeStep)
     }
 
+    /** Checks that we can shift the departure time even when there are stops around. */
+    @Test
+    fun departureTimeShiftWithStops() {
+        /*
+        a --> b --> c --> d
+                 ^
+                stop
+
+        space
+          ^
+        d |########################## /
+          |##########################/
+        c |                         /
+          |    ___(_____x   )   ___/  <-- stop
+          |   /                /
+        b |  /                /
+          | /                /
+        a |/________________/_____________> time
+
+        If we try to lengthen the stop, the running time would be too long
+
+         */
+        val infra = DummyInfra()
+        val timeStep = 2.0
+        val blocks =
+            listOf(
+                infra.addBlock("a", "b"),
+                infra.addBlock("b", "c"),
+                infra.addBlock("c", "d"),
+                infra.addBlock("d", "e"),
+            )
+
+        val builder = ImmutableMultimap.builder<BlockId, OccupancySegment>()
+        builder.put(blocks[2], OccupancySegment(0.0, 10_000.0, 0.meters, 100.meters))
+        val occupancy = builder.build()
+        val res =
+            STDCMPathfindingBuilder()
+                .setInfra(infra.fullInfra())
+                .setUnavailableTimes(occupancy)
+                .addStep(STDCMStep(setOf(EdgeLocation(blocks[0], Offset(0.meters)))))
+                .addStep(STDCMStep(setOf(EdgeLocation(blocks[1], Offset(50.meters))), 1.0, true))
+                .addStep(STDCMStep(setOf(EdgeLocation(blocks[2], Offset(100.meters))), 0.0, true))
+                .setTimeStep(timeStep)
+                .setMaxRunTime(5_000.0)
+                .run()!!
+        occupancyTest(res, occupancy)
+    }
+
     /**
      * Checks that we properly account for stop durations when looking for conflicts, with two
      * stops.
