@@ -52,10 +52,21 @@ export const stdcmConfSlice = createSlice({
     updateStdcmConfigWithData(
       state: Draft<OsrdStdcmConfState>,
       action: PayloadAction<
-        Pick<OsrdStdcmConfState, 'rollingStockID' | 'pathSteps' | 'speedLimitByTag'>
+        Pick<
+          OsrdStdcmConfState,
+          | 'rollingStockID'
+          | 'totalMass'
+          | 'totalLength'
+          | 'maxSpeed'
+          | 'pathSteps'
+          | 'speedLimitByTag'
+        >
       >
     ) {
       state.rollingStockID = action.payload.rollingStockID;
+      state.totalMass = action.payload.totalMass;
+      state.totalLength = action.payload.totalLength;
+      state.maxSpeed = action.payload.maxSpeed;
       state.pathSteps = action.payload.pathSteps;
       state.speedLimitByTag = action.payload.speedLimitByTag;
     },
