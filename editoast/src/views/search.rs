@@ -654,14 +654,28 @@ pub(super) struct SearchResultItemStudy {
 #[derive(Search, Serialize, ToSchema)]
 #[search(
     table = "search_scenario",
+    migration(src_table = "scenario"),
     joins = "
         INNER JOIN scenario ON scenario.id = search_scenario.id
         INNER JOIN infra ON infra.id = scenario.infra_id",
-    column(name = "id", data_type = "integer"),
-    column(name = "name", data_type = "string"),
-    column(name = "description", data_type = "string"),
-    column(name = "tags", data_type = "string"),
-    column(name = "study_id", data_type = "integer")
+    column(
+        name = "name",
+        data_type = "TEXT",
+        sql = "scenario.name",
+        textual_search
+    ),
+    column(
+        name = "description",
+        data_type = "TEXT",
+        sql = "scenario.description",
+        textual_search
+    ),
+    column(
+        name = "tags",
+        data_type = "TEXT",
+        sql = "osrd_prepare_for_search_tags(scenario.tags)"
+    ),
+    column(name = "study_id", data_type = "INTEGER", sql = "scenario.study_id")
 )]
 #[allow(unused)]
 /// A search result item for a query with `object = "scenario"`

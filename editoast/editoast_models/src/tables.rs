@@ -548,8 +548,8 @@ diesel::table! {
         id -> Int8,
         name -> Nullable<Text>,
         description -> Nullable<Text>,
-        study_id -> Nullable<Int4>,
         tags -> Nullable<Text>,
+        study_id -> Nullable<Int4>,
     }
 }
 
@@ -794,6 +794,7 @@ diesel::joinable!(scenario -> study (study_id));
 diesel::joinable!(scenario -> timetable (timetable_id));
 diesel::joinable!(search_operational_point -> infra_object_operational_point (id));
 diesel::joinable!(search_project -> project (id));
+diesel::joinable!(search_scenario -> scenario (id));
 diesel::joinable!(search_signal -> infra_object_signal (id));
 diesel::joinable!(search_study -> study (id));
 diesel::joinable!(stdcm_search_environment -> electrical_profile_set (electrical_profile_set_id));
