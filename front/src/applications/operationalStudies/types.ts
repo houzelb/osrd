@@ -71,10 +71,16 @@ export type ManageTrainSchedulePathProperties = {
 /**
  * Properties signal_updates time_end and time_start are in seconds taking count of the departure time
  */
+// TODO: reuse the type from osrd-ui/ui-manchette
 export type TrainSpaceTimeData = {
   id: number;
   name: string;
-} & ProjectPathTrainResult;
+  spaceTimeCurves: {
+    positions: number[];
+    times: number[];
+  }[];
+  departureTime: Date;
+} & { signalUpdates: ProjectPathTrainResult['signal_updates'] };
 
 export type PositionData<T extends 'gradient' | 'radius'> = {
   [key in T]: number;

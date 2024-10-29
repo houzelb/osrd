@@ -18,7 +18,7 @@ import { useChartSynchronizer } from './ChartSynchronizer';
  * @TODO do not work with colors as string as soon as possible
  */
 const getOccupancyBounds = (
-  routeAspects: TrainSpaceTimeData['signal_updates'],
+  routeAspects: TrainSpaceTimeData['signalUpdates'],
   timePosition: Date
 ): [number, number] => {
   // TODO GET v2 : probably remove this conversion as trains will travel on several days
@@ -59,8 +59,8 @@ const TrainDetails = ({ projectedTrain }: TrainDetailsProps) => {
   const { t } = useTranslation(['simulation']);
 
   const occupancyBounds = useMemo(
-    () => getOccupancyBounds(projectedTrain.signal_updates, new Date(headPosition?.time)),
-    [projectedTrain.signal_updates, headPosition, tailPosition, speed]
+    () => getOccupancyBounds(projectedTrain.signalUpdates, new Date(headPosition?.time)),
+    [projectedTrain.signalUpdates, headPosition, tailPosition, speed]
   );
 
   return (

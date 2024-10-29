@@ -1160,29 +1160,29 @@
   resolved "https://registry.yarnpkg.com/@osrd-project/ui-icons/-/ui-icons-0.0.52.tgz#90221c4a2f3ef3c8c77304a34cf960e2693964da"
   integrity sha512-VvtmcAmum4NForLqhc4xSKtwmuv+jKrG2kzKtAsqX/5khcxQqlJLOQ1vQyvgkA00Axcu+xIAOfmryOr+ie6BmA==
 
-"@osrd-project/ui-manchette-with-spacetimechart@^0.0.52":
-  version "0.0.52"
-  resolved "https://registry.yarnpkg.com/@osrd-project/ui-manchette-with-spacetimechart/-/ui-manchette-with-spacetimechart-0.0.52.tgz#66095f745f94c1785bce46ca0e004c45361eaf61"
-  integrity sha512-ghItdaPaQbWPrfITkJP6+ILVjQeKdB6iaQJtLSyGt4pDXI6As5Xwxo1KY/7dmDCnejxJsTDDBvHUs6cVimF70A==
+"@osrd-project/ui-manchette-with-spacetimechart@^0.0.53":
+  version "0.0.53"
+  resolved "https://registry.yarnpkg.com/@osrd-project/ui-manchette-with-spacetimechart/-/ui-manchette-with-spacetimechart-0.0.53.tgz#957544c02acc2190a13bb319e3c7397df46ac325"
+  integrity sha512-1vjwDaYIq5QRbqKiHM8FKgq6NhcBS35ipT9FvD0E6JCLVRWC2v+1AIIXIwIqtPWP3aIzdddSYwwTRUVghIhhyw==
   dependencies:
-    "@osrd-project/ui-manchette" "^0.0.52"
-    "@osrd-project/ui-spacetimechart" "^0.0.52"
+    "@osrd-project/ui-manchette" "^0.0.53"
+    "@osrd-project/ui-spacetimechart" "^0.0.53"
     classnames "^2.5.1"
     lodash.isequal "^4.5.0"
     vitest "^2.1.1"
 
-"@osrd-project/ui-manchette@^0.0.52":
-  version "0.0.52"
-  resolved "https://registry.yarnpkg.com/@osrd-project/ui-manchette/-/ui-manchette-0.0.52.tgz#df1d27b7cc8d330ff6aa04c318df4bd9fb5827c6"
-  integrity sha512-nCkCDy8I52E9emTZFlkn+RusFbEcTTo4x+0Ef+Ty+QlVMyFjRQiq71dhfe9Axm9Bja44CgrvrnWnOuubT20JZQ==
+"@osrd-project/ui-manchette@^0.0.53":
+  version "0.0.53"
+  resolved "https://registry.yarnpkg.com/@osrd-project/ui-manchette/-/ui-manchette-0.0.53.tgz#0300632ce5b03f4ec215b26b1c6b4d25c32b4725"
+  integrity sha512-xOISp8moVRnHQqjzE/r4gcxues0zQ2VvpaE5auY3iHE+GHf1qCwZEwcUtEc3rONnmYjQoqSkOxhZoxlA76LYVA==
   dependencies:
     classnames "^2.5.1"
     lodash.isequal "^4.5.0"
 
-"@osrd-project/ui-spacetimechart@^0.0.52":
-  version "0.0.52"
-  resolved "https://registry.yarnpkg.com/@osrd-project/ui-spacetimechart/-/ui-spacetimechart-0.0.52.tgz#92b3ba264a44f413b84dbbfe67bbd8aaaa2dadfe"
-  integrity sha512-WHSCiGkios/qnymlCOfPg5j0tzAQeW394zXEiOOMeVbB+weSfnsfUILxA0+dGMHgIAUPC9lrJy2Wff9fwChg7Q==
+"@osrd-project/ui-spacetimechart@^0.0.53":
+  version "0.0.53"
+  resolved "https://registry.yarnpkg.com/@osrd-project/ui-spacetimechart/-/ui-spacetimechart-0.0.53.tgz#172c8734bbf406d428ac7ba8d2e476644d85b697"
+  integrity sha512-Q+4S+DjdJt69obwoKjM+aYWtLDgEAsbmBvy68WbUNMZ55mrMBKat/q8kijURJS4Neu6fMVuRT+h1wkpOLoqtlQ==
   dependencies:
     "@types/chroma-js" "^2.4.4"
     chroma-js "^3.1.1"
