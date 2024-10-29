@@ -35,6 +35,10 @@ const StdcmOperationalPoint = ({
   const { searchTerm, chCodeFilter, sortedSearchResults, setSearchTerm, setChCodeFilter } =
     useSearchOperationalPoint({ initialSearchTerm: point?.name, initialChCodeFilter: point?.ch });
 
+  const handleBlur = () => {
+    setSuggestionsVisible(false);
+  };
+
   const operationalPointsSuggestions = useMemo(
     () =>
       sortedSearchResults
@@ -53,7 +57,7 @@ const StdcmOperationalPoint = ({
           if (!isDuplicate) acc.push(newObject);
           return acc;
         }, [] as Option[]),
-    [sortedSearchResults]
+    [sortedSearchResults, handleBlur]
   );
 
   const sortedChOptions = useMemo(
@@ -123,10 +127,6 @@ const StdcmOperationalPoint = ({
     } else {
       setSuggestionsVisible(true);
     }
-  };
-
-  const handleBlur = () => {
-    setSuggestionsVisible(false);
   };
 
   useEffect(() => {
