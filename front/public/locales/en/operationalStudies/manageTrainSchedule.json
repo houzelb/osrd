@@ -79,6 +79,7 @@
   "launchPathFinding": "Launch pathfinding",
   "launchSimulation": "Start",
   "manageVias": "Steps management",
+  "missingPathSteps": "At least one pathstep wasn't found in the infrastructure",
   "noPlaceChosen": "No stop/waypoint defined",
   "noOriginChosen": "Departure undefined",
   "noDestinationChosen": "Arrival undefined",

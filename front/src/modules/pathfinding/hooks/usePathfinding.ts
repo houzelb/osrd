@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 
 import type { ManageTrainSchedulePathProperties } from 'applications/operationalStudies/types';
 import type {
+  PathfindingInputError,
   PostInfraByInfraIdPathPropertiesApiArg,
   PostInfraByInfraIdPathfindingBlocksApiArg,
   RollingStockWithLiveries,
@@ -17,6 +18,7 @@ import type { PathfindingAction, PathfindingState } from 'modules/pathfinding/ty
 import {
   formatSuggestedOperationalPoints,
   getPathfindingQuery,
+  matchPathStepAndOp,
   upsertPathStepsInOPs,
 } from 'modules/pathfinding/utils';
 import { useStoreDataForRollingStockSelector } from 'modules/rollingStock/components/RollingStockSelector/useStoreDataForRollingStockSelector';
@@ -179,7 +181,18 @@ export const usePathfinding = (
 
   const generatePathfindingParams = (): PostInfraByInfraIdPathfindingBlocksApiArg | null => {
     setPathProperties?.(undefined);
-    return getPathfindingQuery({ infraId, rollingStock, origin, destination, pathSteps });
+
+    const filteredPathSteps = pathSteps.filter(
+      (step) => step !== null && step.coordinates !== null && !step.isInvalid
+    );
+
+    return getPathfindingQuery({
+      infraId,
+      rollingStock,
+      origin,
+      destination,
+      pathSteps: filteredPathSteps,
+    });
   };
 
   useEffect(() => {
@@ -208,6 +221,35 @@ export const usePathfinding = (
     }
   }, [origin?.id, destination?.id, rollingStock]);
 
+  const handleInvalidPathItems = (
+    steps: (PathStep | null)[],
+    invalidPathItems: Extract<PathfindingInputError, { error_type: 'invalid_path_items' }>['items']
+  ) => {
+    // TODO: we currently only handle invalid pathSteps with trigram. We will have to do it for trackOffset, opId and uic too.
+    const invalidTrigrams = invalidPathItems
+      .map((item) => {
+        if ('trigram' in item.path_item) {
+          return item.path_item.trigram;
+        }
+        return null;
+      })
+      .filter((trigram): trigram is string => trigram !== null);
+    if (invalidTrigrams.length > 0) {
+      const updatedPathSteps = steps.map((step) => {
+        if (step && 'trigram' in step && invalidTrigrams.includes(step.trigram)) {
+          return { ...step, isInvalid: true };
+        }
+        return step;
+      });
+
+      dispatch(updatePathSteps({ pathSteps: updatedPathSteps }));
+      pathfindingDispatch({ type: 'PATHFINDING_FINISHED' });
+      pathfindingDispatch({ type: 'PATHFINDING_PARAM_CHANGED' });
+    } else {
+      dispatch(setFailure({ name: t('pathfindingError'), message: t('missingPathSteps') }));
+    }
+  };
+
   useEffect(() => {
     const startPathFinding = async () => {
       if (!pathfindingState.running) {
@@ -229,8 +271,13 @@ export const usePathfinding = (
             pathfindingResult.status === 'failure' &&
             pathfindingResult.failed_status === 'pathfinding_not_found' &&
             pathfindingResult.error_type === 'incompatible_constraints';
-
-          if (pathfindingResult.status === 'success' || incompatibleConstraintsCheck) {
+          if (
+            pathfindingResult.status === 'failure' &&
+            pathfindingResult.failed_status === 'pathfinding_input_error' &&
+            pathfindingResult.error_type === 'invalid_path_items'
+          ) {
+            handleInvalidPathItems(pathSteps, pathfindingResult.items);
+          } else if (pathfindingResult.status === 'success' || incompatibleConstraintsCheck) {
             const pathResult =
               pathfindingResult.status === 'success'
                 ? pathfindingResult
@@ -256,9 +303,8 @@ export const usePathfinding = (
               // We update existing pathsteps with coordinates, positionOnPath and kp corresponding to the new pathfinding result
               const updatedPathSteps: (PathStep | null)[] = pathSteps.map((step, i) => {
                 if (!step) return step;
-                const correspondingOp = suggestedOperationalPoints.find(
-                  (suggestedOp) =>
-                    'uic' in step && suggestedOp.uic === step.uic && suggestedOp.ch === step.ch
+                const correspondingOp = suggestedOperationalPoints.find((suggestedOp) =>
+                  matchPathStepAndOp(step, suggestedOp)
                 );
 
                 const theoreticalMargin = i === 0 ? '0%' : step.theoreticalMargin;

@@ -79,6 +79,7 @@
   "launchPathFinding": "Lancer la recherche d'itinéraire",
   "launchSimulation": "Démarrer",
   "manageVias": "Gestion des étapes",
+  "missingPathSteps": "Au moins un point de passage n'a pas été trouvé dans l'infrastructure",
   "noPlaceChosen": "Aucun point de passage/arrêt défini",
   "noOriginChosen": "Départ non défini",
   "noDestinationChosen": "Arrivée non définie",

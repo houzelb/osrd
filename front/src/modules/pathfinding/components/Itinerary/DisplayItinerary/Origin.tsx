@@ -1,10 +1,12 @@
 import { XCircle } from '@osrd-project/ui-icons';
+import cx from 'classnames';
 import type { Position } from 'geojson';
 import { useTranslation } from 'react-i18next';
 import { RiMapPin2Fill } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
+import { isPathStepInvalid } from 'modules/pathfinding/utils';
 
 type OriginProps = {
   zoomToFeaturePoint: (lngLat?: Position, id?: string) => void;
@@ -45,7 +47,10 @@ const Origin = ({ zoomToFeaturePoint }: OriginProps) => {
     );
 
   return (
-    <div className="mb-2 place" data-testid="itinerary-origin">
+    <div
+      className={cx('mb-2 place', { 'invalid-path-item': isPathStepInvalid(origin) })}
+      data-testid="itinerary-origin"
+    >
       <div className="pl-1 hover w-100 d-flex align-items-center">
         <span className="text-success mr-2">
           <RiMapPin2Fill />
