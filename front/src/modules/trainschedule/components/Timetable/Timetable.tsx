@@ -32,8 +32,7 @@ type TimetableProps = {
   trainSchedulesWithDetails: TrainScheduleWithDetails[];
 };
 
-const formatDepartureDate = (dateString: string) =>
-  dayjs(dateString, 'D/M/YYYY HH:mm:ss').locale(i18n.language).format('dddd D MMMM YYYY');
+const formatDepartureDate = (d: Date) => dayjs(d).locale(i18n.language).format('dddd D MMMM YYYY');
 
 const Timetable = ({
   setDisplayTrainScheduleManagement,

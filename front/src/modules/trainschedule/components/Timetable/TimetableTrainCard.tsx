@@ -34,6 +34,9 @@ type TimetableTrainCardProps = {
   projectionPathIsUsed: boolean;
 };
 
+const formatFullDate = (d: Date) => dayjs(d).format('D/MM/YYYY HH:mm:ss');
+const formatDateHours = (d: Date) => dayjs(d).format('HH:mm');
+
 const TimetableTrainCard = ({
   isInSelection,
   train,
@@ -133,11 +136,7 @@ const TimetableTrainCard = ({
     dispatch(updateTrainIdUsedForProjection(train.id));
   };
 
-  /* TODO: delete the format when the date management PR has been passed */
-  const isAfterMidnight = dayjs(train.arrivalTime, 'D/MM/YYYY').isAfter(
-    dayjs(train.startTime, 'D/MM/YYYY'),
-    'day'
-  );
+  const isAfterMidnight = dayjs(train.arrivalTime).isAfter(train.startTime, 'day');
 
   return (
     <div
@@ -196,9 +195,11 @@ const TimetableTrainCard = ({
             <div className="train-time">
               <div className="status-icon after-midnight">{isAfterMidnight && <Moon />}</div>
               {train.isValid && (
-                <div className="scenario-timetable-train-departure" title={train.startTime}>
-                  {/* TODO: delete the format when the date management `PR` has been passed */}
-                  {dayjs(train.startTime, 'D/MM/YYYY HH:mm:ss').format('HH:mm')}
+                <div
+                  className="scenario-timetable-train-departure"
+                  title={formatFullDate(train.startTime)}
+                >
+                  {formatDateHours(train.startTime)}
                 </div>
               )}
               <div className="status-icon not-honored-or-too-fast">
@@ -209,10 +210,9 @@ const TimetableTrainCard = ({
                 <div
                   data-testid="train-arrival-time"
                   className="scenario-timetable-train-arrival"
-                  title={train.arrivalTime}
+                  title={formatFullDate(train.arrivalTime)}
                 >
-                  {/* TODO: delete the format when the date management `PR` has been passed */}
-                  {dayjs(train.arrivalTime, 'D/MM/YYYY HH:mm:ss').format('HH:mm')}
+                  {formatDateHours(train.arrivalTime)}
                 </div>
               )}
               <div

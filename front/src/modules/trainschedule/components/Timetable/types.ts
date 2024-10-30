@@ -12,8 +12,8 @@ export type ScheduledPointsHonoredFilter = 'both' | 'honored' | 'notHonored';
 export type TrainScheduleWithDetails = {
   id: number;
   trainName: string;
-  startTime: string;
-  arrivalTime: string;
+  startTime: Date;
+  arrivalTime: Date | null;
   /** in ms */
   duration: number;
   stopsCount: number;
