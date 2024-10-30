@@ -145,13 +145,7 @@ const checkCurrentConfig = (
     rollingStockComfort,
     initialSpeed: initialSpeed ? kmhToMs(initialSpeed) : 0,
     usingElectricalProfiles,
-    path: compact(pathSteps).map((step) => {
-      const { id, isInvalid, ...stepLocation } = step;
-      if ('uic' in stepLocation) {
-        return { id, uic: stepLocation.uic };
-      }
-      return { id, isInvalid, ...getStepLocation(step) };
-    }),
+    path: compact(pathSteps).map((step) => ({ id: step.id, ...getStepLocation(step) })),
     margins: formatMargin(compact(pathSteps)),
     schedule: formatSchedule(compact(pathSteps)),
     powerRestrictions: powerRestriction,
