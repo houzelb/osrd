@@ -1,10 +1,12 @@
 import { XCircle } from '@osrd-project/ui-icons';
+import cx from 'classnames';
 import type { Position } from 'geojson';
 import { useTranslation } from 'react-i18next';
 import { IoFlag } from 'react-icons/io5';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
+import { isPathStepInvalid } from 'modules/pathfinding/utils';
 
 type DestinationProps = {
   zoomToFeaturePoint: (lngLat?: Position, id?: string) => void;
@@ -17,7 +19,6 @@ const Destination = ({ zoomToFeaturePoint }: DestinationProps) => {
 
   const dispatch = useDispatch();
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
-
   if (!destination)
     return (
       <>
@@ -29,7 +30,10 @@ const Destination = ({ zoomToFeaturePoint }: DestinationProps) => {
     );
 
   return (
-    <div className="place" data-testid="itinerary-destination">
+    <div
+      className={cx('place', { 'invalid-path-item': isPathStepInvalid(destination) })}
+      data-testid="itinerary-destination"
+    >
       <div className="pl-1 hover w-100 d-flex align-items-center">
         <span className="text-warning mr-2">
           <IoFlag />

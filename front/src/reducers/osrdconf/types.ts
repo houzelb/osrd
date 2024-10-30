@@ -81,6 +81,7 @@ export type PathStep = PathItemLocation & {
     trackName: string;
     trackNumber: number;
   };
+  isInvalid?: boolean;
 };
 
 export type StdcmPathStep = PathStep & {
