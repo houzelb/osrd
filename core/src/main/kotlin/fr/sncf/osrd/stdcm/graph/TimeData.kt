@@ -1,5 +1,7 @@
 package fr.sncf.osrd.stdcm.graph
 
+import com.google.common.primitives.Doubles.min
+import kotlin.Double.Companion.POSITIVE_INFINITY
 import kotlin.math.max
 
 /**
@@ -23,10 +25,18 @@ data class TimeData(
     /**
      * We can delay departure time from either the train start or stops. This value represents how
      * much more delay we can add to the last departure without causing any conflict. The delay
-     * would be added to the departure time of the last stop, or to the global departure time if no
-     * stop has been reached yet.
+     * would be added to the departure time of the last stop, or to the global departure time. We
+     * first delay the departure time whenever possible, then lengthen stop durations if it's not
+     * enough.
      */
     val maxDepartureDelayingWithoutConflict: Double,
+
+    /**
+     * This value describes how much delay we can add to the train departure time without causing
+     * any conflict (from the departure to the current point). This is the preferred method of
+     * delaying when the train reaches the current point.
+     */
+    val maxFirstDepartureDelaying: Double,
 
     /**
      * Time of the next conflict on the given location. Used both to identify edges that go through
@@ -96,6 +106,8 @@ data class TimeData(
             totalRunningTime = totalRunningTime + extraTravelTime,
             stopTimeData = newStopData,
             maxDepartureDelayingWithoutConflict = maxDepartureDelayingWithoutConflict,
+            maxFirstDepartureDelaying =
+                min(maxFirstDepartureDelaying, (maxAdditionalStopTime ?: POSITIVE_INFINITY)),
         )
     }
 
@@ -123,17 +135,22 @@ data class TimeData(
         assert(timeShift >= delayAddedToLastDeparture)
         var newStopData = stopTimeData
         var newDepartureTime = departureTime
+        var newMaxFirstDepartureDelaying = maxFirstDepartureDelaying
         if (delayAddedToLastDeparture > 0) {
-            if (newStopData.isEmpty()) {
-                newDepartureTime += delayAddedToLastDeparture
-            } else {
+            val firstDepartureTimeDelay = min(maxFirstDepartureDelaying, delayAddedToLastDeparture)
+            val lastStopExtraDuration = delayAddedToLastDeparture - firstDepartureTimeDelay
+            newDepartureTime += firstDepartureTimeDelay
+            newMaxFirstDepartureDelaying -= firstDepartureTimeDelay
+            if (newStopData.isNotEmpty()) {
                 val stopDataCopy = newStopData.toMutableList()
                 val oldLastStopData = stopDataCopy.last()
                 stopDataCopy[stopDataCopy.size - 1] =
-                    oldLastStopData.withAddedStopTime(delayAddedToLastDeparture)
+                    oldLastStopData.withAddedStopTime(lastStopExtraDuration)
                 newStopData = stopDataCopy
             }
         }
+        newMaxFirstDepartureDelaying =
+            min(newMaxFirstDepartureDelaying, maxDepartureDelayingWithoutConflict)
         val extraRunningTime = max(0.0, timeShift - delayAddedToLastDeparture)
         return copy(
             earliestReachableTime = earliestReachableTime + timeShift,
@@ -143,6 +160,7 @@ data class TimeData(
             stopTimeData = newStopData,
             departureTime = newDepartureTime,
             totalRunningTime = totalRunningTime + extraRunningTime,
+            maxFirstDepartureDelaying = newMaxFirstDepartureDelaying,
         )
     }
 

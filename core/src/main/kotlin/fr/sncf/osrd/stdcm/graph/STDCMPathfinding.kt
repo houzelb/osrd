@@ -262,6 +262,7 @@ class STDCMPathfinding(
                             timeOfNextConflictAtLocation = 0.0,
                             totalRunningTime = 0.0,
                             stopTimeData = listOf(),
+                            maxFirstDepartureDelaying = maxDepartureDelay,
                         ),
                         0.0,
                         explorer as InfraExplorerWithEnvelope,

@@ -170,14 +170,19 @@ class STDCMPostProcessing(private val graph: STDCMGraph) {
                 nodes.subList(firstPlannedNodeIndex + 1, nodes.size),
                 mutableStopData,
             )
-        val actualStopAddedTime = min(maxAddedTime, timeDiff)
+        var actualStopAddedTime = min(maxAddedTime, timeDiff)
 
-        // Add time to the previous stop, or delay the departure time accordingly
-        if (lastStopIndexBeforeNode == 0)
-            timeData = timeData.copy(departureTime = timeData.departureTime + actualStopAddedTime)
-        else
+        // Add time to the previous stop, or delay the departure time accordingly.
+        // We prefer delaying the departure time when possible.
+        val addedDepartureDelay =
+            min(actualStopAddedTime, timeData.maxDepartureDelayingWithoutConflict)
+        timeData = timeData.copy(departureTime = timeData.departureTime + addedDepartureDelay)
+        actualStopAddedTime -= addedDepartureDelay
+
+        if (actualStopAddedTime > 0) {
             mutableStopData[lastStopIndexBeforeNode - 1] =
                 mutableStopData[lastStopIndexBeforeNode - 1].withAddedStopTime(actualStopAddedTime)
+        }
 
         // Reduce time to the next stops, to keep the change as local as possible
         reduceNextStopDurations(
