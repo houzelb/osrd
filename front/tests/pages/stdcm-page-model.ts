@@ -26,8 +26,6 @@ class STDCMPage {
 
   readonly originCard: Locator;
 
-  readonly viaButtonCard: Locator;
-
   readonly destinationCard: Locator;
 
   readonly mapContainer: Locator;
@@ -41,14 +39,6 @@ class STDCMPage {
   readonly codeCompoField: Locator;
 
   readonly maxSpeedField: Locator;
-
-  readonly originCI: Locator;
-
-  readonly originCH: Locator;
-
-  readonly destinationCI: Locator;
-
-  readonly destinationCH: Locator;
 
   readonly addViaButton: Locator;
 
@@ -106,6 +96,16 @@ class STDCMPage {
 
   readonly simulationLoader: Locator;
 
+  readonly incrementButton: Locator;
+
+  readonly allViaButton: Locator;
+
+  readonly retainSimulationButton: Locator;
+
+  readonly downloadSimulationButton: Locator;
+
+  readonly startNewQueryButton: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.notificationHeader = page.locator('#notification');
@@ -113,18 +113,13 @@ class STDCMPage {
     this.mapContainer = page.locator('#map-container');
     this.consistCard = page.locator('.stdcm-consist-container .stdcm-card');
     this.originCard = page.locator('.stdcm-card:has(.stdcm-origin-icon)');
-    this.viaButtonCard = page.locator('.stdcm-card:has(.stdcm-default-card-icon)');
     this.destinationCard = page.locator('.stdcm-card:has(.stdcm-destination-icon)');
     this.tractionEngineField = page.locator('#tractionEngine');
     this.tonnageField = page.locator('#tonnage');
     this.lengthField = page.locator('#length');
     this.codeCompoField = page.locator('#speed-limit-by-tag-selector');
     this.maxSpeedField = page.locator('#maxSpeed');
-    this.originCI = page.locator('#origin-ci');
-    this.originCH = page.locator('#origin-ch');
-    this.destinationCI = page.locator('#destination-ci');
-    this.destinationCH = page.locator('#destination-ch');
-    this.addViaButton = page.getByTestId('add-via-button');
+    this.addViaButton = page.locator('.stdcm-card.has-tip .stdcm-card__body.add-via button');
     this.viaIcon = page.locator('.stdcm-via-icons');
     this.viaDeleteButton = page.getByTestId('delete-via-button');
     this.originArrival = page.locator('#select-origin-arrival');
@@ -165,6 +160,11 @@ class STDCMPage {
     this.launchSimulationButton = page.getByTestId('launch-simulation-button');
     this.cancelSimulationButton = page.getByTestId('cancel-simulation-button');
     this.simulationLoader = page.locator('.stdcm-loader');
+    this.incrementButton = page.locator('.minute-button', { hasText: '+1mn' });
+    this.allViaButton = page.getByTestId('all-via-button');
+    this.retainSimulationButton = page.getByTestId('retain-simulation-button');
+    this.downloadSimulationButton = page.getByTestId('download-simulation-button');
+    this.startNewQueryButton = page.getByTestId('start-new-query-button');
   }
 
   // Dynamic selectors for via cards
@@ -192,14 +192,25 @@ class STDCMPage {
     return this.getViaCard(viaNumber).locator('.status-message-wrapper');
   }
 
+  private async setMinuteLocator(minuteValue: string) {
+    const minuteLocator = this.page.locator('.time-grid .minute', { hasText: minuteValue });
+    await minuteLocator.click();
+  }
+
+  private async setHourLocator(hourValue: string) {
+    const hourLocator = this.page.locator('.time-grid .hour', { hasText: hourValue });
+    await hourLocator.click();
+  }
+
   async verifyStdcmElementsVisibility() {
-    expect(this.debugButton).toBeVisible();
-    expect(this.notificationHeader).toBeVisible();
-    expect(this.consistCard).toBeVisible();
-    expect(this.originCard).toBeVisible();
-    expect(this.viaButtonCard).toBeVisible();
-    expect(this.destinationCard).toBeVisible();
-    expect(this.mapContainer).toBeVisible();
+    await expect(this.debugButton).toBeVisible();
+    await expect(this.notificationHeader).toBeVisible();
+    await expect(this.consistCard).toBeVisible();
+    await expect(this.originCard).toBeVisible();
+    await expect(this.addViaButton).toBeVisible();
+    await expect(this.destinationCard).toBeVisible();
+    await expect(this.mapContainer).toBeVisible();
+    await expect(this.launchSimulationButton).toBeVisible();
   }
 
   // Verifies all input fields are empty
@@ -209,10 +220,10 @@ class STDCMPage {
       this.tonnageField,
       this.lengthField,
       this.maxSpeedField,
-      this.originCI,
-      this.originCH,
-      this.destinationCI,
-      this.destinationCH,
+      this.dynamicOriginCi,
+      this.dynamicDestinationCi,
+      this.dynamicOriginCh,
+      this.dynamicDestinationCh,
     ];
     for (const field of emptyFields) await expect(field).toHaveValue('');
     await expect(this.codeCompoField).toHaveValue('__PLACEHOLDER__');
@@ -259,7 +270,7 @@ class STDCMPage {
 
   // Fills and verifies origin details with suggestions
   async fillAndVerifyOriginDetails() {
-    await this.originCI.fill('North');
+    await this.dynamicOriginCi.fill('North');
     await this.verifyOriginNorthSuggestions();
     await this.suggestionNWS.click();
     await expect(this.dynamicOriginCi).toHaveValue('North_West_station');
@@ -275,10 +286,29 @@ class STDCMPage {
     await expect(this.toleranceOriginArrival).not.toBeVisible();
   }
 
+  // Fill origin section
+  async fillOriginDetailsLight() {
+    await this.dynamicOriginCi.fill('North');
+    await this.suggestionNWS.click();
+    await expect(this.dynamicOriginCh).toHaveValue('BV');
+    await expect(this.originArrival).toHaveValue('preciseTime');
+    await this.dateOriginArrival.fill('17/10/24');
+    await this.timeOriginArrival.fill('20:11');
+    await this.fillToleranceField('-1h00', '+15', true);
+  }
+
+  // Fill origin section
+  async fillDestinationDetailsLight() {
+    await this.dynamicDestinationCi.fill('South');
+    await this.suggestionSS.click();
+    await expect(this.dynamicDestinationCh).toHaveValue('BV');
+    await expect(this.destinationArrival).toHaveValue('asSoonAsPossible');
+  }
+
   // Fills and verifies destination details based on selected language
   async fillAndVerifyDestinationDetails(selectedLanguage: string) {
     const translations = selectedLanguage === 'English' ? enTranslations : frTranslations;
-    await this.destinationCI.fill('South');
+    await this.dynamicDestinationCi.fill('South');
     await this.verifyDestinationSouthSuggestions();
     await this.suggestionSS.click();
     await expect(this.dynamicDestinationCi).toHaveValue('South_station');
@@ -293,12 +323,24 @@ class STDCMPage {
     await expect(this.timeDestinationArrival).toHaveValue('');
     await expect(this.toleranceDestinationArrival).toHaveValue('-30/+30');
     await this.dateDestinationArrival.fill('18/10/24');
-    await this.timeDestinationArrival.fill('01:37');
-    await this.toleranceDestinationArrival.click();
-    await this.page.getByRole('button', { name: '-1h15', exact: true }).click();
-    await this.page.getByRole('button', { name: '+45', exact: true }).click();
-    await this.toleranceDestinationArrival.click();
+    await this.timeDestinationArrival.click();
+    await this.setHourLocator('01'); // Select hour 01
+    await this.setMinuteLocator('35'); // Select minute 35
+    await this.incrementButton.dblclick(); // Double-click the +1 minute button to reach 37
+    await this.timeDestinationArrival.click();
+    await this.fillToleranceField('-1h15', '+45', false);
     await expect(this.warningBox).not.toBeVisible();
+  }
+
+  async fillToleranceField(minusValue: string, plusValue: string, isOrigin: boolean) {
+    const toleranceField = isOrigin
+      ? this.toleranceOriginArrival
+      : this.toleranceDestinationArrival;
+
+    await toleranceField.click();
+    await this.page.getByRole('button', { name: minusValue, exact: true }).click();
+    await this.page.getByRole('button', { name: plusValue, exact: true }).click();
+    await toleranceField.click();
   }
 
   async fillAndVerifyViaDetails(viaNumber: number, viaSearch: string, selectedLanguage?: string) {
@@ -326,10 +368,10 @@ class STDCMPage {
     }
 
     // Fill 'sS' via details, adjust stop time, and verify warning
-    if (viaSearch === 'sS' && selectedLanguage) {
+    if (viaSearch === 'nS' && selectedLanguage) {
       await this.addViaButton.nth(viaNumber - 1).click();
       await this.getViaCi(viaNumber).fill(viaSearch);
-      await this.suggestionSS.click();
+      await this.suggestionNS.click();
       await expect(this.getViaCh(viaNumber)).toHaveValue('BV');
       await expect(this.getViaType(viaNumber)).toHaveValue('passageTime');
       await this.getViaType(viaNumber).selectOption('driverSwitch');
@@ -340,7 +382,12 @@ class STDCMPage {
         translations.trainPath.warningMinStopTime
       );
       await this.getViaStopTime(viaNumber).fill('4');
+      await expect(this.getViaWarning(viaNumber)).not.toBeVisible();
     }
+  }
+
+  async clickOnAllViaButton() {
+    await this.allViaButton.click();
   }
 
   // Launches the simulation, verifies the loading indicator, and checks if simulation-related elements are visible
@@ -384,25 +431,36 @@ class STDCMPage {
         console.error(`Row ${index + 1} is missing in the HTML table`);
         return;
       }
-
-      // Perform data matching and log any discrepancies
-      const isMatching =
-        jsonRow.index === tableRow.index &&
-        jsonRow.operationalPoint === tableRow.operationalPoint &&
-        jsonRow.code === tableRow.code &&
-        jsonRow.endStop === tableRow.endStop &&
-        jsonRow.passageStop === tableRow.passageStop &&
-        jsonRow.startStop === tableRow.startStop &&
-        jsonRow.weight === tableRow.weight &&
-        jsonRow.refEngine === tableRow.refEngine;
-
-      if (!isMatching) {
-        console.error(`Mismatch found at row ${index + 1}`, {
-          expected: jsonRow,
-          actual: tableRow,
-        });
-      }
+      expect(tableRow.operationalPoint).toBe(jsonRow.operationalPoint);
+      expect(tableRow.code).toBe(jsonRow.code);
+      expect(tableRow.endStop).toBe(jsonRow.endStop);
+      expect(tableRow.passageStop).toBe(jsonRow.passageStop);
+      expect(tableRow.startStop).toBe(jsonRow.startStop);
+      expect(tableRow.weight).toBe(jsonRow.weight);
+      expect(tableRow.refEngine).toBe(jsonRow.refEngine);
     });
+  }
+
+  async retainSimulation() {
+    await this.retainSimulationButton.click();
+    await expect(this.downloadSimulationButton).toBeVisible();
+    await expect(this.startNewQueryButton).toBeVisible();
+
+    const downloadPromise = this.page.waitForEvent('download');
+    await this.downloadSimulationButton.click({ force: true });
+    const download = await downloadPromise;
+
+    // Verify the downloaded file name starts with "STDCM" and ends with ".pdf"
+    const suggestedFilename = download.suggestedFilename();
+    expect(suggestedFilename).toMatch(/^STDCM.*\.pdf$/);
+
+    // Save the downloaded file in a temporary directory
+    const downloadPath = await download.path();
+    if (downloadPath) {
+      console.info(`The PDF was successfully downloaded to: ${downloadPath}`);
+    } else {
+      throw new Error('Download failed');
+    }
   }
 }
 export default STDCMPage;

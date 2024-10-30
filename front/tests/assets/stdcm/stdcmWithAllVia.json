@@ -2,11 +2,11 @@
   {
     "index": 1,
     "operationalPoint": "North_West_station",
-    "code": "BC",
+    "code": "BV",
     "endStop": "",
     "passageStop": "",
-    "startStop": "00:55",
-    "weight": "900t",
+    "startStop": "20:11",
+    "weight": "400t",
     "refEngine": ""
   },
   {
@@ -14,7 +14,7 @@
     "operationalPoint": "Mid_West_station",
     "code": "BV",
     "endStop": "",
-    "passageStop": "01:06",
+    "passageStop": "20:32",
     "startStop": "",
     "weight": "=",
     "refEngine": "="
@@ -23,9 +23,9 @@
     "index": 3,
     "operationalPoint": "Mid_East_station",
     "code": "BV",
-    "endStop": "01:12",
-    "passageStop": "3 min",
-    "startStop": "01:15",
+    "endStop": "",
+    "passageStop": "20:41",
+    "startStop": "",
     "weight": "=",
     "refEngine": "="
   },
@@ -33,9 +33,9 @@
     "index": 4,
     "operationalPoint": "North_station",
     "code": "BV",
-    "endStop": "01:23",
-    "passageStop": "9 min",
-    "startStop": "01:32",
+    "endStop": "",
+    "passageStop": "20:43",
+    "startStop": "",
     "weight": "=",
     "refEngine": "="
   },
@@ -43,10 +43,10 @@
     "index": 5,
     "operationalPoint": "South_station",
     "code": "BV",
-    "endStop": "01:36",
+    "endStop": "20:47",
     "passageStop": "",
     "startStop": "",
-    "weight": "900t",
+    "weight": "400t",
     "refEngine": ""
   }
 ]

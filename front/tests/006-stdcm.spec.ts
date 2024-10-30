@@ -14,9 +14,10 @@ import { postApiRequest } from './utils/api-setup';
 import createScenario from './utils/scenario';
 import { createInfrastructure, createProject, createStudy } from './utils/setup-utils';
 import { deleteProject } from './utils/teardown-utils';
-import { postSimulation, sendTrainSchedules } from './utils/trainSchedule';
+import { sendTrainSchedules } from './utils/trainSchedule';
 
 test.describe('Verify train schedule elements and filters', () => {
+  test.slow(); // Mark test as slow due to multiple steps
   let project: Project;
   let study: Study;
   let scenario: Scenario;
@@ -34,9 +35,8 @@ test.describe('Verify train schedule elements and filters', () => {
     study = await createStudy(project.id, 'STDCM_study_test_e2e');
     scenario = (await createScenario(project.id, study.id, infra.id)).scenario;
 
-    // Post train schedules and start simulation for the created scenario
-    const response = await sendTrainSchedules(scenario.timetable_id, trainSchedulesJson);
-    await postSimulation(response, scenario.infra_id);
+    // Post train schedules
+    await sendTrainSchedules(scenario.timetable_id, trainSchedulesJson);
 
     // Configure STDCM search environment for the tests
     await postApiRequest(
@@ -56,7 +56,7 @@ test.describe('Verify train schedule elements and filters', () => {
     await deleteProject(project.name);
   });
 
-  test.beforeEach(' Navigate to the STDCM page', async ({ page }) => {
+  test.beforeEach('Navigate to the STDCM page', async ({ page }) => {
     // Retrieve OSRD language and navigate to STDCM page
     const homePage = new HomePage(page);
     await homePage.goToHomePage();
@@ -76,8 +76,6 @@ test.describe('Verify train schedule elements and filters', () => {
 
   /** *************** Test 2 **************** */
   test('STDCM simulation with all stops', async ({ page }) => {
-    test.slow(); // Mark test as slow due to multiple steps
-
     // Populate STDCM page with origin, destination, and via details, then verify
     const stdcmPage = new STDCMPage(page);
     await stdcmPage.fillConsistDetails();
@@ -85,10 +83,27 @@ test.describe('Verify train schedule elements and filters', () => {
     await stdcmPage.fillAndVerifyDestinationDetails(OSRDLanguage);
     await stdcmPage.fillAndVerifyViaDetails(1, 'mid_west');
     await stdcmPage.fillAndVerifyViaDetails(2, 'mid_east');
-    await stdcmPage.fillAndVerifyViaDetails(3, 'sS', OSRDLanguage);
+    await stdcmPage.fillAndVerifyViaDetails(3, 'nS', OSRDLanguage);
 
     // Launch simulation and verify output data matches expected results
     await stdcmPage.launchSimulation(OSRDLanguage);
-    await stdcmPage.verifyTableData('./tests/assets/stdcm/simulationResultTable.json');
+    await stdcmPage.verifyTableData('./tests/assets/stdcm/stdcmAllStops.json');
+  });
+
+  /** *************** Test 3 **************** */
+  test('STDCM stops and simulation sheet', async ({ page }) => {
+    // Populate STDCM page with origin, destination, and via details
+    const stdcmPage = new STDCMPage(page);
+    await stdcmPage.fillConsistDetails();
+    await stdcmPage.fillOriginDetailsLight();
+    await stdcmPage.fillDestinationDetailsLight();
+    await stdcmPage.fillAndVerifyViaDetails(1, 'mid_west');
+
+    // Launch simulation and verify output data matches expected results
+    await stdcmPage.launchSimulation(OSRDLanguage);
+    await stdcmPage.verifyTableData('./tests/assets/stdcm/stdcmWithoutAllVia.json');
+    await stdcmPage.clickOnAllViaButton();
+    await stdcmPage.verifyTableData('./tests/assets/stdcm/stdcmWithAllVia.json');
+    await stdcmPage.retainSimulation();
   });
 });
