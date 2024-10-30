@@ -576,8 +576,8 @@ class StopTests {
           |    ____________/_______/  <-- stop
           |   /        /
         b |  /        /
-          | /  ##### /
-        a |/__ #####/___________> time
+          | /  ####  /
+        a |/__ ####_/___________> time
 
          */
         val infra = DummyInfra()
@@ -628,7 +628,7 @@ class StopTests {
         occupancyTest(res, occupancy)
         val arrivalTime =
             res.departureTime + res.envelope.totalTime + res.stopResults.first().duration
-        assertEquals(3_000.0, res.departureTime, timeStep)
+        assertTrue(res.departureTime >= 3_000.0)
         assertEquals(15_000.0, arrivalTime, timeStep)
     }
 
@@ -676,8 +676,10 @@ class StopTests {
                 .addStep(STDCMStep(setOf(EdgeLocation(blocks[2], Offset(100.meters))), 0.0, true))
                 .setTimeStep(timeStep)
                 .setMaxRunTime(5_000.0)
+                .setMaxDepartureDelay(Double.POSITIVE_INFINITY)
                 .run()!!
         occupancyTest(res, occupancy)
+        assertEquals(res.stopResults[0].duration, 1.0, 2 * timeStep)
     }
 
     /**

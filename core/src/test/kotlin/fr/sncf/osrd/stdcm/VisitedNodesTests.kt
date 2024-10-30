@@ -38,6 +38,7 @@ class VisitedNodesTests {
                         totalRunningTime = 0.0,
                         departureTime = 0.0,
                         stopTimeData = listOf(),
+                        maxFirstDepartureDelaying = 42.0,
                     ),
                 maxMarginDuration = 0.0,
             )
@@ -62,6 +63,7 @@ class VisitedNodesTests {
                         totalRunningTime = 0.0,
                         departureTime = 0.0,
                         stopTimeData = listOf(),
+                        maxFirstDepartureDelaying = 42.0,
                     ),
                 maxMarginDuration = 0.0,
             )
@@ -94,6 +96,7 @@ class VisitedNodesTests {
                         totalRunningTime = 0.0,
                         departureTime = 0.0,
                         stopTimeData = listOf(),
+                        maxFirstDepartureDelaying = 100.0,
                     ),
                 maxMarginDuration = 100.0,
             )
@@ -136,6 +139,7 @@ class VisitedNodesTests {
                         totalRunningTime = 0.0,
                         departureTime = 0.0,
                         stopTimeData = listOf(),
+                        maxFirstDepartureDelaying = 100.0,
                     ),
                 maxMarginDuration = 100.0,
             )
@@ -171,6 +175,7 @@ class VisitedNodesTests {
                         totalRunningTime = 0.0,
                         departureTime = 0.0,
                         stopTimeData = listOf(),
+                        maxFirstDepartureDelaying = 0.0,
                     ),
                 maxMarginDuration = 100.0,
             )
@@ -209,9 +214,10 @@ class VisitedNodesTests {
                                 StopTimeData(
                                     currentDuration = 120.0,
                                     minDuration = 120.0,
-                                    maxDepartureDelayBeforeStop = 0.0
+                                    maxDepartureDelayBeforeStop = 0.0,
                                 )
                             ),
+                        maxFirstDepartureDelaying = 100.0,
                     ),
                 maxMarginDuration = 100.0,
             )
@@ -258,6 +264,7 @@ class VisitedNodesTests {
                                     maxDepartureDelayBeforeStop = 0.0
                                 )
                             ),
+                        maxFirstDepartureDelaying = 100.0,
                     ),
                 maxMarginDuration = 100.0,
                 remainingTimeEstimation = 300.0,
