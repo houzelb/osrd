@@ -20,7 +20,7 @@ import DropdownSNCF, { DROPDOWN_STYLE_TYPES } from './DropdownSNCF';
 import { useModal } from './ModalSNCF';
 
 type Props = {
-  appName: string | ReactElement;
+  appName?: string | ReactElement;
   logo?: string;
 };
 

@@ -5,7 +5,7 @@ interface CardProps {
   link: string;
   img: string;
   title: string;
-  disabledLink: boolean;
+  disabledLink?: boolean;
   openInNewTab?: boolean;
 }
 const Card = ({ link, img, title, disabledLink = false, openInNewTab = false }: CardProps) => (
