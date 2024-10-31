@@ -120,8 +120,13 @@ impl<S: StorageDriver> Authorizer<S> {
         &self,
         user_id: i64,
     ) -> Result<HashSet<S::BuiltinRole>, S::Error> {
+        // Authorization disabled, requesting superuser roles.
+        // This case cannot happen with authorization enabled.
+        if user_id == -1 {
+            return Ok(HashSet::from([S::BuiltinRole::superuser()]));
+        }
         let user_roles = self.storage.fetch_subject_roles(user_id).await?;
-        Ok(user_roles.clone())
+        Ok(user_roles)
     }
 
     #[tracing::instrument(skip_all, fields(user_id, auth_user = %self.user, ?roles), ret(level = Level::DEBUG), err)]
