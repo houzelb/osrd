@@ -266,6 +266,8 @@ def test_max_running_time(small_scenario: Scenario, fast_rolling_stock: int):
     r = requests.post(url, json=payload)
     response = r.json()
     assert r.status_code == 200
+    for conflict in response["conflicts"]:
+        conflict["work_schedule_ids"] = [0]  # We can't know the expected ID here
     assert response == {
         "status": "conflicts",
         "conflicts": [
@@ -274,7 +276,7 @@ def test_max_running_time(small_scenario: Scenario, fast_rolling_stock: int):
                 "start_time": "2024-01-01T07:30:00Z",
                 "end_time": "2024-01-01T16:00:00Z",
                 "train_ids": [],
-                "work_schedule_ids": [3],
+                "work_schedule_ids": [0],
                 "requirements": [
                     {
                         "start_time": "2024-01-01T07:30:00Z",
