@@ -831,6 +831,7 @@
   }
 
   .macro-container {
-    height: calc(var(--content-height) - 5.5rem);
+    // the value subtracted is egal to the height of scenario-timetable-collapsed + micro-macro-buttons + scenario-results padding
+    height: calc(var(--content-height) - 9.751rem);
   }
 }
