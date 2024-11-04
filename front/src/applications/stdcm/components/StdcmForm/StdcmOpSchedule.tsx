@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { DatePicker, Select, TimePicker, TolerancePicker } from '@osrd-project/ui-core';
 import { useTranslation } from 'react-i18next';
@@ -38,9 +38,7 @@ type StdcmOpScheduleProps = {
 
 const defaultDate = (date?: Date) => {
   const newDate = date ? new Date(date) : new Date();
-  newDate.setHours(0);
-  newDate.setMinutes(0);
-  newDate.setSeconds(0);
+  newDate.setHours(0, 0, 0);
   return newDate;
 };
 
@@ -63,13 +61,13 @@ const StdcmOpSchedule = ({
     useMemo(() => {
       const isArrivalDateValid =
         opTimingData?.arrivalDate &&
-        isArrivalDateInSearchTimeWindow(opTimingData.arrivalDate, searchDatetimeWindow);
+        isArrivalDateInSearchTimeWindow(new Date(opTimingData.arrivalDate), searchDatetimeWindow);
       return {
         arrivalDate:
           opTimingData && isArrivalDateValid
             ? new Date(opTimingData.arrivalDate)
             : defaultDate(searchDatetimeWindow?.begin),
-        arrivalTime: opTimingData?.arrivalTime || '--:--',
+        arrivalTime: opTimingData?.arrivalTime,
         arrivalTimeHours: opTimingData?.arrivalTimehours,
         arrivalTimeMinutes: opTimingData?.arrivalTimeMinutes,
         arrivalToleranceValues: {
@@ -100,6 +98,20 @@ const StdcmOpSchedule = ({
     }),
     [t, searchDatetimeWindow]
   );
+
+  useEffect(() => {
+    if (
+      (!isArrivalDateInSearchTimeWindow(arrivalDate, searchDatetimeWindow) ||
+        !opTimingData?.arrivalDate) &&
+      opScheduleTimeType === 'preciseTime'
+    ) {
+      onArrivalChange({
+        date: defaultDate(searchDatetimeWindow?.begin),
+        hours: arrivalTimeHours || 0,
+        minutes: arrivalTimeMinutes || 0,
+      });
+    }
+  }, [searchDatetimeWindow, opScheduleTimeType]);
 
   return (
     <>

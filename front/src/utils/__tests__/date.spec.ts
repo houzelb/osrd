@@ -95,7 +95,7 @@ describe('extractDateAndTimefromISO', () => {
 
 describe('isArrivalDateInSearchTimeWindow', () => {
   it('should return true if searchDatetimeWindow is undefined', () => {
-    const result = isArrivalDateInSearchTimeWindow('2024-08-01T10:00:00Z', undefined);
+    const result = isArrivalDateInSearchTimeWindow(new Date('2024-08-01T10:00:00Z'), undefined);
     expect(result).toBe(true);
   });
 
@@ -104,7 +104,10 @@ describe('isArrivalDateInSearchTimeWindow', () => {
       begin: new Date('2024-08-01T00:00:00Z'),
       end: new Date('2024-08-02T00:00:00Z'),
     };
-    const result = isArrivalDateInSearchTimeWindow('2024-08-01T10:00:00Z', searchDatetimeWindow);
+    const result = isArrivalDateInSearchTimeWindow(
+      new Date('2024-08-01T10:00:00Z'),
+      searchDatetimeWindow
+    );
     expect(result).toBe(true);
   });
 
@@ -113,7 +116,10 @@ describe('isArrivalDateInSearchTimeWindow', () => {
       begin: new Date('2024-08-01T00:00:00Z'),
       end: new Date('2024-08-02T00:00:00Z'),
     };
-    const result = isArrivalDateInSearchTimeWindow('2024-07-30T23:59:59Z', searchDatetimeWindow);
+    const result = isArrivalDateInSearchTimeWindow(
+      new Date('2024-07-30T23:59:59Z'),
+      searchDatetimeWindow
+    );
     expect(result).toBe(false);
   });
 });

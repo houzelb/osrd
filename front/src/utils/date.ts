@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import dayjs, { type ManipulateType } from 'dayjs';
 import 'dayjs/locale/fr';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import timezone from 'dayjs/plugin/timezone';
@@ -6,10 +6,8 @@ import utc from 'dayjs/plugin/utc';
 import i18next from 'i18next';
 
 import type { ScheduleConstraint } from 'applications/stdcm/types';
-import type { IsoDateTimeString, IsoDurationString } from 'common/types';
+import type { IsoDateTimeString } from 'common/types';
 import i18n from 'i18n';
-
-import { ISO8601Duration2sec } from './timeManipulation';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -151,16 +149,18 @@ export function convertIsoUtcToLocalTime(isoUtcString: IsoDateTimeString): strin
 
 export function addDurationToIsoDate(
   startTime: IsoDateTimeString,
-  duration: IsoDurationString
+  duration: number,
+  durationUnit: ManipulateType = 'second'
 ): IsoDateTimeString {
-  return dayjs(startTime).add(ISO8601Duration2sec(duration), 'second').format();
+  return dayjs(startTime).add(duration, durationUnit).format();
 }
 
 export function substractDurationToIsoDate(
   startTime: IsoDateTimeString,
-  duration: IsoDurationString
+  duration: number,
+  durationUnit: ManipulateType = 'second'
 ): IsoDateTimeString {
-  return dayjs(startTime).subtract(ISO8601Duration2sec(duration), 'second').format();
+  return dayjs(startTime).subtract(duration, durationUnit).format();
 }
 
 /**
@@ -191,18 +191,17 @@ export function extractDateAndTimefromISO(arrivalTime: string, dateFormat: strin
 /**
  * Checks if the given arrival date falls within the specified search time window.
  *
- * @param {string} arrivalTime - The arrival time as a string, which will be parsed into a Date object.
+ * @param {Date} arrivalDate - The arrival time, which is a Date object.
  * @param {{ begin: Date; end: Date } | undefined} searchDatetimeWindow - An object containing the start and end dates of the search window. If undefined, the function will return true.
  * @returns {boolean} - Returns true if the arrival date is within the search time window, or if the search time window is undefined. Returns false otherwise.
  */
 export function isArrivalDateInSearchTimeWindow(
-  arrivalTime: string,
+  arrivalDate: Date,
   searchDatetimeWindow?: { begin: Date; end: Date }
 ) {
   if (!searchDatetimeWindow) {
     return true;
   }
-  const arrivalDate = new Date(arrivalTime);
   return arrivalDate >= searchDatetimeWindow.begin && arrivalDate <= searchDatetimeWindow.end;
 }
 

@@ -1,21 +1,29 @@
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 
-import { compact, groupBy } from 'lodash';
+import { compact } from 'lodash';
 import { useSelector } from 'react-redux';
 
-import type { PathItem, SearchResultItemTrainSchedule } from 'common/api/osrdEditoastApi';
+import type {
+  PathItem,
+  SearchQuery,
+  SearchResultItemOperationalPoint,
+  SearchResultItemTrainSchedule,
+} from 'common/api/osrdEditoastApi';
 import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
-import { useOsrdConfSelectors } from 'common/osrdContext';
-import { isEqualDate } from 'utils/date';
+import { useInfraID, useOsrdConfSelectors } from 'common/osrdContext';
+import { isArrivalDateInSearchTimeWindow, isEqualDate } from 'utils/date';
 
-import type { StdcmLinkedPathResult, StdcmLinkedPathStep } from '../types';
+import type { StdcmLinkedPathResult } from '../types';
 import computeOpSchedules from '../utils/computeOpSchedules';
 
 const useLinkedPathSearch = () => {
   const [postSearch] = osrdEditoastApi.endpoints.postSearch.useMutation();
+  const [postTrainScheduleSimulationSummary] =
+    osrdEditoastApi.endpoints.postTrainScheduleSimulationSummary.useLazyQuery();
 
   const { getTimetableID, getSearchDatetimeWindow } = useOsrdConfSelectors();
 
+  const infraId = useInfraID();
   const timetableId = useSelector(getTimetableID);
   const searchDatetimeWindow = useSelector(getSearchDatetimeWindow);
 
@@ -29,42 +37,60 @@ const useLinkedPathSearch = () => {
   }, [searchDatetimeWindow]);
 
   const [displaySearchButton, setDisplaySearchButton] = useState(true);
-  const [hasSearchBeenLaunched, setHasSearchBeenLaunched] = useState(false);
   const [trainNameInput, setTrainNameInput] = useState('');
   const [linkedPathDate, setLinkedPathDate] = useState(selectableSlot.start);
-  const [linkedPathResults, setLinkedPathResults] = useState<StdcmLinkedPathResult[]>([]);
+  const [linkedPathResults, setLinkedPathResults] = useState<StdcmLinkedPathResult[]>();
 
-  const getExtremitiesDetails = useCallback(
-    async (pathItemList: PathItem[]) => {
-      const origin = pathItemList.at(0)!;
-      const destination = pathItemList.at(-1)!;
-      if (!('operational_point' in origin) || !('operational_point' in destination))
-        return undefined;
-      const originId = origin.operational_point;
-      const destinationId = destination.operational_point;
+  const getExtremityDetails = useCallback(
+    async (pathItem: PathItem) => {
+      if (!('operational_point' in pathItem) && !('uic' in pathItem)) return undefined;
+
+      const pathItemQuery =
+        'operational_point' in pathItem
+          ? ['=', ['obj_id'], pathItem.operational_point]
+          : ([
+              'and',
+              ['=', ['uic'], pathItem.uic],
+              ['=', ['ch'], pathItem.secondary_code],
+            ] as SearchQuery);
 
       try {
         const payloadOP = {
           object: 'operationalpoint',
-          query: ['or', ['=', ['obj_id'], originId], ['=', ['obj_id'], destinationId]],
+          query: pathItemQuery,
         };
-        const resultsOP = await postSearch({ searchPayload: payloadOP, pageSize: 25 }).unwrap();
-        const groupedResults = groupBy(resultsOP, 'obj_id');
-        return {
-          origin: groupedResults[originId][0],
-          destination: groupedResults[destinationId][0],
-        };
+        const opDetails = (await postSearch({
+          searchPayload: payloadOP,
+          pageSize: 25,
+        }).unwrap()) as SearchResultItemOperationalPoint[];
+        return opDetails[0];
       } catch (error) {
-        console.error('Failed to fetch operational points:', error);
+        console.error('Failed to fetch operational point:', error);
         return undefined;
       }
     },
     [postSearch]
   );
 
+  const getTrainsSummaries = useCallback(
+    async (trainsIds: number[]) => {
+      if (!infraId) return undefined;
+      const trainsSummaries = await postTrainScheduleSimulationSummary({
+        body: {
+          infra_id: infraId,
+          ids: trainsIds,
+        },
+      }).unwrap();
+      return trainsSummaries;
+    },
+    [postTrainScheduleSimulationSummary, infraId]
+  );
+
   const launchTrainScheduleSearch = useCallback(async () => {
+    setLinkedPathResults(undefined);
+    if (!trainNameInput) return;
+
     setDisplaySearchButton(false);
-    setLinkedPathResults([]);
     try {
       const results = (await postSearch({
         searchPayload: {
@@ -86,41 +112,59 @@ const useLinkedPathSearch = () => {
         return;
       }
 
+      const filteredResultsSummaries = await getTrainsSummaries(filteredResults.map((r) => r.id));
+
       const newLinkedPathResults = await Promise.all(
         filteredResults.map(async (result) => {
-          const opDetails = await getExtremitiesDetails(result.path);
-          const computedOpSchedules = computeOpSchedules(
-            result.start_time,
-            result.schedule.at(-1)!.arrival!
-          );
-          if (opDetails === undefined) return undefined;
+          const resultSummary = filteredResultsSummaries && filteredResultsSummaries[result.id];
+          if (!resultSummary || resultSummary.status !== 'success') return undefined;
+          const msFromStartTime = resultSummary.path_item_times_final.at(-1)!;
+
+          const originDetails = await getExtremityDetails(result.path.at(0)!);
+          const destinationDetails = await getExtremityDetails(result.path.at(-1)!);
+          const computedOpSchedules = computeOpSchedules(result.start_time, msFromStartTime);
+
+          if (!originDetails || !destinationDetails) return undefined;
           return {
             trainName: result.train_name,
-            origin: { ...opDetails.origin, ...computedOpSchedules.origin } as StdcmLinkedPathStep,
+            origin: { ...originDetails, ...computedOpSchedules.origin },
             destination: {
-              ...opDetails.destination,
+              ...destinationDetails,
               ...computedOpSchedules.destination,
-            } as StdcmLinkedPathStep,
+            },
           };
         })
       );
       setLinkedPathResults(compact(newLinkedPathResults));
-      setHasSearchBeenLaunched(true);
     } catch (error) {
       console.error('Train schedule search failed:', error);
       setDisplaySearchButton(true);
     }
-  }, [postSearch, trainNameInput, timetableId, linkedPathDate, getExtremitiesDetails]);
+  }, [postSearch, trainNameInput, timetableId, linkedPathDate, getExtremityDetails]);
+
+  const resetLinkedPathSearch = () => {
+    setDisplaySearchButton(true);
+    setLinkedPathResults(undefined);
+    setTrainNameInput('');
+  };
+
+  useEffect(() => {
+    if (!isArrivalDateInSearchTimeWindow(linkedPathDate, searchDatetimeWindow)) {
+      setLinkedPathDate(selectableSlot.start);
+      resetLinkedPathSearch();
+    }
+  }, [selectableSlot]);
 
   return {
     displaySearchButton,
-    hasSearchBeenLaunched,
     launchTrainScheduleSearch,
     linkedPathDate,
     linkedPathResults,
+    resetLinkedPathSearch,
     selectableSlot,
     setDisplaySearchButton,
     setLinkedPathDate,
+    setLinkedPathResults,
     setTrainNameInput,
     trainNameInput,
   };

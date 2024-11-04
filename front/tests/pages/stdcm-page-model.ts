@@ -315,7 +315,7 @@ class STDCMPage {
     await expect(this.dynamicOriginCh).toHaveValue('BV');
     await expect(this.originArrival).toHaveValue('preciseTime');
     await expect(this.dateOriginArrival).toHaveValue('17/10/24');
-    await expect(this.timeOriginArrival).toHaveValue('');
+    await expect(this.timeOriginArrival).toHaveValue('00:00');
     await expect(this.toleranceOriginArrival).toHaveValue('-30/+30');
     await this.dynamicOriginCh.selectOption('BC');
     await this.originArrival.selectOption('respectDestinationSchedule');
@@ -340,7 +340,7 @@ class STDCMPage {
     await expect(this.toleranceDestinationArrival).not.toBeVisible();
     await this.destinationArrival.selectOption('preciseTime');
     await expect(this.dateDestinationArrival).toHaveValue('17/10/24');
-    await expect(this.timeDestinationArrival).toHaveValue('');
+    await expect(this.timeDestinationArrival).toHaveValue('00:00');
     await expect(this.toleranceDestinationArrival).toHaveValue('-30/+30');
     await this.dateDestinationArrival.fill('18/10/24');
     await this.timeDestinationArrival.click();
