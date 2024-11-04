@@ -6,7 +6,7 @@ import {
   ArrivalTimeTypes,
   StdcmStopTypes,
   type ExtremityPathStepType,
-  type StdcmLinkedPathStep,
+  type StdcmLinkedTrainExtremity,
 } from 'applications/stdcm/types';
 import { defaultCommonConf, buildCommonConfReducers } from 'reducers/osrdconf/osrdConfCommon';
 import type { OsrdStdcmConfState, StdcmPathStep } from 'reducers/osrdconf/types';
@@ -35,9 +35,9 @@ export const stdcmConfInitialState: OsrdStdcmConfState = {
   totalLength: undefined,
   maxSpeed: undefined,
   towedRollingStockID: undefined,
-  linkedPaths: {
-    anteriorPath: undefined,
-    posteriorPath: undefined,
+  linkedTrains: {
+    anteriorTrain: undefined,
+    posteriorTrain: undefined,
   },
   ...defaultCommonConf,
 };
@@ -167,16 +167,16 @@ export const stdcmConfSlice = createSlice({
         (pathStep) => pathStep.id !== action.payload
       );
     },
-    updateLinkedPathStep(
+    updateLinkedTrainExtremity(
       state: Draft<OsrdStdcmConfState>,
       action: PayloadAction<{
-        linkedPathStep: ExtremityPathStepType;
+        linkedTrainExtremity: ExtremityPathStepType;
         trainName: string;
-        pathStep: StdcmLinkedPathStep;
+        pathStep: StdcmLinkedTrainExtremity;
         pathStepId: string;
       }>
     ) {
-      const { linkedPathStep, trainName, pathStep, pathStepId } = action.payload;
+      const { linkedTrainExtremity, trainName, pathStep, pathStepId } = action.payload;
       const { name, ch, uic, geographic, isoArrivalTime, date, time } = pathStep;
       const newPathStep = {
         name,
@@ -185,15 +185,15 @@ export const stdcmConfSlice = createSlice({
         uic,
         coordinates: geographic.coordinates,
         arrival: isoArrivalTime,
-        ...(linkedPathStep === 'origin' && { arrivalType: ArrivalTimeTypes.PRECISE_TIME }),
+        ...(linkedTrainExtremity === 'origin' && { arrivalType: ArrivalTimeTypes.PRECISE_TIME }),
       };
 
-      const newLinkedPath = { date, time, trainName };
+      const newLinkedTrain = { date, time, trainName };
 
-      if (linkedPathStep === 'destination') {
-        state.linkedPaths.anteriorPath = newLinkedPath;
+      if (linkedTrainExtremity === 'destination') {
+        state.linkedTrains.anteriorTrain = newLinkedTrain;
       } else {
-        state.linkedPaths.posteriorPath = newLinkedPath;
+        state.linkedTrains.posteriorTrain = newLinkedTrain;
       }
       const newPathSteps = state.stdcmPathSteps.map((step) =>
         step.id === action.payload.pathStepId

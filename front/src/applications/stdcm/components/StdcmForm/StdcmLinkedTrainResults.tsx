@@ -5,52 +5,52 @@ import { useDispatch } from 'react-redux';
 import { useOsrdConfActions } from 'common/osrdContext';
 import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
 
-import type { StdcmLinkedPathResult, ExtremityPathStepType } from '../../types';
+import type { StdcmLinkedTrainResult, ExtremityPathStepType } from '../../types';
 
-type StdcmLinkedPathResultsProps = {
-  linkedPathResults: StdcmLinkedPathResult[];
+type StdcmLinkedTrainResultsProps = {
+  linkedTrainResults: StdcmLinkedTrainResult[];
   linkedOp: { extremityType: ExtremityPathStepType; id: string };
 };
 
-const StdcmLinkedPathResults = ({
-  linkedPathResults,
+const StdcmLinkedTrainResults = ({
+  linkedTrainResults,
   linkedOp: { extremityType, id },
-}: StdcmLinkedPathResultsProps) => {
+}: StdcmLinkedTrainResultsProps) => {
   const dispatch = useDispatch();
-  const { updateLinkedPathStep } = useOsrdConfActions() as StdcmConfSliceActions;
+  const { updateLinkedTrainExtremity } = useOsrdConfActions() as StdcmConfSliceActions;
   return (
-    <div className="stdcm-linked-path-results">
-      {linkedPathResults.map(({ trainName, origin, destination }, index) => (
+    <div className="stdcm-linked-train-results">
+      {linkedTrainResults.map(({ trainName, origin, destination }, index) => (
         <button
-          key={`linked-path-${index}`}
+          key={`linked-train-${index}`}
           tabIndex={0}
           type="button"
-          className="linked-path-result-infos"
+          className="linked-train-result-infos"
           onClick={() => {
-            if (linkedPathResults.length === 1)
+            if (linkedTrainResults.length === 1)
               dispatch(
-                updateLinkedPathStep({
-                  linkedPathStep: extremityType,
+                updateLinkedTrainExtremity({
+                  linkedTrainExtremity: extremityType,
                   trainName,
-                  pathStep: linkedPathResults[0][extremityType],
+                  pathStep: linkedTrainResults[0][extremityType],
                   pathStepId: id,
                 })
               );
           }}
         >
-          {linkedPathResults.length > 1 ? (
+          {linkedTrainResults.length > 1 ? (
             <RadioButton
               label={trainName}
               id={`${extremityType}-${index}`}
               value={`${index}`}
-              name={`linked-path-radio-buttons-${extremityType}`}
+              name={`linked-train-radio-buttons-${extremityType}`}
               onClick={({ target }) => {
                 const resultIndex = Number((target as HTMLInputElement).value);
                 dispatch(
-                  updateLinkedPathStep({
-                    linkedPathStep: extremityType,
+                  updateLinkedTrainExtremity({
+                    linkedTrainExtremity: extremityType,
                     trainName,
-                    pathStep: linkedPathResults[resultIndex][extremityType],
+                    pathStep: linkedTrainResults[resultIndex][extremityType],
                     pathStepId: id,
                   })
                 );
@@ -62,7 +62,7 @@ const StdcmLinkedPathResults = ({
           {[origin, destination].map((opPoint) => (
             <div
               key={`linked-op-${opPoint.obj_id}-${index}`}
-              className={cx('d-flex', { 'ml-4 pl-1': linkedPathResults.length > 1 })}
+              className={cx('d-flex', { 'ml-4 pl-1': linkedTrainResults.length > 1 })}
             >
               <p className="opDetails grey50">{opPoint.date}</p>
               <p className="opDetails info60">{opPoint.time}</p>
@@ -76,4 +76,4 @@ const StdcmLinkedPathResults = ({
   );
 };
 
-export default StdcmLinkedPathResults;
+export default StdcmLinkedTrainResults;

@@ -25,9 +25,11 @@
     "incompleteForm": "Formulaire incomplet",
     "viaNotDefined": "Au moins une localisation n'est pas renseignée"
   },
-  "indicateAnteriorPath": "Indiquer le sillon antérieur",
-  "indicatePosteriorPath": "Indiquer le sillon postérieur",
   "leaveAt": "Partir à {{ time }}",
+  "linkedTrainDefaultCard": {
+    "anterior": "Indiquer le sillon antérieur",
+    "posterior": "Indiquer le sillon postérieur"
+  },
   "noConfigurationFound": {
     "title": "Un problème de configuration vous empêche de faire une recherche",
     "text": "Veuillez contacter l'équipe de maintenance pour qu'elle puisse vous remettre sur les rails."
@@ -99,14 +101,16 @@
   "stdcmSimulationReport": "Fiche simulation",
   "trainPath": {
     "addVia": "Ajouter un PR intermédiaire",
-    "anteriorPath": "Sillon antérieur",
     "asSoonAsPossible": "dès que possible",
     "ch": "CH",
     "ci": "CI",
     "date": "Date",
     "destination": "Destination",
+    "linkedTrain": {
+      "anterior": "Sillon antérieur",
+      "posterior": "Sillon postérieur"
+    },
     "origin": "Origine",
-    "posteriorPath": "Sillon postérieur",
     "preciseTime": "horaire précis",
     "respectDestinationSchedule": "respecter l'horaire de la destination",
     "stopFor": "Temps d'arrêt minimum",

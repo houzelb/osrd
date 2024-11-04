@@ -36,7 +36,7 @@ const getArrivalTime = (step: StdcmPathStep, t: TFunction) => {
 };
 
 const SimulationReportSheet = ({
-  stdcmLinkedPaths,
+  stdcmLinkedTrains,
   stdcmData,
   consist,
   simulationReportSheetNumber,
@@ -47,7 +47,7 @@ const SimulationReportSheet = ({
   let renderedIndex = 0;
 
   const { rollingStock, speedLimitByTag, departure_time: departureTime, creationDate } = stdcmData;
-  const { anteriorPath, posteriorPath } = stdcmLinkedPaths;
+  const { anteriorTrain, posteriorTrain } = stdcmLinkedTrains;
 
   const convoyMass = consist?.totalMass ?? rollingStock.mass / 1000;
   const convoyLength = consist?.totalLength ?? rollingStock.length;
@@ -168,11 +168,11 @@ const SimulationReportSheet = ({
                 <Text style={styles.convoyAndRoute.from}>{t('from')}</Text>
               </View>
               <Text style={styles.convoyAndRoute.fromNumber}>
-                {anteriorPath?.trainName || fakeInformation.path_number1}
+                {anteriorTrain?.trainName || fakeInformation.path_number1}
               </Text>
               <Text style={styles.convoyAndRoute.fromScheduled}>
-                {anteriorPath &&
-                  t('scheduledArrival', { date: anteriorPath.date, time: anteriorPath.time })}
+                {anteriorTrain &&
+                  t('scheduledArrival', { date: anteriorTrain.date, time: anteriorTrain.time })}
               </Text>
             </View>
             <View style={styles.convoyAndRoute.stopTableContainer}>
@@ -237,11 +237,11 @@ const SimulationReportSheet = ({
             {/* TODO: Add path number and date from reference path when it becomes avalaible */}
             <View style={styles.convoyAndRoute.forBanner}>
               <Text style={styles.convoyAndRoute.forScheduled}>
-                {posteriorPath &&
-                  t('scheduledDeparture', { date: posteriorPath.date, time: posteriorPath.time })}
+                {posteriorTrain &&
+                  t('scheduledDeparture', { date: posteriorTrain.date, time: posteriorTrain.time })}
               </Text>
               <Text style={styles.convoyAndRoute.forNumber}>
-                {posteriorPath?.trainName || fakeInformation.path_number2}
+                {posteriorTrain?.trainName || fakeInformation.path_number2}
               </Text>
               <View style={styles.convoyAndRoute.forBox}>
                 <Text style={styles.convoyAndRoute.for}>{t('for')}</Text>

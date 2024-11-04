@@ -4,7 +4,7 @@ import type { PowerRestriction } from 'applications/operationalStudies/types';
 import type {
   AllowanceValue,
   ArrivalTimeTypes,
-  LinkedPaths,
+  LinkedTrains,
   StdcmStopTypes,
 } from 'applications/stdcm/types';
 import type {
@@ -58,7 +58,7 @@ export interface OsrdStdcmConfState extends OsrdConfState {
   totalLength?: number;
   maxSpeed?: number;
   towedRollingStockID?: number;
-  linkedPaths: LinkedPaths;
+  linkedTrains: LinkedTrains;
 }
 
 export type PathStep = PathItemLocation & {

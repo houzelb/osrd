@@ -17,7 +17,7 @@ const useStdcmForm = (): StdcmSimulationInputs => {
     getTotalMass,
     getTotalLength,
     getMaxSpeed,
-    getLinkedPaths,
+    getLinkedTrains,
     getStdcmOrigin,
   } = useOsrdConfSelectors() as StdcmConfSelectors;
 
@@ -26,7 +26,7 @@ const useStdcmForm = (): StdcmSimulationInputs => {
   const totalMass = useSelector(getTotalMass);
   const totalLength = useSelector(getTotalLength);
   const maxSpeed = useSelector(getMaxSpeed);
-  const linkedPaths = useSelector(getLinkedPaths);
+  const linkedTrains = useSelector(getLinkedTrains);
   const origin = useSelector(getStdcmOrigin);
   const { rollingStock } = useStoreDataForRollingStockSelector();
   const towedRollingStock = useStdcmTowedRollingStock();
@@ -46,7 +46,7 @@ const useStdcmForm = (): StdcmSimulationInputs => {
         maxSpeed,
         speedLimitByTag,
       },
-      linkedPaths,
+      linkedTrains,
     };
   }, [
     pathSteps,
@@ -56,7 +56,7 @@ const useStdcmForm = (): StdcmSimulationInputs => {
     totalMass,
     totalLength,
     maxSpeed,
-    linkedPaths,
+    linkedTrains,
   ]);
 
   return currentSimulationInputs;

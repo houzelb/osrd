@@ -52,7 +52,7 @@ export type StdcmPathProperties = {
 };
 
 export type SimulationReportSheetProps = {
-  stdcmLinkedPaths: LinkedPaths;
+  stdcmLinkedTrains: LinkedTrains;
   stdcmData: StdcmSuccessResponse;
   consist: StdcmSimulationInputs['consist'];
   simulationReportSheetNumber: string;
@@ -79,13 +79,13 @@ export type StdcmResults = {
   spaceTimeData: TrainSpaceTimeData[] | null;
 };
 
-export type LinkedPaths = {
-  anteriorPath?: {
+export type LinkedTrains = {
+  anteriorTrain?: {
     date: string;
     time: string;
     trainName: string;
   };
-  posteriorPath?: {
+  posteriorTrain?: {
     date: string;
     time: string;
     trainName: string;
@@ -121,7 +121,7 @@ export type StdcmSimulationInputs = {
     maxSpeed?: number;
     speedLimitByTag?: string;
   };
-  linkedPaths: LinkedPaths;
+  linkedTrains: LinkedTrains;
 };
 
 export type StdcmResultsOutput = {
@@ -180,7 +180,7 @@ export enum StdcmStopTypes {
   SERVICE_STOP = 'serviceStop',
 }
 
-export type StdcmLinkedPathStep = {
+export type StdcmLinkedTrainExtremity = {
   ch: string;
   date: string;
   geographic: GeoJsonPoint;
@@ -192,9 +192,9 @@ export type StdcmLinkedPathStep = {
   uic: number;
 };
 
-export type StdcmLinkedPathResult = {
-  destination: StdcmLinkedPathStep;
-  origin: StdcmLinkedPathStep;
+export type StdcmLinkedTrainResult = {
+  destination: StdcmLinkedTrainExtremity;
+  origin: StdcmLinkedTrainExtremity;
   trainName: string;
 };
 
@@ -204,3 +204,5 @@ export type LoaderStatus = {
   status: 'loader-fixed-bottom' | 'loader-fixed-top' | 'loader-absolute';
   firstLaunch: boolean;
 };
+
+export type LinkedTrainType = 'anterior' | 'posterior';
