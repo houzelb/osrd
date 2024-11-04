@@ -225,16 +225,16 @@ pub fn create_towed_rolling_stock() -> TowedRollingStock {
     TowedRollingStock {
         name: "TOWED_ROLLING_STOCK".to_string(),
         label: "towed".to_string(),
-        mass: 50000.0,
-        length: 30.0, // m
-        comfort_acceleration: 0.2,
+        mass: 50000.0,             // kg
+        length: 30.0,              // m
+        comfort_acceleration: 0.2, // In m/s²
         startup_acceleration: 0.06,
         inertia_coefficient: 1.05,
         rolling_resistance: RollingResistance {
             rolling_resistance_type: "davis".to_string(),
-            A: 1.0,
-            B: 0.01,
-            C: 0.0002,
+            A: 1.0,    // In kN
+            B: 0.01,   // In kN/(km/h)
+            C: 0.0002, // In kN/(km/h)²
         },
         gamma: Gamma {
             gamma_type: "CONST".to_string(),
@@ -250,9 +250,9 @@ pub fn create_simple_rolling_stock() -> RollingStock {
         loading_gauge: LoadingGaugeType::G1,
         supported_signaling_systems: RollingStockSupportedSignalingSystems(vec![]),
         base_power_class: None,
-        comfort_acceleration: 0.1,
+        comfort_acceleration: 0.1, // In m/s²
         inertia_coefficient: 1.10,
-        startup_acceleration: 0.04,
+        startup_acceleration: 0.04, // In m/s²
         startup_time: 1.0,
         effort_curves: EffortCurves::default(),
         electrical_power_startup_time: None,
@@ -268,9 +268,9 @@ pub fn create_simple_rolling_stock() -> RollingStock {
         railjson_version: "12".to_string(),
         rolling_resistance: RollingResistance {
             rolling_resistance_type: "davis".to_string(),
-            A: 1.0,
-            B: 0.01,
-            C: 0.0005,
+            A: 1.0,    // In kN
+            B: 0.01,   // In kN/(km/h)
+            C: 0.0005, // In kN/(km/h)²
         },
         length: 140.0,   // m
         mass: 15000.0,   // kg

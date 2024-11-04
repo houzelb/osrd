@@ -147,10 +147,10 @@ impl PhysicsConsistParameters {
         if let (Some(towed_rolling_stock), Some(total_mass)) =
             (self.towed_rolling_stock.as_ref(), self.total_mass)
         {
-            let mass_carriage = total_mass - self.traction_engine.mass;
+            let towed_mass = total_mass - self.traction_engine.mass;
             let traction_engine_inertia =
                 self.traction_engine.mass * self.traction_engine.inertia_coefficient;
-            let towed_inertia = mass_carriage * towed_rolling_stock.inertia_coefficient;
+            let towed_inertia = towed_mass * towed_rolling_stock.inertia_coefficient;
             (traction_engine_inertia + towed_inertia) / total_mass
         } else {
             self.traction_engine.inertia_coefficient
@@ -178,15 +178,15 @@ impl PhysicsConsistParameters {
             let towed_rs_rr = &towed_rolling_stock.rolling_resistance;
             let traction_engine_mass = self.traction_engine.mass; // kg
 
-            let carriage_mass = total_mass - traction_engine_mass; // kg
+            let towed_mass = total_mass - traction_engine_mass; // kg
 
             let traction_engine_solid_friction_a = traction_engine_rr.A * 1000.0; // convert from kN to N
             let traction_engine_viscosity_friction_b = traction_engine_rr.B * 1000.0 * 3.6; // convert from kN/(km/h) to N/(m/s)
             let traction_engine_aerodynamic_drag_c = traction_engine_rr.C * 1000.0 * 3.6 * 3.6; // convert from kN/(km/h)² to N/(m/s)²
 
-            let towed_solid_friction_a = towed_rs_rr.A * 1e-2 * carriage_mass; // convert from daN/t to N
-            let towed_viscosity_friction_b = towed_rs_rr.B * 1e-2 * carriage_mass * 3.6; // convert from (daN/t)/(km/h) to N/(m/s)
-            let towed_aerodynamic_drag_c = towed_rs_rr.C * 1e-2 * carriage_mass * 3.6 * 3.6; // convert from (daN/t)/(km/h)² to N/(m/s)²
+            let towed_solid_friction_a = towed_rs_rr.A * 1e-2 * towed_mass; // convert from daN/t to N
+            let towed_viscosity_friction_b = towed_rs_rr.B * 1e-2 * towed_mass * 3.6; // convert from (daN/t)/(km/h) to N/(m/s)
+            let towed_aerodynamic_drag_c = towed_rs_rr.C * 1e-2 * towed_mass * 3.6 * 3.6; // convert from (daN/t)/(km/h)² to N/(m/s)²
 
             let solid_friction_a = traction_engine_solid_friction_a + towed_solid_friction_a;
             let viscosity_friction_b =

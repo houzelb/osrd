@@ -58,12 +58,16 @@ pub struct RollingStock {
     pub base_power_class: Option<String>,
     /// In m
     pub length: f64,
+    /// In m/s
     pub max_speed: f64,
     pub startup_time: f64,
+    /// In m/s²
     pub startup_acceleration: f64,
+    /// In m/s²
     pub comfort_acceleration: f64,
     pub gamma: Gamma,
     pub inertia_coefficient: f64,
+    /// In kg
     pub mass: f64,
     pub rolling_resistance: RollingResistance,
     pub loading_gauge: LoadingGaugeType,
