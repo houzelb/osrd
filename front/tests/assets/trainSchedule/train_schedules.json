@@ -5,18 +5,8 @@
     "rolling_stock_name": "slow_rolling_stock_test_e2e",
     "start_time": "2024-10-17T03:00:00Z",
     "path": [
-      {
-        "id": "id227",
-        "deleted": false,
-        "uic": 6,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id228",
-        "deleted": false,
-        "uic": 5,
-        "secondary_code": "BV"
-      }
+      { "id": "id227", "deleted": false, "uic": 6, "secondary_code": "BV" },
+      { "id": "id228", "deleted": false, "uic": 5, "secondary_code": "BV" }
     ],
     "schedule": [
       {
@@ -27,18 +17,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
     "speed_limit_tag": null,
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 2",
@@ -46,30 +31,10 @@
     "rolling_stock_name": "electric_rolling_stock_test_e2e",
     "start_time": "2024-10-17T03:15:00Z",
     "path": [
-      {
-        "id": "id477",
-        "deleted": false,
-        "uic": 2,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id3522",
-        "deleted": false,
-        "track": "TA1",
-        "offset": 1424000
-      },
-      {
-        "id": "id498",
-        "deleted": false,
-        "uic": 4,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id478",
-        "deleted": false,
-        "uic": 8,
-        "secondary_code": "BV"
-      }
+      { "id": "id477", "deleted": false, "uic": 2, "secondary_code": "BV" },
+      { "id": "id3522", "deleted": false, "track": "TA1", "offset": 1424000 },
+      { "id": "id498", "deleted": false, "uic": 4, "secondary_code": "BV" },
+      { "id": "id478", "deleted": false, "uic": 8, "secondary_code": "BV" }
     ],
     "schedule": [
       {
@@ -87,18 +52,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 33.333333333333336,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
     "speed_limit_tag": "MA100",
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 3",
@@ -106,24 +66,9 @@
     "rolling_stock_name": "dual-mode_rolling_stock_test_e2e",
     "start_time": "2024-10-17T05:00:00Z",
     "path": [
-      {
-        "id": "id744",
-        "deleted": false,
-        "uic": 3,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id765",
-        "deleted": false,
-        "uic": 4,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id745",
-        "deleted": false,
-        "uic": 7,
-        "secondary_code": "BV"
-      }
+      { "id": "id744", "deleted": false, "uic": 3, "secondary_code": "BV" },
+      { "id": "id765", "deleted": false, "uic": 4, "secondary_code": "BV" },
+      { "id": "id745", "deleted": false, "uic": 7, "secondary_code": "BV" }
     ],
     "schedule": [
       {
@@ -141,18 +86,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
     "speed_limit_tag": "HLP",
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": false
-    }
+    "options": { "use_electrical_profiles": false }
   },
   {
     "train_name": "Train 4",
@@ -160,36 +100,11 @@
     "rolling_stock_name": "electric_rolling_stock_test_e2e",
     "start_time": "2024-10-17T05:15:00Z",
     "path": [
-      {
-        "id": "id938",
-        "deleted": false,
-        "uic": 2,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id1939",
-        "deleted": false,
-        "track": "TA6",
-        "offset": 10000
-      },
-      {
-        "id": "id959",
-        "deleted": false,
-        "uic": 3,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id964",
-        "deleted": false,
-        "uic": 4,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id939",
-        "deleted": false,
-        "uic": 8,
-        "secondary_code": "BV"
-      }
+      { "id": "id938", "deleted": false, "uic": 2, "secondary_code": "BV" },
+      { "id": "id1939", "deleted": false, "track": "TA6", "offset": 10000 },
+      { "id": "id959", "deleted": false, "uic": 3, "secondary_code": "BV" },
+      { "id": "id964", "deleted": false, "uic": 4, "secondary_code": "BV" },
+      { "id": "id939", "deleted": false, "uic": 8, "secondary_code": "BV" }
     ],
     "schedule": [
       {
@@ -214,24 +129,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
     "speed_limit_tag": "E32C",
-    "power_restrictions": [
-      {
-        "from": "id1939",
-        "to": "id939",
-        "value": "C1"
-      }
-    ],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "power_restrictions": [{ "from": "id1939", "to": "id939", "value": "C1" }],
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 5",
@@ -239,24 +143,9 @@
     "rolling_stock_name": "slow_rolling_stock_test_e2e",
     "start_time": "2024-10-17T07:30:00Z",
     "path": [
-      {
-        "id": "id1306",
-        "deleted": false,
-        "uic": 1,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id1327",
-        "deleted": false,
-        "uic": 3,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id1307",
-        "deleted": false,
-        "uic": 4,
-        "secondary_code": "BV"
-      }
+      { "id": "id1306", "deleted": false, "uic": 1, "secondary_code": "BV" },
+      { "id": "id1327", "deleted": false, "uic": 3, "secondary_code": "BV" },
+      { "id": "id1307", "deleted": false, "uic": 4, "secondary_code": "BV" }
     ],
     "schedule": [
       {
@@ -274,18 +163,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
     "speed_limit_tag": null,
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 6",
@@ -293,24 +177,9 @@
     "rolling_stock_name": "dual-mode_rolling_stock_test_e2e",
     "start_time": "2024-10-17T07:45:00Z",
     "path": [
-      {
-        "id": "id1700",
-        "deleted": false,
-        "uic": 2,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id1762",
-        "deleted": false,
-        "uic": 4,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id1701",
-        "deleted": false,
-        "uic": 5,
-        "secondary_code": "BV"
-      }
+      { "id": "id1700", "deleted": false, "uic": 2, "secondary_code": "BV" },
+      { "id": "id1762", "deleted": false, "uic": 4, "secondary_code": "BV" },
+      { "id": "id1701", "deleted": false, "uic": 5, "secondary_code": "BV" }
     ],
     "schedule": [
       {
@@ -328,18 +197,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
     "speed_limit_tag": "HLP",
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 7",
@@ -347,24 +211,9 @@
     "rolling_stock_name": "fast_rolling_stock_test_e2e",
     "start_time": "2024-10-17T08:37:00Z",
     "path": [
-      {
-        "id": "id2121",
-        "deleted": false,
-        "uic": 2,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id2175",
-        "deleted": false,
-        "uic": 3,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id2122",
-        "deleted": false,
-        "uic": 7,
-        "secondary_code": "BV"
-      }
+      { "id": "id2121", "deleted": false, "uic": 2, "secondary_code": "BV" },
+      { "id": "id2175", "deleted": false, "uic": 3, "secondary_code": "BV" },
+      { "id": "id2122", "deleted": false, "uic": 7, "secondary_code": "BV" }
     ],
     "schedule": [
       {
@@ -375,18 +224,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
     "speed_limit_tag": null,
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 8",
@@ -394,24 +238,9 @@
     "rolling_stock_name": "slow_rolling_stock_test_e2e",
     "start_time": "2024-10-17T08:56:01Z",
     "path": [
-      {
-        "id": "id2532",
-        "deleted": false,
-        "uic": 6,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id2550",
-        "deleted": false,
-        "uic": 5,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id2533",
-        "deleted": false,
-        "uic": 4,
-        "secondary_code": "BV"
-      }
+      { "id": "id2532", "deleted": false, "uic": 6, "secondary_code": "BV" },
+      { "id": "id2550", "deleted": false, "uic": 5, "secondary_code": "BV" },
+      { "id": "id2533", "deleted": false, "uic": 4, "secondary_code": "BV" }
     ],
     "schedule": [
       {
@@ -429,18 +258,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
     "speed_limit_tag": null,
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": false
-    }
+    "options": { "use_electrical_profiles": false }
   },
   {
     "train_name": "Train 9",
@@ -448,18 +272,8 @@
     "rolling_stock_name": "electric_rolling_stock_test_e2e",
     "start_time": "2024-10-17T09:35:59Z",
     "path": [
-      {
-        "id": "id2854",
-        "deleted": false,
-        "uic": 3,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id2855",
-        "deleted": false,
-        "uic": 7,
-        "secondary_code": "BV"
-      }
+      { "id": "id2854", "deleted": false, "uic": 3, "secondary_code": "BV" },
+      { "id": "id2855", "deleted": false, "uic": 7, "secondary_code": "BV" }
     ],
     "schedule": [
       {
@@ -470,18 +284,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 16.666666666666668,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
     "speed_limit_tag": "MA100",
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 10",
@@ -489,24 +298,9 @@
     "rolling_stock_name": "dual-mode_rolling_stock_test_e2e",
     "start_time": "2024-10-17T09:45:31Z",
     "path": [
-      {
-        "id": "id3088",
-        "deleted": false,
-        "uic": 8,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id3571",
-        "deleted": false,
-        "track": "TD3",
-        "offset": 0
-      },
-      {
-        "id": "id3089",
-        "deleted": false,
-        "uic": 4,
-        "secondary_code": "BV"
-      }
+      { "id": "id3088", "deleted": false, "uic": 8, "secondary_code": "BV" },
+      { "id": "id3571", "deleted": false, "track": "TD3", "offset": 0 },
+      { "id": "id3089", "deleted": false, "uic": 4, "secondary_code": "BV" }
     ],
     "schedule": [
       {
@@ -517,24 +311,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": ["id3571"],
-      "values": ["0%", "5min/100km"]
-    },
+    "margins": { "boundaries": ["id3571"], "values": ["0%", "5min/100km"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
     "speed_limit_tag": null,
-    "power_restrictions": [
-      {
-        "from": "id3088",
-        "to": "id3571",
-        "value": "C2"
-      }
-    ],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "power_restrictions": [{ "from": "id3088", "to": "id3571", "value": "C2" }],
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 11",
@@ -542,24 +325,9 @@
     "rolling_stock_name": "",
     "start_time": "2024-10-17T09:45:43Z",
     "path": [
-      {
-        "id": "id3807",
-        "deleted": false,
-        "track": "TA6",
-        "offset": 8058000
-      },
-      {
-        "id": "id3822",
-        "deleted": false,
-        "track": "TD0",
-        "offset": 10809000
-      },
-      {
-        "id": "id3855",
-        "deleted": false,
-        "track": "TG2",
-        "offset": 1686000
-      }
+      { "id": "id3807", "deleted": false, "track": "TA6", "offset": 8058000 },
+      { "id": "id3822", "deleted": false, "track": "TD0", "offset": 10809000 },
+      { "id": "id3855", "deleted": false, "track": "TG2", "offset": 1686000 }
     ],
     "schedule": [
       {
@@ -570,18 +338,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
     "speed_limit_tag": "MA100",
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 12",
@@ -589,30 +352,10 @@
     "rolling_stock_name": "",
     "start_time": "2024-10-17T10:16:03Z",
     "path": [
-      {
-        "id": "id130",
-        "deleted": false,
-        "track": "TX1",
-        "offset": 421000
-      },
-      {
-        "id": "id219",
-        "deleted": false,
-        "track": "TA6",
-        "offset": 9199000
-      },
-      {
-        "id": "id3822",
-        "deleted": false,
-        "track": "TD0",
-        "offset": 10809000
-      },
-      {
-        "id": "id188",
-        "deleted": false,
-        "track": "TF1",
-        "offset": 2486000
-      }
+      { "id": "id130", "deleted": false, "track": "TX1", "offset": 421000 },
+      { "id": "id219", "deleted": false, "track": "TA6", "offset": 9199000 },
+      { "id": "id3822", "deleted": false, "track": "TD0", "offset": 10809000 },
+      { "id": "id188", "deleted": false, "track": "TF1", "offset": 2486000 }
     ],
     "schedule": [
       {
@@ -623,18 +366,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
     "speed_limit_tag": null,
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 13",
@@ -642,24 +380,9 @@
     "rolling_stock_name": "slow_rolling_stock_test_e2e",
     "start_time": "2024-10-17T10:48:00Z",
     "path": [
-      {
-        "id": "id354",
-        "deleted": false,
-        "uic": 8,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id385",
-        "deleted": false,
-        "uic": 4,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id355",
-        "deleted": false,
-        "uic": 1,
-        "secondary_code": "BV"
-      }
+      { "id": "id354", "deleted": false, "uic": 8, "secondary_code": "BV" },
+      { "id": "id385", "deleted": false, "uic": 4, "secondary_code": "BV" },
+      { "id": "id355", "deleted": false, "uic": 1, "secondary_code": "BV" }
     ],
     "schedule": [
       {
@@ -677,18 +400,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
     "speed_limit_tag": null,
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 14",
@@ -696,18 +414,8 @@
     "rolling_stock_name": "electric_rolling_stock_test_e2e",
     "start_time": "2024-10-17T12:10:00Z",
     "path": [
-      {
-        "id": "id803",
-        "deleted": false,
-        "uic": 7,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id804",
-        "deleted": false,
-        "uic": 4,
-        "secondary_code": "BV"
-      }
+      { "id": "id803", "deleted": false, "uic": 7, "secondary_code": "BV" },
+      { "id": "id804", "deleted": false, "uic": 4, "secondary_code": "BV" }
     ],
     "schedule": [
       {
@@ -718,24 +426,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
     "speed_limit_tag": "MA100",
-    "power_restrictions": [
-      {
-        "from": "id803",
-        "to": "id804",
-        "value": "C1"
-      }
-    ],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "power_restrictions": [{ "from": "id803", "to": "id804", "value": "C1" }],
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 15",
@@ -743,24 +440,9 @@
     "rolling_stock_name": "improbable_rolling_stock_test_e2e",
     "start_time": "2024-10-17T12:30:00Z",
     "path": [
-      {
-        "id": "id1073",
-        "deleted": false,
-        "track": "TA6",
-        "offset": 6609000
-      },
-      {
-        "id": "id1136",
-        "deleted": false,
-        "track": "TE3",
-        "offset": 1247000
-      },
-      {
-        "id": "id1109",
-        "deleted": false,
-        "track": "TH1",
-        "offset": 3761000
-      }
+      { "id": "id1073", "deleted": false, "track": "TA6", "offset": 6609000 },
+      { "id": "id1136", "deleted": false, "track": "TE3", "offset": 1247000 },
+      { "id": "id1109", "deleted": false, "track": "TH1", "offset": 3761000 }
     ],
     "schedule": [
       {
@@ -771,18 +453,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "STANDARD",
     "speed_limit_tag": null,
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 16",
@@ -790,24 +467,9 @@
     "rolling_stock_name": "dual-mode_rolling_stock_test_e2e",
     "start_time": "2024-10-17T13:00:00Z",
     "path": [
-      {
-        "id": "id1353",
-        "deleted": false,
-        "uic": 8,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id1371",
-        "deleted": false,
-        "uic": 4,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id1354",
-        "deleted": false,
-        "uic": 2,
-        "secondary_code": "BV"
-      }
+      { "id": "id1353", "deleted": false, "uic": 8, "secondary_code": "BV" },
+      { "id": "id1371", "deleted": false, "uic": 4, "secondary_code": "BV" },
+      { "id": "id1354", "deleted": false, "uic": 2, "secondary_code": "BV" }
     ],
     "schedule": [
       {
@@ -825,18 +487,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "STANDARD",
     "speed_limit_tag": "HLP",
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": false
-    }
+    "options": { "use_electrical_profiles": false }
   },
   {
     "train_name": "Train 17",
@@ -844,30 +501,10 @@
     "rolling_stock_name": "electric_rolling_stock_test_e2e",
     "start_time": "2024-10-17T14:05:00Z",
     "path": [
-      {
-        "id": "id1572",
-        "deleted": false,
-        "uic": 2,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id1593",
-        "deleted": false,
-        "uic": 3,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id1598",
-        "deleted": false,
-        "uic": 4,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id1573",
-        "deleted": false,
-        "uic": 8,
-        "secondary_code": "BV"
-      }
+      { "id": "id1572", "deleted": false, "uic": 2, "secondary_code": "BV" },
+      { "id": "id1593", "deleted": false, "uic": 3, "secondary_code": "BV" },
+      { "id": "id1598", "deleted": false, "uic": 4, "secondary_code": "BV" },
+      { "id": "id1573", "deleted": false, "uic": 8, "secondary_code": "BV" }
     ],
     "schedule": [
       {
@@ -892,18 +529,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
     "speed_limit_tag": "MA100",
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 18",
@@ -911,18 +543,8 @@
     "rolling_stock_name": "slow_rolling_stock_test_e2e",
     "start_time": "2024-10-17T14:15:08Z",
     "path": [
-      {
-        "id": "id1948",
-        "deleted": false,
-        "uic": 1,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id1949",
-        "deleted": false,
-        "uic": 3,
-        "secondary_code": "BV"
-      }
+      { "id": "id1948", "deleted": false, "uic": 1, "secondary_code": "BV" },
+      { "id": "id1949", "deleted": false, "uic": 3, "secondary_code": "BV" }
     ],
     "schedule": [
       {
@@ -933,18 +555,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
-    "speed_limit_tag": null,
+    "speed_limit_tag": "MA100",
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 19",
@@ -952,18 +569,8 @@
     "rolling_stock_name": "",
     "start_time": "2024-10-17T15:55:00Z",
     "path": [
-      {
-        "id": "id3049",
-        "deleted": false,
-        "track": "TG4",
-        "offset": 1604000
-      },
-      {
-        "id": "id3065",
-        "deleted": false,
-        "track": "TD1",
-        "offset": 13883000
-      }
+      { "id": "id3049", "deleted": false, "track": "TG4", "offset": 1604000 },
+      { "id": "id3065", "deleted": false, "track": "TD1", "offset": 13883000 }
     ],
     "schedule": [
       {
@@ -974,18 +581,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": [],
-      "values": ["0%"]
-    },
+    "margins": { "boundaries": [], "values": ["0%"] },
     "initial_speed": 8.333333333333334,
     "comfort": "STANDARD",
     "constraint_distribution": "STANDARD",
     "speed_limit_tag": null,
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 20",
@@ -993,30 +595,10 @@
     "rolling_stock_name": "electric_rolling_stock_test_e2e",
     "start_time": "2024-10-17T16:00:00Z",
     "path": [
-      {
-        "id": "id2078",
-        "deleted": false,
-        "uic": 6,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id2124",
-        "deleted": false,
-        "uic": 4,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id2129",
-        "deleted": false,
-        "uic": 3,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id2079",
-        "deleted": false,
-        "uic": 2,
-        "secondary_code": "BV"
-      }
+      { "id": "id2078", "deleted": false, "uic": 6, "secondary_code": "BV" },
+      { "id": "id2124", "deleted": false, "uic": 4, "secondary_code": "BV" },
+      { "id": "id2129", "deleted": false, "uic": 3, "secondary_code": "BV" },
+      { "id": "id2079", "deleted": false, "uic": 2, "secondary_code": "BV" }
     ],
     "schedule": [
       {
@@ -1041,18 +623,13 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": ["id2079"],
-      "values": ["4.5%", "0%"]
-    },
+    "margins": { "boundaries": ["id2079"], "values": ["4.5%", "0%"] },
     "initial_speed": 0,
     "comfort": "STANDARD",
     "constraint_distribution": "MARECO",
     "speed_limit_tag": null,
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": true
-    }
+    "options": { "use_electrical_profiles": true }
   },
   {
     "train_name": "Train 21",
@@ -1060,36 +637,11 @@
     "rolling_stock_name": "electric_rolling_stock_test_e2e",
     "start_time": "2024-10-17T19:05:00Z",
     "path": [
-      {
-        "id": "id2458",
-        "deleted": false,
-        "track": "TG4",
-        "offset": 1549000
-      },
-      {
-        "id": "id2659",
-        "deleted": false,
-        "uic": 4,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id2492",
-        "deleted": false,
-        "track": "TD0",
-        "offset": 11080000
-      },
-      {
-        "id": "id2570",
-        "deleted": false,
-        "uic": 3,
-        "secondary_code": "BV"
-      },
-      {
-        "id": "id2436",
-        "deleted": false,
-        "track": "TX1",
-        "offset": 105000
-      }
+      { "id": "id2458", "deleted": false, "track": "TG4", "offset": 1549000 },
+      { "id": "id2659", "deleted": false, "uic": 4, "secondary_code": "BV" },
+      { "id": "id2492", "deleted": false, "track": "TD0", "offset": 11080000 },
+      { "id": "id2570", "deleted": false, "uic": 3, "secondary_code": "BV" },
+      { "id": "id2436", "deleted": false, "track": "TX1", "offset": 105000 }
     ],
     "schedule": [
       {
@@ -1114,17 +666,12 @@
         "locked": false
       }
     ],
-    "margins": {
-      "boundaries": ["id2436"],
-      "values": ["5%", "0%"]
-    },
+    "margins": { "boundaries": ["id2436"], "values": ["5%", "0%"] },
     "initial_speed": 27.77777777777778,
     "comfort": "STANDARD",
-    "constraint_distribution": "STANDARD",
-    "speed_limit_tag": null,
+    "constraint_distribution": "MARECO",
+    "speed_limit_tag": "MA100",
     "power_restrictions": [],
-    "options": {
-      "use_electrical_profiles": false
-    }
+    "options": { "use_electrical_profiles": false }
   }
 ]

@@ -13,7 +13,7 @@ class OperationalStudiesTimetablePage {
 
   readonly selectedTimetableTrain: Locator;
 
-  // TODO: remove this commented code when the design of simationBar has been changed
+  // TODO: remove this commented code when the design of simulation bar has been changed
   // readonly simulationBar: Locator;
 
   readonly manchetteSpaceTimeChart: Locator;

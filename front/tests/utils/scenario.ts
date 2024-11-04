@@ -21,44 +21,33 @@ interface SetupResult {
  * @returns {Promise<SetupResult>} - The setup result containing the infrastructure, project, study, scenario, and timetable result.
  */
 export default async function createScenario(
+  scenarioName?: string,
   projectId: number | null = null,
   studyId: number | null = null,
   infraId: number | null = null,
   electricalProfileId: number | null = null
 ): Promise<SetupResult> {
   // Fetch or create infrastructure
-  let smallInfra: Infra;
-  if (!infraId) {
-    smallInfra = await getInfra();
-  } else {
-    smallInfra = { id: infraId } as Infra;
-  }
+  const smallInfra: Infra = infraId ? ({ id: infraId } as Infra) : await getInfra();
 
   // Fetch or create project
-  let project: Project;
-  if (!projectId) {
-    project = await getProject();
-  } else {
-    project = { id: projectId } as Project;
-  }
+  const project: Project = projectId ? ({ id: projectId } as Project) : await getProject();
 
   // Fetch or create study
-  let study: Study;
-  if (!studyId) {
-    study = await getStudy(project.id);
-  } else {
-    study = { id: studyId } as Study;
-  }
+  const study: Study = studyId ? ({ id: studyId } as Study) : await getStudy(project.id);
 
   // Create a new timetable result
   const timetableResult = await postApiRequest(`/api/timetable`);
 
-  // Create a new scenario with a unique name using UUID
+  // Create a new scenario with a unique name if not provided
+  const scenarioNameFinal = scenarioName || `${scenarioData.name} ${uuidv4()}`;
+
+  // Create a new scenario with the provided or generated name
   const scenario: Scenario = await postApiRequest(
     `/api/projects/${project.id}/studies/${study.id}/scenarios`,
     {
       ...scenarioData,
-      name: `${scenarioData.name} ${uuidv4()}`, // Generating a unique name
+      name: scenarioNameFinal,
       study_id: study.id,
       infra_id: smallInfra.id,
       timetable_id: timetableResult.timetable_id,

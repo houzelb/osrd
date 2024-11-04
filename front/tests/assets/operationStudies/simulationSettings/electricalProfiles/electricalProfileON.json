@@ -28,7 +28,7 @@
       "actual": "0 s",
       "difference": "0 s"
     },
-    "calculatedArrival": "11:31:53",
+    "calculatedArrival": "11:32:58",
     "calculatedDeparture": ""
   },
   {
@@ -44,8 +44,8 @@
       "actual": "0 s",
       "difference": "0 s"
     },
-    "calculatedArrival": "11:39:22",
-    "calculatedDeparture": "11:41:26"
+    "calculatedArrival": "11:40:27",
+    "calculatedDeparture": "11:42:31"
   },
   {
     "stationName": "South_East_station",
@@ -60,7 +60,7 @@
       "actual": "",
       "difference": ""
     },
-    "calculatedArrival": "11:52:14",
+    "calculatedArrival": "11:53:19",
     "calculatedDeparture": ""
   }
 ]

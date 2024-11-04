@@ -3,6 +3,8 @@ import fs from 'fs';
 import { type Locator, type Page, expect } from '@playwright/test';
 import { v4 as uuidv4 } from 'uuid';
 
+import { getInfraById } from './api-setup';
+
 /**
  * Fill the input field identified by ID or TestID with the specified value and verifies it.
  *
@@ -105,3 +107,35 @@ export function formatDateToDayMonthYear(dateString: string): string {
   // Convert the short month (first letter capitalized) to lowercase
   return formattedDate.replace(/([A-Z])/g, (match) => match.toLowerCase());
 }
+
+/**
+ * Waits until the infrastructure state becomes 'CACHED' before proceeding to the next step.
+ * The function polls the `infra.state` every 10 seconds, up to a total of 3 minutes.
+ * Displays the total time taken for the state to reach 'CACHED'.
+ *
+ * @param {number} infraId - The ID of the infrastructure to retrieve and check.
+ * @throws {Error} - Throws an error if the state does not become 'CACHED' within 5 minutes.
+ * @returns {Promise<void>} - Resolves when the state is 'CACHED'.
+ */
+export const waitForInfraStateToBeCached = async (infraId: number): Promise<void> => {
+  const maxRetries = 18; // Total attempts (3 minutes / 10 seconds)
+  const delay = 10000; // Delay in milliseconds (10 seconds)
+  const startTime = Date.now(); // Record start time
+
+  for (let attempt = 0; attempt < maxRetries; attempt += 1) {
+    const infra = await getInfraById(infraId); // Retrieve the latest infra object
+    if (infra.state === 'CACHED') {
+      const totalTime = Date.now() - startTime;
+      console.info(
+        `Infrastructure state is 'CACHED'. Total time taken: ${totalTime / 1000} seconds.`
+      );
+      return;
+    }
+    console.info(`Attempt ${attempt + 1}: Current state is '${infra.state}', waiting...`);
+    await new Promise((resolve) => {
+      setTimeout(resolve, delay);
+    });
+  }
+
+  throw new Error("Infrastructure state did not reach 'CACHED' within the allotted 3 minutes.");
+};

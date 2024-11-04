@@ -106,6 +106,14 @@ class STDCMPage {
 
   readonly startNewQueryButton: Locator;
 
+  readonly originMarker: Locator;
+
+  readonly destinationMarker: Locator;
+
+  readonly viaMarker: Locator;
+
+  readonly mapResultContainer: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.notificationHeader = page.locator('#notification');
@@ -165,6 +173,10 @@ class STDCMPage {
     this.retainSimulationButton = page.getByTestId('retain-simulation-button');
     this.downloadSimulationButton = page.getByTestId('download-simulation-button');
     this.startNewQueryButton = page.getByTestId('start-new-query-button');
+    this.originMarker = this.mapContainer.locator('img[alt="origin"]');
+    this.destinationMarker = this.mapContainer.locator('img[alt="destination"]');
+    this.viaMarker = this.mapContainer.locator('img[alt="via"]');
+    this.mapResultContainer = page.locator('#map-result');
   }
 
   // Dynamic selectors for via cards
@@ -399,6 +411,7 @@ class STDCMPage {
     expect(loaderText).toContain(translations.simulation.averageRequestTime);
     await expect(this.cancelSimulationButton).toBeVisible();
     await expect(this.simulationList).toBeVisible();
+    await expect(this.mapResultContainer).toBeVisible();
   }
 
   async verifyTableData(tableDataPath: string): Promise<void> {
@@ -441,8 +454,16 @@ class STDCMPage {
     });
   }
 
-  async retainSimulation() {
+  async clickOnRetainSimulation() {
     await this.retainSimulationButton.click();
+  }
+
+  async clickOnStartNewQueryButton() {
+    await this.startNewQueryButton.click();
+  }
+
+  async retainSimulation() {
+    await this.clickOnRetainSimulation();
     await expect(this.downloadSimulationButton).toBeVisible();
     await expect(this.startNewQueryButton).toBeVisible();
 
@@ -461,6 +482,12 @@ class STDCMPage {
     } else {
       throw new Error('Download failed');
     }
+  }
+
+  async mapMarkerVisibility() {
+    await expect(this.originMarker).toBeVisible();
+    await expect(this.destinationMarker).toBeVisible();
+    await expect(this.viaMarker).toBeVisible();
   }
 }
 export default STDCMPage;

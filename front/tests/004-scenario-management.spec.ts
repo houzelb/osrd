@@ -3,7 +3,7 @@ import { expect } from '@playwright/test';
 import type { ElectricalProfileSet, Project, Scenario, Study } from 'common/api/osrdEditoastApi';
 
 import scenarioData from './assets/operationStudies/scenario.json';
-import { infrastructureName } from './assets/project_const';
+import { infrastructureName } from './assets/project-const';
 import ScenarioPage from './pages/scenario-page-model';
 import test from './test-logger';
 import { generateUniqueName } from './utils';

@@ -1,6 +1,6 @@
 import type { ElectricalProfileSet, Project, Scenario, Study } from 'common/api/osrdEditoastApi';
 
-import { improbableRollingStockName } from './assets/project_const';
+import { improbableRollingStockName } from './assets/project-const';
 import HomePage from './pages/home-page-model';
 import OperationalStudiesInputTablePage from './pages/op-input-table-page-model';
 import OperationalStudiesOutputTablePage from './pages/op-output-table-page-model';
@@ -88,6 +88,7 @@ test.describe('Simulation Settings Tab Verification', () => {
       OSRDLanguage = await homePage.getOSRDLanguage();
       // Create a new scenario
       ({ project, study, scenario } = await createScenario(
+        undefined,
         null,
         null,
         null,
@@ -157,7 +158,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await operationalStudiesPage.addTrainSchedule();
     await operationalStudiesPage.returnSimulationResult();
     await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
-    await opTimetablePage.getTrainArrivalTime('11:52');
+    await opTimetablePage.getTrainArrivalTime('11:53');
     await opTimetablePage.clickOnScenarioCollapseButton();
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataElectricalProfileON, OSRDLanguage);
@@ -170,7 +171,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     // TODO: Remove the reload when bug #8854 (UI not updating after modification) is fixed
     await page.reload({ timeout: 30000, waitUntil: 'networkidle' });
     await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
-    await opTimetablePage.getTrainArrivalTime('11:51');
+    await opTimetablePage.getTrainArrivalTime('11:52');
     await opTimetablePage.clickOnScenarioCollapseButton();
     await opOutputTablePage.getOutputTableData(expectedCellDataElectricalProfileOFF, OSRDLanguage);
   });
@@ -212,7 +213,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await operationalStudiesPage.addTrainSchedule();
     await operationalStudiesPage.returnSimulationResult();
     await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
-    await opTimetablePage.getTrainArrivalTime('12:02');
+    await opTimetablePage.getTrainArrivalTime('12:03');
     await opTimetablePage.clickOnScenarioCollapseButton();
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataCodeCompoON, OSRDLanguage);
@@ -225,7 +226,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     // TODO: Remove the reload when bug #8854 (UI not updating after modification) is fixed
     await page.reload({ timeout: 30000, waitUntil: 'networkidle' });
     await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
-    await opTimetablePage.getTrainArrivalTime('11:51');
+    await opTimetablePage.getTrainArrivalTime('11:52');
     await opTimetablePage.clickOnScenarioCollapseButton();
     await opOutputTablePage.getOutputTableData(expectedCellDataCodeCompoOFF, OSRDLanguage);
   });
@@ -341,7 +342,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await operationalStudiesPage.addTrainSchedule();
     await operationalStudiesPage.returnSimulationResult();
     await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
-    await opTimetablePage.getTrainArrivalTime('12:05');
+    await opTimetablePage.getTrainArrivalTime('12:06');
     await opTimetablePage.clickOnScenarioCollapseButton();
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataForAllSettings, OSRDLanguage);

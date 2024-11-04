@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 
-import { dualModeRollingStockName, electricRollingStockName } from './assets/project_const';
+import { dualModeRollingStockName, electricRollingStockName } from './assets/project-const';
 import RollingstockEditorPage from './pages/rollingstock-editor-page-model';
 import RollingStockSelectorPage from './pages/rollingstock-selector-page-model';
 import test from './test-logger';

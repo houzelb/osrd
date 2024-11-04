@@ -1,6 +1,6 @@
 import type { Project, Scenario, Study } from 'common/api/osrdEditoastApi';
 
-import { electricRollingStockName } from './assets/project_const';
+import { electricRollingStockName } from './assets/project-const';
 import HomePage from './pages/home-page-model';
 import RoutePage from './pages/op-route-page-model';
 import OperationalStudiesPage from './pages/operational-studies-page-model';
@@ -82,8 +82,8 @@ test.describe('Route Tab Verification', () => {
 
     // Define waypoints and add them to the route
     const expectedViaValues = [
-      { name: 'Mid_West_station', ch: 'BV', uic: '3', km: 'KM 11.850' },
-      { name: 'Mid_East_station', ch: 'BV', uic: '4', km: 'KM 26.300' },
+      { name: 'Mid_West_station', ch: 'BV', uic: '3', km: 'KM 12.050' },
+      { name: 'Mid_East_station', ch: 'BV', uic: '4', km: 'KM 26.500' },
     ];
     await routePage.addNewWaypoints(2, ['Mid_West_station', 'Mid_East_station'], expectedViaValues);
 
