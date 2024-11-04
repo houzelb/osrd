@@ -45,21 +45,27 @@ It requires:
 
 Now you can run the test with `cd front/ && yarn e2e-tests`.
 
-> [!CAUTION]
-> If you try to run `yarn start` instead of running it through docker, you'll notice it doesn't
-> work because the gateway can't access your local port from inside a container. 2 solutions:
+If you are using a Linux distribution not supported by playwright (which only supports Windows, macOS and Ubuntu/Debian),
+you can instead start the tests inside a docker container using `osrd/scripts/run-front-playwright-container.sh`.
+You may pass the same options and arguments to this script as you would to `yarn e2e-tests` or `yarn playwright test`.
+
+> [!CAUTION] If you try to run `yarn start` instead of running it through docker, you'll notice it
+> doesn't work because the gateway can't access your local port from inside a container. 2
+> solutions:
 >
 > - run all the components locally (you might keep Postgres and Valkey in containers)
 > - if on Linux, you can also launch all the containers on the host network: you can replace the
-> `docker compose <something>` above with `osrd/scripts/host-compose.sh <something>`
+>   `docker compose <something>` above with `osrd/scripts/host-compose.sh <something>`
 
 If the tests fail, you'll find a `front/test-results` folder that will contain videos of the fail
 test executions. They might be of help to understand what's going on. Note that the CI also exports
 these videos as artifacts.
 
-You may also want to explore the documentation of the test framework [Playwright](https://playwright.dev/).
-For example, try launching each test independently using `yarn playwright test --ui`, or debug a
-test with `yarn playwright test --debug`.
+You may also want to explore the documentation of the test framework
+[Playwright](https://playwright.dev/). For example, try launching each test independently using
+`yarn playwright test --ui`, debug a test with `yarn playwright test --debug`, or launch a specified
+test of a specified test file with a specified browser once with for example
+`yarn playwright test 011-op-times-and-stops-tab.spec.ts -g "should correctly set and display times and stops tables" --project=firefox  --retries=0`.
 
 ## Design rules
 

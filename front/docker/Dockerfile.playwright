@@ -1,0 +1,10 @@
+ARG PLAYWRIGHT_VERSION=latest
+FROM mcr.microsoft.com/playwright:$PLAYWRIGHT_VERSION
+
+COPY front/package.json front/yarn.lock /app/front/
+WORKDIR /app/front
+RUN yarn install --frozen-lockfile
+
+COPY front /app/front/
+COPY tests /app/tests
+RUN chmod a+w /app/front/
