@@ -20,6 +20,7 @@ import type { ProjectionData } from 'modules/simulationResult/types';
 import TimesStopsOutput from 'modules/timesStops/TimesStopsOutput';
 import { updateViewport, type Viewport } from 'reducers/map';
 import { useAppDispatch } from 'store';
+import { getPointCoordinates } from 'utils/geometry';
 
 const SPEED_SPACE_CHART_HEIGHT = 521.5;
 const HANDLE_TAB_RESIZE_HEIGHT = 20;
@@ -64,6 +65,15 @@ const SimulationResults = ({
     pathProperties,
     infraId
   );
+
+  // Compute path items coordinates in order to place them on the map
+
+  const pathItemsCoordinates =
+    path &&
+    pathProperties &&
+    path.path_item_positions.map((positionOnPath) =>
+      getPointCoordinates(pathProperties.geometry, path.length, positionOnPath)
+    );
 
   const {
     operationalPoints: projectedOperationalPoints,
@@ -192,6 +202,7 @@ const SimulationResults = ({
                 }
               : undefined
           }
+          pathItemsCoordinates={pathItemsCoordinates}
           setMapCanvas={setMapCanvas}
         />
       </div>

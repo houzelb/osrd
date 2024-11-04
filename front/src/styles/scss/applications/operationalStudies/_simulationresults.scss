@@ -85,4 +85,27 @@
     text-shadow: 0 0 3px #fff;
     padding-bottom: 1.5rem;
   }
+
+  .map-pathfinding-marker {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    position: absolute;
+    font-weight: 500;
+    border-radius: 4px;
+    line-height: 0.7rem;
+    padding: 0.15rem 0.25rem;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    &.via-number {
+      padding: 0;
+      font-weight: bold;
+      color: white;
+    }
+    &.stdcm-via {
+      align-self: flex-start;
+      padding-top: 0.5rem;
+      color: black;
+    }
+  }
 }
