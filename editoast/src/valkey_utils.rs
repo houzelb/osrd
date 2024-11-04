@@ -39,14 +39,14 @@ fn no_cache_cmd_handler(cmd: &redis::Cmd) -> std::result::Result<redis::Value, R
                 || cmd_name_bytes == "MSET".as_bytes()
                 || nb_keys > 1 =>
         {
-            Ok(redis::Value::Bulk(vec![redis::Value::Nil; nb_keys]))
+            Ok(redis::Value::Array(vec![redis::Value::Nil; nb_keys]))
         },
         redis::Arg::Simple(_)
             if nb_keys == 1 =>
         {
             Ok(redis::Value::Nil)
         },
-        redis::Arg::Simple(cmd_name_bytes) if cmd_name_bytes == "PING".as_bytes() => Ok(redis::Value::Status("PONG".to_string())),
+        redis::Arg::Simple(cmd_name_bytes) if cmd_name_bytes == "PING".as_bytes() => Ok(redis::Value::SimpleString("PONG".to_string())),
         redis::Arg::Simple(cmd_name_bytes) => unimplemented!(
             "valkey command '{}' is not supported by editoast::valkey_utils::ValkeyConnection with '--no-cache'", String::from_utf8(cmd_name_bytes.to_vec())?
         ),
@@ -232,7 +232,7 @@ impl ValkeyClient {
 
     pub async fn ping_valkey(&self) -> RedisResult<()> {
         let mut conn = self.get_connection().await?;
-        cmd("PING").query_async::<_, ()>(&mut conn).await?;
+        cmd("PING").query_async::<()>(&mut conn).await?;
         trace!("Valkey ping successful");
         Ok(())
     }
