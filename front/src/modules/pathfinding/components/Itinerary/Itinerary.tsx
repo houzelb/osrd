@@ -98,7 +98,8 @@ const Itinerary = ({
   return (
     <div className="osrd-config-item">
       <div className="mb-2 d-flex">
-        <Pathfinding pathProperties={pathProperties} setPathProperties={setPathProperties} />
+        (
+        <Pathfinding pathProperties={pathProperties} setPathProperties={setPathProperties} />)
         <button
           type="button"
           className="btn btn-sm btn-only-icon btn-white px-3 ml-2"

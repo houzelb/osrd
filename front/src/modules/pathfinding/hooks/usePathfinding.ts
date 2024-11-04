@@ -307,7 +307,9 @@ export const usePathfinding = (
                   matchPathStepAndOp(step, suggestedOp)
                 );
 
-                const theoreticalMargin = i === 0 ? '0%' : step.theoreticalMargin;
+                const theoreticalMargin =
+                  i === 0 ? step.theoreticalMargin || '0%' : step.theoreticalMargin;
+
                 const stopFor = i === pathSteps.length - 1 && !step.stopFor ? '0' : step.stopFor;
                 const stopType =
                   i === pathSteps.length - 1 && !step.stopFor ? undefined : step.stopType;
