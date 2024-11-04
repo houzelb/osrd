@@ -2,9 +2,11 @@ import { useRef } from 'react';
 
 import { useTranslation } from 'react-i18next';
 
+import type { ManageTrainSchedulePathProperties } from 'applications/operationalStudies/types';
 import icon from 'assets/pictures/components/train.svg';
 import type { Comfort, RollingStockWithLiveries } from 'common/api/osrdEditoastApi';
 import { useModal } from 'common/BootstrapSNCF/ModalSNCF';
+import { usePathfinding } from 'modules/pathfinding/hooks/usePathfinding';
 import RollingStock2Img from 'modules/rollingStock/components/RollingStock2Img';
 import {
   comfort2pictogram,
@@ -17,6 +19,8 @@ type RollingStockProps = {
   rollingStockSelected?: RollingStockWithLiveries;
   rollingStockComfort: Comfort;
   image?: JSX.Element;
+  pathProperties?: ManageTrainSchedulePathProperties;
+  setPathProperties: (pathProperties?: ManageTrainSchedulePathProperties) => void;
 };
 
 const RollingStockSelector = ({
@@ -24,12 +28,16 @@ const RollingStockSelector = ({
   rollingStockSelected,
   rollingStockComfort,
   image,
+  pathProperties,
+  setPathProperties,
 }: RollingStockProps) => {
   const { openModal } = useModal();
 
   const ref2scroll = useRef<HTMLDivElement>(null);
 
   const { t } = useTranslation('rollingstock');
+
+  usePathfinding(setPathProperties, pathProperties);
 
   return (
     <div className="osrd-config-item mb-2">

@@ -93,6 +93,8 @@ const ManageTrainSchedule = ({ trainIdToEdit }: ManageTrainScheduleProps) => {
       <RollingStockSelector
         rollingStockSelected={rollingStock}
         rollingStockComfort={rollingStockComfort}
+        pathProperties={pathProperties}
+        setPathProperties={setPathProperties}
       />
     ),
   };
