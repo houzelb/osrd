@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import bbox from '@turf/bbox';
-import { lineString, point } from '@turf/helpers';
+import { lineString, point, type Position } from '@turf/helpers';
 import lineLength from '@turf/length';
 import lineSlice from '@turf/line-slice';
 import type { MapLayerMouseEvent } from 'maplibre-gl';
@@ -64,12 +64,14 @@ type SimulationResultMapProps = {
   setExtViewport: (mapViewport: Viewport) => void;
   geometry?: PathPropertiesFormatted['geometry'];
   trainSimulation?: SimulationResponseSuccess & { trainId: number; startTime: string };
+  pathItemsCoordinates?: Position[];
   setMapCanvas?: (mapCanvas: string) => void;
 };
 
 const SimulationResultMap = ({
   geometry,
   trainSimulation,
+  pathItemsCoordinates,
   setMapCanvas,
 }: SimulationResultMapProps) => {
   const { urlLat = '', urlLon = '', urlZoom = '', urlBearing = '', urlPitch = '' } = useParams();
@@ -347,6 +349,7 @@ const SimulationResultMap = ({
           <RenderItinerary
             geojsonPath={geojsonPath}
             layerOrder={LAYER_GROUPS_ORDER[LAYERS.ITINERARY.GROUP]}
+            pathItemsCoordinates={pathItemsCoordinates}
           />
         )}
 
