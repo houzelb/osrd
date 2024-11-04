@@ -33,16 +33,21 @@ const StdcmLinkedPathSearch = ({
 
   const {
     displaySearchButton,
-    hasSearchBeenLaunched,
     launchTrainScheduleSearch,
     linkedPathDate,
     linkedPathResults,
+    resetLinkedPathSearch,
     selectableSlot,
     setDisplaySearchButton,
     setLinkedPathDate,
     setTrainNameInput,
     trainNameInput,
   } = useLinkedPathSearch();
+
+  const removeLinkedPathCard = () => {
+    setShowLinkedPathSearch(false);
+    resetLinkedPathSearch();
+  };
 
   return (
     <div className={`stdcm-linked-path-search-container ${className}`}>
@@ -59,7 +64,7 @@ const StdcmLinkedPathSearch = ({
           disabled={disabled}
           name={cardName}
           title={
-            <button type="button" onClick={() => setShowLinkedPathSearch(false)}>
+            <button type="button" onClick={removeLinkedPathCard}>
               {t('translation:common.delete').toLowerCase()}
             </button>
           }
@@ -98,18 +103,17 @@ const StdcmLinkedPathSearch = ({
               {t('find')}
             </button>
           )}
-          {!displaySearchButton && !linkedPathResults.length && (
+          {!displaySearchButton && !linkedPathResults && (
             <div className="stdcm-linked-path-button white">
               <Gear size="lg" className="stdcm-linked-path-loading" />
             </div>
           )}
-          {linkedPathResults.length > 0 ? (
-            <StdcmLinkedPathResults linkedPathResults={linkedPathResults} linkedOp={linkedOp} />
-          ) : (
-            hasSearchBeenLaunched && (
+          {linkedPathResults &&
+            (linkedPathResults.length > 0 ? (
+              <StdcmLinkedPathResults linkedPathResults={linkedPathResults} linkedOp={linkedOp} />
+            ) : (
               <p className="text-center mb-0">{t('noCorrespondingResults')}</p>
-            )
-          )}
+            ))}
         </StdcmCard>
       )}
     </div>
