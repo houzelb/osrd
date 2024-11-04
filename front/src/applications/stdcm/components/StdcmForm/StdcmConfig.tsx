@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from '@osrd-project/ui-core';
-import { ArrowDown, ArrowUp } from '@osrd-project/ui-icons';
 import cx from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -16,7 +15,7 @@ import { useAppDispatch } from 'store';
 
 import StdcmConsist from './StdcmConsist';
 import StdcmDestination from './StdcmDestination';
-import StdcmLinkedPathSearch from './StdcmLinkedPathSearch';
+import StdcmLinkedTrainSearch from './StdcmLinkedTrainSearch';
 import StdcmOrigin from './StdcmOrigin';
 import useStaticPathfinding from '../../hooks/useStaticPathfinding';
 import type { StdcmConfigErrors } from '../../types';
@@ -148,13 +147,10 @@ const StdcmConfig = ({
       )}
       <div className="d-flex">
         <div className="d-flex flex-column">
-          <StdcmLinkedPathSearch
+          <StdcmLinkedTrainSearch
             disabled={disabled}
-            defaultCardText={t('indicateAnteriorPath')}
-            cardName={t('trainPath.anteriorPath')}
-            cardIcon={<ArrowUp size="lg" />}
-            className="anterior-linked-path"
-            linkedOp={{ extremityType: 'destination', id: origin.id }}
+            linkedTrainType="anterior"
+            linkedOpId={origin.id}
           />
           <div className="stdcm-simulation-inputs">
             <div className="stdcm-consist-container">
@@ -165,13 +161,10 @@ const StdcmConfig = ({
               <StdcmOrigin disabled={disabled} />
               <StdcmVias disabled={disabled} />
               <StdcmDestination disabled={disabled} />
-              <StdcmLinkedPathSearch
+              <StdcmLinkedTrainSearch
                 disabled={disabled}
-                defaultCardText={t('indicatePosteriorPath')}
-                cardName={t('trainPath.posteriorPath')}
-                cardIcon={<ArrowDown size="lg" />}
-                className="posterior-linked-path"
-                linkedOp={{ extremityType: 'origin', id: destination.id }}
+                linkedTrainType="posterior"
+                linkedOpId={destination.id}
               />
 
               <div

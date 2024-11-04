@@ -13,10 +13,10 @@ import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import { useInfraID, useOsrdConfSelectors } from 'common/osrdContext';
 import { isArrivalDateInSearchTimeWindow, isEqualDate } from 'utils/date';
 
-import type { StdcmLinkedPathResult } from '../types';
+import type { StdcmLinkedTrainResult } from '../types';
 import computeOpSchedules from '../utils/computeOpSchedules';
 
-const useLinkedPathSearch = () => {
+const useLinkedTrainSearch = () => {
   const [postSearch] = osrdEditoastApi.endpoints.postSearch.useMutation();
   const [postTrainScheduleSimulationSummary] =
     osrdEditoastApi.endpoints.postTrainScheduleSimulationSummary.useLazyQuery();
@@ -38,8 +38,8 @@ const useLinkedPathSearch = () => {
 
   const [displaySearchButton, setDisplaySearchButton] = useState(true);
   const [trainNameInput, setTrainNameInput] = useState('');
-  const [linkedPathDate, setLinkedPathDate] = useState(selectableSlot.start);
-  const [linkedPathResults, setLinkedPathResults] = useState<StdcmLinkedPathResult[]>();
+  const [linkedTrainDate, setLinkedTrainDate] = useState(selectableSlot.start);
+  const [linkedTrainResults, setLinkedTrainResults] = useState<StdcmLinkedTrainResult[]>();
 
   const getExtremityDetails = useCallback(
     async (pathItem: PathItem) => {
@@ -87,10 +87,10 @@ const useLinkedPathSearch = () => {
   );
 
   const launchTrainScheduleSearch = useCallback(async () => {
-    setLinkedPathResults(undefined);
+    setLinkedTrainResults(undefined);
     if (!trainNameInput) return;
-
     setDisplaySearchButton(false);
+    setLinkedTrainResults([]);
     try {
       const results = (await postSearch({
         searchPayload: {
@@ -104,12 +104,12 @@ const useLinkedPathSearch = () => {
         pageSize: 25,
       }).unwrap()) as SearchResultItemTrainSchedule[];
       const filteredResults = results.filter((result) =>
-        isEqualDate(linkedPathDate, new Date(result.start_time))
+        isEqualDate(linkedTrainDate, new Date(result.start_time))
       );
 
       if (!filteredResults.length) {
         setDisplaySearchButton(true);
-        setLinkedPathResults([]);
+        setLinkedTrainResults([]);
         return;
       }
 
@@ -136,39 +136,38 @@ const useLinkedPathSearch = () => {
           };
         })
       );
-      setLinkedPathResults(compact(newLinkedPathResults));
+      setLinkedTrainResults(compact(newLinkedPathResults));
     } catch (error) {
       console.error('Train schedule search failed:', error);
       setDisplaySearchButton(true);
     }
-  }, [postSearch, trainNameInput, timetableId, linkedPathDate, getExtremityDetails]);
+  }, [postSearch, trainNameInput, timetableId, linkedTrainDate, getExtremityDetails]);
 
-  const resetLinkedPathSearch = () => {
+  const resetLinkedTrainSearch = () => {
     setDisplaySearchButton(true);
-    setLinkedPathResults(undefined);
+    setLinkedTrainResults(undefined);
     setTrainNameInput('');
   };
 
   useEffect(() => {
-    if (!isArrivalDateInSearchTimeWindow(linkedPathDate, searchDatetimeWindow)) {
-      setLinkedPathDate(selectableSlot.start);
-      resetLinkedPathSearch();
+    if (!isArrivalDateInSearchTimeWindow(linkedTrainDate, searchDatetimeWindow)) {
+      setLinkedTrainDate(selectableSlot.start);
+      resetLinkedTrainSearch();
     }
   }, [selectableSlot]);
 
   return {
     displaySearchButton,
     launchTrainScheduleSearch,
-    linkedPathDate,
-    linkedPathResults,
-    resetLinkedPathSearch,
+    linkedTrainDate,
+    linkedTrainResults,
+    resetLinkedTrainSearch,
     selectableSlot,
     setDisplaySearchButton,
-    setLinkedPathDate,
-    setLinkedPathResults,
+    setLinkedTrainDate,
     setTrainNameInput,
     trainNameInput,
   };
 };
 
-export default useLinkedPathSearch;
+export default useLinkedTrainSearch;

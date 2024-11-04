@@ -25,9 +25,11 @@
     "incompleteForm": "Incomplete form",
     "viaNotDefined": "Au moins une localisation n'est pas renseignée"
   },
-  "indicateAnteriorPath": "Indicate anterior path",
-  "indicatePosteriorPath": "Indicate posterior path",
   "leaveAt": "Leave at {{ time }}",
+  "linkedTrainDefaultCard": {
+    "anterior": "Indicate anterior train",
+    "posterior": "Indicate posterior train"
+  },
   "noConfigurationFound": {
     "title": "A configuration problem prevents you from performing a search",
     "text": "Please contact the maintenance team so they can get you back on track."
@@ -99,14 +101,16 @@
   "stdcmSimulationReport": "Path simulation report",
   "trainPath": {
     "addVia": "Add intermediate OP",
-    "anteriorPath": "Anterior path",
     "asSoonAsPossible": "as soon as possible",
     "ch": "CH",
     "ci": "CI",
     "date": "Date",
     "destination": "Destination",
+    "linkedTrain": {
+      "anterior": "Anterior train",
+      "posterior": "Posterior train"
+    },
     "origin": "Origin",
-    "posteriorPath": "Posterior path",
     "preciseTime": "precise time",
     "respectDestinationSchedule": "respect the destination schedule",
     "stopFor": "Minimum stop time",
