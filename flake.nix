@@ -84,6 +84,7 @@
 
               # OSRD dev scripts
               osrd-dev-scripts
+              jq
 
             ]
             # Section added only on Linux systems
