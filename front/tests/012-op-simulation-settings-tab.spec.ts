@@ -168,7 +168,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await opSimulationSettingsPage.deactivateElectricalProfile();
     await opTimetablePage.clickOnEditTrainSchedule();
     // TODO: Remove the reload when bug #8854 (UI not updating after modification) is fixed
-    await page.reload({ timeout: 30000, waitUntil: 'load' });
+    await page.reload({ timeout: 30000, waitUntil: 'networkidle' });
     await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
     await opTimetablePage.getTrainArrivalTime('11:51');
     await opTimetablePage.clickOnScenarioCollapseButton();
@@ -223,7 +223,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await opSimulationSettingsPage.selectCodeCompoOption('__PLACEHOLDER__');
     await opTimetablePage.clickOnEditTrainSchedule();
     // TODO: Remove the reload when bug #8854 (UI not updating after modification) is fixed
-    await page.reload({ timeout: 30000, waitUntil: 'load' });
+    await page.reload({ timeout: 30000, waitUntil: 'networkidle' });
     await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
     await opTimetablePage.getTrainArrivalTime('11:51');
     await opTimetablePage.clickOnScenarioCollapseButton();
@@ -287,7 +287,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await opSimulationSettingsPage.activateMarecoMargin();
     await opTimetablePage.clickOnEditTrainSchedule();
     // TODO: Remove the reload when bug #8854 (UI not updating after modification) is fixed
-    await page.reload({ timeout: 30000, waitUntil: 'load' });
+    await page.reload({ timeout: 30000, waitUntil: 'networkidle' });
     await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
     await opTimetablePage.getTrainArrivalTime('11:54');
     await opTimetablePage.clickOnScenarioCollapseButton();
