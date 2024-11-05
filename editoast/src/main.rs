@@ -169,6 +169,9 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     match client.command {
         Commands::Runserver(args) => runserver(args, pg_config, valkey_config).await,
         Commands::ImportRollingStock(args) => import_rolling_stock(args, db_pool.into()).await,
+        Commands::ImportTowedRollingStock(args) => {
+            import_towed_rolling_stock(args, db_pool.into()).await
+        }
         Commands::OsmToRailjson(args) => {
             osm_to_railjson::osm_to_railjson(args.osm_pbf_in, args.railjson_out)
         }
