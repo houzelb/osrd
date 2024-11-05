@@ -1,3 +1,5 @@
+pub mod macro_nodes;
+
 use axum::extract::Json;
 use axum::extract::Path;
 use axum::extract::Query;
@@ -45,6 +47,7 @@ crate::routes! {
             get,
             delete,
             patch,
+            &macro_nodes,
         },
     },
 }
