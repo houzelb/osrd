@@ -91,6 +91,7 @@
   "pathfinding": "Recherche d’itinéraire",
   "pathfindingDone": "Recherche d'itinéraire terminée.",
   "pathfindingError": "Erreur dans la recherche d’itinéraire : {{errorMessage}}.",
+  "InvalidTrainScheduleStep": "Au moins un des points de passage n'a pas été reconnu",
   "pathfindingInProgress": "Recherche d’itinéraire en cours…",
   "pathfindingMissingParams": "Éléments manquants pour la recherche : {{missingElements}}.",
   "pathfindingMissingParamsSimple": "Informations manquantes pour la recherche",

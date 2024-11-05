@@ -219,7 +219,7 @@ export const usePathfinding = (
         },
       });
     }
-  }, [origin?.id, destination?.id, rollingStock]);
+  }, [origin, destination, rollingStock]);
 
   const handleInvalidPathItems = (
     steps: (PathStep | null)[],
