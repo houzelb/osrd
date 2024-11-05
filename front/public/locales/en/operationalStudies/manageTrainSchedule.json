@@ -91,6 +91,7 @@
   "pathfinding": "Path search",
   "pathfindingDone": "Pathfinding done.",
   "pathfindingError": "An error occurred in pathfinding: {{errorMessage}}.",
+  "InvalidTrainScheduleStep": "At least one of the waypoints could not be recognized",
   "pathfindingInProgress": "Pathfinding in progress…",
   "pathfindingMissingParams": "Missing parameters for pathfinding: {{missingElements}}.",
   "pathfindingMissingParamsSimple": "Missing information for the search",

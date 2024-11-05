@@ -10,6 +10,7 @@ import infraLogo from 'assets/pictures/components/tracks.svg';
 import { Spinner } from 'common/Loaders';
 import { useOsrdConfSelectors } from 'common/osrdContext';
 import { usePathfinding } from 'modules/pathfinding/hooks/usePathfinding';
+import { isPathStepInvalid } from 'modules/pathfinding/utils';
 import { useStoreDataForRollingStockSelector } from 'modules/rollingStock/components/RollingStockSelector/useStoreDataForRollingStockSelector';
 import { conditionalStringConcat, formatKmValue } from 'utils/strings';
 
@@ -23,7 +24,9 @@ type PathfindingProps = {
 const Pathfinding = ({ pathProperties, setPathProperties }: PathfindingProps) => {
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
 
-  const { getOrigin, getDestination } = useOsrdConfSelectors();
+  const { getOrigin, getDestination, getPathSteps } = useOsrdConfSelectors();
+  const pathSteps = useSelector(getPathSteps);
+  const hasInvalidPathStep = pathSteps.some((pathStep) => isPathStepInvalid(pathStep));
   const origin = useSelector(getOrigin, isEqual);
   const destination = useSelector(getDestination, isEqual);
   const { rollingStock } = useStoreDataForRollingStockSelector();
@@ -61,7 +64,8 @@ const Pathfinding = ({ pathProperties, setPathProperties }: PathfindingProps) =>
         !pathfindingState.running &&
         pathfindingState.done &&
         origin &&
-        destination && (
+        destination &&
+        !hasInvalidPathStep && (
           <div className="content pathfinding-done">
             <span className="lead" data-testid="result-pathfinding-done">
               <CheckCircle />
@@ -83,7 +87,7 @@ const Pathfinding = ({ pathProperties, setPathProperties }: PathfindingProps) =>
         </div>
       ) : (
         <>
-          {pathfindingState.error && (
+          {(pathfindingState.error || hasInvalidPathStep) && (
             <div
               className={cx('content pathfinding-error', {
                 'mt-2': infra && infra.state !== 'CACHED',
@@ -93,7 +97,9 @@ const Pathfinding = ({ pathProperties, setPathProperties }: PathfindingProps) =>
                 <Stop />
               </span>
               <span className="flex-grow-1">
-                {t('pathfindingError', { errorMessage: t(pathfindingState.error) })}
+                {hasInvalidPathStep
+                  ? t('InvalidTrainScheduleStep')
+                  : t('pathfindingError', { errorMessage: t(pathfindingState.error) })}
               </span>
             </div>
           )}
