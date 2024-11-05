@@ -6,6 +6,7 @@ pub mod fixtures;
 pub mod infra;
 pub mod infra_objects;
 pub mod layers;
+pub mod macro_node;
 pub mod stdcm_log;
 // We allow unused until models is moved to a separate crate
 pub mod auth;
@@ -20,6 +21,7 @@ pub mod rolling_stock_model;
 pub mod scenario;
 pub mod stdcm_search_environment;
 pub mod study;
+pub mod tags;
 pub mod temporary_speed_limits;
 pub mod timetable;
 pub mod towed_rolling_stock;
@@ -32,17 +34,18 @@ pub use documents::Document;
 pub use infra::Infra;
 pub use infra_objects::*;
 pub use projects::Project;
-pub use projects::Tags;
 pub use rolling_stock_image::RollingStockSeparatedImageModel;
 pub use rolling_stock_model::RollingStockModel;
 pub use scenario::Scenario;
 pub use study::Study;
+pub use tags::Tags;
 
 editoast_common::schemas! {
     infra::schemas(),
     projects::schemas(),
     rolling_stock_model::schemas(),
     stdcm_log::schemas(),
+    tags::schemas(),
 }
 
 #[cfg(test)]
