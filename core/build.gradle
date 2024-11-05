@@ -65,6 +65,7 @@ dependencies {
 
     // the logging API stub
     implementation libs.slf4j
+    implementation libs.jansi
 
     // the logging API implementation
     implementation libs.logback.core

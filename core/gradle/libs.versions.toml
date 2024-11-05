@@ -60,6 +60,7 @@ mockito-junit-jupiter = { module = 'org.mockito:mockito-junit-jupiter', version.
 junit-platform-launcher = { module = 'org.junit.platform:junit-platform-launcher', version = '1.11.+' } # EPL 2.0
 jcip-annotations = { module = 'net.jcip:jcip-annotations', version = '1.0' } # CC Attribution
 spotbugs-annotations = { module = 'com.github.spotbugs:spotbugs-annotations', version = '4.8.+' } # LGPLv2.1
+jansi = { module = 'org.fusesource.jansi:jansi', version = '2.4.+' } # Apache 2.0
 
 opentelemetry-api = { module = 'io.opentelemetry:opentelemetry-api', version.ref = 'otel' }
 opentelemetry-instrumentation-annotations = { module = 'io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations', version = '2.9.0' }

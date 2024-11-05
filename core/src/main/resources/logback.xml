@@ -1,5 +1,6 @@
 <configuration>
     <appender name="COLOR" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>true</withJansi>
         <encoder>
             <pattern>[%date{"HH:mm:ss,SSS"}] %highlight(%-7([%level])) %23([%logger{0}]) %msg%n</pattern>
         </encoder>
