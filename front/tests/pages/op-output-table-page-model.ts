@@ -143,6 +143,7 @@ class OperationalStudiesOutputTablePage extends OperationalStudiesTimetablePage 
   async verifyTimeStopsDataSheetVisibility(timeout = 60 * 1000): Promise<void> {
     await this.timeStopsDataSheet.waitFor({ state: 'attached', timeout });
     await expect(this.timeStopsDataSheet).toBeVisible({ timeout });
+    await this.timeStopsDataSheet.scrollIntoViewIfNeeded({ timeout });
   }
 }
 

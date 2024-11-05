@@ -135,7 +135,7 @@ class RollingStockSelectorPage extends CommonPage {
     const rollingstockCard = this.getRollingstockCardByTestID(`rollingstock-${rollingStockName}`);
     await rollingstockCard.click();
     await rollingstockCard.locator('button').click();
-    expect(await this.selectedRollingStockName.innerText()).toEqual(rollingStockName);
+    expect(await this.selectedRollingStockName.first().innerText()).toEqual(rollingStockName);
   }
 }
 export default RollingStockSelectorPage;

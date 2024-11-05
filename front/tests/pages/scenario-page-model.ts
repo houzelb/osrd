@@ -68,7 +68,7 @@ class ScenarioPage extends CommonPage {
 
   // Create a scenario based on the provided details.
   async createScenario(details: ScenarioDetails) {
-    expect(this.addScenarioButton).toBeVisible();
+    await expect(this.addScenarioButton).toBeVisible();
     await this.addScenarioButton.click();
     await this.fillScenarioDetails(details);
     await this.createScenarioButton.click();
