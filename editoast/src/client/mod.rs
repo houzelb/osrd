@@ -67,6 +67,7 @@ pub enum Commands {
     )]
     ElectricalProfiles(electrical_profiles_commands::ElectricalProfilesCommands),
     ImportRollingStock(ImportRollingStockArgs),
+    ImportTowedRollingStock(ImportRollingStockArgs),
     OsmToRailjson(OsmToRailjsonArgs),
     #[command(about, long_about = "Prints the OpenApi of the service")]
     Openapi,
