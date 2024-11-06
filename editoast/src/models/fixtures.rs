@@ -354,7 +354,7 @@ pub async fn create_small_infra(conn: &mut DbConnection) -> Infra {
 pub async fn create_work_schedule_group(conn: &mut DbConnection) -> WorkScheduleGroup {
     WorkScheduleGroup::changeset()
         .name("Empty work schedule group".to_string())
-        .creation_date(Utc::now().naive_utc())
+        .creation_date(Utc::now())
         .create(conn)
         .await
         .expect("Failed to create empty work schedule group")

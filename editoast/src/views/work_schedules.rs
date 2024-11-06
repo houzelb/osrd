@@ -1,8 +1,7 @@
 use axum::extract::Json;
 use axum::extract::State;
 use axum::Extension;
-use chrono::NaiveDateTime;
-use chrono::Utc;
+use chrono::{offset::Utc, DateTime};
 use derivative::Derivative;
 use editoast_authz::BuiltinRole;
 use editoast_derive::EditoastError;
@@ -64,8 +63,8 @@ pub fn map_diesel_error(e: InternalError, name: impl AsRef<str>) -> InternalErro
 
 #[derive(Serialize, Derivative, ToSchema)]
 struct WorkScheduleItemForm {
-    pub start_date_time: NaiveDateTime,
-    pub end_date_time: NaiveDateTime,
+    pub start_date_time: DateTime<Utc>,
+    pub end_date_time: DateTime<Utc>,
     pub track_ranges: Vec<TrackRange>,
     pub obj_id: String,
     #[schema(inline)]
@@ -80,8 +79,8 @@ impl<'de> Deserialize<'de> for WorkScheduleItemForm {
         #[derive(Deserialize)]
         #[serde(deny_unknown_fields)]
         struct Internal {
-            start_date_time: NaiveDateTime,
-            end_date_time: NaiveDateTime,
+            start_date_time: DateTime<Utc>,
+            end_date_time: DateTime<Utc>,
             track_ranges: Vec<TrackRange>,
             obj_id: String,
             work_schedule_type: WorkScheduleType,
@@ -163,7 +162,7 @@ async fn create(
     // Create the work_schedule_group
     let work_schedule_group = WorkScheduleGroup::changeset()
         .name(work_schedule_group_name.clone())
-        .creation_date(Utc::now().naive_utc())
+        .creation_date(Utc::now())
         .create(conn)
         .await;
     let work_schedule_group =
@@ -197,9 +196,9 @@ struct WorkScheduleProjection {
     /// The type of the work schedule.
     pub work_schedule_type: WorkScheduleType,
     /// The date and time when the work schedule takes effect.
-    pub start_date_time: NaiveDateTime,
+    pub start_date_time: DateTime<Utc>,
     /// The date and time when the work schedule ends.
-    pub end_date_time: NaiveDateTime,
+    pub end_date_time: DateTime<Utc>,
     /// a list of intervals `(a, b)` that represent the projections of the work schedule track ranges:
     /// - `a` is the distance from the beginning of the path to the beginning of the track range
     /// - `b` is the distance from the beginning of the path to the end of the track range
@@ -278,7 +277,7 @@ async fn project_path(
 #[cfg(test)]
 pub mod test {
     use axum::http::StatusCode;
-    use chrono::NaiveDate;
+    use chrono::{offset::Utc, TimeZone};
     use pretty_assertions::assert_eq;
     use rstest::rstest;
     use serde_json::json;
@@ -348,7 +347,7 @@ pub mod test {
 
         WorkScheduleGroup::changeset()
             .name("duplicated work schedule group name".to_string())
-            .creation_date(Utc::now().naive_utc())
+            .creation_date(Utc::now())
             .create(&mut pool.get_ok())
             .await
             .expect("Failed to create work schedule group");
@@ -433,16 +432,12 @@ pub mod test {
             .into_iter()
             .enumerate()
             .map(|(index, track_ranges)| {
-                let start_date_time =
-                    NaiveDate::from_ymd_opt(2024, 1, (index + 1).try_into().unwrap())
-                        .unwrap()
-                        .and_hms_opt(0, 0, 0)
-                        .unwrap();
-                let end_date_time =
-                    NaiveDate::from_ymd_opt(2024, 1, (index + 2).try_into().unwrap())
-                        .unwrap()
-                        .and_hms_opt(0, 0, 0)
-                        .unwrap();
+                let start_date_time = Utc
+                    .with_ymd_and_hms(2024, 1, (index + 1).try_into().unwrap(), 0, 0, 0)
+                    .unwrap();
+                let end_date_time = Utc
+                    .with_ymd_and_hms(2024, 1, (index + 2).try_into().unwrap(), 0, 0, 0)
+                    .unwrap();
                 WorkSchedule::changeset()
                     .start_date_time(start_date_time)
                     .end_date_time(end_date_time)

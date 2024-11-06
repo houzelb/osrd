@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use editoast_derive::Model;
 use editoast_schemas::infra::TrackRange;
 use strum::FromRepr;
@@ -12,7 +12,7 @@ use utoipa::ToSchema;
 #[model(gen(ops = crd, batch_ops = c, list))]
 pub struct WorkScheduleGroup {
     pub id: i64,
-    pub creation_date: NaiveDateTime,
+    pub creation_date: DateTime<Utc>,
     pub name: String,
 }
 
@@ -29,8 +29,8 @@ pub enum WorkScheduleType {
 #[model(gen(batch_ops = c, list))]
 pub struct WorkSchedule {
     pub id: i64,
-    pub start_date_time: NaiveDateTime,
-    pub end_date_time: NaiveDateTime,
+    pub start_date_time: DateTime<Utc>,
+    pub end_date_time: DateTime<Utc>,
     #[model(json)]
     pub track_ranges: Vec<TrackRange>,
     pub obj_id: String,

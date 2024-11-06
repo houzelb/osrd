@@ -786,8 +786,8 @@ async fn build_temporary_speed_limits(
     Ok(applicable_speed_limits)
 }
 
-fn elapsed_since_time_ms(time: &NaiveDateTime, zero: &DateTime<Utc>) -> u64 {
-    max(0, (Utc.from_utc_datetime(time) - zero).num_milliseconds()) as u64
+fn elapsed_since_time_ms(time: &DateTime<Utc>, zero: &DateTime<Utc>) -> u64 {
+    max(0, (*time - zero).num_milliseconds()) as u64
 }
 
 /// Create steps from track_map and waypoints
@@ -1219,9 +1219,12 @@ mod tests {
         // GIVEN
         let work_schedules = [WorkSchedule {
             id: rand::random::<i64>(),
-            start_date_time: NaiveDateTime::parse_from_str(ws_start_time, "%Y-%m-%d %H:%M:%S")
-                .unwrap(),
-            end_date_time: NaiveDateTime::parse_from_str(ws_end_time, "%Y-%m-%d %H:%M:%S").unwrap(),
+            start_date_time: DateTime::parse_from_str(ws_start_time, "%Y-%m-%d %H:%M:%S")
+                .unwrap()
+                .with_timezone(&Utc),
+            end_date_time: DateTime::parse_from_str(ws_end_time, "%Y-%m-%d %H:%M:%S")
+                .unwrap()
+                .with_timezone(&Utc),
             ..Default::default()
         }];
         let start_time = DateTime::parse_from_rfc3339("2024-03-14T08:00:00Z")
