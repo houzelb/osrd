@@ -17,7 +17,7 @@ interface SetupResult {
 /**
  * Set up a scenario by fetching required infrastructure, project, study, and creating a new scenario.
  *
- * @param {number | null} [electricalProfileId=null] - Optional electrical profile ID for the scenario.
+ * @param electricalProfileId - Optional electrical profile ID for the scenario.
  * @returns {Promise<SetupResult>} - The setup result containing the infrastructure, project, study, scenario, and timetable result.
  */
 export default async function createScenario(

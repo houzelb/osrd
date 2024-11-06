@@ -19,6 +19,7 @@ import type {
   Study,
   Scenario,
   LightRollingStock,
+  StdcmSearchEnvironment,
 } from 'common/api/osrdEditoastApi';
 
 import electricalProfileSet from '../assets/operationStudies/simulationSettings/electricalProfiles/electricalProfile.json';
@@ -37,8 +38,8 @@ export const getApiContext = async (): Promise<APIRequestContext> =>
 /**
  * Send a GET request to the specified API endpoint with optional query parameters.
  *
- * @param {string} url - The API endpoint URL.
- * @param {object} [params] - Optional query parameters to include in the request.
+ * @param url - The API endpoint URL.
+ * @param params - Optional query parameters to include in the request.
  */
 export const getApiRequest = async (
   url: string,
@@ -52,7 +53,7 @@ export const getApiRequest = async (
 /**
  * Handle API error responses by checking the status and throwing an error if the request failed.
  *
- * @param {APIResponse} response - The response object from the API request.
+ * @param response - The response object from the API request.
  * @param errorMessage - Optional. The error message to throw if the request fails.
  * @throws {Error} - Throws an error if the response status is not OK.
  */
@@ -66,10 +67,10 @@ export function handleErrorResponse(response: APIResponse, errorMessage = 'API R
  * Send a POST request to the specified API endpoint with optional data and query parameters.
  *
  * @template T
- * @param {string} url - The API endpoint URL.
- * @param {T} [data] - Optional. The payload to send in the request body.
- * @param {object} [params] - Optional query parameters to include in the request.
- * @param {string} [errorMessage] - Optional. Custom error message for failed requests.
+ * @param url - The API endpoint URL.
+ * @param data - Optional. The payload to send in the request body.
+ * @param params - Optional query parameters to include in the request.
+ * @param errorMessage - Optional. Custom error message for failed requests.
  */
 export const postApiRequest = async <T>(
   url: string,
@@ -87,7 +88,7 @@ export const postApiRequest = async <T>(
 /**
  * Send a DELETE request to the specified API endpoint.
  *
- * @param {string} url - The API endpoint URL.
+ * @param url - The API endpoint URL.
  * @returns {Promise<APIResponse>} - The response from the API.
  */
 export const deleteApiRequest = async (
@@ -103,7 +104,7 @@ export const deleteApiRequest = async (
 /**
  * Retrieve infrastructure data by name.
  *
- * @param  infraName - The name of the infrastructure to retrieve.
+ * @param infraName - The name of the infrastructure to retrieve.
  * @returns {Promise<Infra>} - The matching infrastructure data.
  */
 export const getInfra = async (infraName = infrastructureName): Promise<Infra> => {
@@ -115,7 +116,7 @@ export const getInfra = async (infraName = infrastructureName): Promise<Infra> =
 /**
  * Retrieve infrastructure data by ID.
  *
- * @param {number} infraId - The ID of the infrastructure to retrieve.
+ * @param infraId - The ID of the infrastructure to retrieve.
  * @returns {Promise<InfraWithState>} - The matching infrastructure data.
  */
 export const getInfraById = async (infraId: number): Promise<InfraWithState> => {
@@ -142,8 +143,8 @@ export const getProject = async (projectName = globalProjectName): Promise<Proje
 /**
  * Retrieve study data by project ID and study name.
  *
- * @param {number} projectId - The ID of the project.
- * @param  studyName - The name of the study to retrieve.
+ * @param projectId - The ID of the project.
+ * @param studyName - The name of the study to retrieve.
  * @returns {Promise<Study>} - The matching study data.
  */
 export const getStudy = async (projectId: number, studyName = globalStudyName): Promise<Study> => {
@@ -157,9 +158,9 @@ export const getStudy = async (projectId: number, studyName = globalStudyName): 
 /**
  * Retrieve scenario data by project ID, study ID, and scenario name.
  *
- * @param {number} projectId - The ID of the project.
- * @param {number} studyId - The ID of the study.
- * @param {string} scenarioName - The name of the scenario to retrieve.
+ * @param projectId - The ID of the project.
+ * @param studyId - The ID of the study.
+ * @param scenarioName - The name of the scenario to retrieve.
  * @returns {Promise<Scenario>} - The matching scenario data.
  */
 export const getScenario = async (
@@ -176,7 +177,7 @@ export const getScenario = async (
 /**
  * Retrieve rolling stock data by name.
  *
- * @param {string} rollingStockName - The name of the rolling stock to retrieve.
+ * @param rollingStockName - The name of the rolling stock to retrieve.
  * @returns {Promise<RollingStock>} - The matching rolling stock data.
  */
 export const getRollingStock = async (rollingStockName: string): Promise<LightRollingStock> => {
@@ -193,7 +194,7 @@ export const getRollingStock = async (rollingStockName: string): Promise<LightRo
 /**
  * Retrieve electrical profile data by name.
  *
- * @param {string}  electricalProfileName - The name of the electrical profile to retrieve.
+ * @param electricalProfileName - The name of the electrical profile to retrieve.
  * @returns {Promise<ElectricalProfileSet>} - The matching electrical profile data.
  */
 export const getElectricalProfile = async (
@@ -221,3 +222,41 @@ export const setElectricalProfile = async (): Promise<ElectricalProfileSet> => {
   );
   return electricalProfile as ElectricalProfileSet;
 };
+
+/**
+ * Fetch the STDCM environment if not in CI mode.
+ */
+export async function getStdcmEnvironment(): Promise<StdcmSearchEnvironment | null> {
+  if (process.env.CI) return null; // Skip in CI mode.
+
+  try {
+    const apiContext = await getApiContext();
+    const response = await apiContext.get('api/stdcm/search_environment');
+
+    if (response.status() === 200) {
+      return (await response.json()) as StdcmSearchEnvironment;
+    }
+
+    console.warn(`STDCM environment not configured. HTTP status: ${response.status()}`);
+    return null;
+  } catch (error) {
+    console.error('Failed to fetch STDCM environment:', error);
+    return null;
+  }
+}
+
+/**
+ * Set the STDCM environment with the provided data.
+ *
+ * @param stdcmEnvironment -The stdcm search environment to use.
+ */
+export async function setStdcmEnvironment(stdcmEnvironment: StdcmSearchEnvironment): Promise<void> {
+  // Remove the `id` field to match the StdcmSearchEnvironmentCreateForm schema
+  const { id, ...stdcmEnvironmentWithoutId } = stdcmEnvironment;
+  await postApiRequest(
+    '/api/stdcm/search_environment',
+    stdcmEnvironmentWithoutId,
+    undefined,
+    'Failed to update STDCM configuration environment'
+  );
+}

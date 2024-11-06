@@ -1,4 +1,4 @@
-import type { Project, Scenario, Study } from 'common/api/osrdEditoastApi';
+import type { Infra, Project, Scenario, Study } from 'common/api/osrdEditoastApi';
 
 import { electricRollingStockName } from './assets/project-const';
 import HomePage from './pages/home-page-model';
@@ -6,6 +6,8 @@ import RoutePage from './pages/op-route-page-model';
 import OperationalStudiesPage from './pages/operational-studies-page-model';
 import RollingStockSelectorPage from './pages/rollingstock-selector-page-model';
 import test from './test-logger';
+import { waitForInfraStateToBeCached } from './utils';
+import { getInfra } from './utils/api-setup';
 import createScenario from './utils/scenario';
 import { deleteScenario } from './utils/teardown-utils';
 
@@ -15,9 +17,11 @@ test.describe('Route Tab Verification', () => {
   let study: Study;
   let scenario: Scenario;
   let OSRDLanguage: string;
+  let infra: Infra;
 
   test.beforeAll('Set up the scenario', async () => {
     ({ project, study, scenario } = await createScenario());
+    infra = await getInfra();
   });
 
   test.afterAll('Delete the created scenario', async () => {
@@ -40,8 +44,8 @@ test.describe('Route Tab Verification', () => {
         `/operational-studies/projects/${project.id}/studies/${study.id}/scenarios/${scenario.id}`
       );
 
-      // Verify that the infrastructure is correctly loaded
-      await operationalStudiesPage.checkInfraLoaded();
+      // Wait for infra to be in 'CACHED' state before proceeding
+      await waitForInfraStateToBeCached(infra.id);
 
       // Click on add train button and verify tab warnings
       await operationalStudiesPage.clickOnAddTrainButton();

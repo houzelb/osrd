@@ -8,16 +8,16 @@ import { getInfraById } from './api-setup';
 /**
  * Fill the input field identified by ID or TestID with the specified value and verifies it.
  *
- * @param {Page} page - The Playwright page object.
- * @param {string} inputId - The ID or TestID of the input field.
- * @param {string | number} value - The value to fill into the input field.
- * @param {boolean} [isTestId=false] - Optional. If true, uses TestID instead of ID for locating the input field.
+ * @param  page - The Playwright page object.
+ * @param inputId - The ID or TestID of the input field.
+ * @param value - The value to fill into the input field.
+ * @param isTestId - Optional. If true, uses TestID instead of ID for locating the input field.
  */
 export async function fillAndCheckInputById(
   page: Page,
   inputId: string,
   value: string | number,
-  isTestId = false
+  isTestId: boolean = false
 ) {
   const input = isTestId ? page.getByTestId(inputId) : page.locator(`#${inputId}`);
 
@@ -29,16 +29,16 @@ export async function fillAndCheckInputById(
 /**
  * Verify the content of the input field identified by ID or TestID.
  *
- * @param {Page} page - The Playwright page object.
- * @param {string} inputId - The ID or TestID of the input field.
- * @param {string | number} expectedValue - The expected value to verify in the input field.
- * @param {boolean} [isTestId=false] - Optional. If true, uses TestID instead of ID for locating the input field.
+ * @param page - The Playwright page object.
+ * @param inputId - The ID or TestID of the input field.
+ * @param expectedValue - The expected value to verify in the input field.
+ * @param isTestId - Optional. If true, uses TestID instead of ID for locating the input field.
  */
 export async function verifyAndCheckInputById(
   page: Page,
   inputId: string,
   expectedValue: string | number,
-  isTestId = false
+  isTestId: boolean = false
 ) {
   const input = isTestId ? page.getByTestId(inputId) : page.locator(`#${inputId}`);
 
@@ -48,7 +48,7 @@ export async function verifyAndCheckInputById(
 /**
  * Generate a unique name by appending a truncated UUID to the base name.
  *
- * @param {string} baseName - The base name to append the UUID segment to.
+ * @param baseName - The base name to append the UUID segment to.
  * @returns {string} - The generated unique name.
  */
 export const generateUniqueName = (baseName: string): string => {
@@ -60,7 +60,7 @@ export const generateUniqueName = (baseName: string): string => {
  * Extract the first sequence of digits found in a string and returns it as a number.
  * Return 0 if no digits are found.
  *
- * @param {string} input - The string to extract the number from.
+ * @param input - The string to extract the number from.
  * @returns {Promise<number>} - The extracted number or 0 if none found.
  */
 export async function extractNumberFromString(input: string): Promise<number> {
@@ -71,7 +71,7 @@ export async function extractNumberFromString(input: string): Promise<number> {
 /**
  * Read a JSON file from the specified path and returns its parsed content.
  *
- * @param {string} path - The file path of the JSON file.
+ * @param path - The file path of the JSON file.
  * @returns {any} - The parsed JSON content.
  */
 export const readJsonFile = (path: string) => JSON.parse(fs.readFileSync(path, 'utf8'));
@@ -79,8 +79,8 @@ export const readJsonFile = (path: string) => JSON.parse(fs.readFileSync(path, '
 /**
  * Click on the specified element and waits for a specified delay after the click.
  *
- * @param {Locator} element - locator object representing the element to click.
- * @param {number} [delay=500] - Optional. The delay in milliseconds to wait after clicking the element. Defaults to 500ms.
+ * @param element - locator object representing the element to click.
+ * @param delay - Optional. The delay in milliseconds to wait after clicking the element. Defaults to 500ms.
  *
  * @returns {Promise<void>} - A promise that resolves after the element is clicked and the delay has passed.
  */
@@ -112,7 +112,7 @@ export function formatDateToDayMonthYear(dateString: string): string {
  * The function polls the `infra.state` every 10 seconds, up to a total of 3 minutes.
  * Displays the total time taken for the state to reach 'CACHED'.
  *
- * @param {number} infraId - The ID of the infrastructure to retrieve and check.
+ * @param infraId - The ID of the infrastructure to retrieve and check.
  * @throws {Error} - Throws an error if the state does not become 'CACHED' within 5 minutes.
  * @returns {Promise<void>} - Resolves when the state is 'CACHED'.
  */
@@ -130,7 +130,9 @@ export const waitForInfraStateToBeCached = async (infraId: number): Promise<void
       );
       return;
     }
-    console.info(`Attempt ${attempt + 1}: Current state is '${infra.state}', waiting...`);
+    console.info(
+      `Attempt ${attempt + 1}: Infrastructure current state is '${infra.state}', waiting...`
+    );
     await new Promise((resolve) => {
       setTimeout(resolve, delay);
     });

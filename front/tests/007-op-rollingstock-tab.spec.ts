@@ -1,12 +1,19 @@
 import { expect } from '@playwright/test';
 
-import type { LightRollingStock, Project, Scenario, Study } from 'common/api/osrdEditoastApi';
+import type {
+  Infra,
+  LightRollingStock,
+  Project,
+  Scenario,
+  Study,
+} from 'common/api/osrdEditoastApi';
 
 import { dualModeRollingStockName, electricRollingStockName } from './assets/project-const';
 import OperationalStudiesPage from './pages/operational-studies-page-model';
 import RollingStockSelectorPage from './pages/rollingstock-selector-page-model';
 import test from './test-logger';
-import { getRollingStock } from './utils/api-setup';
+import { waitForInfraStateToBeCached } from './utils';
+import { getInfra, getRollingStock } from './utils/api-setup';
 import createScenario from './utils/scenario';
 import { deleteScenario } from './utils/teardown-utils';
 
@@ -15,10 +22,12 @@ test.describe('Rolling stock Tab Verification', () => {
   let study: Study;
   let scenario: Scenario;
   let rollingStock: LightRollingStock;
+  let infra: Infra;
 
   test.beforeAll('Set up a scenario before all tests', async () => {
     rollingStock = await getRollingStock(electricRollingStockName);
     ({ project, study, scenario } = await createScenario());
+    infra = await getInfra();
   });
 
   test.afterAll('Delete the created scenario', async () => {
@@ -26,12 +35,12 @@ test.describe('Rolling stock Tab Verification', () => {
   });
 
   test.beforeEach('Navigate to the scenario page', async ({ page }) => {
-    const operationalStudiesPage = new OperationalStudiesPage(page);
     await page.goto(
       `/operational-studies/projects/${project.id}/studies/${study.id}/scenarios/${scenario.id}`
     );
     // Ensure infrastructure is loaded before each test
-    await operationalStudiesPage.checkInfraLoaded();
+    // Wait for infra to be in 'CACHED' state before proceeding
+    await waitForInfraStateToBeCached(infra.id);
   });
 
   /** *************** Test 1 **************** */

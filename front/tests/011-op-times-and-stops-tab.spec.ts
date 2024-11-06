@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 
 import type { Infra, Project, Scenario, Study } from 'common/api/osrdEditoastApi';
 
-import { dualModeRollingStockName, infrastructureName } from './assets/project-const';
+import { dualModeRollingStockName } from './assets/project-const';
 import HomePage from './pages/home-page-model';
 import OperationalStudiesInputTablePage from './pages/op-input-table-page-model';
 import OperationalStudiesOutputTablePage from './pages/op-output-table-page-model';
@@ -64,7 +64,7 @@ test.describe('Times and Stops Tab Verification', () => {
   type TranslationKeys = keyof typeof enTranslations;
 
   test.beforeAll('Fetch infrastructure', async () => {
-    infra = await getInfra(infrastructureName);
+    infra = await getInfra();
   });
 
   test.beforeEach(

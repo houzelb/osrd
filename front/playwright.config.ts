@@ -43,7 +43,9 @@ export default defineConfig({
     trace: 'on-first-retry',
     video: 'on-first-retry',
 
+    /* Set locale and timezone */
     locale: 'fr',
+    timezoneId: 'Europe/Paris',
   },
   reporter: process.env.CI ? 'github' : [['line'], ['html']],
 

@@ -9,9 +9,9 @@ interface ScrollOptions {
 /**
  * Scroll a specified container element horizontally by the given step size, with a delay between steps.
  *
- * @param {Page} page - The Playwright page object.
- * @param {string} containerSelector - The CSS selector for the scrollable container element.
- * @param {ScrollOptions} [options={}] - Optional scroll configuration including step size, timeout, and scroll offset threshold.
+ * @param page - The Playwright page object.
+ * @param containerSelector - The CSS selector for the scrollable container element.
+ * @param ScrollOptions - Optional scroll configuration including step size, timeout, and scroll offset threshold.
  * @returns {Promise<void>} - Resolves once the container has been fully scrolled.
  */
 const scrollContainer = async (

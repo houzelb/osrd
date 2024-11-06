@@ -14,8 +14,6 @@ class OperationalStudiesPage extends CommonPage {
 
   readonly startTimeField: Locator;
 
-  readonly infraLoadState: Locator;
-
   readonly resultPathfindingDistance: Locator;
 
   readonly returnSimulationResultButton: Locator;
@@ -36,7 +34,6 @@ class OperationalStudiesPage extends CommonPage {
 
   constructor(page: Page) {
     super(page);
-    this.infraLoadState = page.locator('.infra-loading-state');
     this.resultPathfindingDistance = page.getByTestId('result-pathfinding-distance');
     this.addScenarioTrainButton = page.getByTestId('scenarios-add-train-schedule-button');
     this.rollingStockTab = page.getByTestId('tab-rollingstock');
@@ -112,11 +109,6 @@ class OperationalStudiesPage extends CommonPage {
   async checkPathfindingDistance(distance: string | RegExp) {
     await this.page.waitForSelector('[data-testid="result-pathfinding-distance"]');
     await expect(this.resultPathfindingDistance).toHaveText(distance);
-  }
-
-  async checkInfraLoaded() {
-    await this.page.waitForSelector('.cached', { timeout: 2 * 60 * 1000 }); // Wait for the infrastructure to be fully loaded with a timeout of 2 minutes
-    await expect(this.infraLoadState).toHaveClass(/cached/);
   }
 
   async setNumberOfTrains(trainCount: string) {

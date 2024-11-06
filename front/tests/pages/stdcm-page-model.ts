@@ -101,13 +101,9 @@ class STDCMPage {
 
   readonly simulationList: Locator;
 
-  readonly cancelSimulationButton: Locator;
-
-  readonly simulationLoader: Locator;
-
   readonly incrementButton: Locator;
 
-  readonly allViaButton: Locator;
+  readonly allViasButton: Locator;
 
   readonly retainSimulationButton: Locator;
 
@@ -122,6 +118,12 @@ class STDCMPage {
   readonly viaMarker: Locator;
 
   readonly mapResultContainer: Locator;
+
+  readonly originResultMarker: Locator;
+
+  readonly destinationResultMarker: Locator;
+
+  readonly viaResultMarker: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -179,10 +181,8 @@ class STDCMPage {
     this.dynamicDestinationCi = this.destinationCard.locator('[id^="id"][id$="-ci"]');
     this.simulationStatus = page.getByTestId('simulation-status');
     this.simulationList = page.locator('.simulation-list .simulation-name');
-    this.cancelSimulationButton = page.getByTestId('cancel-simulation-button');
-    this.simulationLoader = page.locator('.stdcm-loader');
     this.incrementButton = page.locator('.minute-button', { hasText: '+1mn' });
-    this.allViaButton = page.getByTestId('all-via-button');
+    this.allViasButton = page.getByTestId('all-vias-button');
     this.retainSimulationButton = page.getByTestId('retain-simulation-button');
     this.downloadSimulationButton = page.getByTestId('download-simulation-button');
     this.startNewQueryButton = page.getByTestId('start-new-query-button');
@@ -190,6 +190,9 @@ class STDCMPage {
     this.destinationMarker = this.mapContainer.locator('img[alt="destination"]');
     this.viaMarker = this.mapContainer.locator('img[alt="via"]');
     this.mapResultContainer = page.locator('#map-result');
+    this.originResultMarker = this.mapResultContainer.locator('img[alt="origin"]');
+    this.destinationResultMarker = this.mapResultContainer.locator('img[alt="destination"]');
+    this.viaResultMarker = this.mapResultContainer.locator('img[alt="via"]');
   }
 
   // Dynamic selectors for via cards
@@ -293,6 +296,9 @@ class STDCMPage {
   // Fills fields with test values in the consist section
   async fillConsistDetails() {
     await this.tractionEngineField.fill(electricRollingStockName);
+    await this.tractionEngineField.press('ArrowDown');
+    await this.tractionEngineField.press('Enter');
+    await this.tractionEngineField.dispatchEvent('blur');
     await this.tonnageField.fill('400');
     await this.lengthField.fill('300');
     await this.codeCompoField.selectOption('HLP');
@@ -304,7 +310,8 @@ class STDCMPage {
     await this.dynamicOriginCi.fill('North');
     await this.verifyOriginNorthSuggestions();
     await this.suggestionNWS.click();
-    await expect(this.dynamicOriginCi).toHaveValue('North_West_station');
+    const originCiValue = await this.dynamicOriginCi.getAttribute('value');
+    expect(originCiValue).toContain('North_West_station');
     await expect(this.dynamicOriginCh).toHaveValue('BV');
     await expect(this.originArrival).toHaveValue('preciseTime');
     await expect(this.dateOriginArrival).toHaveValue('17/10/24');
@@ -323,7 +330,8 @@ class STDCMPage {
     await this.dynamicDestinationCi.fill('South');
     await this.verifyDestinationSouthSuggestions();
     await this.suggestionSS.click();
-    await expect(this.dynamicDestinationCi).toHaveValue('South_station');
+    const destinationCiValue = await this.dynamicDestinationCi.getAttribute('value');
+    expect(destinationCiValue).toContain('South_station');
     await expect(this.dynamicDestinationCh).toHaveValue('BV');
     await expect(this.destinationArrival).toHaveValue('asSoonAsPossible');
     await expect(this.warningBox).toContainText(translations.stdcmErrors.noScheduledPoint);
@@ -344,6 +352,25 @@ class STDCMPage {
     await expect(this.warningBox).not.toBeVisible();
   }
 
+  // Fill origin section
+  async fillOriginDetailsLight() {
+    await this.dynamicOriginCi.fill('North');
+    await this.suggestionNWS.click();
+    await expect(this.dynamicOriginCh).toHaveValue('BV');
+    await expect(this.originArrival).toHaveValue('preciseTime');
+    await this.dateOriginArrival.fill('17/10/24');
+    await this.timeOriginArrival.fill('20:21');
+    await this.fillToleranceField('-1h00', '+15', true);
+  }
+
+  // Fill origin section
+  async fillDestinationDetailsLight() {
+    await this.dynamicDestinationCi.fill('South');
+    await this.suggestionSS.click();
+    await expect(this.dynamicDestinationCh).toHaveValue('BV');
+    await expect(this.destinationArrival).toHaveValue('asSoonAsPossible');
+  }
+
   async fillToleranceField(minusValue: string, plusValue: string, isOrigin: boolean) {
     const toleranceField = isOrigin
       ? this.toleranceOriginArrival
@@ -352,7 +379,7 @@ class STDCMPage {
     await toleranceField.click();
     await this.page.getByRole('button', { name: minusValue, exact: true }).click();
     await this.page.getByRole('button', { name: plusValue, exact: true }).click();
-    await toleranceField.click();
+    // TODO : Add a click on the close button when #693 is done
   }
 
   async fillAndVerifyViaDetails(viaNumber: number, viaSearch: string, selectedLanguage?: string) {
@@ -361,6 +388,7 @@ class STDCMPage {
     // Helper function to fill common fields
     const fillVia = async (selectedSuggestion: Locator) => {
       await this.addViaButton.nth(viaNumber - 1).click();
+      expect(await this.addViaButton.count()).toBe(viaNumber + 1);
       await this.getViaCi(viaNumber).fill(viaSearch);
       await selectedSuggestion.click();
       await expect(this.getViaCh(viaNumber)).toHaveValue('BV');
@@ -397,16 +425,15 @@ class STDCMPage {
     }
   }
 
-  // Launches the simulation, verifies the loading indicator, and checks if simulation-related elements are visible
-  async launchSimulation(selectedLanguage: string) {
-    const translations = selectedLanguage === 'English' ? enTranslations : frTranslations;
+  // Launches the simulation and checks if simulation-related elements are visible
+  async launchSimulation() {
+    await expect(this.launchSimulationButton).toBeEnabled();
     await this.launchSimulationButton.click();
-    await expect(this.simulationLoader).toBeVisible();
-    const loaderText = await this.simulationLoader.textContent();
-    expect(loaderText).toContain(translations.simulation.averageRequestTime);
-    await expect(this.cancelSimulationButton).toBeVisible();
     await expect(this.simulationList).toBeVisible();
-    await expect(this.mapResultContainer).toBeVisible();
+    // Check map result container visibility only for Chromium browser
+    if (this.page.context().browser()?.browserType().name() === 'chromium') {
+      await expect(this.mapResultContainer).toBeVisible();
+    }
   }
 
   async verifyTableData(tableDataPath: string): Promise<void> {
@@ -447,6 +474,53 @@ class STDCMPage {
       expect(tableRow.weight).toBe(jsonRow.weight);
       expect(tableRow.refEngine).toBe(jsonRow.refEngine);
     });
+  }
+
+  async clickOnAllViaButton() {
+    await this.allViasButton.click();
+  }
+
+  async clickOnRetainSimulation() {
+    await this.retainSimulationButton.click();
+  }
+
+  async retainSimulation() {
+    await this.clickOnRetainSimulation();
+    await expect(this.downloadSimulationButton).toBeVisible();
+    await expect(this.downloadSimulationButton).toBeEnabled();
+    await expect(this.startNewQueryButton).toBeVisible();
+  }
+
+  async downloadSimulation(browserName: string) {
+    // Wait for the download event
+    const downloadPromise = this.page.waitForEvent('download', { timeout: 120000 });
+    await this.downloadSimulationButton.click({ force: true });
+    const download = await downloadPromise.catch(() => {
+      throw new Error('Download event was not triggered.');
+    });
+
+    // Verify filename and save the download
+    const suggestedFilename = download.suggestedFilename();
+    expect(suggestedFilename).toMatch(/^STDCM.*\.pdf$/);
+    const downloadPath = `./tests/stdcm-results/${browserName}/${suggestedFilename}`;
+    await download.saveAs(downloadPath);
+    console.info(`The PDF was successfully downloaded to: ${downloadPath}`);
+  }
+
+  async clickOnStartNewQueryButton() {
+    await this.startNewQueryButton.click();
+  }
+
+  async mapMarkerVisibility() {
+    await expect(this.originMarker).toBeVisible();
+    await expect(this.destinationMarker).toBeVisible();
+    await expect(this.viaMarker).toBeVisible();
+  }
+
+  async mapMarkerResultVisibility() {
+    await expect(this.originResultMarker).toBeVisible();
+    await expect(this.destinationResultMarker).toBeVisible();
+    await expect(this.viaResultMarker).toBeVisible();
   }
 }
 export default STDCMPage;

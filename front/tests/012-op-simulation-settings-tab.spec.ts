@@ -6,7 +6,7 @@ import type {
   Study,
 } from 'common/api/osrdEditoastApi';
 
-import { improbableRollingStockName, infrastructureName } from './assets/project-const';
+import { improbableRollingStockName } from './assets/project-const';
 import HomePage from './pages/home-page-model';
 import OperationalStudiesInputTablePage from './pages/op-input-table-page-model';
 import OperationalStudiesOutputTablePage from './pages/op-output-table-page-model';
@@ -75,7 +75,7 @@ test.describe('Simulation Settings Tab Verification', () => {
 
   test.beforeAll('Add electrical profile via API and fetch infrastructure', async () => {
     electricalProfileSet = await setElectricalProfile();
-    infra = await getInfra(infrastructureName);
+    infra = await getInfra();
   });
 
   test.afterAll('Delete the electrical profile', async () => {

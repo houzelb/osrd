@@ -1,10 +1,9 @@
 import type { Scenario, Project, Study, Infra } from 'common/api/osrdEditoastApi';
 
 import {
-  infrastructureName,
-  stdcmProjectName,
-  stdcmScenarioName,
-  stdcmStudyName,
+  trainScheduleProjectName,
+  trainScheduleScenarioName,
+  trainScheduleStudyName,
 } from './assets/project-const';
 import HomePage from './pages/home-page-model';
 import OperationalStudiesTimetablePage from './pages/op-timetable-page-model';
@@ -29,10 +28,10 @@ test.describe('Verify train schedule elements and filters', () => {
   const VALID_AND_HONORED_TRAINS = 13;
   const INVALID_AND_NOT_HONORED_TRAINS = 0;
   test.beforeAll('Fetch project, study and scenario with train schedule', async () => {
-    project = await getProject(stdcmProjectName);
-    study = await getStudy(project.id, stdcmStudyName);
-    scenario = await getScenario(project.id, study.id, stdcmScenarioName);
-    infra = await getInfra(infrastructureName);
+    project = await getProject(trainScheduleProjectName);
+    study = await getStudy(project.id, trainScheduleStudyName);
+    scenario = await getScenario(project.id, study.id, trainScheduleScenarioName);
+    infra = await getInfra();
   });
 
   test.beforeEach('Navigate to scenario page before each test', async ({ page }) => {
