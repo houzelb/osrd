@@ -59,6 +59,17 @@ export function createMapSearchQuery(
     : ['search', [nameColumn], searchState];
 }
 
+export function createTrackSystemQuery(trackSystem: string) {
+  if (trackSystem === 'TVM') {
+    return [
+      'or',
+      ['contains', ['list', 'TVM300'], ['signaling_systems']],
+      ['contains', ['list', 'TVM430'], ['signaling_systems']],
+    ];
+  }
+  return ['contains', ['list', trackSystem], ['signaling_systems']];
+}
+
 export function removeSearchItemMarkersOnMap(dispatch: AppDispatch) {
   dispatch(updateMapSearchMarker(undefined));
   dispatch(updateLineSearchCode(undefined));
