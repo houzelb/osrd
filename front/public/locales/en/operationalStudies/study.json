@@ -46,7 +46,7 @@
   "confirmDeleteMessage_one": "Do you really want to delete {{count}} scenario?",
   "confirmDeleteMessage_other": "Do you really want to delete the {{count}} scenarios?",
   "studyBudget": "Budget",
-  "studyBudgetInvalid": "The budget for the study must not exceed 2147483647",
+  "studyBudgetInvalid": "The study budget must be a positive integer and must not exceed 2147483647 €",
   "studyBusinessCode": "Business code",
   "studyBusinessCodeInvalid": "The business code for the study must not exceed 128 characters",
   "studyCancel": "Cancel",
