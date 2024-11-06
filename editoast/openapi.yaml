@@ -4287,7 +4287,6 @@ components:
       - $ref: '#/components/schemas/EditoastTrainScheduleErrorBatchTrainScheduleNotFound'
       - $ref: '#/components/schemas/EditoastTrainScheduleErrorInfraNotFound'
       - $ref: '#/components/schemas/EditoastTrainScheduleErrorNotFound'
-      - $ref: '#/components/schemas/EditoastValkeyConfigErrorUrl'
       - $ref: '#/components/schemas/EditoastWorkScheduleErrorNameAlreadyUsed'
       description: Generated error type for Editoast
       discriminator:
@@ -5683,30 +5682,6 @@ components:
           type: string
           enum:
           - editoast:train_schedule:NotFound
-    EditoastValkeyConfigErrorUrl:
-      type: object
-      required:
-      - type
-      - status
-      - message
-      properties:
-        context:
-          type: object
-          required:
-          - url
-          properties:
-            url:
-              type: string
-        message:
-          type: string
-        status:
-          type: integer
-          enum:
-          - 500
-        type:
-          type: string
-          enum:
-          - editoast:valkey:Url
     EditoastWorkScheduleErrorNameAlreadyUsed:
       type: object
       required:

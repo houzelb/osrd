@@ -25,14 +25,24 @@ pub mod work_schedules;
 mod test_app;
 
 use std::collections::HashSet;
+use std::env;
 use std::sync::Arc;
 
+use axum::extract::DefaultBodyLimit;
+use axum::extract::FromRef;
 use axum::extract::Request;
 use axum::middleware::Next;
 use axum::response::Response;
+use axum::Router;
+use axum::ServiceExt;
+use axum_tracing_opentelemetry::middleware::OtelAxumLayer;
+use chrono::Duration;
+use dashmap::DashMap;
 use editoast_authz::authorizer::Authorizer;
 use editoast_authz::authorizer::UserInfo;
 use editoast_authz::BuiltinRole;
+use editoast_models::DbConnectionPool;
+use editoast_osrdyne_client::OsrdyneClient;
 use futures::TryFutureExt;
 pub use openapi::OpenApiRoot;
 
@@ -45,9 +55,21 @@ use serde::Deserialize;
 use serde::Serialize;
 use thiserror::Error;
 use tokio::time::timeout;
+use tower::Layer as _;
+use tower_http::cors::Any;
+use tower_http::cors::CorsLayer;
+use tower_http::limit::RequestBodyLimitLayer;
+use tower_http::normalize_path::NormalizePath;
+use tower_http::normalize_path::NormalizePathLayer;
+use tower_http::trace::TraceLayer;
+use tracing::info;
+use tracing::warn;
+use url::Url;
 use utoipa::ToSchema;
 
 use crate::client::get_app_version;
+use crate::client::MapLayersConfig;
+use crate::core::mq_client;
 use crate::core::version::CoreVersionRequest;
 use crate::core::AsCoreRequest;
 use crate::core::CoreClient;
@@ -56,14 +78,17 @@ use crate::core::{self};
 use crate::error::Result;
 use crate::error::{self};
 use crate::generated_data;
+use crate::generated_data::speed_limit_tags_config::SpeedLimitTagIds;
 use crate::infra_cache::operation;
+use crate::infra_cache::InfraCache;
+use crate::map::MapLayers;
 use crate::models;
 use crate::models::auth::PgAuthDriver;
-use crate::AppState;
+use crate::valkey_utils::ValkeyConfig;
 use crate::ValkeyClient;
 
 crate::routes! {
-    pub fn router();
+    fn router();
     fn openapi_paths();
 
     "/health" => health,
@@ -199,7 +224,7 @@ async fn authenticate(
     Ok(Authentication::Authenticated(authorizer))
 }
 
-pub async fn authentication_middleware(
+async fn authentication_middleware(
     State(AppState {
         db_pool_v2: db_pool,
         disable_authorization,
@@ -262,7 +287,9 @@ async fn health(
     }): State<AppState>,
 ) -> Result<&'static str> {
     timeout(
-        health_check_timeout,
+        health_check_timeout
+            .to_std()
+            .expect("timeout should be valid at this point"),
         check_health(db_pool, valkey, core_client),
     )
     .await
@@ -313,6 +340,200 @@ async fn core_version(app_state: State<AppState>) -> Json<Version> {
     let response = CoreVersionRequest {}.fetch(&core).await;
     let response = response.unwrap_or(Version { git_describe: None });
     Json(response)
+}
+
+#[derive(Clone)]
+pub struct CoreConfig {
+    pub timeout: Duration,
+    pub single_worker: bool,
+    pub num_channels: usize,
+}
+
+pub struct OsrdyneConfig {
+    pub mq_url: Url,
+    pub osrdyne_api_url: Url,
+    pub core: CoreConfig,
+}
+
+#[derive(Clone)]
+pub struct PostgresConfig {
+    pub database_url: Url,
+    pub pool_size: usize,
+}
+
+pub struct ServerConfig {
+    pub port: u16,
+    pub address: String,
+    pub health_check_timeout: Duration,
+    pub map_layers_config: MapLayersConfig,
+    pub root_path: String,
+    pub workers: Option<usize>,
+    pub disable_authorization: bool,
+
+    pub postgres_config: PostgresConfig,
+    pub osrdyne_config: OsrdyneConfig,
+    pub valkey_config: ValkeyConfig,
+}
+
+pub struct Server {
+    app_state: AppState,
+    router: NormalizePath<Router>,
+}
+
+/// The state of the whole Editoast service, available to all handlers
+///
+/// If only the database is needed, use `State<editoast_models::DbConnectionPoolV2>`.
+#[derive(Clone)]
+pub struct AppState {
+    pub config: Arc<ServerConfig>,
+
+    pub db_pool_v1: Arc<DbConnectionPool>,
+    pub db_pool_v2: Arc<DbConnectionPoolV2>,
+    pub valkey: Arc<ValkeyClient>,
+    pub infra_caches: Arc<DashMap<i64, InfraCache>>,
+    pub map_layers: Arc<MapLayers>,
+    pub map_layers_config: Arc<MapLayersConfig>,
+    pub speed_limit_tag_ids: Arc<SpeedLimitTagIds>,
+    pub disable_authorization: bool,
+    pub core_client: Arc<CoreClient>,
+    pub osrdyne_client: Arc<OsrdyneClient>,
+    pub health_check_timeout: Duration,
+}
+
+impl FromRef<AppState> for DbConnectionPoolV2 {
+    fn from_ref(input: &AppState) -> Self {
+        (*input.db_pool_v2).clone()
+    }
+}
+
+impl AppState {
+    async fn init(config: ServerConfig) -> Result<Self> {
+        info!("Building application state...");
+
+        // Config database
+        let valkey = ValkeyClient::new(config.valkey_config.clone())?.into();
+
+        // Create both database pools
+        let db_pool_v2 = {
+            let PostgresConfig {
+                database_url,
+                pool_size,
+            } = config.postgres_config.clone();
+            DbConnectionPoolV2::try_initialize(database_url, pool_size).await?
+        };
+        let db_pool_v1 = db_pool_v2.pool_v1();
+        let db_pool_v2 = Arc::new(db_pool_v2);
+
+        // Setup infra cache map
+        let infra_caches = DashMap::<i64, InfraCache>::default().into();
+
+        // Static list of configured speed-limit tag ids
+        let speed_limit_tag_ids = Arc::new(SpeedLimitTagIds::load());
+
+        // Build Core client
+        let core_client = {
+            let CoreConfig {
+                timeout,
+                single_worker,
+                num_channels,
+            } = config.osrdyne_config.core.clone();
+            let options = mq_client::Options {
+                uri: config.osrdyne_config.mq_url.to_string(),
+                worker_pool_identifier: "core".to_owned(),
+                timeout: timeout.num_seconds() as u64,
+                single_worker,
+                num_channels,
+            };
+            CoreClient::new_mq(options).await?.into()
+        };
+
+        let osrdyne_client = Arc::new(OsrdyneClient::new(
+            config.osrdyne_config.osrdyne_api_url.clone(),
+        ));
+
+        Ok(Self {
+            valkey,
+            db_pool_v1,
+            db_pool_v2,
+            infra_caches,
+            core_client,
+            osrdyne_client,
+            map_layers: Arc::new(MapLayers::parse()),
+            map_layers_config: Arc::new(config.map_layers_config.clone()),
+            speed_limit_tag_ids,
+            disable_authorization: config.disable_authorization,
+            health_check_timeout: config.health_check_timeout,
+            config: Arc::new(config),
+        })
+    }
+}
+
+impl Server {
+    pub async fn new(config: ServerConfig) -> Result<Self> {
+        info!("Building server...");
+        let app_state = AppState::init(config).await?;
+
+        // Custom Bytes and String extractor configuration
+        let request_payload_limit = RequestBodyLimitLayer::new(250 * 1024 * 1024); // 250MiB
+
+        // Build CORS layer
+        let cors = {
+            let allowed_origin = env::var("OSRD_ALLOWED_ORIGIN").ok();
+            match allowed_origin {
+                Some(origin) => CorsLayer::new()
+                    .allow_methods(Any)
+                    .allow_headers(Any)
+                    .allow_origin(
+                        origin
+                            .parse::<axum::http::header::HeaderValue>()
+                            .expect("invalid allowed origin"),
+                    ),
+                None => CorsLayer::new()
+                    .allow_methods(Any)
+                    .allow_headers(Any)
+                    .allow_origin(Any),
+            }
+        };
+
+        // Configure the axum router
+        let router: Router<()> = axum::Router::<AppState>::new()
+            .merge(router())
+            .route_layer(axum::middleware::from_fn_with_state(
+                app_state.clone(),
+                authentication_middleware,
+            ))
+            .layer(OtelAxumLayer::default())
+            .layer(DefaultBodyLimit::disable())
+            .layer(request_payload_limit)
+            .layer(cors)
+            .layer(TraceLayer::new_for_http())
+            .with_state(app_state.clone());
+        let normalizing_router = NormalizePathLayer::trim_trailing_slash().layer(router);
+
+        Ok(Self {
+            app_state,
+            router: normalizing_router,
+        })
+    }
+
+    pub async fn start(self) -> std::io::Result<()> {
+        let Self { app_state, router } = self;
+        let ServerConfig {
+            address,
+            port,
+            disable_authorization,
+            ..
+        } = app_state.config.as_ref();
+
+        if *disable_authorization {
+            warn!("authorization disabled — all role and permission checks are bypassed");
+        }
+
+        info!("Running server...");
+        let service = ServiceExt::<axum::extract::Request>::into_make_service(router);
+        let listener = tokio::net::TcpListener::bind((address.as_str(), *port)).await?;
+        axum::serve(listener, service).await
+    }
 }
 
 #[cfg(test)]

@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use itertools::Itertools;
 use serde::Deserialize;
+use url::Url;
 
 #[cfg(any(test, feature = "mock_client"))]
 mod mock_client;
@@ -22,15 +23,13 @@ struct HTTPClient {
 }
 
 impl OsrdyneClient {
-    pub fn new(osrdyne_url: &str) -> Result<Self, url::ParseError> {
-        let client = HTTPClient {
-            client: reqwest::Client::new(),
-            base_url: url::Url::parse(osrdyne_url)?,
-        };
-        let client = OsrdyneClient {
-            inner: OsrdyneClientInternal::HTTPClient(client),
-        };
-        Ok(client)
+    pub fn new(osrdyne_url: Url) -> Self {
+        OsrdyneClient {
+            inner: OsrdyneClientInternal::HTTPClient(HTTPClient {
+                client: reqwest::Client::new(),
+                base_url: osrdyne_url,
+            }),
+        }
     }
 
     #[cfg(any(test, feature = "mock_client"))]
