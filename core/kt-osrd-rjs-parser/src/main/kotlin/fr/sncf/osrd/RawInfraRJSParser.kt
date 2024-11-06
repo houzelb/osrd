@@ -279,7 +279,7 @@ private fun buildZones(builder: RawInfraBuilder) {
     val nodeHasZone = BooleanArray(builder.getTrackNodes().size.toInt()) { false }
 
     // TODO: change this algorithm to add all nodes to zones separately from iterating on track
-    // sections
+    //       sections
     for (trackSectionIdx in builder.getTrackSections()) {
         val detectors = builder.getTrackSectionDetectors(trackSectionIdx)
 

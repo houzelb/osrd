@@ -362,6 +362,14 @@ class RawInfraBuilder {
     }
 
     fun setNextZone(detector: DirDetectorId, zone: ZoneId) {
+        if (nextZones[detector.opposite] == zone) {
+            // Invalid detector if the zone is identical on both sides: data issue
+            // (wrong place for detector or missing detectors around to avoid "zone-loop").
+            // This often leads to self-conflicts on trains.
+            logger.warn {
+                "detector ${detectorPool[detector.value].names} is not bounding a zone (both sides are inside a unique zone)"
+            }
+        }
         nextZones[detector] = zone
     }
 
