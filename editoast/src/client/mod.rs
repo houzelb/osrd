@@ -4,6 +4,7 @@ pub mod import_rolling_stock;
 pub mod infra_commands;
 mod postgres_config;
 pub mod roles;
+pub mod runserver;
 pub mod search_commands;
 pub mod stdcm_search_env_commands;
 mod telemetry_config;
@@ -23,6 +24,8 @@ use import_rolling_stock::ImportRollingStockArgs;
 use infra_commands::InfraCommands;
 pub use postgres_config::PostgresConfig;
 use roles::RolesCommand;
+use runserver::CoreArgs;
+use runserver::RunserverArgs;
 use search_commands::SearchCommands;
 use stdcm_search_env_commands::StdcmSearchEnvCommands;
 pub use telemetry_config::TelemetryConfig;
@@ -89,52 +92,6 @@ pub enum Commands {
     Roles(RolesCommand),
     #[command(about, long_about = "Healthcheck")]
     Healthcheck(CoreArgs),
-}
-
-#[derive(Args, Debug, Derivative, Clone)]
-#[derivative(Default)]
-pub struct MapLayersConfig {
-    #[derivative(Default(value = "18"))]
-    #[arg(long, env, default_value_t = 18)]
-    pub max_zoom: u64,
-}
-
-#[derive(Args, Debug)]
-#[command(about, long_about = "Launch the server")]
-pub struct CoreArgs {
-    #[clap(long, env = "OSRD_MQ_URL", default_value_t = Url::parse("amqp://osrd:password@127.0.0.1:5672/%2f").unwrap())]
-    pub mq_url: Url,
-    #[clap(long, env = "EDITOAST_CORE_TIMEOUT", default_value_t = 180)]
-    pub core_timeout: u64,
-    #[clap(long, env = "EDITOAST_CORE_SINGLE_WORKER", default_value_t = false)]
-    pub core_single_worker: bool,
-    #[clap(long, env = "CORE_CLIENT_CHANNELS_SIZE", default_value_t = 8)]
-    pub core_client_channels_size: usize,
-}
-
-#[derive(Args, Debug)]
-#[command(about, long_about = "Launch the server")]
-pub struct RunserverArgs {
-    #[command(flatten)]
-    pub map_layers_config: MapLayersConfig,
-    #[arg(long, env = "EDITOAST_PORT", default_value_t = 8090)]
-    pub port: u16,
-    #[arg(long, env = "EDITOAST_ADDRESS", default_value_t = String::from("0.0.0.0"))]
-    pub address: String,
-    #[command(flatten)]
-    pub core: CoreArgs,
-    /// If this option is set, any role and permission check will be bypassed. Even if no user is
-    /// provided by the request headers of if the provided user doesn't have the required privileges.
-    // TODO: once the whole role system will be deployed, the default value of this option should
-    // be set to false. It's currently set to true in order to pass integration tests, which otherwise
-    // only recieve 401 responses.
-    #[clap(long, env = "EDITOAST_DISABLE_AUTHORIZATION", default_value_t = true)]
-    pub disable_authorization: bool,
-    #[clap(long, env = "OSRDYNE_API_URL", default_value_t = Url::parse("http://127.0.0.1:4242/").unwrap())]
-    pub osrdyne_api_url: Url,
-    /// The timeout to use when performing the healthcheck, in milliseconds
-    #[clap(long, env = "EDITOAST_HEALTH_CHECK_TIMEOUT_MS", default_value_t = 500)]
-    pub health_check_timeout_ms: u64,
 }
 
 #[derive(Args, Debug)]
