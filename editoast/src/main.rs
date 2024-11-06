@@ -11,7 +11,6 @@ mod models;
 mod valkey_utils;
 mod views;
 
-use chrono::Duration;
 use clap::Parser;
 use client::electrical_profiles_commands::*;
 use client::healthcheck::healthcheck_cmd;
@@ -20,12 +19,11 @@ use client::infra_commands::*;
 use client::print_openapi;
 use client::roles;
 use client::roles::RolesCommand;
+use client::runserver::runserver;
 use client::search_commands::*;
 use client::stdcm_search_env_commands::handle_stdcm_search_env_command;
 use client::timetables_commands::*;
-use client::CoreArgs;
-use client::PostgresConfig;
-use client::{Client, Color, Commands, RunserverArgs, ValkeyConfig};
+use client::{Client, Color, Commands};
 use editoast_models::DbConnectionPoolV2;
 use models::RollingStockModel;
 use opentelemetry::trace::TracerProvider as _;
@@ -151,7 +149,9 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     }
 
     match client.command {
-        Commands::Runserver(args) => runserver(args, pg_config, valkey_config).await,
+        Commands::Runserver(args) => runserver(args, pg_config, valkey_config)
+            .await
+            .map_err(Into::into),
         Commands::ImportRollingStock(args) => import_rolling_stock(args, db_pool.into()).await,
         Commands::ImportTowedRollingStock(args) => {
             import_towed_rolling_stock(args, db_pool.into()).await
@@ -222,49 +222,6 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
                 .map_err(Into::into)
         }
     }
-}
-
-/// Create and run the server
-async fn runserver(
-    RunserverArgs {
-        map_layers_config,
-        port,
-        address,
-        core:
-            CoreArgs {
-                mq_url,
-                core_timeout,
-                core_single_worker,
-                core_client_channels_size,
-            },
-        disable_authorization,
-        osrdyne_api_url,
-        health_check_timeout_ms,
-    }: RunserverArgs,
-    postgres: PostgresConfig,
-    valkey: ValkeyConfig,
-) -> Result<(), Box<dyn Error + Send + Sync>> {
-    let config = views::ServerConfig {
-        port,
-        address,
-        health_check_timeout: Duration::milliseconds(health_check_timeout_ms as i64),
-        map_layers_max_zoom: map_layers_config.max_zoom as u8,
-        disable_authorization,
-        postgres_config: postgres.into(),
-        osrdyne_config: views::OsrdyneConfig {
-            mq_url,
-            osrdyne_api_url,
-            core: views::CoreConfig {
-                timeout: Duration::seconds(core_timeout as i64),
-                single_worker: core_single_worker,
-                num_channels: core_client_channels_size,
-            },
-        },
-        valkey_config: valkey.into(),
-    };
-
-    let server = views::Server::new(config).await?;
-    server.start().await.map_err(Into::into)
 }
 
 #[derive(Debug, Error, PartialEq)]

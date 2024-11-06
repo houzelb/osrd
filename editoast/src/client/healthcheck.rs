@@ -9,7 +9,7 @@ use crate::{
     ValkeyClient,
 };
 
-use super::{CoreArgs, ValkeyConfig};
+use super::{runserver::CoreArgs, ValkeyConfig};
 
 pub async fn healthcheck_cmd(
     db_pool: Arc<DbConnectionPoolV2>,
