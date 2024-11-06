@@ -14,7 +14,7 @@ import kotlin.collections.set
 import kotlin.time.Duration
 import mu.KotlinLogging
 
-private val logger = KotlinLogging.logger {}
+val logger = KotlinLogging.logger {}
 
 // TODO: refactor this structure (and its usage) to be able to model a speed limit affecting only
 //       trains using one specific route AND one specific speedLimitTag
