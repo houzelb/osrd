@@ -35,5 +35,6 @@ export const checkStudyFields = (
   description: isInvalidString(SMALL_TEXT_AREA_MAX_LENGTH, study.description),
   business_code: isInvalidString(SMALL_INPUT_MAX_LENGTH, study.business_code),
   service_code: isInvalidString(SMALL_INPUT_MAX_LENGTH, study.service_code),
-  budget: (study.budget ?? 0) > 2147483647,
+  budget:
+    (study.budget ?? 0) > 2147483647 || (!Number.isInteger(study.budget) && study.budget !== null),
 });
