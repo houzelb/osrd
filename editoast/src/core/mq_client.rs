@@ -17,6 +17,7 @@ use tokio::{
     task,
     time::{timeout, Duration},
 };
+use url::Url;
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]
@@ -151,7 +152,7 @@ impl ChannelWorker {
 pub struct Options {
     /// format `amqp://username:password@host:port/vhost`
     /// for instance: `amqp://osrd:password@localhost:5672/%2f` for the default vhost
-    pub uri: String,
+    pub uri: Url,
     /// Exchange name
     pub worker_pool_identifier: String,
     /// Default timeout for the response
@@ -265,7 +266,7 @@ impl RabbitMQClient {
     }
 
     async fn connection_loop(
-        uri: String,
+        uri: Url,
         hostname: String,
         connection: Arc<RwLock<Option<Connection>>>,
     ) {
@@ -279,7 +280,7 @@ impl RabbitMQClient {
 
             // Connection should be re-established
             let new_connection = Connection::connect(
-                &uri,
+                uri.as_str(),
                 ConnectionProperties::default().with_connection_name(hostname.clone().into()),
             )
             .await;
