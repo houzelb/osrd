@@ -2,6 +2,9 @@ use lapin::Connection;
 use lapin::ConnectionProperties;
 use opentelemetry::trace::TracerProvider;
 use opentelemetry_otlp::WithExportConfig;
+use opentelemetry_sdk::resource::EnvResourceDetector;
+use opentelemetry_sdk::resource::SdkProvidedResourceDetector;
+use opentelemetry_sdk::resource::TelemetryResourceDetector;
 use std::collections::BTreeMap;
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -230,12 +233,19 @@ fn init_tracing(config: &OsrdyneConfig) {
 
         let svc_name = otel.service_name.clone().unwrap_or("osrdyne".to_string());
 
-        let trace_config = opentelemetry_sdk::trace::Config::default().with_resource(
-            opentelemetry_sdk::Resource::new(vec![opentelemetry::KeyValue::new(
-                opentelemetry_semantic_conventions::resource::SERVICE_NAME,
-                svc_name.clone(),
-            )]),
-        );
+        let resource = opentelemetry_sdk::Resource::new(vec![opentelemetry::KeyValue::new(
+            opentelemetry_semantic_conventions::resource::SERVICE_NAME,
+            svc_name.clone(),
+        )])
+        .merge(&opentelemetry_sdk::Resource::from_detectors(
+            Duration::from_secs(10),
+            vec![
+                Box::new(SdkProvidedResourceDetector),
+                Box::new(TelemetryResourceDetector),
+                Box::new(EnvResourceDetector::new()),
+            ],
+        ));
+        let trace_config = opentelemetry_sdk::trace::Config::default().with_resource(resource);
 
         let otlp_tracer_provider = opentelemetry_otlp::new_pipeline()
             .tracing()

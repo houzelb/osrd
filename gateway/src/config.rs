@@ -11,7 +11,10 @@ use log::info;
 use opentelemetry::global;
 use opentelemetry_otlp::WithExportConfig;
 use opentelemetry_sdk::{
-    propagation::TraceContextPropagator, runtime::TokioCurrentThread, trace::TracerProvider,
+    propagation::TraceContextPropagator,
+    resource::{EnvResourceDetector, SdkProvidedResourceDetector, TelemetryResourceDetector},
+    runtime::TokioCurrentThread,
+    trace::TracerProvider,
 };
 use serde::{Deserialize, Serialize};
 
@@ -53,13 +56,20 @@ impl TracingTelemetry {
 
         info!("Tracing enabled with otlp");
 
+        let resource = opentelemetry_sdk::Resource::new(vec![opentelemetry::KeyValue::new(
+            "service.name",
+            service_name,
+        )])
+        .merge(&opentelemetry_sdk::Resource::from_detectors(
+            Duration::from_secs(10),
+            vec![
+                Box::new(SdkProvidedResourceDetector),
+                Box::new(TelemetryResourceDetector),
+                Box::new(EnvResourceDetector::new()),
+            ],
+        ));
         let provider = TracerProvider::builder()
-            .with_config(opentelemetry_sdk::trace::Config::default().with_resource(
-                opentelemetry_sdk::Resource::new(vec![opentelemetry::KeyValue::new(
-                    "service.name",
-                    service_name,
-                )]),
-            ))
+            .with_config(opentelemetry_sdk::trace::Config::default().with_resource(resource))
             .with_batch_exporter(exporter, TokioCurrentThread)
             .build();
 

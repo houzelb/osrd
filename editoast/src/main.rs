@@ -29,6 +29,9 @@ use models::RollingStockModel;
 use opentelemetry::trace::TracerProvider as _;
 use opentelemetry_sdk::propagation::TraceContextPropagator;
 pub use views::AppState;
+use opentelemetry_sdk::resource::EnvResourceDetector;
+use opentelemetry_sdk::resource::SdkProvidedResourceDetector;
+use opentelemetry_sdk::resource::TelemetryResourceDetector;
 
 use models::prelude::*;
 use opentelemetry::KeyValue;
@@ -79,13 +82,19 @@ fn init_tracing(mode: EditoastMode, telemetry_config: &client::TelemetryConfig) 
             let exporter = opentelemetry_otlp::new_exporter()
                 .tonic()
                 .with_endpoint(telemetry_config.telemetry_endpoint.as_str());
-            let trace_config =
-                opentelemetry_sdk::trace::Config::default().with_resource(Resource::new(vec![
-                    KeyValue::new(
-                        opentelemetry_semantic_conventions::resource::SERVICE_NAME,
-                        telemetry_config.service_name.clone(),
-                    ),
-                ]));
+            let resource = Resource::new(vec![KeyValue::new(
+                opentelemetry_semantic_conventions::resource::SERVICE_NAME,
+                telemetry_config.service_name.clone(),
+            )])
+            .merge(&Resource::from_detectors(
+                Duration::from_secs(10),
+                vec![
+                    Box::new(SdkProvidedResourceDetector),
+                    Box::new(TelemetryResourceDetector),
+                    Box::new(EnvResourceDetector::new()),
+                ],
+            ));
+            let trace_config = opentelemetry_sdk::trace::Config::default().with_resource(resource);
             let otlp_tracer = opentelemetry_otlp::new_pipeline()
                 .tracing()
                 .with_exporter(exporter)
