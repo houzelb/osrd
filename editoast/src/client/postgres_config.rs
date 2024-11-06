@@ -2,7 +2,7 @@ use clap::Args;
 use derivative::Derivative;
 use url::Url;
 
-use crate::error::Result;
+use crate::views;
 
 #[derive(Args, Debug, Derivative, Clone)]
 #[derivative(Default)]
@@ -21,8 +21,16 @@ pub struct PostgresConfig {
     pub pool_size: usize,
 }
 
-impl PostgresConfig {
-    pub fn url(&self) -> Result<Url> {
-        Ok(self.database_url.clone())
+impl From<PostgresConfig> for views::PostgresConfig {
+    fn from(
+        PostgresConfig {
+            database_url,
+            pool_size,
+        }: PostgresConfig,
+    ) -> Self {
+        views::PostgresConfig {
+            database_url,
+            pool_size,
+        }
     }
 }

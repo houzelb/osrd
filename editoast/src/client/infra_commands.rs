@@ -210,7 +210,7 @@ async fn build_valkey_pool_and_invalidate_all_cache(
     valkey_config: ValkeyConfig,
     infra_id: i64,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    let valkey = ValkeyClient::new(valkey_config).unwrap();
+    let valkey = ValkeyClient::new(valkey_config.into()).unwrap();
     let mut conn = valkey.get_connection().await.unwrap();
     Ok(map::invalidate_all(
         &mut conn,

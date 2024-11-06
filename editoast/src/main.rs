@@ -11,11 +11,7 @@ mod models;
 mod valkey_utils;
 mod views;
 
-use crate::core::CoreClient;
-use axum::extract::DefaultBodyLimit;
-use axum::extract::FromRef;
-use axum::{Router, ServiceExt};
-use axum_tracing_opentelemetry::middleware::OtelAxumLayer;
+use chrono::Duration;
 use clap::Parser;
 use client::electrical_profiles_commands::*;
 use client::healthcheck::healthcheck_cmd;
@@ -27,40 +23,27 @@ use client::roles::RolesCommand;
 use client::search_commands::*;
 use client::stdcm_search_env_commands::handle_stdcm_search_env_command;
 use client::timetables_commands::*;
+use client::CoreArgs;
+use client::PostgresConfig;
 use client::{Client, Color, Commands, RunserverArgs, ValkeyConfig};
-use client::{MapLayersConfig, PostgresConfig};
-use dashmap::DashMap;
-use editoast_models::DbConnectionPool;
 use editoast_models::DbConnectionPoolV2;
-use editoast_osrdyne_client::OsrdyneClient;
-use generated_data::speed_limit_tags_config::SpeedLimitTagIds;
-use infra_cache::InfraCache;
 use models::RollingStockModel;
 use opentelemetry::trace::TracerProvider as _;
 use opentelemetry_sdk::propagation::TraceContextPropagator;
-use tower::Layer as _;
-use tower_http::cors::{Any, CorsLayer};
-use tower_http::limit::RequestBodyLimitLayer;
-use tower_http::normalize_path::NormalizePathLayer;
-use tower_http::trace::TraceLayer;
+pub use views::AppState;
 
-use core::mq_client;
-use map::MapLayers;
 use models::prelude::*;
 use opentelemetry::KeyValue;
 use opentelemetry_otlp::WithExportConfig as _;
 use opentelemetry_sdk::Resource;
-use std::env;
 use std::error::Error;
 use std::io::IsTerminal;
 use std::process::exit;
 use std::sync::Arc;
-use std::time::Duration;
 use thiserror::Error;
-use tracing::{error, info, warn};
+use tracing::error;
 use tracing_subscriber::{layer::SubscriberExt as _, util::SubscriberInitExt as _, Layer as _};
 pub use valkey_utils::{ValkeyClient, ValkeyConnection};
-use views::authentication_middleware;
 
 /// The mode editoast is running in
 ///
@@ -155,7 +138,9 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     init_tracing(EditoastMode::from_client(&client), &client.telemetry_config);
 
     let pg_config = client.postgres_config;
-    let db_pool = DbConnectionPoolV2::try_initialize(pg_config.url()?, pg_config.pool_size).await?;
+    let db_pool =
+        DbConnectionPoolV2::try_initialize(pg_config.database_url.clone(), pg_config.pool_size)
+            .await?;
 
     let valkey_config = client.valkey_config;
 
@@ -239,141 +224,51 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     }
 }
 
-/// The state of the whole Editoast service, available to all handlers
-///
-/// If only the database is needed, use `State<editoast_models::DbConnectionPoolV2>`.
-#[derive(Clone)]
-pub struct AppState {
-    pub db_pool_v1: Arc<DbConnectionPool>,
-    pub db_pool_v2: Arc<DbConnectionPoolV2>,
-    pub valkey: Arc<ValkeyClient>,
-    pub infra_caches: Arc<DashMap<i64, InfraCache>>,
-    pub map_layers: Arc<MapLayers>,
-    pub map_layers_config: Arc<MapLayersConfig>,
-    pub speed_limit_tag_ids: Arc<SpeedLimitTagIds>,
-    pub disable_authorization: bool,
-    pub core_client: Arc<CoreClient>,
-    pub osrdyne_client: Arc<OsrdyneClient>,
-    pub health_check_timeout: Duration,
-}
-
-impl AppState {
-    async fn init(
-        args: &RunserverArgs,
-        postgres_config: PostgresConfig,
-        valkey_config: ValkeyConfig,
-    ) -> Result<Self, Box<dyn Error + Send + Sync>> {
-        info!("Building application state...");
-
-        // Config database
-        let valkey = ValkeyClient::new(valkey_config)?.into();
-
-        // Create both database pools
-        let db_pool_v2 =
-            DbConnectionPoolV2::try_initialize(postgres_config.url()?, postgres_config.pool_size)
-                .await?;
-        let db_pool_v1 = db_pool_v2.pool_v1();
-        let db_pool_v2 = Arc::new(db_pool_v2);
-
-        // Setup infra cache map
-        let infra_caches = DashMap::<i64, InfraCache>::default().into();
-
-        // Static list of configured speed-limit tag ids
-        let speed_limit_tag_ids = Arc::new(SpeedLimitTagIds::load());
-
-        if args.disable_authorization {
-            warn!("authorization disabled — all role and permission checks are bypassed");
-        }
-
-        // Build Core client
-        let core_client = CoreClient::new_mq(mq_client::Options {
-            uri: args.core.mq_url.clone(),
-            worker_pool_identifier: "core".into(),
-            timeout: args.core.core_timeout,
-            single_worker: args.core.core_single_worker,
-            num_channels: args.core.core_client_channels_size,
-        })
-        .await?
-        .into();
-
-        let osrdyne_client = Arc::new(OsrdyneClient::new(args.osrdyne_api_url.as_str())?);
-
-        let health_check_timeout = Duration::from_millis(args.health_check_timeout_ms);
-
-        Ok(Self {
-            valkey,
-            db_pool_v1,
-            db_pool_v2,
-            infra_caches,
-            core_client,
-            osrdyne_client,
-            map_layers: Arc::new(MapLayers::parse()),
-            map_layers_config: Arc::new(args.map_layers_config.clone()),
-            speed_limit_tag_ids,
-            disable_authorization: args.disable_authorization,
-            health_check_timeout,
-        })
-    }
-}
-
-impl FromRef<AppState> for DbConnectionPoolV2 {
-    fn from_ref(input: &AppState) -> Self {
-        (*input.db_pool_v2).clone()
-    }
-}
-
 /// Create and run the server
 async fn runserver(
-    args: RunserverArgs,
-    postgres_config: PostgresConfig,
-    valkey_config: ValkeyConfig,
+    RunserverArgs {
+        map_layers_config,
+        port,
+        address,
+        core:
+            CoreArgs {
+                mq_url,
+                core_timeout,
+                core_single_worker,
+                core_client_channels_size,
+            },
+        root_path,
+        workers,
+        disable_authorization,
+        osrdyne_api_url,
+        health_check_timeout_ms,
+    }: RunserverArgs,
+    postgres: PostgresConfig,
+    valkey: ValkeyConfig,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    info!("Building server...");
-    // Custom Bytes and String extractor configuration
-    let request_payload_limit = RequestBodyLimitLayer::new(250 * 1024 * 1024); // 250MiB
-
-    // Build CORS layer
-    let cors = {
-        let allowed_origin = env::var("OSRD_ALLOWED_ORIGIN").ok();
-        match allowed_origin {
-            Some(origin) => CorsLayer::new()
-                .allow_methods(Any)
-                .allow_headers(Any)
-                .allow_origin(
-                    origin
-                        .parse::<axum::http::header::HeaderValue>()
-                        .expect("invalid allowed origin"),
-                ),
-            None => CorsLayer::new()
-                .allow_methods(Any)
-                .allow_headers(Any)
-                .allow_origin(Any),
-        }
+    let config = views::ServerConfig {
+        port,
+        address,
+        health_check_timeout: Duration::milliseconds(health_check_timeout_ms as i64),
+        map_layers_config,
+        root_path,
+        workers,
+        disable_authorization,
+        postgres_config: postgres.into(),
+        osrdyne_config: views::OsrdyneConfig {
+            mq_url,
+            osrdyne_api_url,
+            core: views::CoreConfig {
+                timeout: Duration::seconds(core_timeout as i64),
+                single_worker: core_single_worker,
+                num_channels: core_client_channels_size,
+            },
+        },
+        valkey_config: valkey.into(),
     };
 
-    let app_state = AppState::init(&args, postgres_config, valkey_config).await?;
-
-    // Configure the axum router
-    let router: Router<()> = axum::Router::<AppState>::new()
-        .merge(views::router())
-        .route_layer(axum::middleware::from_fn_with_state(
-            app_state.clone(),
-            authentication_middleware,
-        ))
-        .layer(OtelAxumLayer::default())
-        .layer(DefaultBodyLimit::disable())
-        .layer(request_payload_limit)
-        .layer(cors)
-        .layer(TraceLayer::new_for_http())
-        .with_state(app_state);
-    let normalizing_router = NormalizePathLayer::trim_trailing_slash().layer(router);
-
-    // Run server
-    info!("Running server...");
-    let service = ServiceExt::<axum::extract::Request>::into_make_service(normalizing_router);
-    let listener = tokio::net::TcpListener::bind((args.address.clone(), args.port)).await?;
-    axum::serve(listener, service).await.expect("unreachable");
-    Ok(())
+    let server = views::Server::new(config).await?;
+    server.start().await.map_err(Into::into)
 }
 
 #[derive(Debug, Error, PartialEq)]

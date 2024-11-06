@@ -16,9 +16,9 @@ pub async fn healthcheck_cmd(
     valkey_config: ValkeyConfig,
     core_config: CoreArgs,
 ) -> anyhow::Result<()> {
-    let valkey = ValkeyClient::new(valkey_config).unwrap();
+    let valkey = ValkeyClient::new(valkey_config.into()).unwrap();
     let core_client = CoreClient::new_mq(mq_client::Options {
-        uri: core_config.mq_url,
+        uri: core_config.mq_url.to_string(),
         worker_pool_identifier: String::from("core"),
         timeout: core_config.core_timeout,
         single_worker: core_config.core_single_worker,

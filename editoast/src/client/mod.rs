@@ -106,8 +106,8 @@ pub struct MapLayersConfig {
 #[derive(Args, Debug)]
 #[command(about, long_about = "Launch the server")]
 pub struct CoreArgs {
-    #[clap(long, env = "OSRD_MQ_URL", default_value_t = String::from("amqp://osrd:password@127.0.0.1:5672/%2f"))]
-    pub mq_url: String,
+    #[clap(long, env = "OSRD_MQ_URL", default_value_t = Url::parse("amqp://osrd:password@127.0.0.1:5672/%2f").unwrap())]
+    pub mq_url: Url,
     #[clap(long, env = "EDITOAST_CORE_TIMEOUT", default_value_t = 180)]
     pub core_timeout: u64,
     #[clap(long, env = "EDITOAST_CORE_SINGLE_WORKER", default_value_t = false)]
@@ -138,8 +138,8 @@ pub struct RunserverArgs {
     // only recieve 401 responses.
     #[clap(long, env = "EDITOAST_DISABLE_AUTHORIZATION", default_value_t = true)]
     pub disable_authorization: bool,
-    #[clap(long, env = "OSRDYNE_API_URL", default_value_t = String::from("http://127.0.0.1:4242/"))]
-    pub osrdyne_api_url: String,
+    #[clap(long, env = "OSRDYNE_API_URL", default_value_t = Url::parse("http://127.0.0.1:4242/").unwrap())]
+    pub osrdyne_api_url: Url,
     /// The timeout to use when performing the healthcheck, in milliseconds
     #[clap(long, env = "EDITOAST_HEALTH_CHECK_TIMEOUT_MS", default_value_t = 500)]
     pub health_check_timeout_ms: u64,

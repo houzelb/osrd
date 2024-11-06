@@ -17,8 +17,8 @@ use redis::ToRedisArgs;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use tracing::trace;
+use url::Url;
 
-use crate::client::ValkeyConfig;
 use crate::error::Result;
 
 pub enum ValkeyConnection {
@@ -202,19 +202,26 @@ pub enum ValkeyClient {
     NoCache,
 }
 
+#[derive(Clone)]
+pub struct ValkeyConfig {
+    /// Disables caching. This should not be used in production.
+    pub no_cache: bool,
+    pub is_cluster_client: bool,
+    pub valkey_url: Url,
+}
+
 impl ValkeyClient {
     pub fn new(valkey_config: ValkeyConfig) -> Result<ValkeyClient> {
         if valkey_config.no_cache {
             return Ok(ValkeyClient::NoCache);
         }
-        let valkey_config_url = valkey_config.url()?;
         if valkey_config.is_cluster_client {
             return Ok(ValkeyClient::Cluster(
-                redis::cluster::ClusterClient::new(vec![valkey_config_url.as_str()]).unwrap(),
+                redis::cluster::ClusterClient::new(vec![valkey_config.valkey_url]).unwrap(),
             ));
         }
         Ok(ValkeyClient::Tokio(
-            redis::Client::open(valkey_config_url.as_str()).unwrap(),
+            redis::Client::open(valkey_config.valkey_url).unwrap(),
         ))
     }
 

@@ -2,7 +2,7 @@
 //! test actix server, database connection pool, and different mocking
 //! components.
 
-use std::{sync::Arc, time::Duration};
+use std::sync::Arc;
 
 use axum::Router;
 use axum_tracing_opentelemetry::middleware::OtelAxumLayer;
@@ -12,19 +12,21 @@ use editoast_models::DbConnectionPoolV2;
 use editoast_osrdyne_client::OsrdyneClient;
 use serde::de::DeserializeOwned;
 use tower_http::trace::TraceLayer;
+use url::Url;
 
 use crate::{
-    client::{MapLayersConfig, PostgresConfig, ValkeyConfig},
+    client::MapLayersConfig,
     core::{mocking::MockingClient, CoreClient},
     generated_data::speed_limit_tags_config::SpeedLimitTagIds,
     infra_cache::InfraCache,
     map::MapLayers,
+    valkey_utils::ValkeyConfig,
     AppState, ValkeyClient,
 };
 use axum_test::TestRequest;
 use axum_test::TestServer;
 
-use super::authentication_middleware;
+use super::{authentication_middleware, CoreConfig, OsrdyneConfig, PostgresConfig, ServerConfig};
 
 /// A builder interface for [TestApp]
 ///
@@ -81,6 +83,36 @@ impl TestAppBuilder {
     }
 
     pub fn build(self) -> TestApp {
+        // Generate test server config
+        let config = ServerConfig {
+            port: 0,
+            address: String::default(),
+            health_check_timeout: chrono::Duration::milliseconds(500),
+            map_layers_config: MapLayersConfig::default().into(),
+            root_path: String::default(),
+            workers: None,
+            disable_authorization: true,
+            postgres_config: PostgresConfig {
+                database_url: Url::parse("postgres://osrd:password@localhost:5432/osrd").unwrap(),
+                pool_size: 32,
+            },
+            osrdyne_config: OsrdyneConfig {
+                mq_url: Url::parse("amqp://osrd:password@127.0.0.1:5672/%2f").unwrap(),
+                osrdyne_api_url: Url::parse("http://127.0.0.1:4242/").unwrap(),
+                core: CoreConfig {
+                    timeout: chrono::Duration::seconds(180),
+                    single_worker: false,
+                    num_channels: 8,
+                },
+            },
+            valkey_config: ValkeyConfig {
+                no_cache: false,
+                is_cluster_client: false,
+                valkey_url: Url::parse("redis://localhost:6379").unwrap(),
+            },
+        };
+
+        // Setup tracing
         let sub = tracing_subscriber::fmt()
             .pretty()
             .with_env_filter(
@@ -93,15 +125,17 @@ impl TestAppBuilder {
         let tracing_guard = tracing::subscriber::set_default(sub);
 
         // Config valkey
-        let valkey = ValkeyClient::new(ValkeyConfig::default())
+        let valkey = ValkeyClient::new(config.valkey_config.clone())
             .expect("Could not build Valkey client")
             .into();
 
         // Create both database pools
         let (db_pool_v2, db_pool_v1) = if self.db_pool_v1 {
-            let config = PostgresConfig::default();
-            let pg_config_url = config.url().expect("cannot get postgres config url");
-            let pool = create_connection_pool(pg_config_url, config.pool_size)
+            let PostgresConfig {
+                database_url,
+                pool_size,
+            } = config.postgres_config.clone();
+            let pool = create_connection_pool(database_url, pool_size)
                 .expect("could not create connection pool for tests");
             let v1 = Arc::new(pool);
             let v2 = futures::executor::block_on(DbConnectionPoolV2::from_pool(v1.clone()));
@@ -139,10 +173,11 @@ impl TestAppBuilder {
             valkey,
             infra_caches,
             map_layers: MapLayers::parse().into(),
-            map_layers_config: MapLayersConfig::default().into(),
+            map_layers_config: Arc::new(config.map_layers_config.clone()),
             speed_limit_tag_ids,
             disable_authorization: true,
-            health_check_timeout: Duration::from_millis(500),
+            health_check_timeout: config.health_check_timeout,
+            config: Arc::new(config),
         };
 
         // Configure the axum router
