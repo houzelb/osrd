@@ -434,7 +434,7 @@ impl AppState {
                 num_channels,
             } = config.osrdyne_config.core.clone();
             let options = mq_client::Options {
-                uri: config.osrdyne_config.mq_url.to_string(),
+                uri: config.osrdyne_config.mq_url.clone(),
                 worker_pool_identifier: "core".to_owned(),
                 timeout: timeout.num_seconds() as u64,
                 single_worker,
