@@ -159,6 +159,9 @@
             padding-bottom: 0.313rem;
             vertical-align: middle;
           }
+          th:last-child {
+            text-transform: none;
+          }
           tbody tr:nth-child(odd) {
             background-color: rgb(239, 243, 245);
           }
