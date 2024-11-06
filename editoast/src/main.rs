@@ -23,15 +23,17 @@ use client::runserver::runserver;
 use client::search_commands::*;
 use client::stdcm_search_env_commands::handle_stdcm_search_env_command;
 use client::timetables_commands::*;
-use client::{Client, Color, Commands};
+use client::Client;
+use client::Color;
+use client::Commands;
 use editoast_models::DbConnectionPoolV2;
 use models::RollingStockModel;
 use opentelemetry::trace::TracerProvider as _;
 use opentelemetry_sdk::propagation::TraceContextPropagator;
-pub use views::AppState;
 use opentelemetry_sdk::resource::EnvResourceDetector;
 use opentelemetry_sdk::resource::SdkProvidedResourceDetector;
 use opentelemetry_sdk::resource::TelemetryResourceDetector;
+pub use views::AppState;
 
 use models::prelude::*;
 use opentelemetry::KeyValue;
@@ -41,10 +43,14 @@ use std::error::Error;
 use std::io::IsTerminal;
 use std::process::exit;
 use std::sync::Arc;
+use std::time::Duration;
 use thiserror::Error;
 use tracing::error;
-use tracing_subscriber::{layer::SubscriberExt as _, util::SubscriberInitExt as _, Layer as _};
-pub use valkey_utils::{ValkeyClient, ValkeyConnection};
+use tracing_subscriber::layer::SubscriberExt as _;
+use tracing_subscriber::util::SubscriberInitExt as _;
+use tracing_subscriber::Layer as _;
+pub use valkey_utils::ValkeyClient;
+pub use valkey_utils::ValkeyConnection;
 
 /// The mode editoast is running in
 ///
