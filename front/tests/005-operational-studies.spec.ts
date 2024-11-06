@@ -1,24 +1,34 @@
 import { expect } from '@playwright/test';
 
-import type { LightRollingStock, Project, Scenario, Study } from 'common/api/osrdEditoastApi';
+import type {
+  Infra,
+  LightRollingStock,
+  Project,
+  Scenario,
+  Study,
+} from 'common/api/osrdEditoastApi';
 
-import { electricRollingStockName } from './assets/project_const';
+import { electricRollingStockName, infrastructureName } from './assets/project-const';
 import RoutePage from './pages/op-route-page-model';
 import OperationalStudiesPage from './pages/operational-studies-page-model';
 import RollingStockSelectorPage from './pages/rollingstock-selector-page-model';
 import test from './test-logger';
-import { getRollingStock } from './utils/api-setup';
+import { waitForInfraStateToBeCached } from './utils';
+import { getInfra, getRollingStock } from './utils/api-setup';
 import createScenario from './utils/scenario';
 import { deleteScenario } from './utils/teardown-utils';
 
 test.describe('Verify simulation configuration in operational studies', () => {
+  test.slow();
   let project: Project;
   let study: Study;
   let scenario: Scenario;
+  let infra: Infra;
   let rollingStock: LightRollingStock;
 
   test.beforeAll('Fetch rolling stock ', async () => {
     rollingStock = await getRollingStock(electricRollingStockName);
+    infra = await getInfra(infrastructureName);
   });
 
   test.beforeEach('Set up the project, study, and scenario', async () => {
@@ -43,8 +53,8 @@ test.describe('Verify simulation configuration in operational studies', () => {
       `/operational-studies/projects/${project.id}/studies/${study.id}/scenarios/${scenario.id}`
     );
 
-    // Ensure infrastructure is loaded
-    await operationalStudiesPage.checkInfraLoaded();
+    // Wait for infra to be in 'CACHED' state before proceeding
+    await waitForInfraStateToBeCached(infra.id);
 
     // Click the button to add a train schedule
     await operationalStudiesPage.clickOnAddTrainButton();

@@ -26,7 +26,7 @@ const StdcmWarningBox = ({
 }: StdcmWarningBoxProps) => {
   const { t } = useTranslation('stdcm');
   return (
-    <div className="warning-box">
+    <div data-testid="warning-box" className="warning-box">
       <span>
         <Alert variant="fill" size="lg" />
       </span>

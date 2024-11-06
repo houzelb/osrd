@@ -122,6 +122,7 @@ const StcdmResultsTable = ({
       <div className={cx('results-buttons', { 'simulation-retained': isSimulationRetained })}>
         <div className="button-display-all-PR">
           <Button
+            data-testid="all-via-button"
             variant="Normal"
             label={
               showAllOP
@@ -134,6 +135,7 @@ const StcdmResultsTable = ({
         <div className="button-get-simulation">
           {!isSimulationRetained ? (
             <Button
+              data-testid="retain-simulation-button"
               label={t('stdcm:simulation.results.retainThisSimulation')}
               onClick={onRetainSimulation}
             />

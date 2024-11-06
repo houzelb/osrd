@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 
 import type { LightRollingStock, Project, Scenario, Study } from 'common/api/osrdEditoastApi';
 
-import { dualModeRollingStockName, electricRollingStockName } from './assets/project_const';
+import { dualModeRollingStockName, electricRollingStockName } from './assets/project-const';
 import OperationalStudiesPage from './pages/operational-studies-page-model';
 import RollingStockSelectorPage from './pages/rollingstock-selector-page-model';
 import test from './test-logger';

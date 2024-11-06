@@ -1,13 +1,13 @@
 import { test as teardown } from '@playwright/test';
 
-import ROLLING_STOCK_NAMES, { infrastructureName, globalProjectName } from './assets/project_const';
-import { deleteInfra, deleteProject, deleteRollingStocks } from './utils/teardown-utils';
+import ROLLING_STOCK_NAMES, { globalProjectName, stdcmProjectName } from './assets/project-const';
+import { deleteProject, deleteRollingStocks } from './utils/teardown-utils';
 
 teardown('teardown', async () => {
   try {
     await Promise.all([
-      deleteInfra(infrastructureName),
-      deleteProject(globalProjectName),
+      await deleteProject(stdcmProjectName),
+      await deleteProject(globalProjectName),
       deleteRollingStocks(ROLLING_STOCK_NAMES),
     ]);
     console.info('Test data teardown completed successfully.');

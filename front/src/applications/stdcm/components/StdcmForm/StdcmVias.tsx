@@ -80,7 +80,11 @@ const StdcmVias = ({ disabled = false }: StdcmConfigCardProps) => {
                     <img src={IntermediatePointIcon} alt="intermediate-point" />
                     <span className="icon-index">{pathStepIndex}</span>
                   </div>
-                  <button type="button" onClick={() => deleteViaOnClick(pathStep.id)}>
+                  <button
+                    data-testid="delete-via-button"
+                    type="button"
+                    onClick={() => deleteViaOnClick(pathStep.id)}
+                  >
                     {t('translation:common.delete')}
                   </button>
                 </div>

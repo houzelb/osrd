@@ -1,49 +1,49 @@
-import type { Scenario, Project, Study } from 'common/api/osrdEditoastApi';
+import type { Scenario, Project, Study, Infra } from 'common/api/osrdEditoastApi';
 
+import {
+  infrastructureName,
+  stdcmProjectName,
+  stdcmScenarioName,
+  stdcmStudyName,
+} from './assets/project-const';
 import HomePage from './pages/home-page-model';
 import OperationalStudiesTimetablePage from './pages/op-timetable-page-model';
-import OperationalStudiesPage from './pages/operational-studies-page-model';
 import test from './test-logger';
-import { readJsonFile } from './utils';
-import createScenario from './utils/scenario';
-import { deleteScenario } from './utils/teardown-utils';
-import { sendTrainSchedules } from './utils/trainSchedule';
+import { waitForInfraStateToBeCached } from './utils';
+import { getInfra, getProject, getScenario, getStudy } from './utils/api-setup';
 
 test.describe('Verify train schedule elements and filters', () => {
   test.slow();
   let project: Project;
   let study: Study;
   let scenario: Scenario;
+  let infra: Infra;
   let OSRDLanguage: string;
-  const trainSchedulesJson = readJsonFile('./tests/assets/trainSchedule/train_schedules.json');
+
   // Constants for expected train counts
   const TOTAL_TRAINS = 21;
   const VALID_TRAINS = 17;
   const INVALID_TRAINS = 4;
-  const HONORED_TRAINS = 12;
-  const NOT_HONORED_TRAINS = 5;
-  const VALID_AND_HONORED_TRAINS = 12;
+  const HONORED_TRAINS = 13;
+  const NOT_HONORED_TRAINS = 4;
+  const VALID_AND_HONORED_TRAINS = 13;
   const INVALID_AND_NOT_HONORED_TRAINS = 0;
-
-  test.beforeAll('Set up the scenario and post train schedules before all tests', async () => {
-    ({ project, study, scenario } = await createScenario());
-
-    // Post train schedule
-    await sendTrainSchedules(scenario.timetable_id, trainSchedulesJson);
+  test.beforeAll('Fetch project, study and scenario with train schedule', async () => {
+    project = await getProject(stdcmProjectName);
+    study = await getStudy(project.id, stdcmStudyName);
+    scenario = await getScenario(project.id, study.id, stdcmScenarioName);
+    infra = await getInfra(infrastructureName);
   });
-  test.afterAll('Delete the created scenario', async () => {
-    await deleteScenario(project.id, study.id, scenario.name);
-  });
+
   test.beforeEach('Navigate to scenario page before each test', async ({ page }) => {
-    const operationalStudiesPage = new OperationalStudiesPage(page);
     const homePage = new HomePage(page);
     await homePage.goToHomePage();
     OSRDLanguage = await homePage.getOSRDLanguage();
     await page.goto(
       `/operational-studies/projects/${project.id}/studies/${study.id}/scenarios/${scenario.id}`
     );
-    // Ensure infrastructure is loaded
-    await operationalStudiesPage.checkInfraLoaded();
+    // Wait for infra to be in 'CACHED' state before proceeding
+    await waitForInfraStateToBeCached(infra.id);
   });
 
   /** *************** Test 1 **************** */

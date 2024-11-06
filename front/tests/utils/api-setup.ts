@@ -22,7 +22,7 @@ import type {
 } from 'common/api/osrdEditoastApi';
 
 import electricalProfileSet from '../assets/operationStudies/simulationSettings/electricalProfiles/electricalProfile.json';
-import { globalProjectName, globalStudyName, infrastructureName } from '../assets/project_const';
+import { globalProjectName, globalStudyName, infrastructureName } from '../assets/project-const';
 
 /**
  * Initialize a new API request context with the base URL.
@@ -110,6 +110,21 @@ export const getInfra = async (infraName = infrastructureName): Promise<Infra> =
   const infras: GetInfraApiResponse = await getApiRequest('/api/infra');
   const infra = infras.results.find((i: InfraWithState) => i.name === infraName);
   return infra as Infra;
+};
+
+/**
+ * Retrieve infrastructure data by ID.
+ *
+ * @param {number} infraId - The ID of the infrastructure to retrieve.
+ * @returns {Promise<InfraWithState>} - The matching infrastructure data.
+ */
+export const getInfraById = async (infraId: number): Promise<InfraWithState> => {
+  try {
+    const response = await getApiRequest(`/api/infra/${infraId}`);
+    return response as InfraWithState;
+  } catch (error) {
+    throw new Error(`Failed to retrieve infrastructure with ID ${infraId}: ${error}`);
+  }
 };
 
 /**

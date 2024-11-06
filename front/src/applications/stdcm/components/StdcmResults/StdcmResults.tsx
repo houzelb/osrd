@@ -107,7 +107,11 @@ const StcdmResults = ({
                     }
                     fileName={`STDCM-${simulationReportSheetNumber}.pdf`}
                   >
-                    <Button label={t('downloadSimulationSheet')} onClick={() => {}} />
+                    <Button
+                      data-testid="download-simulation-button"
+                      label={t('downloadSimulationSheet')}
+                      onClick={() => {}}
+                    />
                   </PDFDownloadLink>
                 </div>
                 <div className="gesico-text">{t('gesicoRequest')}</div>
@@ -115,7 +119,12 @@ const StcdmResults = ({
             )}
             {retainedSimulationIndex > -1 && (
               <div className="start-new-query">
-                <Button variant="Normal" label={t('startNewQuery')} onClick={onStartNewQuery} />
+                <Button
+                  data-testid="start-new-query-button"
+                  variant="Normal"
+                  label={t('startNewQuery')}
+                  onClick={onStartNewQuery}
+                />
               </div>
             )}
           </div>

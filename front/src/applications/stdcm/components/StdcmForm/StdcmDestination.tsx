@@ -75,6 +75,7 @@ const StdcmDestination = ({ disabled = false }: StdcmConfigCardProps) => {
 
   return (
     <StdcmCard
+      data-testid="destination-card"
       name={t('trainPath.destination')}
       title={<img src={DestinationIcon} alt="destination" className="stdcm-destination-icon" />}
       disabled={disabled}

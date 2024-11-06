@@ -1,8 +1,8 @@
 import { expect } from '@playwright/test';
 
-import type { Project, Scenario, Study } from 'common/api/osrdEditoastApi';
+import type { Infra, Project, Scenario, Study } from 'common/api/osrdEditoastApi';
 
-import { dualModeRollingStockName } from './assets/project_const';
+import { dualModeRollingStockName, infrastructureName } from './assets/project-const';
 import HomePage from './pages/home-page-model';
 import OperationalStudiesInputTablePage from './pages/op-input-table-page-model';
 import OperationalStudiesOutputTablePage from './pages/op-output-table-page-model';
@@ -10,7 +10,8 @@ import RoutePage from './pages/op-route-page-model';
 import OperationalStudiesPage from './pages/operational-studies-page-model';
 import RollingStockSelectorPage from './pages/rollingstock-selector-page-model';
 import test from './test-logger';
-import { readJsonFile } from './utils';
+import { readJsonFile, waitForInfraStateToBeCached } from './utils';
+import { getInfra } from './utils/api-setup';
 import { cleanWhitespace, cleanWhitespaceInArray, type StationData } from './utils/dataNormalizer';
 import createScenario from './utils/scenario';
 import scrollContainer from './utils/scrollHelper';
@@ -26,6 +27,7 @@ test.describe('Times and Stops Tab Verification', () => {
   let project: Project;
   let study: Study;
   let scenario: Scenario;
+  let infra: Infra;
   let OSRDLanguage: string;
 
   // Load test data for table inputs and expected results
@@ -47,8 +49,8 @@ test.describe('Times and Stops Tab Verification', () => {
 
   // Waypoints data for route verification
   const expectedViaValues = [
-    { name: 'Mid_West_station', ch: 'BV', uic: '3', km: 'KM 11.850' },
-    { name: 'Mid_East_station', ch: 'BV', uic: '4', km: 'KM 26.300' },
+    { name: 'Mid_West_station', ch: 'BV', uic: '3', km: 'KM 12.050' },
+    { name: 'Mid_East_station', ch: 'BV', uic: '4', km: 'KM 26.500' },
   ];
 
   // Define interface for table cell data
@@ -60,6 +62,10 @@ test.describe('Times and Stops Tab Verification', () => {
   }
 
   type TranslationKeys = keyof typeof enTranslations;
+
+  test.beforeAll('Fetch infrastructure', async () => {
+    infra = await getInfra(infrastructureName);
+  });
 
   test.beforeEach(
     'Navigate to Times and Stops tab with rolling stock and route set',
@@ -82,8 +88,10 @@ test.describe('Times and Stops Tab Verification', () => {
         `/operational-studies/projects/${project.id}/studies/${study.id}/scenarios/${scenario.id}`
       );
 
+      // Wait for infra to be in 'CACHED' state before proceeding
+      await waitForInfraStateToBeCached(infra.id);
+
       // Setup train configuration and schedule
-      await operationalStudiesPage.checkInfraLoaded();
       await operationalStudiesPage.clickOnAddTrainButton();
       await operationalStudiesPage.setTrainScheduleName('Train-name-e2e-test');
       await page.waitForTimeout(500); // Wait for any async actions to complete
