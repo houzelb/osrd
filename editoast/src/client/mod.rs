@@ -1,4 +1,5 @@
 pub mod electrical_profiles_commands;
+pub mod healthcheck;
 pub mod import_rolling_stock;
 pub mod infra_commands;
 mod postgres_config;
