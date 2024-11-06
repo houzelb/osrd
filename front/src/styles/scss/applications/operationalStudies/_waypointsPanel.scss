@@ -44,6 +44,10 @@
     padding-left: calc(1.125rem - 0.125rem); // 0.125rem > checkbox border
     overflow-y: scroll;
 
+    &.with-warning {
+      padding-bottom: 144px; // height + margin of the warning message
+    }
+
     .waypoint-item {
       height: 2.5rem;
       display: flex;

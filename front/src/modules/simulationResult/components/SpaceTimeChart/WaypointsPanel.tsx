@@ -136,7 +136,11 @@ const WaypointsPanel = ({
         <div className="name">{t('simulation:waypointsPanel.name')}</div>
         <div className="secondary-code">{t('simulation:waypointsPanel.secondaryCode')}</div>
       </div>
-      <div className="waypoints-panel-body">
+      <div
+        className={cx('waypoints-panel-body', {
+          'with-warning': selectedWaypoints.size < 2,
+        })}
+      >
         <div className="waypoint-item selector-all">
           <Checkbox
             small
