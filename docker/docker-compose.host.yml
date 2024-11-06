@@ -2,17 +2,17 @@ version: '3'
 
 services:
   postgres:
-    ports: []
+    ports: !reset []
     network_mode: host
     healthcheck:
       test: [ "CMD", "pg_isready", "-d", "postgres://osrd:password@localhost:5432/osrd" ]
 
   valkey:
-    ports: []
+    ports: !reset []
     network_mode: host
 
   editoast:
-    ports: []
+    ports: !reset []
     network_mode: host
     environment:
       EDITOAST_PORT: 8090
@@ -25,28 +25,28 @@ services:
       test: [ "CMD", "curl", "-f", "http://localhost:8090/health" ]
 
   gateway:
-    ports: []
+    ports: !reset []
     network_mode: host
     volumes:
       - "./docker/gateway.dev.host.toml:/gateway.toml"
 
   osrd-images:
-    ports: []
+    ports: !reset []
     network_mode: host
 
   rabbitmq:
-    ports: []
+    ports: !reset []
     network_mode: host
 
   core:
-    ports: []
+    ports: !reset []
     network_mode: host
     environment:
       CORE_EDITOAST_URL: "http://127.0.0.1:8090"
       OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: "http://127.0.0.1:4317"
 
   osrdyne:
-    ports: []
+    ports: !reset []
     network_mode: host
     environment:
       OSRDYNE__WORKER_DRIVER__HOST_NETWORKING: "true"
@@ -59,7 +59,7 @@ services:
       OSRDYNE__OPENTELEMETRY__ENDPOINT: "http://localhost:4317"
 
   jaeger:
-    ports: []
+    ports: !reset []
     network_mode: host
 
   wait-healthy:
