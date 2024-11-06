@@ -27,15 +27,15 @@ impl Instrumentation for TracingInstrumentation {
         match event {
             InstrumentationEvent::StartEstablishConnection { url, .. } => {
                 let url = Url::parse(url).unwrap();
-                let span = tracing::trace_span!(
+                let span = tracing::info_span!(
                     "connection",
-                    // opentelemetry_semantic_conventions::trace::DB_SYSTEM
+                    // opentelemetry_semantic_conventions::attribute::DB_SYSTEM
                     "db.system" = "postgresql",
-                    // opentelemetry_semantic_conventions::trace::NETWORK_PEER_ADDRESS
+                    // opentelemetry_semantic_conventions::attribute::NETWORK_PEER_ADDRESS
                     "network.peer.address" = tracing::field::display(url.host().unwrap()),
-                    // opentelemetry_semantic_conventions::trace::NETWORK_PEER_PORT
+                    // opentelemetry_semantic_conventions::attribute::NETWORK_PEER_PORT
                     "network.peer.port" = tracing::field::display(url.port().unwrap()),
-                    // opentelemetry_semantic_conventions::trace::ERROR_TYPE
+                    // opentelemetry_semantic_conventions::attribute::ERROR_TYPE
                     "error.type" = tracing::field::Empty,
                 );
                 {
@@ -49,7 +49,7 @@ impl Instrumentation for TracingInstrumentation {
                     let _guard = self.connection_span.enter();
                     if let Some(error) = error {
                         self.connection_span.record(
-                            opentelemetry_semantic_conventions::trace::ERROR_TYPE,
+                            opentelemetry_semantic_conventions::attribute::ERROR_TYPE,
                             tracing::field::debug(error),
                         );
                         tracing::warn!("failed to establish a connection");
@@ -62,9 +62,9 @@ impl Instrumentation for TracingInstrumentation {
             InstrumentationEvent::StartQuery { query, .. } => {
                 let span = tracing::info_span!(
                     "query",
-                    // opentelemetry_semantic_conventions::trace::DB_STATEMENT
-                    "db.statement" = tracing::field::display(query),
-                    // opentelemetry_semantic_conventions::trace::ERROR_TYPE
+                    // opentelemetry_semantic_conventions::attribute::DB_QUERY_TEXT
+                    "db.query.text" = tracing::field::display(query),
+                    // opentelemetry_semantic_conventions::attribute::ERROR_TYPE
                     "error.type" = tracing::field::Empty,
                 );
                 {
@@ -86,12 +86,12 @@ impl Instrumentation for TracingInstrumentation {
                     .expect("a query has to be started before finishing");
                 let _guard = span.enter();
                 span.record(
-                    opentelemetry_semantic_conventions::trace::DB_STATEMENT,
+                    opentelemetry_semantic_conventions::attribute::DB_QUERY_TEXT,
                     tracing::field::display(query),
                 );
                 if let Some(error) = error {
                     span.record(
-                        opentelemetry_semantic_conventions::trace::ERROR_TYPE,
+                        opentelemetry_semantic_conventions::attribute::ERROR_TYPE,
                         tracing::field::debug(error),
                     );
                     tracing::warn!("failed to execute the query");
@@ -102,10 +102,10 @@ impl Instrumentation for TracingInstrumentation {
             InstrumentationEvent::BeginTransaction { depth, .. } => {
                 let span = tracing::info_span!(
                     "transaction",
-                    // opentelemetry_semantic_conventions::trace::DB_OPERATION,
-                    "db.operation" = "create_transaction",
+                    // opentelemetry_semantic_conventions::attribute::DB_OPERATION_NAME,
+                    "db.operation.name" = "create_transaction",
                     "db.transaction.depth" = depth,
-                    // opentelemetry_semantic_conventions::trace::ERROR_TYPE
+                    // opentelemetry_semantic_conventions::attribute::ERROR_TYPE
                     "error.type" = tracing::field::Empty,
                 );
                 {
@@ -122,7 +122,7 @@ impl Instrumentation for TracingInstrumentation {
                     .expect("a transaction has necessary began first");
                 let _guard = span.enter();
                 span.record(
-                    opentelemetry_semantic_conventions::trace::DB_OPERATION,
+                    opentelemetry_semantic_conventions::attribute::DB_OPERATION_NAME,
                     "commit_transaction",
                 );
                 tracing::debug!("committing transaction");
@@ -135,7 +135,7 @@ impl Instrumentation for TracingInstrumentation {
                     .expect("a transaction has necessary began first");
                 let _guard = span.enter();
                 span.record(
-                    opentelemetry_semantic_conventions::trace::DB_OPERATION,
+                    opentelemetry_semantic_conventions::attribute::DB_OPERATION_NAME,
                     "rollback_transaction",
                 );
                 tracing::debug!("rollbacking transaction");

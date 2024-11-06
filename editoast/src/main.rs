@@ -36,6 +36,7 @@ use editoast_osrdyne_client::OsrdyneClient;
 use generated_data::speed_limit_tags_config::SpeedLimitTagIds;
 use infra_cache::InfraCache;
 use models::RollingStockModel;
+use opentelemetry::trace::TracerProvider as _;
 use opentelemetry_sdk::propagation::TraceContextPropagator;
 use tower::Layer as _;
 use tower_http::cors::{Any, CorsLayer};
@@ -99,7 +100,7 @@ fn init_tracing(mode: EditoastMode, telemetry_config: &client::TelemetryConfig) 
                 .tonic()
                 .with_endpoint(telemetry_config.telemetry_endpoint.as_str());
             let trace_config =
-                opentelemetry_sdk::trace::config().with_resource(Resource::new(vec![
+                opentelemetry_sdk::trace::Config::default().with_resource(Resource::new(vec![
                     KeyValue::new(
                         opentelemetry_semantic_conventions::resource::SERVICE_NAME,
                         telemetry_config.service_name.clone(),
@@ -110,10 +111,9 @@ fn init_tracing(mode: EditoastMode, telemetry_config: &client::TelemetryConfig) 
                 .with_exporter(exporter)
                 .with_trace_config(trace_config)
                 .install_batch(opentelemetry_sdk::runtime::Tokio)
-                .expect("Failed to initialize Opentelemetry tracer");
-            let layer = tracing_opentelemetry::layer()
-                .with_tracer(otlp_tracer)
-                .boxed();
+                .expect("Failed to initialize Opentelemetry tracer")
+                .tracer("osrd-editoast");
+            let layer = tracing_opentelemetry::OpenTelemetryLayer::new(otlp_tracer);
             opentelemetry::global::set_text_map_propagator(TraceContextPropagator::new());
             Some(layer)
         }
