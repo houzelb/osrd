@@ -123,8 +123,7 @@ editoast_common::schemas! {
 pub enum Authentication {
     /// The issuer of the request did not provide any authentication information.
     Unauthenticated,
-    /// The issuer of the request provided the 'x-remote-user' header, which contains the
-    /// identity and name of the user.
+    /// The issuer of the request provided the 'x-remote-user-identity' header.
     Authenticated(Authorizer<PgAuthDriver<BuiltinRole>>),
     /// The requests comes from a Core instance. All requests are considered safe.
     Core,
@@ -172,17 +171,23 @@ async fn authenticate(
             PgAuthDriver::<BuiltinRole>::new(db_pool),
         )));
     }
-    let Some(header) = headers.get("x-remote-user") else {
+    let Some(identity) = headers.get("x-remote-user-identity") else {
         if headers.contains_key("x-osrd-core") {
             return Ok(Authentication::Core);
         }
         return Ok(Authentication::Unauthenticated);
     };
-    let (identity, name) = header
+    let identity = identity
         .to_str()
-        .expect("unexpected non-ascii characters in x-remote-user")
-        .split_once('/') // FIXME: the gateway should inject two headers instead
-        .expect("odd x-remote-user format");
+        .expect("unexpected non-ascii characters in x-remote-user-identity");
+
+    let name = match headers.get("x-remote-user-name") {
+        Some(name) => name
+            .to_str()
+            .expect("unexpected non-ascii characters in x-remote-user-name"),
+        None => "",
+    };
+
     let authorizer = Authorizer::try_initialize(
         UserInfo {
             identity: identity.to_owned(),
