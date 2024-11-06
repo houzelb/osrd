@@ -248,7 +248,7 @@ async fn runserver(
         port,
         address,
         health_check_timeout: Duration::milliseconds(health_check_timeout_ms as i64),
-        map_layers_config,
+        map_layers_max_zoom: map_layers_config.max_zoom as u8,
         disable_authorization,
         postgres_config: postgres.into(),
         osrdyne_config: views::OsrdyneConfig {

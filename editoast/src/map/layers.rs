@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use serde::Deserialize;
-use serde::Serialize;
 
 // select C.stuff from A inner join B C on C.id = C.id;
 //                       \___________________________/
@@ -10,7 +9,7 @@ use serde::Serialize;
 type JoinExpr = String;
 
 /// Layer view description
-#[derive(Clone, Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Debug, Deserialize)]
 pub struct View {
     pub on_field: String,
     pub data_expr: String,
@@ -23,7 +22,7 @@ pub struct View {
 }
 
 /// Layer description
-#[derive(Clone, Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Debug, Deserialize)]
 pub struct Layer {
     pub table_name: String,
     pub views: HashMap<String, View>,
@@ -33,14 +32,20 @@ pub struct Layer {
     pub attribution: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Debug, Deserialize)]
 pub struct MapLayers {
     pub layers: HashMap<String, Layer>,
 }
 
 impl MapLayers {
-    /// Parses file containing layers' description into MapLayers struct
-    pub fn parse() -> MapLayers {
-        serde_yaml::from_str(include_str!("../../map_layers.yml")).unwrap()
+    pub fn new(layers: HashMap<String, Layer>) -> Self {
+        Self { layers }
+    }
+}
+
+impl Default for MapLayers {
+    fn default() -> Self {
+        serde_yaml::from_str(include_str!("../../map_layers.yml"))
+            .expect("static data should be valid")
     }
 }

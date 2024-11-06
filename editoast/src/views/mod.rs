@@ -68,7 +68,6 @@ use url::Url;
 use utoipa::ToSchema;
 
 use crate::client::get_app_version;
-use crate::client::MapLayersConfig;
 use crate::core::mq_client;
 use crate::core::version::CoreVersionRequest;
 use crate::core::AsCoreRequest;
@@ -365,7 +364,7 @@ pub struct ServerConfig {
     pub port: u16,
     pub address: String,
     pub health_check_timeout: Duration,
-    pub map_layers_config: MapLayersConfig,
+    pub map_layers_max_zoom: u8,
     pub disable_authorization: bool,
 
     pub postgres_config: PostgresConfig,
@@ -390,7 +389,6 @@ pub struct AppState {
     pub valkey: Arc<ValkeyClient>,
     pub infra_caches: Arc<DashMap<i64, InfraCache>>,
     pub map_layers: Arc<MapLayers>,
-    pub map_layers_config: Arc<MapLayersConfig>,
     pub speed_limit_tag_ids: Arc<SpeedLimitTagIds>,
     pub disable_authorization: bool,
     pub core_client: Arc<CoreClient>,
@@ -456,8 +454,7 @@ impl AppState {
             infra_caches,
             core_client,
             osrdyne_client,
-            map_layers: Arc::new(MapLayers::parse()),
-            map_layers_config: Arc::new(config.map_layers_config.clone()),
+            map_layers: Arc::new(MapLayers::default()),
             speed_limit_tag_ids,
             disable_authorization: config.disable_authorization,
             health_check_timeout: config.health_check_timeout,

@@ -15,7 +15,6 @@ use tower_http::trace::TraceLayer;
 use url::Url;
 
 use crate::{
-    client::MapLayersConfig,
     core::{mocking::MockingClient, CoreClient},
     generated_data::speed_limit_tags_config::SpeedLimitTagIds,
     infra_cache::InfraCache,
@@ -88,8 +87,8 @@ impl TestAppBuilder {
             port: 0,
             address: String::default(),
             health_check_timeout: chrono::Duration::milliseconds(500),
-            map_layers_config: MapLayersConfig::default().into(),
             disable_authorization: true,
+            map_layers_max_zoom: 18,
             postgres_config: PostgresConfig {
                 database_url: Url::parse("postgres://osrd:password@localhost:5432/osrd").unwrap(),
                 pool_size: 32,
@@ -170,8 +169,7 @@ impl TestAppBuilder {
             osrdyne_client,
             valkey,
             infra_caches,
-            map_layers: MapLayers::parse().into(),
-            map_layers_config: Arc::new(config.map_layers_config.clone()),
+            map_layers: Arc::new(MapLayers::default()),
             speed_limit_tag_ids,
             disable_authorization: true,
             health_check_timeout: config.health_check_timeout,
