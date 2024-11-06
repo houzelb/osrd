@@ -12,7 +12,6 @@ mod valkey_utils;
 mod views;
 
 use crate::core::CoreClient;
-use crate::views::OpenApiRoot;
 use axum::extract::DefaultBodyLimit;
 use axum::extract::FromRef;
 use axum::{Router, ServiceExt};
@@ -21,6 +20,7 @@ use clap::Parser;
 use client::electrical_profiles_commands::*;
 use client::import_rolling_stock::*;
 use client::infra_commands::*;
+use client::print_openapi;
 use client::roles;
 use client::roles::RolesCommand;
 use client::search_commands::*;
@@ -176,7 +176,7 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
             osm_to_railjson::osm_to_railjson(args.osm_pbf_in, args.railjson_out)
         }
         Commands::Openapi => {
-            generate_openapi();
+            print_openapi();
             Ok(())
         }
         Commands::ElectricalProfiles(subcommand) => match subcommand {
@@ -394,12 +394,6 @@ async fn runserver(
     let listener = tokio::net::TcpListener::bind((args.address.clone(), args.port)).await?;
     axum::serve(listener, service).await.expect("unreachable");
     Ok(())
-}
-
-/// Prints the OpenApi to stdout
-fn generate_openapi() {
-    let openapi = OpenApiRoot::build_openapi();
-    print!("{}", serde_yaml::to_string(&openapi).unwrap());
 }
 
 #[derive(Debug, Error, PartialEq)]
