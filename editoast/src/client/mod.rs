@@ -97,10 +97,6 @@ pub struct MapLayersConfig {
     #[derivative(Default(value = "18"))]
     #[arg(long, env, default_value_t = 18)]
     pub max_zoom: u64,
-    /// Number maximum of tiles before we consider invalidating full Valkey cache is required
-    #[derivative(Default(value = "250_000"))]
-    #[arg(long, env, default_value_t = 250_000)]
-    pub max_tiles: u64,
 }
 
 #[derive(Args, Debug)]
