@@ -122,7 +122,7 @@ const StcdmResultsTable = ({
       <div className={cx('results-buttons', { 'simulation-retained': isSimulationRetained })}>
         <div className="button-display-all-PR">
           <Button
-            data-testid="all-via-button"
+            data-testid="all-vias-button"
             variant="Normal"
             label={
               showAllOP

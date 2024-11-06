@@ -15,7 +15,7 @@ import {
 /**
  * Delete infrastructure by name if it exists.
  *
- * @param {string} infraName - The name of the infrastructure to delete.
+ * @param infraName - The name of the infrastructure to delete.
  * @returns {Promise<void>} - A promise that resolves when the infrastructure is deleted or if not found.
  */
 export async function deleteInfra(infraName: string): Promise<void> {
@@ -31,7 +31,7 @@ export async function deleteInfra(infraName: string): Promise<void> {
 /**
  * Delete a project by name if it exists.
  *
- * @param {string} projectName - The name of the project to delete.
+ * @param projectName - The name of the project to delete.
  * @returns {Promise<void>} - A promise that resolves when the project is deleted or if not found.
  */
 export async function deleteProject(projectName: string): Promise<void> {
@@ -46,7 +46,7 @@ export async function deleteProject(projectName: string): Promise<void> {
 /**
  * Delete rolling stocks by their names if they exist.
  *
- * @param {string[]} rollingStockNames - The list of rolling stock names to delete.
+ * @param rollingStockNames - The list of rolling stock names to delete.
  * @returns {Promise<void>} - A promise that resolves when the matching rolling stocks are deleted or if none are found.
  */
 export async function deleteRollingStocks(rollingStockNames: string[]): Promise<void> {
@@ -73,7 +73,7 @@ export async function deleteRollingStocks(rollingStockNames: string[]): Promise<
 /**
  * Delete a study by name if it exists.
  *
- * @param {string} studyName - The name of the study to delete.
+ * @param studyName - The name of the study to delete.
  * @returns {Promise<void>} - A promise that resolves when the study is deleted or if not found.
  */
 export async function deleteStudy(projectId: number, studyName: string): Promise<void> {
@@ -89,7 +89,7 @@ export async function deleteStudy(projectId: number, studyName: string): Promise
 /**
  * Delete a scenario by name if it exists.
  *
- * @param {string} scenarioName - The name of the scenario to delete.
+ * @param scenarioName - The name of the scenario to delete.
  * @returns {Promise<void>} - A promise that resolves when the scenario is deleted or if not found.
  */
 export async function deleteScenario(

@@ -10,7 +10,7 @@ import type {
 } from 'common/api/osrdEditoastApi';
 
 import { readJsonFile } from '.';
-import { getApiRequest, postApiRequest } from './api-setup';
+import { getApiRequest, postApiRequest, setStdcmEnvironment } from './api-setup';
 import createScenario from './scenario';
 import { sendTrainSchedules } from './trainSchedule';
 import projectData from '../assets/operationStudies/project.json';
@@ -24,9 +24,9 @@ import {
   improbableRollingStockName,
   infrastructureName,
   slowRollingStockName,
-  stdcmProjectName,
-  stdcmScenarioName,
-  stdcmStudyName,
+  trainScheduleProjectName,
+  trainScheduleScenarioName,
+  trainScheduleStudyName,
 } from '../assets/project-const';
 
 /**
@@ -118,8 +118,8 @@ export async function createProject(projectName = globalProjectName): Promise<Pr
 /**
  * Helper function to create a study for a given project.
  *
- * @param {number} projectId - The ID of the project under which the study will be created.
- * @param  studyName - The name of the study to create.
+ * @param projectId - The ID of the project under which the study will be created.
+ * @param studyName - The name of the study to create.
  * @returns {Promise<Study>} - The created study object.
  */
 export async function createStudy(projectId: number, studyName = globalStudyName): Promise<Study> {
@@ -159,11 +159,11 @@ export async function createDataForTests(): Promise<void> {
     await createScenario(undefined, project.id, study.id, smallInfra.id);
 
     // Step 6: Create a project, study, scenario and import train schedule
-    const projectTrainSchedule = await createProject(stdcmProjectName);
-    const studyTrainSchedule = await createStudy(projectTrainSchedule.id, stdcmStudyName);
+    const projectTrainSchedule = await createProject(trainScheduleProjectName);
+    const studyTrainSchedule = await createStudy(projectTrainSchedule.id, trainScheduleStudyName);
     const scenarioTrainSchedule = (
       await createScenario(
-        stdcmScenarioName,
+        trainScheduleScenarioName,
         projectTrainSchedule.id,
         studyTrainSchedule.id,
         smallInfra.id
@@ -172,18 +172,15 @@ export async function createDataForTests(): Promise<void> {
     await sendTrainSchedules(scenarioTrainSchedule.timetable_id, trainSchedulesJson);
 
     // Configure STDCM search environment for the tests
-    await postApiRequest(
-      '/api/stdcm/search_environment',
-      {
-        infra_id: smallInfra.id,
-        search_window_begin: '2024-10-17T00:00:01',
-        search_window_end: '2024-10-18T23:59:59',
-        timetable_id: scenarioTrainSchedule.timetable_id,
-      } as StdcmSearchEnvironment,
-      undefined,
-      'Failed to update STDCM configuration environment'
-    );
-    console.info('Test data setup completed successfully.');
+
+    const stdcmEnvironment = {
+      infra_id: smallInfra.id,
+      search_window_begin: '2024-10-17T00:00:01',
+      search_window_end: '2024-10-18T23:59:59',
+      timetable_id: scenarioTrainSchedule.timetable_id,
+    } as StdcmSearchEnvironment;
+
+    await setStdcmEnvironment(stdcmEnvironment);
   } catch (error) {
     console.error('Error during test data setup:', error);
   }

@@ -8,7 +8,7 @@ import type {
   Study,
 } from 'common/api/osrdEditoastApi';
 
-import { electricRollingStockName, infrastructureName } from './assets/project-const';
+import { electricRollingStockName } from './assets/project-const';
 import RoutePage from './pages/op-route-page-model';
 import OperationalStudiesPage from './pages/operational-studies-page-model';
 import RollingStockSelectorPage from './pages/rollingstock-selector-page-model';
@@ -26,9 +26,9 @@ test.describe('Verify simulation configuration in operational studies', () => {
   let infra: Infra;
   let rollingStock: LightRollingStock;
 
-  test.beforeAll('Fetch rolling stock ', async () => {
+  test.beforeAll('Fetch rolling stock and infrastructure ', async () => {
     rollingStock = await getRollingStock(electricRollingStockName);
-    infra = await getInfra(infrastructureName);
+    infra = await getInfra();
   });
 
   test.beforeEach('Set up the project, study, and scenario', async () => {
