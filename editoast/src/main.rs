@@ -18,6 +18,7 @@ use axum::{Router, ServiceExt};
 use axum_tracing_opentelemetry::middleware::OtelAxumLayer;
 use clap::Parser;
 use client::electrical_profiles_commands::*;
+use client::healthcheck::healthcheck_cmd;
 use client::import_rolling_stock::*;
 use client::infra_commands::*;
 use client::print_openapi;
@@ -26,7 +27,6 @@ use client::roles::RolesCommand;
 use client::search_commands::*;
 use client::stdcm_search_env_commands::handle_stdcm_search_env_command;
 use client::timetables_commands::*;
-use client::CoreArgs;
 use client::{Client, Color, Commands, RunserverArgs, ValkeyConfig};
 use client::{MapLayersConfig, PostgresConfig};
 use dashmap::DashMap;
@@ -43,7 +43,6 @@ use tower_http::cors::{Any, CorsLayer};
 use tower_http::limit::RequestBodyLimitLayer;
 use tower_http::normalize_path::NormalizePathLayer;
 use tower_http::trace::TraceLayer;
-use views::check_health;
 
 use core::mq_client;
 use map::MapLayers;
@@ -233,30 +232,11 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
             }
         },
         Commands::Healthcheck(core_config) => {
-            healthcheck_cmd(db_pool.into(), valkey_config, core_config).await
+            healthcheck_cmd(db_pool.into(), valkey_config, core_config)
+                .await
+                .map_err(Into::into)
         }
     }
-}
-
-async fn healthcheck_cmd(
-    db_pool: Arc<DbConnectionPoolV2>,
-    valkey_config: ValkeyConfig,
-    core_config: CoreArgs,
-) -> Result<(), Box<dyn Error + Send + Sync>> {
-    let valkey = ValkeyClient::new(valkey_config).unwrap();
-    let core_client = CoreClient::new_mq(mq_client::Options {
-        uri: core_config.mq_url,
-        worker_pool_identifier: String::from("core"),
-        timeout: core_config.core_timeout,
-        single_worker: core_config.core_single_worker,
-        num_channels: core_config.core_client_channels_size,
-    })
-    .await?;
-    check_health(db_pool, valkey.into(), core_client.into())
-        .await
-        .map_err(|e| CliError::new(1, format!("❌ healthcheck failed: {0}", e)))?;
-    println!("✅ Healthcheck passed");
-    Ok(())
 }
 
 /// The state of the whole Editoast service, available to all handlers
