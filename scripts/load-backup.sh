@@ -14,6 +14,8 @@ if [ "$#" -ne 1 ]; then
   exit 1
 fi
 
+root_path="$(realpath $(dirname "$0")/..)"
+
 # Check sha1 is matching
 echo "Checking backup integrity..."
 BACKUP_PATH="$1"
@@ -44,7 +46,7 @@ if [ "$PR_TEST" -eq 1 ]; then
   OSRD_POSTGRES_PORT=5433
 fi
 
-$(dirname "$0")/cleanup-db.sh # Cleanup and init db (no migration)
+"$root_path"/scripts/cleanup-db.sh # Cleanup and init db (no migration)
 
 # Copy needed files to the container
 docker cp "$BACKUP_PATH" "$OSRD_POSTGRES:tmp/backup-osrd"

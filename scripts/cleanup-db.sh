@@ -14,6 +14,8 @@ if [ "$#" -ne 0 ]; then
   exit 1
 fi
 
+root_path="$(realpath $(dirname "$0")/..)"
+
 # These variables are necessary to load the infra on the correct instance (the pr-infra or the dev one)
 OSRD_POSTGRES="osrd-postgres"
 OSRD_EDITOAST="osrd-editoast"
@@ -77,4 +79,4 @@ docker exec "$OSRD_VALKEY" valkey-cli -p "$OSRD_VALKEY_PORT" FLUSHALL > /dev/nul
 
 echo "Cleanup done!\n"
 echo "You may want to apply migrations if you don't load a backup:"
-echo "'diesel migration run --migration-dir $(dirname $0)/../editoast/migrations'  # 'docker compose up editoast' does it automatically"
+echo "'diesel migration run --migration-dir \"$root_path/editoast/migrations\"'  # 'docker compose up editoast' does it automatically"
