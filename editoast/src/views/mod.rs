@@ -366,8 +366,6 @@ pub struct ServerConfig {
     pub address: String,
     pub health_check_timeout: Duration,
     pub map_layers_config: MapLayersConfig,
-    pub root_path: String,
-    pub workers: Option<usize>,
     pub disable_authorization: bool,
 
     pub postgres_config: PostgresConfig,

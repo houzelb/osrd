@@ -127,10 +127,6 @@ pub struct RunserverArgs {
     pub address: String,
     #[command(flatten)]
     pub core: CoreArgs,
-    #[clap(long, env = "ROOT_PATH", default_value_t = String::new())]
-    pub root_path: String,
-    #[clap(long)]
-    pub workers: Option<usize>,
     /// If this option is set, any role and permission check will be bypassed. Even if no user is
     /// provided by the request headers of if the provided user doesn't have the required privileges.
     // TODO: once the whole role system will be deployed, the default value of this option should

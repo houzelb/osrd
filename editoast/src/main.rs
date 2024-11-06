@@ -237,8 +237,6 @@ async fn runserver(
                 core_single_worker,
                 core_client_channels_size,
             },
-        root_path,
-        workers,
         disable_authorization,
         osrdyne_api_url,
         health_check_timeout_ms,
@@ -251,8 +249,6 @@ async fn runserver(
         address,
         health_check_timeout: Duration::milliseconds(health_check_timeout_ms as i64),
         map_layers_config,
-        root_path,
-        workers,
         disable_authorization,
         postgres_config: postgres.into(),
         osrdyne_config: views::OsrdyneConfig {

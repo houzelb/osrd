@@ -89,8 +89,6 @@ impl TestAppBuilder {
             address: String::default(),
             health_check_timeout: chrono::Duration::milliseconds(500),
             map_layers_config: MapLayersConfig::default().into(),
-            root_path: String::default(),
-            workers: None,
             disable_authorization: true,
             postgres_config: PostgresConfig {
                 database_url: Url::parse("postgres://osrd:password@localhost:5432/osrd").unwrap(),
