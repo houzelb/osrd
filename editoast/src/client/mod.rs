@@ -32,6 +32,7 @@ use url::Url;
 pub use valkey_config::ValkeyConfig;
 
 use crate::error::Result;
+use crate::views::OpenApiRoot;
 
 #[derive(Parser, Debug)]
 #[command(author, version)]
@@ -150,6 +151,12 @@ pub struct OsmToRailjsonArgs {
     pub osm_pbf_in: PathBuf,
     /// Output file in Railjson format
     pub railjson_out: PathBuf,
+}
+
+/// Prints the OpenApi to stdout
+pub fn print_openapi() {
+    let openapi = OpenApiRoot::build_openapi();
+    print!("{}", serde_yaml::to_string(&openapi).unwrap());
 }
 
 /// Retrieve the ROOT_URL env var. If not found returns default local url.
