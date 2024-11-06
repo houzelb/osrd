@@ -220,7 +220,7 @@ mod tests {
 
     #[test]
     fn test_query_creation() {
-        let map_layers = MapLayers::parse();
+        let map_layers = MapLayers::default();
         let expected_queries = [
         "
         WITH bbox AS (

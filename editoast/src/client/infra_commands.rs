@@ -214,7 +214,7 @@ async fn build_valkey_pool_and_invalidate_all_cache(
     let mut conn = valkey.get_connection().await.unwrap();
     Ok(map::invalidate_all(
         &mut conn,
-        &MapLayers::parse().layers.keys().cloned().collect(),
+        &MapLayers::default().layers.keys().cloned().collect(),
         infra_id,
     )
     .await

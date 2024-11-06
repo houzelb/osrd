@@ -113,9 +113,7 @@ struct ViewMetadata {
 )]
 async fn layer_view(
     State(AppState {
-        map_layers,
-        map_layers_config,
-        ..
+        map_layers, config, ..
     }): State<AppState>,
     Extension(auth): AuthenticationExt,
     Path((layer_slug, view_slug)): Path<(String, String)>,
@@ -155,7 +153,7 @@ async fn layer_view(
         tiles: vec![tiles_url_pattern],
         attribution: layer.attribution.clone().unwrap_or_default(),
         minzoom: 5,
-        maxzoom: map_layers_config.max_zoom,
+        maxzoom: config.map_layers_max_zoom as u64,
     }))
 }
 
@@ -282,7 +280,7 @@ mod tests {
 
     #[rstest]
     async fn layer_view_ko() {
-        let map_layers = MapLayers::parse();
+        let map_layers = MapLayers::default();
         let error: InternalError =
             LayersError::new_view_not_found("does_not_exist", &map_layers.layers["track_sections"])
                 .into();
