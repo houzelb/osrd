@@ -13,7 +13,11 @@ import InputSNCF from 'common/BootstrapSNCF/InputSNCF';
 import MultiSelectSNCF from 'common/BootstrapSNCF/MultiSelectSNCF';
 import SelectImproved from 'common/BootstrapSNCF/SelectImprovedSNCF';
 import SignalCard from 'common/Map/Search/SignalCard';
-import { createMapSearchQuery, onResultSearchClick } from 'common/Map/utils';
+import {
+  createMapSearchQuery,
+  createTrackSystemQuery,
+  onResultSearchClick,
+} from 'common/Map/utils';
 import { useInfraID } from 'common/osrdContext';
 import { setFailure } from 'reducers/main';
 import type { Viewport } from 'reducers/map';
@@ -101,7 +105,7 @@ const MapSearchSignal = ({ updateExtViewport, closeMapSearchPopUp }: MapSearchSi
     lineSearch: string,
     signalName: string,
     infraIDPayload: number,
-    trackSystems: string[],
+    trackSystem: string,
     settings: string[]
   ): SearchPayload => {
     const payloadQuery = createMapSearchQuery(lineSearch, {
@@ -114,7 +118,7 @@ const MapSearchSignal = ({ updateExtViewport, closeMapSearchPopUp }: MapSearchSi
         'and',
         ['=', ['infra_id'], infraIDPayload],
         !lineSearch || payloadQuery,
-        !trackSystems.length || ['contains', ['list', ...trackSystems], ['signaling_systems']],
+        !trackSystem || createTrackSystemQuery(trackSystem),
         !settings.length || ['contains', ['settings'], ['list', ...settings]],
         ['search', ['label'], signalName],
       ],
@@ -127,7 +131,7 @@ const MapSearchSignal = ({ updateExtViewport, closeMapSearchPopUp }: MapSearchSi
       searchLineState,
       searchState,
       infraIDPayload,
-      signalSystem === SIGNALING_SYSTEMS.ALL ? [] : [signalSystem],
+      signalSystem === SIGNALING_SYSTEMS.ALL ? '' : signalSystem,
       settings
     );
     await postSearch({
