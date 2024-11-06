@@ -8,8 +8,8 @@
     "signalReceptionClosed": false,
     "margin": {
       "theoretical": "10 %",
-      "theoreticalS": "56 s",
-      "actual": "56 s",
+      "theoreticalS": "60 s",
+      "actual": "60 s",
       "difference": "0 s"
     },
     "calculatedArrival": "11:22:40",
@@ -28,7 +28,7 @@
       "actual": "45 s",
       "difference": "0 s"
     },
-    "calculatedArrival": "11:32:49",
+    "calculatedArrival": "11:33:33",
     "calculatedDeparture": ""
   },
   {
@@ -44,8 +44,8 @@
       "actual": "62 s",
       "difference": "0 s"
     },
-    "calculatedArrival": "11:40:56",
-    "calculatedDeparture": "11:43:00"
+    "calculatedArrival": "11:41:40",
+    "calculatedDeparture": "11:43:44"
   },
   {
     "stationName": "South_East_station",
@@ -60,7 +60,7 @@
       "actual": "",
       "difference": ""
     },
-    "calculatedArrival": "11:54:14",
+    "calculatedArrival": "11:54:58",
     "calculatedDeparture": ""
   }
 ]

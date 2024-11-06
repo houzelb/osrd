@@ -25,6 +25,7 @@ const StdcmHeader = ({ isDebugMode, onDebugModeToggle }: StdcmHeaderProps) => {
       {isSuperUser && (
         <div className="stdcm-header_debug">
           <button
+            data-testid="stdcm-debug-button"
             type="button"
             aria-label="stdcm-debug"
             className={cx({ 'debug-on': isDebugMode, 'debug-off': !isDebugMode })}

@@ -174,7 +174,11 @@ const StdcmConfig = ({
                 })}
               >
                 {showBtnToLaunchSimulation && (
-                  <Button label={t('simulation.getSimulation')} onClick={startSimulation} />
+                  <Button
+                    data-testid="launch-simulation-button"
+                    label={t('simulation.getSimulation')}
+                    onClick={startSimulation}
+                  />
                 )}
                 {formErrors && (
                   <StdcmWarningBox

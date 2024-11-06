@@ -10,7 +10,7 @@ const StdcmStatusBanner = ({ isFailed }: StdcmStatusBannerProps) => {
   return (
     <div className="simulation-status-banner">
       <div className="banner-content">
-        <span className={cx('status', { failed: isFailed })}>
+        <span data-testid="simulation-status" className={cx('status', { failed: isFailed })}>
           {isFailed ? t('failed') : t('completed')}
         </span>
         {isFailed && <p className="error-message">{t('errorMessage')}</p>}
