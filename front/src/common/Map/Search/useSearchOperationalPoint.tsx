@@ -86,13 +86,17 @@ export default function useSearchOperationalPoint({
     if (nameComparison !== 0) {
       return nameComparison;
     }
-    if (MAIN_OP_CH_CODES.includes(a.ch)) {
+
+    const chA = a.ch ?? '';
+    const chB = b.ch ?? '';
+
+    if (MAIN_OP_CH_CODES.includes(chA)) {
       return -1;
     }
-    if (MAIN_OP_CH_CODES.includes(b.ch)) {
+    if (MAIN_OP_CH_CODES.includes(chB)) {
       return 1;
     }
-    return a.ch.localeCompare(b.ch);
+    return chA.localeCompare(chB);
   };
 
   const sortedSearchResults = useMemo(
