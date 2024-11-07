@@ -911,7 +911,7 @@ jobs:
           poetry install
 
       - name: Startup the test infrastructure
-        id: start_playwright_worker
+        id: start_integration_worker
         run: |
           set -e
           export OSRD_FRONT_MODE=nginx
@@ -943,6 +943,91 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.xml
 
+      - name: Save container logs
+        run: docker compose logs > container-logs
+        if: always()
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-container-logs
+          path: container-logs
+          retention-days: 30
+
+  end_to_end_tests:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      # TODO: check if we can deduplicate the base steps from integration_tests_quality
+      # https://www.jameskerr.blog/posts/sharing-steps-in-github-action-workflows/
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download built front-tests image
+        if: needs.build.outputs.output_method == 'artifact'
+        uses: actions/download-artifact@v4
+        with:
+          name: front-tests
+          path: .
+      - name: Download built editoast image
+        if: needs.build.outputs.output_method == 'artifact'
+        uses: actions/download-artifact@v4
+        with:
+          name: editoast
+          path: .
+      - name: Download built core image
+        if: needs.build.outputs.output_method == 'artifact'
+        uses: actions/download-artifact@v4
+        with:
+          name: core
+          path: .
+      - name: Download built gateway-standalone image
+        if: needs.build.outputs.output_method == 'artifact'
+        uses: actions/download-artifact@v4
+        with:
+          name: gateway-standalone
+          path: .
+      - name: Download built front-nginx image
+        if: needs.build.outputs.output_method == 'artifact'
+        uses: actions/download-artifact@v4
+        with:
+          name: front-nginx
+          path: .
+      - name: Download built osrdyne image
+        if: needs.build.outputs.output_method == 'artifact'
+        uses: actions/download-artifact@v4
+        with:
+          name: osrdyne
+          path: .
+      - name: Load built images
+        if: needs.build.outputs.output_method == 'artifact'
+        run: |
+          docker load --input ./osrd-front-tests.tar
+          docker load --input ./osrd-editoast.tar
+          docker load --input ./osrd-core.tar
+          docker load --input ./osrd-gateway-standalone.tar
+          docker load --input ./osrd-front-nginx.tar
+          docker load --input ./osrd-osrdyne.tar
+
+      - name: Startup the test infrastructure
+        id: start_playwright_worker
+        run: |
+          set -e
+          export OSRD_FRONT_MODE=nginx
+          export TAG='${{ needs.build.outputs.stable_version }}'
+
+          # Inside /docker/osrdyne.yml, replace core_image "osrd-core:dev" with "osrd-core:$TAG"
+          # to match the version of the core image we just built inside osrdyne
+          sed -i "s/osrd-core:dev/osrd-core:$TAG/" docker/osrdyne.yml
+
+          services='editoast osrdyne front core gateway'
+          composes='-f docker-compose.yml'
+          docker compose $composes pull --policy missing $services
+          docker compose $composes up --no-build -d $services jaeger
+        env:
+          DOCKER_BUILDKIT: 1
+          COMPOSE_DOCKER_CLI_BUILD: 1
+
       - name: Run Playwright tests
         run: |
           docker run --init --name=playwright-test --net=host \
@@ -967,7 +1052,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: integration-container-logs
+          name: e2e-container-logs
           path: container-logs
           retention-days: 30
 
