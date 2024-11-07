@@ -117,7 +117,7 @@ impl Project {
 }
 
 #[cfg(test)]
-pub mod test {
+pub mod tests {
     use pretty_assertions::assert_eq;
     use rstest::rstest;
 

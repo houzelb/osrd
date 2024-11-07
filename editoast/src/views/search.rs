@@ -761,7 +761,7 @@ pub(super) struct SearchResultItemTrainSchedule {
 pub struct SearchConfigFinder;
 
 #[cfg(test)]
-pub mod test {
+pub mod tests {
 
     use axum::http::StatusCode;
     use pretty_assertions::assert_eq;

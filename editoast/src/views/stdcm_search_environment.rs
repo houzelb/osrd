@@ -155,14 +155,14 @@ async fn retrieve_latest(
 }
 
 #[cfg(test)]
-pub mod test {
+pub mod tests {
     use axum::http::StatusCode;
     use chrono::NaiveDate;
     use pretty_assertions::assert_eq;
     use rstest::rstest;
 
     use super::*;
-    use crate::models::stdcm_search_environment::test::stdcm_search_env_fixtures;
+    use crate::models::stdcm_search_environment::tests::stdcm_search_env_fixtures;
     use crate::views::test_app::TestAppBuilder;
     use crate::{Create, Retrieve};
 

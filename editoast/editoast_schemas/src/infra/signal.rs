@@ -88,7 +88,7 @@ impl OSRDIdentified for Signal {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use serde_json::from_str;
 
     use super::SignalExtensions;

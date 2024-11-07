@@ -99,7 +99,7 @@ impl OSRDIdentified for SpeedSection {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use serde_json::from_str;
     use serde_json::from_value;
     use serde_json::json;

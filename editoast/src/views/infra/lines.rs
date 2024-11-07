@@ -82,7 +82,7 @@ async fn get_line_bbox(
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use axum::http::StatusCode;
     use editoast_schemas::infra::TrackSectionSncfExtension;
     use editoast_schemas::primitives::Identifier;

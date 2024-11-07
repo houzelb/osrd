@@ -73,7 +73,7 @@ fn dates_in_order(a: Option<Option<NaiveDate>>, b: Option<Option<NaiveDate>>) ->
 }
 
 #[cfg(test)]
-pub mod test {
+pub mod tests {
     use pretty_assertions::assert_eq;
     use rstest::rstest;
 

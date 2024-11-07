@@ -362,7 +362,7 @@ impl From<reqwest::Error> for CoreError {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use axum::http::StatusCode;
     use pretty_assertions::assert_eq;
     use reqwest::Method;

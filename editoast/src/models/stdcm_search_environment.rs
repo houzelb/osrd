@@ -61,7 +61,7 @@ impl StdcmSearchEnvironmentChangeset {
 }
 
 #[cfg(test)]
-pub mod test {
+pub mod tests {
     use chrono::NaiveDate;
     use pretty_assertions::assert_eq;
     use rstest::rstest;

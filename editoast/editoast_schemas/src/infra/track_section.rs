@@ -65,7 +65,7 @@ impl TrackSection {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use geojson;
     use serde_json::from_str;
 

@@ -59,7 +59,7 @@ impl<'a> InvolvedObjects<'a> {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use std::collections::HashSet;
 
     use super::InvolvedObjects;
