@@ -1,4 +1,4 @@
-FROM alpine as exec_as_builder
+FROM alpine AS exec_as_builder
 
 RUN apk add build-base
 COPY docker/exec-as.c .

@@ -1,6 +1,6 @@
 ### BUILD STAGE
 
-FROM node:20-bookworm as build
+FROM node:20-bookworm AS build
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ RUN yarn generate-licenses && yarn build
 
 ### TESTS STAGE
 
-FROM build as tests
+FROM build AS tests
 
 # Allow to import tests data files
 COPY --from=test_data . /tests/data

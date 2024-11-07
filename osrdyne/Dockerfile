@@ -9,14 +9,14 @@ WORKDIR /osrdyne
 #######################
 # Cargo chef : Recipe #
 #######################
-FROM chef as planner
+FROM chef AS planner
 COPY . .
 RUN cargo chef prepare --recipe-path recipe.json
 
 ######################
 # Cargo chef : build #
 ######################
-FROM chef as run_builder
+FROM chef AS run_builder
 RUN apk add --no-cache musl-dev build-base jemalloc-dev mold
 ENV RUSTFLAGS="-C link-arg=-fuse-ld=mold"
 COPY --from=planner /osrdyne/recipe.json recipe.json
@@ -47,7 +47,7 @@ COPY . .
 #######################
 # Running env : build #
 #######################
-FROM alpine:3.20 as running_env
+FROM alpine:3.20 AS running_env
 RUN apk add --no-cache curl ca-certificates bind-tools
 COPY --from=run_builder /usr/local/cargo/bin/osrdyne /usr/local/bin/osrdyne
 
