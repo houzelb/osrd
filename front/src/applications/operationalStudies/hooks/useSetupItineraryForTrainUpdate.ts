@@ -15,7 +15,7 @@ import {
 } from 'common/api/osrdEditoastApi';
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import {
-  formatSuggestedOperationalPoints,
+  formatSuggestedOperationalPointsWithTrackName,
   matchPathStepAndOp,
   upsertPathStepsInOPs,
 } from 'modules/pathfinding/utils';
@@ -124,11 +124,14 @@ const useSetupItineraryForTrainUpdate = (
       const stepsCoordinates = pathfindingResult.path_item_positions.map((position) =>
         getPointCoordinates(geometry, pathfindingResult.length, position)
       );
-      const suggestedOperationalPoints: SuggestedOP[] = formatSuggestedOperationalPoints(
-        operational_points,
-        geometry,
-        pathfindingResult.length
-      );
+      const suggestedOperationalPoints: SuggestedOP[] =
+        await formatSuggestedOperationalPointsWithTrackName(
+          operational_points,
+          geometry,
+          pathfindingResult.length,
+          infraId,
+          dispatch
+        );
 
       const computedpathSteps = computeBasePathSteps(trainSchedule);
       const updatedPathSteps: PathStep[] = updatePathStepsFromOperationalPoints(

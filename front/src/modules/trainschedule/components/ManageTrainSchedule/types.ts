@@ -15,6 +15,7 @@ export type SuggestedOP = {
   trigram?: string;
   offsetOnTrack: number;
   track: string;
+  trackName?: string;
   /** Distance from the beginning of the path in mm */
   positionOnPath: number;
   coordinates?: Position;

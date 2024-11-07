@@ -19,5 +19,6 @@
   "theoreticalMargin": "marge théorique",
   "theoreticalMarginPlaceholder": "% ou min/100km",
   "theoreticalMarginSeconds": "marge théorique (s)",
+  "trackName": "voie",
   "waypoint": "Via {{id}}"
 }

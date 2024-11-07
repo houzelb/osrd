@@ -16,7 +16,7 @@ import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import { initialState } from 'modules/pathfinding/consts';
 import type { PathfindingAction, PathfindingState } from 'modules/pathfinding/types';
 import {
-  formatSuggestedOperationalPoints,
+  formatSuggestedOperationalPointsWithTrackName,
   getPathfindingQuery,
   matchPathStepAndOp,
   upsertPathStepsInOPs,
@@ -294,11 +294,14 @@ export const usePathfinding = (
               await postPathProperties(pathPropertiesParams).unwrap();
 
             if (electrifications && geometry && operational_points) {
-              const suggestedOperationalPoints: SuggestedOP[] = formatSuggestedOperationalPoints(
-                operational_points,
-                geometry,
-                pathResult.length
-              );
+              const suggestedOperationalPoints: SuggestedOP[] =
+                await formatSuggestedOperationalPointsWithTrackName(
+                  operational_points,
+                  geometry,
+                  pathResult.length,
+                  infraId,
+                  dispatch
+                );
 
               // We update existing pathsteps with coordinates, positionOnPath and kp corresponding to the new pathfinding result
               const updatedPathSteps: (PathStep | null)[] = pathSteps.map((step, i) => {

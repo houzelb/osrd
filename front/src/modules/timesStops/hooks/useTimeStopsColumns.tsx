@@ -86,7 +86,7 @@ export const useTimeStopsColumns = <T extends TimeStopsRow>(
         title: t('name'),
         ...(isOutputTable && {
           component: ({ rowData }) => (
-            <span title={rowData.name} className="ml-1 text-nowrap overflow-hidden">
+            <span title={rowData.name} className="ml-2 text-nowrap overflow-hidden">
               {rowData.name}
             </span>
           ),
@@ -99,6 +99,17 @@ export const useTimeStopsColumns = <T extends TimeStopsRow>(
         title: t('ch'),
         disabled: true,
         ...fixedWidth(45),
+      },
+      {
+        ...keyColumn('trackName', createTextColumn()),
+        title: t('trackName'),
+        component: ({ rowData }) => (
+          <span title={rowData.trackName} className="ml-2 text-nowrap overflow-hidden">
+            {rowData.trackName}
+          </span>
+        ),
+        disabled: true,
+        ...fixedWidth(70),
       },
       {
         ...keyColumn('arrival', timeColumn(isOutputTable)),
