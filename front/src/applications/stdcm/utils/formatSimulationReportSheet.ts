@@ -1,4 +1,5 @@
 import type { SimulationResponse } from 'common/api/osrdEditoastApi';
+import { interpolateValue } from 'modules/simulationResult/SimulationResultExport/utils';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 
 import type { StdcmResultsOperationalPointsList } from '../types';
@@ -76,8 +77,15 @@ function getTimeAtPosition(
   trainDepartureHour: number,
   trainDepartureMinute: number
 ): string {
-  const index = trainPositions.findIndex((pos) => pos >= trainPosition);
-  const timeInMillis = trainTimes[index];
+  const timeInMillis = interpolateValue(
+    {
+      positions: trainPositions,
+      speeds: [],
+      times: trainTimes,
+    },
+    trainPosition,
+    'times'
+  );
   const timeInMinutes = Math.round(timeInMillis / 60000);
   return addMinutesToTime(trainDepartureHour, trainDepartureMinute, timeInMinutes);
 }
