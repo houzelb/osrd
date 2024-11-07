@@ -24,11 +24,11 @@
     "signalReceptionClosed": false,
     "margin": {
       "theoretical": "",
-      "theoreticalS": "24 s",
-      "actual": "24 s",
+      "theoreticalS": "85 s",
+      "actual": "85 s",
       "difference": "0 s"
     },
-    "calculatedArrival": "11:44:12",
+    "calculatedArrival": "11:44:13",
     "calculatedDeparture": ""
   },
   {
@@ -40,8 +40,8 @@
     "signalReceptionClosed": false,
     "margin": {
       "theoretical": "",
-      "theoreticalS": "32 s",
-      "actual": "32 s",
+      "theoreticalS": "117 s",
+      "actual": "117 s",
       "difference": "0 s"
     },
     "calculatedArrival": "11:52:55",
@@ -61,6 +61,6 @@
       "difference": ""
     },
     "calculatedArrival": "12:06:18",
-    "calculatedDeparture": ""
+    "calculatedDeparture": "12:06:18"
   }
 ]

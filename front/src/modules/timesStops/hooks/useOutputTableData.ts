@@ -4,154 +4,129 @@ import { keyBy } from 'lodash';
 import { useTranslation } from 'react-i18next';
 
 import type {
-  OperationalPointWithTimeAndSpeed,
   PathPropertiesFormatted,
   SimulationResponseSuccess,
 } from 'applications/operationalStudies/types';
 import type { PathfindingResultSuccess, TrainScheduleResult } from 'common/api/osrdEditoastApi';
-import { formatSuggestedOperationalPoints } from 'modules/pathfinding/utils';
-import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
-import { convertIsoUtcToLocalTime } from 'utils/date';
-import { secToHoursString } from 'utils/timeManipulation';
+import { interpolateValue } from 'modules/simulationResult/SimulationResultExport/utils';
+import type { TrainScheduleWithDetails } from 'modules/trainschedule/components/Timetable/types';
+import { dateToHHMMSS } from 'utils/date';
+import { calculateTimeDifferenceInSeconds } from 'utils/timeManipulation';
 
-import { checkAndFormatCalculatedArrival } from '../helpers/arrivalTime';
+import { ARRIVAL_TIME_ACCEPTABLE_ERROR_MS } from '../consts';
+import { computeInputDatetimes } from '../helpers/arrivalTime';
 import computeMargins from '../helpers/computeMargins';
-import { computeScheduleData, formatScheduleData } from '../helpers/scheduleData';
-import {
-  findNextScheduledOpPoint,
-  formatSuggestedViasToRowVias,
-  updateDaySinceDeparture,
-} from '../helpers/utils';
-import {
-  type TrainScheduleBasePathWithUic,
-  type ScheduleEntry,
-  type TimeStopsRow,
-  TableType,
-} from '../types';
+import { formatSchedule } from '../helpers/scheduleData';
+import { type ScheduleEntry, type TimeStopsRow } from '../types';
 
-function useOutputTableData(
-  simulatedTrain: SimulationResponseSuccess,
-  pathProperties: PathPropertiesFormatted,
-  operationalPoints: OperationalPointWithTimeAndSpeed[],
-  selectedTrainSchedule: TrainScheduleResult,
+const useOutputTableData = (
+  { final_output: simulatedTrain }: SimulationResponseSuccess,
+  trainSummary?: TrainScheduleWithDetails,
+  operationalPoints?: PathPropertiesFormatted['operationalPoints'],
+  selectedTrainSchedule?: TrainScheduleResult,
   path?: PathfindingResultSuccess
-): TimeStopsRow[] {
+): TimeStopsRow[] => {
   const { t } = useTranslation('timesStops');
 
-  const scheduleByAt: Record<string, ScheduleEntry> = keyBy(selectedTrainSchedule.schedule, 'at');
-  const suggestedOperationalPoints: SuggestedOP[] = useMemo(
-    () =>
-      path?.length
-        ? formatSuggestedOperationalPoints(
-            pathProperties.operationalPoints,
-            pathProperties.geometry,
-            path.length
-          )
-        : [],
-    [pathProperties.operationalPoints, pathProperties.geometry]
-  );
+  const scheduleByAt: Record<string, ScheduleEntry> = keyBy(selectedTrainSchedule?.schedule, 'at');
+  const startDatetime = selectedTrainSchedule
+    ? new Date(selectedTrainSchedule.start_time)
+    : undefined;
 
-  const pathStepsWithPositionOnPath = useMemo(() => {
-    if (!path || !selectedTrainSchedule) return [];
-    return selectedTrainSchedule.path.map((pathStep, index) => ({
-      ...pathStep,
-      positionOnPath: path.path_item_positions[index],
-    }));
-  }, [path, selectedTrainSchedule]);
+  const pathStepRows = useMemo(() => {
+    const pathItemTimes = trainSummary?.pathItemTimes;
+    if (!path || !selectedTrainSchedule || !pathItemTimes || !startDatetime) return [];
 
-  const pathStepsWithOpPointIndices = useMemo(
-    () =>
-      selectedTrainSchedule.path
-        .filter((pathStep): pathStep is TrainScheduleBasePathWithUic => 'uic' in pathStep)
-        .map((pathStep) => {
-          const correspondingOpPointIndex = suggestedOperationalPoints.findIndex(
-            (sugOpPoint) =>
-              'uic' in pathStep &&
-              sugOpPoint.uic === pathStep.uic &&
-              sugOpPoint.ch === pathStep.secondary_code
-          );
-          return {
-            ...pathStep,
-            correspondingOpPointIndex,
-          };
-        }),
-    [selectedTrainSchedule, suggestedOperationalPoints]
-  );
-  const pathStepsByUic = keyBy(
-    pathStepsWithOpPointIndices,
-    (pathStep) => `${pathStep.uic}-${pathStep.secondary_code}`
-  );
+    let lastReferenceDate = startDatetime;
 
-  const outputTableData = useMemo(() => {
-    const pathStepRows = pathStepsWithPositionOnPath.map((pathStep) => {
-      const schedule = scheduleByAt[pathStep.id];
-      const scheduleData = computeScheduleData(schedule);
-      return { ...pathStep, ...formatScheduleData(scheduleData) };
-    });
+    return selectedTrainSchedule.path.map((pathStep, index) => {
+      const schedule: ScheduleEntry | undefined = scheduleByAt[pathStep.id];
 
-    const suggestedOpRows = suggestedOperationalPoints.map((sugOpPoint, sugOpIndex) => {
-      const opPoint = operationalPoints.find((op) => op.id === sugOpPoint.opId);
-      if (!opPoint) {
-        return sugOpPoint;
-      }
-      const nextOpPoint = findNextScheduledOpPoint(
-        operationalPoints,
-        pathStepsWithOpPointIndices,
-        sugOpIndex
+      const computedArrival = new Date(startDatetime.getTime() + pathItemTimes.final[index]);
+
+      const { stopFor, shortSlipDistance, onStopSignal, calculatedDeparture } = formatSchedule(
+        computedArrival,
+        schedule
       );
-      const pathStepKey = `${sugOpPoint.uic}-${sugOpPoint.ch}`;
+      const { theoreticalMargin, theoreticalMarginSeconds, calculatedMargin, diffMargins } =
+        computeMargins(selectedTrainSchedule, index, pathItemTimes);
 
-      if (pathStepKey in pathStepsByUic) {
-        const pathStepId = pathStepsByUic[pathStepKey].id || '';
-        const schedule = scheduleByAt[pathStepId];
-        const scheduleData = computeScheduleData(schedule);
-        const formattedScheduleData = formatScheduleData(scheduleData);
-        const marginsData = nextOpPoint
-          ? computeMargins(simulatedTrain, opPoint, nextOpPoint, selectedTrainSchedule, pathStepId)
-          : null;
-        const calculatedArrival = checkAndFormatCalculatedArrival(scheduleData, opPoint.time);
+      const { theoreticalArrival, arrival, departure, refDate } = computeInputDatetimes(
+        startDatetime,
+        lastReferenceDate,
+        schedule,
+        {
+          isDeparture: index === 0,
+        }
+      );
+      lastReferenceDate = refDate;
+
+      const isOnTime = theoreticalArrival
+        ? calculateTimeDifferenceInSeconds(theoreticalArrival, computedArrival) <=
+          ARRIVAL_TIME_ACCEPTABLE_ERROR_MS / 1000
+        : false;
+
+      return {
+        opId: pathStep.id,
+        name: t('waypoint', { id: pathStep.id }),
+        ch: undefined,
+        isWaypoint: true,
+
+        arrival,
+        departure,
+        stopFor,
+        onStopSignal,
+        shortSlipDistance,
+        theoreticalMargin,
+
+        theoreticalMarginSeconds,
+        calculatedMargin,
+        diffMargins,
+        calculatedArrival: dateToHHMMSS(isOnTime ? theoreticalArrival! : computedArrival),
+        calculatedDeparture,
+        positionOnPath: path.path_item_positions[index],
+      };
+    });
+  }, [selectedTrainSchedule, path, trainSummary?.pathItemTimes, startDatetime]);
+
+  const rows: TimeStopsRow[] = useMemo(() => {
+    if (!operationalPoints || !startDatetime) return [];
+
+    return operationalPoints.map((op) => {
+      const matchingPathStep = pathStepRows.find(
+        (pathStepRow) => op.position === pathStepRow.positionOnPath
+      );
+      if (matchingPathStep) {
         return {
-          ...sugOpPoint,
-          ...formattedScheduleData,
-          receptionSignal: schedule?.reception_signal,
-          calculatedArrival,
-          calculatedDeparture:
-            opPoint.duration > 0
-              ? secToHoursString(opPoint.time + opPoint.duration, { withSeconds: true })
-              : '',
-          ...marginsData,
+          ...matchingPathStep,
+          opId: op.id,
+          name: op.extensions?.identifier?.name,
+          ch: op.extensions?.sncf?.ch,
         };
       }
 
-      return {
-        ...sugOpPoint,
-        calculatedArrival: secToHoursString(opPoint.time, { withSeconds: true }),
-      };
-    });
-
-    const allWaypoints = suggestedOpRows.map((sugOpPoint) => {
-      const matchingPathStep = pathStepRows.find(
-        (pathStepRow) => sugOpPoint.positionOnPath === pathStepRow.positionOnPath
+      // compute arrival time
+      const matchingReportTrainIndex = simulatedTrain.positions.findIndex(
+        (position) => position === op.position
       );
+
+      const time =
+        matchingReportTrainIndex === -1
+          ? interpolateValue(simulatedTrain, op.position, 'times')
+          : simulatedTrain.times[matchingReportTrainIndex];
+      const calculatedArrival = new Date(startDatetime.getTime() + time);
+
       return {
-        ...sugOpPoint,
-        ...(matchingPathStep || {}),
-        isWaypoint: matchingPathStep !== undefined,
+        isWaypoint: false,
+        opId: op.id,
+        name: op.extensions?.identifier?.name,
+        ch: op.extensions?.sncf?.ch,
+        calculatedArrival: dateToHHMMSS(calculatedArrival),
       };
     });
+  }, [operationalPoints, pathStepRows, simulatedTrain, startDatetime]);
 
-    const startTime = convertIsoUtcToLocalTime(selectedTrainSchedule.start_time);
-    const formattedWaypoints = formatSuggestedViasToRowVias(
-      allWaypoints,
-      [],
-      t,
-      startTime,
-      TableType.Output
-    );
-    return updateDaySinceDeparture(formattedWaypoints, startTime, { keepFirstIndexArrival: true });
-  }, [simulatedTrain, operationalPoints, selectedTrainSchedule, pathStepsWithOpPointIndices]);
-
-  return outputTableData;
-}
+  return rows;
+};
 
 export default useOutputTableData;

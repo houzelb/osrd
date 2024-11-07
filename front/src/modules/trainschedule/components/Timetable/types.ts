@@ -10,10 +10,13 @@ export type ValidityFilter = 'both' | 'valid' | 'invalid';
 
 export type ScheduledPointsHonoredFilter = 'both' | 'honored' | 'notHonored';
 
+type SimulationSummaryResultSuccess = Extract<SimulationSummaryResult, { status: 'success' }>;
+
 export type TrainScheduleWithDetails = Omit<
   TrainScheduleResult,
   'train_name' | 'rolling_stock_name' | 'timetable_id'
 > & {
+  id: number;
   trainName: string;
   startTime: Date;
   arrivalTime: Date | null;
@@ -29,6 +32,11 @@ export type TrainScheduleWithDetails = Omit<
   notHonoredReason?: 'scheduleNotHonored' | 'trainTooFast';
   scheduledPointsNotHonored?: boolean;
   isValid: boolean;
+  pathItemTimes?: {
+    base: SimulationSummaryResultSuccess['path_item_times_base'];
+    provisional: SimulationSummaryResultSuccess['path_item_times_provisional'];
+    final: SimulationSummaryResultSuccess['path_item_times_final'];
+  };
 };
 
 export type InvalidReason =

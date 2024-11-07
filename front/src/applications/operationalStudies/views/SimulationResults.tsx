@@ -42,6 +42,7 @@ const SimulationResults = ({
     selectedTrainSchedule,
     selectedTrainRollingStock,
     selectedTrainPowerRestrictions,
+    selectedTrainSummary,
     trainSimulation,
     pathProperties,
     path,
@@ -208,23 +209,17 @@ const SimulationResults = ({
       </div>
 
       {/* TIME STOPS TABLE */}
-      {selectedTrainSchedule &&
-        trainSimulation.status === 'success' &&
-        pathProperties &&
-        operationalPoints &&
-        infraId && (
-          <div className="time-stop-outputs">
-            <p className="mt-2 mb-3 ml-3 font-weight-bold">{t('timetableOutput')}</p>
-            <TimesStopsOutput
-              simulatedTrain={trainSimulation}
-              pathProperties={pathProperties}
-              operationalPoints={operationalPoints}
-              selectedTrainSchedule={selectedTrainSchedule}
-              path={path}
-              dataIsLoading={formattedOpPointsLoading}
-            />
-          </div>
-        )}
+      <div className="time-stop-outputs">
+        <p className="mt-2 mb-3 ml-3 font-weight-bold">{t('timetableOutput')}</p>
+        <TimesStopsOutput
+          simulatedTrain={trainSimulation}
+          trainSummary={selectedTrainSummary}
+          operationalPoints={pathProperties?.operationalPoints}
+          selectedTrainSchedule={selectedTrainSchedule}
+          path={path}
+          dataIsLoading={formattedOpPointsLoading}
+        />
+      </div>
 
       {/* SIMULATION EXPORT BUTTONS */}
       {selectedTrainSchedule &&

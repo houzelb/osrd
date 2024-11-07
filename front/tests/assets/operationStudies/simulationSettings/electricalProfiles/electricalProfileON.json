@@ -8,9 +8,9 @@
     "signalReceptionClosed": false,
     "margin": {
       "theoretical": "",
-      "theoreticalS": "0 s",
-      "actual": "0 s",
-      "difference": "0 s"
+      "theoreticalS": "",
+      "actual": "",
+      "difference": ""
     },
     "calculatedArrival": "11:22:40",
     "calculatedDeparture": ""
@@ -24,9 +24,9 @@
     "signalReceptionClosed": false,
     "margin": {
       "theoretical": "",
-      "theoreticalS": "0 s",
-      "actual": "0 s",
-      "difference": "0 s"
+      "theoreticalS": "",
+      "actual": "",
+      "difference": ""
     },
     "calculatedArrival": "11:32:58",
     "calculatedDeparture": ""
@@ -40,9 +40,9 @@
     "signalReceptionClosed": false,
     "margin": {
       "theoretical": "",
-      "theoreticalS": "0 s",
-      "actual": "0 s",
-      "difference": "0 s"
+      "theoreticalS": "",
+      "actual": "",
+      "difference": ""
     },
     "calculatedArrival": "11:40:27",
     "calculatedDeparture": "11:42:31"
@@ -61,6 +61,6 @@
       "difference": ""
     },
     "calculatedArrival": "11:53:19",
-    "calculatedDeparture": ""
+    "calculatedDeparture": "11:53:19"
   }
 ]

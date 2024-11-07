@@ -1,42 +1,34 @@
-import type { IsoDurationString } from 'common/types';
-import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
-import { ISO8601Duration2sec, formatDurationAsISO8601 } from 'utils/timeManipulation';
+/* eslint-disable import/prefer-default-export */
+import { dateToHHMMSS } from 'utils/date';
+import { ISO8601Duration2sec } from 'utils/timeManipulation';
 
-import type { ComputedScheduleEntry, ScheduleEntry } from '../types';
+import type { ScheduleEntry } from '../types';
+import { receptionSignalToSignalBooleans } from './utils';
 
-/**
- *
- * @param schedule for a given operational point
- */
-export function computeScheduleData(schedule: ScheduleEntry) {
+/** Format the stopFor, calculatedDeparture, shortSlipDistance and onStopSignal properties */
+export const formatSchedule = (arrivalTime: Date, schedule?: ScheduleEntry) => {
   if (!schedule) {
-    return { arrival: null, departure: null, stopFor: null };
+    return {
+      stopFor: undefined,
+      calculatedDeparture: undefined,
+      shortSlipDistance: false,
+      onStopSignal: false,
+    };
   }
-  const arrivalSeconds = schedule.arrival ? ISO8601Duration2sec(schedule.arrival) : null;
-  const stopForSeconds = schedule.stop_for ? ISO8601Duration2sec(schedule.stop_for) : null;
-  const departureSeconds =
-    arrivalSeconds && stopForSeconds ? arrivalSeconds + stopForSeconds : null;
+
+  if (!schedule.stop_for) {
+    return {
+      stopFor: undefined,
+      calculatedDeparture: undefined,
+      ...receptionSignalToSignalBooleans(schedule.reception_signal),
+    };
+  }
+
+  const stopForSeconds = ISO8601Duration2sec(schedule.stop_for);
 
   return {
-    arrival: arrivalSeconds,
-    departure: departureSeconds,
-    stopFor: stopForSeconds,
+    stopFor: `${stopForSeconds}`,
+    calculatedDeparture: dateToHHMMSS(new Date(arrivalTime.getTime() + stopForSeconds * 1000)),
+    ...receptionSignalToSignalBooleans(schedule.reception_signal),
   };
-}
-
-export function formatScheduleData(
-  scheduleData: ComputedScheduleEntry
-): Pick<SuggestedOP, 'arrival' | 'departure' | 'stopFor'> {
-  const arrival: IsoDurationString | null = scheduleData.arrival
-    ? formatDurationAsISO8601(scheduleData.arrival)
-    : null;
-  const departure: IsoDurationString | null = scheduleData.departure
-    ? formatDurationAsISO8601(scheduleData.departure)
-    : null;
-  const stopFor = scheduleData.stopFor !== null ? String(scheduleData.stopFor) : '';
-  return {
-    arrival,
-    departure,
-    stopFor,
-  };
-}
+};

@@ -25,9 +25,9 @@
     "shortSlipDistance": true,
     "margin": {
       "theoretical": "1 min/100km",
-      "theoreticalS": "9 s",
-      "actual": "291 s",
-      "difference": "283 s"
+      "theoreticalS": "37 s",
+      "actual": "1213 s",
+      "difference": "1176 s"
     },
     "calculatedArrival": "11:47:40",
     "calculatedDeparture": "11:52:40"
@@ -41,11 +41,11 @@
     "signalReceptionClosed": false,
     "margin": {
       "theoretical": "",
-      "theoreticalS": "12 s",
-      "actual": "12 s",
-      "difference": "0 s"
+      "theoreticalS": "20 s",
+      "actual": "303 s",
+      "difference": "283 s"
     },
-    "calculatedArrival": "12:05:20",
+    "calculatedArrival": "12:05:21",
     "calculatedDeparture": "12:07:24"
   },
   {
@@ -62,6 +62,6 @@
       "difference": ""
     },
     "calculatedArrival": "12:16:22",
-    "calculatedDeparture": ""
+    "calculatedDeparture": "12:16:22"
   }
 ]
