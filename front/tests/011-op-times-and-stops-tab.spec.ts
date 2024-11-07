@@ -125,6 +125,7 @@ test.describe('Times and Stops Tab Verification', () => {
     const expectedColumnNames = cleanWhitespaceInArray([
       translations.name,
       translations.ch,
+      translations.trackName,
       translations.arrivalTime,
       translations.stopTime,
       translations.departureTime,

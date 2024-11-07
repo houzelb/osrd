@@ -19,5 +19,6 @@
   "theoreticalMargin": "theoretical margin",
   "theoreticalMarginPlaceholder": "% or min/100km",
   "theoreticalMarginSeconds": "theoretical margin (s)",
+  "trackName": "track",
   "waypoint": "Waypoint {{id}}"
 }

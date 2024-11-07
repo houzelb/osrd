@@ -13,6 +13,7 @@ export type TimeStopsRow = {
   opId: string;
   name?: string;
   ch?: string;
+  trackName?: string;
   isWaypoint: boolean;
 
   arrival?: TimeExtraDays; // value asked by user
