@@ -28,6 +28,9 @@
 /chartos                                                 @openrailassociation/OSRD-Editoast
 /python                                                  @openrailassociation/OSRD-Editoast
 
+# --- E2E TESTS  ---
+/front/tests                                             @openrailassociation/OSRD-E2E-Tests
+
 # --- INTEGRATION TESTS  ---
 /tests                                                   @openrailassociation/OSRD-Tests
 
