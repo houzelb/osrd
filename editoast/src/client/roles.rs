@@ -3,7 +3,7 @@ use std::{collections::HashSet, fmt::Display, sync::Arc};
 use anyhow::{anyhow, bail};
 use clap::{Args, Subcommand};
 use editoast_authz::{
-    authorizer::{StorageDriver, UserInfo},
+    authorizer::{GroupInfo, StorageDriver, UserInfo},
     roles::BuiltinRoleSet,
     BuiltinRole,
 };
@@ -55,16 +55,41 @@ pub fn list_roles() {
 #[derive(Debug)]
 struct Subject {
     id: i64,
-    info: UserInfo,
+    info: SubjectInfo,
+}
+impl Subject {
+    /// Create a new subject representing a user
+    pub fn new_user(id: i64, info: UserInfo) -> Self {
+        Self {
+            id,
+            info: SubjectInfo::User(info),
+        }
+    }
+
+    /// Create a new subject representing a group
+    pub fn new_group(id: i64, info: GroupInfo) -> Self {
+        Self {
+            id,
+            info: SubjectInfo::Group(info),
+        }
+    }
+}
+
+#[derive(Debug)]
+enum SubjectInfo {
+    User(UserInfo),
+    Group(GroupInfo),
 }
 
 impl Display for Subject {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let Self {
-            id,
-            info: UserInfo { identity, name },
-        } = self;
-        write!(f, "{identity}#{id} ({name})")
+        let Self { id, info } = self;
+        match info {
+            SubjectInfo::User(UserInfo { name, identity }) => {
+                write!(f, "User {}#{} ({})", identity, id, name)
+            }
+            SubjectInfo::Group(info) => write!(f, "Group #{} ({})", id, info.name),
+        }
     }
 }
 
@@ -78,13 +103,15 @@ async fn parse_and_fetch_subject(
         let uid = driver.get_user_id(subject).await?;
         uid.ok_or_else(|| anyhow!("No subject with identity '{subject}' found"))?
     };
-    if let Some(info) = driver.get_user_info(id).await? {
-        let subject = Subject { id, info };
-        info!("Subject {subject}");
-        Ok(subject)
+    let subject = if let Some(info) = driver.get_user_info(id).await? {
+        Subject::new_user(id, info)
+    } else if let Some(info) = driver.get_group_info(id).await? {
+        Subject::new_group(id, info)
     } else {
         bail!("No subject found with ID {id}");
-    }
+    };
+    info!("{subject}");
+    Ok(subject)
 }
 
 pub async fn list_subject_roles(

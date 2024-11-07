@@ -4,7 +4,7 @@ use std::{collections::HashSet, sync::Arc};
 use diesel::{dsl, prelude::*};
 use diesel_async::{scoped_futures::ScopedFutureExt as _, RunQueryDsl};
 use editoast_authz::{
-    authorizer::{StorageDriver, UserIdentity, UserInfo},
+    authorizer::{GroupInfo, StorageDriver, UserIdentity, UserInfo},
     roles::BuiltinRoleSet,
 };
 use editoast_models::DbConnectionPoolV2;
@@ -60,13 +60,26 @@ impl<B: BuiltinRoleSet + Send + Sync> StorageDriver for PgAuthDriver<B> {
             .filter(authn_user::id.eq(user_id))
             .first::<(String, Option<String>)>(conn.write().await.deref_mut())
             .await
-            .optional()
-            .map(|res| {
-                res.map(|(identity, name)| UserInfo {
+            .optional()?
+            .map(|(identity, name)| {
+                UserInfo {
                     identity,
                     name: name.unwrap_or_default(), // FIXME: make the column non-nullable
-                })
-            })?;
+                }
+            });
+        Ok(info)
+    }
+
+    #[tracing::instrument(skip_all, fields(%group_id), ret(level = Level::DEBUG), err)]
+    async fn get_group_info(&self, group_id: i64) -> Result<Option<GroupInfo>, Self::Error> {
+        let conn = self.pool.get().await?;
+        let info = authn_group::table
+            .select(authn_group::name)
+            .filter(authn_group::id.eq(group_id))
+            .first::<String>(conn.write().await.deref_mut())
+            .await
+            .optional()?
+            .map(|name| GroupInfo { name });
         Ok(info)
     }
 

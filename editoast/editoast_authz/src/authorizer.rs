@@ -7,11 +7,17 @@ use crate::roles::BuiltinRoleSet;
 
 pub type UserIdentity = String;
 pub type UserName = String;
+pub type GroupName = String;
 
 #[derive(Debug, Clone)]
 pub struct UserInfo {
     pub identity: UserIdentity,
     pub name: UserName,
+}
+
+#[derive(Debug, Clone)]
+pub struct GroupInfo {
+    pub name: GroupName,
 }
 
 #[derive(Clone)]
@@ -36,6 +42,11 @@ pub trait StorageDriver: Clone {
         &self,
         user_id: i64,
     ) -> impl Future<Output = Result<Option<UserInfo>, Self::Error>> + Send;
+
+    fn get_group_info(
+        &self,
+        group_id: i64,
+    ) -> impl Future<Output = Result<Option<GroupInfo>, Self::Error>> + Send;
 
     fn ensure_user(&self, user: &UserInfo)
         -> impl Future<Output = Result<i64, Self::Error>> + Send;
@@ -338,6 +349,10 @@ mod tests {
                     name: "Mocked User".to_owned(),
                 });
             Ok(user_info)
+        }
+
+        async fn get_group_info(&self, _group_id: i64) -> Result<Option<GroupInfo>, Self::Error> {
+            Ok(None)
         }
     }
 }
