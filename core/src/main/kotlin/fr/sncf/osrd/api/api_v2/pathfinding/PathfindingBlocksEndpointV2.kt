@@ -62,7 +62,7 @@ class PathfindingBlocksEndpointV2(private val infraManager: InfraManager) : Take
             pathfindingLogger.info("No path found")
             RsJson(RsWithBody(pathfindingResponseAdapter.toJson(error.response)))
         } catch (ex: Throwable) {
-            if (ex is OSRDError && ex.osrdErrorType.isCacheable) {
+            if (ex is OSRDError && ex.osrdErrorType.isRecoverable) {
                 pathfindingLogger.info("Pathfinding failed: ${ex.message}")
                 val response = PathfindingFailed(ex)
                 RsJson(RsWithBody(pathfindingResponseAdapter.toJson(response)))
