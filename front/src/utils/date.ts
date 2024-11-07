@@ -248,3 +248,8 @@ export const formatTimeDifference = (_start: number | Date, _end: number | Date)
 
   return parts.join(' ');
 };
+
+export const dateToHHMMSS = (date: Date, { withoutSeconds } = { withoutSeconds: false }) => {
+  const format = withoutSeconds ? 'HH:mm' : 'HH:mm:ss';
+  return dayjs(date).local().format(format);
+};

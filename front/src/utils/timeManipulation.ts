@@ -64,6 +64,15 @@ export function calculateTimeDifferenceInSeconds(time1: string | Date, time2: st
   return (date2.getTime() - date1.getTime()) / 1000;
 }
 
+export function calculateTimeDifferenceInDays(datetime1?: Date, datetime2?: Date) {
+  if (!datetime1 || !datetime2) {
+    return undefined;
+  }
+  const date1 = new Date(datetime1.getFullYear(), datetime1.getMonth(), datetime1.getDate());
+  const date2 = new Date(datetime2.getFullYear(), datetime2.getMonth(), datetime2.getDate());
+  return dayjs.duration(date2.getTime() - date1.getTime()).asDays();
+}
+
 export function formatDurationAsISO8601(seconds: number) {
   return `PT${Math.abs(seconds)}S`;
 }

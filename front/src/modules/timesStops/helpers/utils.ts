@@ -4,7 +4,6 @@ import type { TFunction } from 'i18next';
 import { round, isEqual, isNil } from 'lodash';
 import { keyColumn, createTextColumn } from 'react-datasheet-grid';
 
-import type { OperationalPointWithTimeAndSpeed } from 'applications/operationalStudies/types';
 import type { ReceptionSignal } from 'common/api/osrdEditoastApi';
 import type { IsoDateTimeString, IsoDurationString, TimeString } from 'common/types';
 import { matchPathStepAndOp } from 'modules/pathfinding/utils';
@@ -23,12 +22,7 @@ import {
 } from 'utils/timeManipulation';
 
 import { marginRegExValidation, MarginUnit } from '../consts';
-import {
-  TableType,
-  type TimeExtraDays,
-  type PathStepOpPointCorrespondance,
-  type TimesStopsInputRow,
-} from '../types';
+import { TableType, type TimeExtraDays, type TimesStopsInputRow } from '../types';
 
 const matchPathStepAndOpWithKP = (step: PathStep, op: SuggestedOP) => {
   if (!matchPathStepAndOp(step, op)) {
@@ -115,21 +109,6 @@ export const formatSuggestedViasToRowVias = (
     };
   });
 };
-
-export function findNextScheduledOpPoint(
-  operationalPoints: OperationalPointWithTimeAndSpeed[],
-  pathStepsWithOpPointIndex: PathStepOpPointCorrespondance[],
-  sugOpIndex: number
-) {
-  const pathStepIndex = pathStepsWithOpPointIndex.findIndex(
-    (pathStep) => pathStep.correspondingOpPointIndex === sugOpIndex
-  );
-  if (pathStepIndex >= 0) {
-    const nextPathStep = pathStepsWithOpPointIndex[pathStepIndex + 1];
-    return operationalPoints[nextPathStep?.correspondingOpPointIndex];
-  }
-  return null;
-}
 
 const getDigits = (unit: string | undefined) =>
   unit === MarginUnit.second || unit === MarginUnit.percent ? 0 : 1;
