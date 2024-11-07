@@ -42,17 +42,14 @@ const useStdcmResults = (
     [selectedTrainId, stdcmTrainResult, otherSelectedTrainSchedule]
   );
 
-  const {
-    path: pathFinding,
-    simulation,
-    departure_time: departureTime,
-  } = stdcmResponse?.status === 'success'
-    ? stdcmResponse
-    : { path: undefined, simulation: undefined, departure_time: undefined };
+  const { simulation, departure_time: departureTime } =
+    stdcmResponse?.status === 'success'
+      ? stdcmResponse
+      : { simulation: undefined, departure_time: undefined };
 
   const speedSpaceChartData = useSpeedSpaceChart(
     stdcmTrainResult,
-    pathFinding,
+    stdcmResponse?.path,
     simulation,
     departureTime
   );
@@ -90,8 +87,8 @@ const useStdcmResults = (
       }
     };
 
-    if (infraId && stdcmResponse && pathFinding) {
-      getPathProperties(infraId, pathFinding);
+    if (infraId && stdcmResponse && stdcmResponse?.path) {
+      getPathProperties(infraId, stdcmResponse.path);
     }
   }, [stdcmResponse]);
 
