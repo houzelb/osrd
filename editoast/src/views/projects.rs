@@ -357,7 +357,7 @@ async fn patch(
 }
 
 #[cfg(test)]
-pub mod test {
+pub mod tests {
 
     use axum::http::StatusCode;
     use pretty_assertions::assert_eq;

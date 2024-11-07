@@ -429,7 +429,7 @@ impl GeneratedData for ErrorLayer {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use rstest::rstest;
 
     use super::buffer_stops;

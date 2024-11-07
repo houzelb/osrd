@@ -169,7 +169,7 @@ fn value_to_sql(value: &TypedAst, string_bindings: &mut Vec<String>) -> String {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
 
     use super::SqlQuery;
     use crate::context::TypedAst;

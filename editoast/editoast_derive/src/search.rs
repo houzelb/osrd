@@ -362,7 +362,7 @@ pub fn expand_store(input: &DeriveInput) -> Result<TokenStream> {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use darling::FromDeriveInput;
     use pretty_assertions::assert_eq;
 

@@ -276,7 +276,7 @@ async fn project_path(
 }
 
 #[cfg(test)]
-pub mod test {
+pub mod tests {
     use axum::http::StatusCode;
     use chrono::NaiveDate;
     use pretty_assertions::assert_eq;

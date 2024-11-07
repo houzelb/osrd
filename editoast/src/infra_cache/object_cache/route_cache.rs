@@ -15,7 +15,7 @@ impl Cache for Route {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
 
     use crate::infra_cache::tests::create_small_infra_cache;
     use crate::infra_cache::Graph;
