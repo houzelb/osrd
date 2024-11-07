@@ -470,7 +470,8 @@ public final class OSRDError extends RuntimeException {
      */
     @Override
     public String getMessage() {
-        return message;
+        if (context.isEmpty()) return message;
+        else return String.format("%s, context=%s", message, context);
     }
 
     /** The JSON adapter for serializing and deserializing OSRDError instances. */
