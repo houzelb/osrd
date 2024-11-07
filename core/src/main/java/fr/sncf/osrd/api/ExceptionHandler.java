@@ -1,7 +1,6 @@
 package fr.sncf.osrd.api;
 
 import fr.sncf.osrd.reporting.exceptions.ErrorCause;
-import fr.sncf.osrd.reporting.exceptions.ErrorType;
 import fr.sncf.osrd.reporting.exceptions.OSRDError;
 import org.takes.Response;
 import org.takes.rs.RsJson;
@@ -15,7 +14,7 @@ public class ExceptionHandler {
     public static Response handle(Throwable ex) throws OSRDError {
         ex.printStackTrace();
         if (ex instanceof OSRDError osrdError) {
-            if (osrdError.osrdErrorType == ErrorType.InfraSoftLoadingError) {
+            if (!osrdError.osrdErrorType.isRecoverable) {
                 throw osrdError;
             }
             return toResponse(osrdError);

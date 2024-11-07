@@ -73,7 +73,7 @@ class SimulationEndpoint(
                 )
             return RsJson(RsWithBody(simulationResponseAdapter.toJson(res)))
         } catch (ex: Throwable) {
-            if (ex is OSRDError && ex.osrdErrorType.isCacheable) {
+            if (ex is OSRDError && ex.osrdErrorType.isRecoverable) {
                 val response = SimulationFailed(ex)
                 return RsJson(RsWithBody(simulationResponseAdapter.toJson(response)))
             }

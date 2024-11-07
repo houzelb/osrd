@@ -175,16 +175,16 @@ public enum ErrorType {
     public final String type;
     public final String message;
     public final ErrorCause cause;
-    public final boolean isCacheable;
+    public final boolean isRecoverable;
 
     ErrorType(String type, String message, ErrorCause cause) {
         this(type, message, cause, true);
     }
 
-    ErrorType(String type, String message, ErrorCause cause, boolean isCacheable) {
+    ErrorType(String type, String message, ErrorCause cause, boolean isRecoverable) {
         this.type = "core:" + type;
         this.message = message;
         this.cause = cause;
-        this.isCacheable = isCacheable;
+        this.isRecoverable = isRecoverable;
     }
 }
