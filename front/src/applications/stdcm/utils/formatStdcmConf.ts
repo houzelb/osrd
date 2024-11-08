@@ -16,6 +16,7 @@ import { kmhToMs, tToKg } from 'utils/physics';
 import { ISO8601Duration2sec, sec2ms } from 'utils/timeManipulation';
 
 import createMargin from './createMargin';
+import { StdcmStopTypes } from '../types';
 
 type ValidStdcmConfig = {
   rollingStockId: number;
@@ -139,15 +140,25 @@ export const checkStdcmConf = (
     const { arrival, tolerances, stopFor, arrivalType } = step;
     const location = getStepLocation(step);
 
-    const duration = stopFor ? sec2ms(ISO8601Duration2sec(stopFor) || Number(stopFor)) : 0;
-    const timingData =
-      arrivalType === 'preciseTime' && arrival
-        ? {
-            arrival_time: arrival,
-            arrival_time_tolerance_before: sec2ms(tolerances?.before ?? 0),
-            arrival_time_tolerance_after: sec2ms(tolerances?.after ?? 0),
-          }
-        : undefined;
+    let timingData: PathfindingItem['timing_data'] | undefined;
+    let duration: number | undefined;
+    if (step.isVia) {
+      if (step.stopType !== StdcmStopTypes.PASSAGE_TIME) {
+        duration = stopFor ? sec2ms(ISO8601Duration2sec(stopFor) || Number(stopFor)) : 0;
+      }
+    } else {
+      // if the step is either the origin or the destination,
+      // it must have a duration
+      duration = 0;
+      if (arrivalType === 'preciseTime' && arrival) {
+        timingData = {
+          arrival_time: arrival,
+          arrival_time_tolerance_before: sec2ms(tolerances?.before ?? 0),
+          arrival_time_tolerance_after: sec2ms(tolerances?.after ?? 0),
+        };
+      }
+    }
+
     return {
       duration,
       location,
