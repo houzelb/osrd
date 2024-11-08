@@ -58,7 +58,7 @@ object EnvelopeTrainPath {
         val res = mutableMapOf<String, DistanceRangeMap<Electrification>>()
         for (entry in profileMap.entries) {
             val electrificationMapWithProfiles = electrificationMap.clone()
-            electrificationMapWithProfiles.updateMap(entry.value) {
+            electrificationMapWithProfiles.updateMapIntersection(entry.value) {
                 obj: Electrification,
                 profile: String ->
                 obj.withElectricalProfile(profile)

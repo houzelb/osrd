@@ -52,12 +52,25 @@ interface DistanceRangeMap<T> : Iterable<DistanceRangeMap.RangeMapEntry<T>> {
 
     /**
      * Updates the map with another one, using a merge function to fuse the values of intersecting
-     * ranges
+     * ranges. Doesn't keep any range from update where there is no intersection.
      */
-    fun <U> updateMap(update: DistanceRangeMap<U>, updateFunction: BiFunction<T, U, T>)
+    fun <U> updateMapIntersection(update: DistanceRangeMap<U>, updateFunction: BiFunction<T, U, T>)
+
+    /**
+     * Updates the map with another one, using a merge function to fuse the values of intersecting
+     * ranges. Calls default on the values of the ranges from update where there is no intersection.
+     */
+    fun updateMap(
+        update: DistanceRangeMap<T>,
+        updateFunction: (T, T) -> T,
+        default: (T) -> T = { it }
+    )
 
     /** Returns true if there is no entry at all */
     fun isEmpty(): Boolean
+
+    /** Clear the map */
+    fun clear()
 }
 
 fun <T> distanceRangeMapOf(

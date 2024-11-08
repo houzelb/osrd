@@ -190,12 +190,113 @@ data class DistanceRangeMapImpl<T>(
         return bounds.isEmpty()
     }
 
-    override fun <U> updateMap(update: DistanceRangeMap<U>, updateFunction: BiFunction<T, U, T>) {
+    override fun <U> updateMapIntersection(
+        update: DistanceRangeMap<U>,
+        updateFunction: BiFunction<T, U, T>
+    ) {
         for ((updateLower, updateUpper, updateValue) in update) {
             for ((subMapLower, subMapUpper, subMapValue) in this.subMap(updateLower, updateUpper)) {
                 this.put(subMapLower, subMapUpper, updateFunction.apply(subMapValue, updateValue))
             }
         }
+    }
+
+    override fun updateMap(
+        update: DistanceRangeMap<T>,
+        updateFunction: (T, T) -> T,
+        default: (T) -> T
+    ) {
+        val resultEntries = mutableListOf<DistanceRangeMap.RangeMapEntry<T>>()
+
+        // Iterate over each range in the update map
+        for ((updateLower, updateUpper, updateValue) in update) {
+            val subMap = this.subMap(updateLower, updateUpper)
+
+            // Track segments that are part of the updated map but not intersecting with `this`
+            if (subMap.isEmpty()) {
+                resultEntries.add(
+                    DistanceRangeMap.RangeMapEntry(updateLower, updateUpper, default(updateValue))
+                )
+            } else {
+                // Handle intersections
+                var lastEnd = updateLower
+
+                for ((subMapLower, subMapUpper, subMapValue) in subMap) {
+                    // Add non-overlapping segment from `update` before the intersection
+                    if (lastEnd < subMapLower) {
+                        resultEntries.add(
+                            DistanceRangeMap.RangeMapEntry(
+                                lastEnd,
+                                subMapLower,
+                                default(updateValue)
+                            )
+                        )
+                    }
+
+                    // Add the overlapping segment with combined value
+                    val combinedValue = updateFunction(subMapValue, updateValue)
+                    resultEntries.add(
+                        DistanceRangeMap.RangeMapEntry(subMapLower, subMapUpper, combinedValue)
+                    )
+
+                    lastEnd = subMapUpper
+                }
+
+                // Add non-overlapping segment from `update` after the intersection
+                if (lastEnd < updateUpper) {
+                    val combinedValue = default(updateValue)
+                    resultEntries.add(
+                        DistanceRangeMap.RangeMapEntry(lastEnd, updateUpper, combinedValue)
+                    )
+                }
+            }
+        }
+
+        // Add non-overlapping segments from `this`
+        // It's the same thing except we never add the overlapping segments
+        // Iterate over each range in the update map
+        for ((thisLower, thisUpper, thisValue) in this) {
+            val subMap = update.subMap(thisLower, thisUpper)
+
+            // Track segments that are part of the updated map but not intersecting with `this`
+            if (subMap.isEmpty()) {
+                val combinedValue = default(thisValue)
+                resultEntries.add(
+                    DistanceRangeMap.RangeMapEntry(thisLower, thisUpper, combinedValue)
+                )
+            } else {
+                // Handle intersections
+                var lastEnd = thisLower
+
+                for ((subMapLower, subMapUpper, subMapValue) in subMap) {
+                    // Add non-overlapping segment from `this` before the intersection
+                    if (lastEnd < subMapLower) {
+                        val combinedValue = default(thisValue)
+                        resultEntries.add(
+                            DistanceRangeMap.RangeMapEntry(lastEnd, subMapLower, combinedValue)
+                        )
+                    }
+                    lastEnd = subMapUpper
+                }
+
+                // Add non-overlapping segment from `this` after the intersection
+                if (lastEnd < thisUpper) {
+                    val combinedValue = default(thisValue)
+                    resultEntries.add(
+                        DistanceRangeMap.RangeMapEntry(lastEnd, thisUpper, combinedValue)
+                    )
+                }
+            }
+        }
+
+        // Clear current map and insert the updated entries
+        this.clear()
+        this.putMany(resultEntries)
+    }
+
+    override fun clear() {
+        bounds.clear()
+        values.clear()
     }
 
     /** Merges adjacent values, removes 0-length ranges */

@@ -1,9 +1,11 @@
 package fr.sncf.osrd.utils
 
 import fr.sncf.osrd.utils.units.Distance
+import fr.sncf.osrd.utils.units.meters
 import kotlin.test.assertEquals
 import kotlin.time.*
 import kotlin.time.Duration.Companion.seconds
+import org.junit.Assert.*
 import org.junit.Test
 
 class TestDistanceRangeMap {
@@ -309,5 +311,92 @@ class TestDistanceRangeMap {
         val rangeMap = mergeDistanceRangeMaps<Int>(maps, distances)
         assert(!mark2.hasPassedNow())
         assertEquals(mergedEntries, rangeMap.asList())
+    }
+
+    @Test
+    fun updateMapIntersection() {
+        val map = DistanceRangeMapImpl<String>()
+        map.put(0.0.meters, 10.0.meters, "A")
+        val updateMap = DistanceRangeMapImpl<String>()
+        updateMap.put(5.0.meters, 15.0.meters, "B")
+        map.updateMapIntersection(updateMap) { old, new -> old + new }
+        assertEquals("AB", map.get(7.5.meters))
+        assertEquals("A", map.get(2.5.meters))
+        assertNull(map.get(12.5.meters))
+    }
+
+    @Test
+    fun updateMap_noOverlap() {
+        val map = DistanceRangeMapImpl<String>()
+        map.put(0.0.meters, 5.0.meters, "A")
+        val update = DistanceRangeMapImpl<String>()
+        update.put(10.0.meters, 15.0.meters, "B")
+        map.updateMap(update, { old, new -> old + new })
+        assertEquals("A", map.get(2.5.meters))
+        assertEquals("B", map.get(12.5.meters))
+        assertNull(map.get(7.5.meters))
+    }
+
+    @Test
+    fun updateMap_partialOverlap() {
+        val map = DistanceRangeMapImpl<String>()
+        map.put(0.0.meters, 10.0.meters, "A")
+        val update = DistanceRangeMapImpl<String>()
+        update.put(5.0.meters, 15.0.meters, "B")
+        map.updateMap(update, { old, new -> old + new })
+        assertEquals("A", map.get(2.5.meters))
+        assertEquals("AB", map.get(7.5.meters))
+        assertEquals("B", map.get(12.5.meters))
+    }
+
+    @Test
+    fun updateMap_fullOverlap() {
+        val map = DistanceRangeMapImpl<String>()
+        map.put(0.0.meters, 10.0.meters, "A")
+        val update = DistanceRangeMapImpl<String>()
+        update.put(0.0.meters, 10.0.meters, "B")
+        map.updateMap(update, { old, new -> old + new })
+        assertEquals("AB", map.get(5.0.meters))
+    }
+
+    @Test
+    fun updateMap_multipleRanges() {
+        val map = DistanceRangeMapImpl<String>()
+        map.put(0.0.meters, 5.0.meters, "A")
+        map.put(10.0.meters, 15.0.meters, "C")
+        val update = DistanceRangeMapImpl<String>()
+        update.put(3.0.meters, 12.0.meters, "B")
+        map.updateMap(update, { old, new -> old + new })
+        assertEquals("A", map.get(1.0.meters))
+        assertEquals("AB", map.get(4.0.meters))
+        assertEquals("B", map.get(8.0.meters))
+        assertEquals("CB", map.get(11.0.meters))
+        assertEquals("C", map.get(14.0.meters))
+    }
+
+    @Test
+    fun updateMapKeepingNonIntersecting_emptyUpdate() {
+        val map = DistanceRangeMapImpl<String>()
+        map.put(0.0.meters, 10.0.meters, "A")
+        val update = DistanceRangeMapImpl<String>()
+        map.updateMap(update, { old, new -> old + new })
+        assertEquals("A", map.get(5.0.meters))
+    }
+
+    @Test
+    fun updateMap_emptyOriginal() {
+        val map = DistanceRangeMapImpl<String>()
+        val update = DistanceRangeMapImpl<String>()
+        update.put(0.0.meters, 10.0.meters, "B")
+        map.updateMap(update, { old, new -> old + new })
+        assertEquals("B", map.get(5.0.meters))
+    }
+
+    @Test
+    fun clear() {
+        val map = DistanceRangeMapImpl<String>()
+        map.put(0.0.meters, 10.0.meters, "A")
+        map.clear()
+        assertNull(map.get(5.0.meters))
     }
 }
