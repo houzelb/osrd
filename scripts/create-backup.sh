@@ -10,7 +10,7 @@ set -e
 
 OUTPUT_DIR="."
 if [ "$#" -eq 1 ]; then
-  OUTPUT_DIR="$(readlink -f $1)/"
+  OUTPUT_DIR="$(readlink -f "$1")/"
 fi
 
 # Check output directory

@@ -4,9 +4,9 @@
 # First add all your svg in a subfolder named to the signaling system (eg: `BAL`)
 # Then run this script. You will need docker.
 
-for signaling_system in $(ls); do
+for signaling_system in *; do
   # Skip files (like this file)
-  [ ! -d "${signaling_system}" ] && continue
+  [ -d "${signaling_system}" ] || continue
 
   # Prepare the tmp directory
   tmp_dir="$(mktemp -d)"
@@ -20,7 +20,8 @@ for signaling_system in $(ls); do
   cp "${tmp_dir}"/sprites/sprites* "${signaling_system}"
 
   # Add a linefeed to the json files
-  for json_file in $(ls  "${signaling_system}"/*.json); do
+  for json_file in "${signaling_system}"/*.json; do
+    [ -f "$json_file" ] || continue
     echo "" >> "${json_file}"
   done
 

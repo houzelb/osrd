@@ -14,7 +14,7 @@ if [ "$#" -ne 1 ]; then
   exit 1
 fi
 
-root_path="$(realpath $(dirname "$0")/..)"
+root_path=$(realpath "$(dirname "$0")/..")
 
 # Check sha1 is matching
 echo "Checking backup integrity..."
