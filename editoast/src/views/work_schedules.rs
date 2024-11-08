@@ -1,7 +1,7 @@
 use axum::extract::Json;
 use axum::extract::State;
 use axum::Extension;
-use chrono::NaiveDateTime;
+use chrono::DateTime;
 use chrono::Utc;
 use derivative::Derivative;
 use editoast_authz::BuiltinRole;
@@ -64,8 +64,8 @@ pub fn map_diesel_error(e: InternalError, name: impl AsRef<str>) -> InternalErro
 
 #[derive(Serialize, Derivative, ToSchema)]
 struct WorkScheduleItemForm {
-    pub start_date_time: NaiveDateTime,
-    pub end_date_time: NaiveDateTime,
+    pub start_date_time: DateTime<Utc>,
+    pub end_date_time: DateTime<Utc>,
     pub track_ranges: Vec<TrackRange>,
     pub obj_id: String,
     #[schema(inline)]
@@ -80,8 +80,8 @@ impl<'de> Deserialize<'de> for WorkScheduleItemForm {
         #[derive(Deserialize)]
         #[serde(deny_unknown_fields)]
         struct Internal {
-            start_date_time: NaiveDateTime,
-            end_date_time: NaiveDateTime,
+            start_date_time: DateTime<Utc>,
+            end_date_time: DateTime<Utc>,
             track_ranges: Vec<TrackRange>,
             obj_id: String,
             work_schedule_type: WorkScheduleType,
@@ -163,7 +163,7 @@ async fn create(
     // Create the work_schedule_group
     let work_schedule_group = WorkScheduleGroup::changeset()
         .name(work_schedule_group_name.clone())
-        .creation_date(Utc::now().naive_utc())
+        .creation_date(Utc::now())
         .create(conn)
         .await;
     let work_schedule_group =
@@ -197,9 +197,9 @@ struct WorkScheduleProjection {
     /// The type of the work schedule.
     pub work_schedule_type: WorkScheduleType,
     /// The date and time when the work schedule takes effect.
-    pub start_date_time: NaiveDateTime,
+    pub start_date_time: DateTime<Utc>,
     /// The date and time when the work schedule ends.
-    pub end_date_time: NaiveDateTime,
+    pub end_date_time: DateTime<Utc>,
     /// a list of intervals `(a, b)` that represent the projections of the work schedule track ranges:
     /// - `a` is the distance from the beginning of the path to the beginning of the track range
     /// - `b` is the distance from the beginning of the path to the end of the track range
@@ -297,8 +297,8 @@ pub mod tests {
         let request = app.post("/work_schedules").json(&json!({
             "work_schedule_group_name": "work schedule group name",
             "work_schedules": [{
-                "start_date_time": "2024-01-01T08:00:00",
-                "end_date_time": "2024-01-01T09:00:00",
+                "start_date_time": "2024-01-01T08:00:00Z",
+                "end_date_time": "2024-01-01T09:00:00Z",
                 "track_ranges": [],
                 "obj_id": "work_schedule_obj_id",
                 "work_schedule_type": "CATENARY"
@@ -328,8 +328,8 @@ pub mod tests {
         let request = app.post("/work_schedules").json(&json!({
             "work_schedule_group_name": "work schedule group name",
             "work_schedules": [{
-                "start_date_time": "2024-01-01T08:00:00",
-                "end_date_time": "2024-01-01T07:00:00",
+                "start_date_time": "2024-01-01T08:00:00Z",
+                "end_date_time": "2024-01-01T07:00:00Z",
                 "track_ranges": [],
                 "obj_id": "work_schedule_obj_id",
                 "work_schedule_type": "CATENARY"
@@ -348,7 +348,7 @@ pub mod tests {
 
         WorkScheduleGroup::changeset()
             .name("duplicated work schedule group name".to_string())
-            .creation_date(Utc::now().naive_utc())
+            .creation_date(Utc::now())
             .create(&mut pool.get_ok())
             .await
             .expect("Failed to create work schedule group");
@@ -356,8 +356,8 @@ pub mod tests {
         let request = app.post("/work_schedules").json(&json!({
             "work_schedule_group_name": "duplicated work schedule group name",
             "work_schedules": [{
-                "start_date_time": "2024-01-01T08:00:00",
-                "end_date_time": "2024-01-01T09:00:00",
+                "start_date_time": "2024-01-01T08:00:00Z",
+                "end_date_time": "2024-01-01T09:00:00Z",
                 "track_ranges": [],
                 "obj_id": "work_schedule_obj_id",
                 "work_schedule_type": "CATENARY"
@@ -437,12 +437,14 @@ pub mod tests {
                     NaiveDate::from_ymd_opt(2024, 1, (index + 1).try_into().unwrap())
                         .unwrap()
                         .and_hms_opt(0, 0, 0)
-                        .unwrap();
+                        .unwrap()
+                        .and_utc();
                 let end_date_time =
                     NaiveDate::from_ymd_opt(2024, 1, (index + 2).try_into().unwrap())
                         .unwrap()
                         .and_hms_opt(0, 0, 0)
-                        .unwrap();
+                        .unwrap()
+                        .and_utc();
                 WorkSchedule::changeset()
                     .start_date_time(start_date_time)
                     .end_date_time(end_date_time)
