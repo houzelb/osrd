@@ -960,7 +960,6 @@ mod tests {
                     "speeds": [],
                     "energy_consumption": 0.0,
                     "path_item_times": [0, 1000, 2000, 3000],
-                    "signal_sightings": [],
                     "zone_updates": [],
                     "spacing_requirements": [],
                     "routing_requirements": []

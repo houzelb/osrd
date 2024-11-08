@@ -3306,7 +3306,6 @@ components:
       - $ref: '#/components/schemas/ReportTrain'
       - type: object
         required:
-        - signal_sightings
         - zone_updates
         - spacing_requirements
         - routing_requirements
@@ -3315,10 +3314,6 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/RoutingRequirement'
-          signal_sightings:
-            type: array
-            items:
-              $ref: '#/components/schemas/SignalSighting'
           spacing_requirements:
             type: array
             items:
@@ -9504,28 +9499,6 @@ components:
           maxLength: 255
           minLength: 1
       additionalProperties: false
-    SignalSighting:
-      type: object
-      required:
-      - signal
-      - time
-      - position
-      - state
-      properties:
-        position:
-          type: integer
-          format: int64
-          description: Position in mm
-          minimum: 0
-        signal:
-          type: string
-        state:
-          type: string
-        time:
-          type: integer
-          format: int64
-          description: Time in ms
-          minimum: 0
     SimulationResponse:
       oneOf:
       - type: object
@@ -9586,7 +9559,6 @@ components:
             - $ref: '#/components/schemas/ReportTrain'
             - type: object
               required:
-              - signal_sightings
               - zone_updates
               - spacing_requirements
               - routing_requirements
@@ -9595,10 +9567,6 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/RoutingRequirement'
-                signal_sightings:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/SignalSighting'
                 spacing_requirements:
                   type: array
                   items:

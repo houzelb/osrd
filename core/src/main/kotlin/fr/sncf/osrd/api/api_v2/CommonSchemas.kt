@@ -37,13 +37,6 @@ class ZoneUpdate(
     @Json(name = "is_entry") val isEntry: Boolean,
 )
 
-class SignalSighting(
-    val signal: String,
-    val time: TimeDelta,
-    val position: Offset<TravelledPath>,
-    val state: String,
-)
-
 class RoutingRequirement(
     val route: String,
     @Json(name = "begin_time") val beginTime: TimeDelta,

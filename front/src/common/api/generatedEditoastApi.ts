@@ -3093,14 +3093,6 @@ export type RoutingRequirement = {
   route: string;
   zones: RoutingZoneRequirement[];
 };
-export type SignalSighting = {
-  /** Position in mm */
-  position: number;
-  signal: string;
-  state: string;
-  /** Time in ms */
-  time: number;
-};
 export type SpacingRequirement = {
   begin_time: number;
   end_time: number;
@@ -3133,7 +3125,6 @@ export type SimulationResponse =
       };
       final_output: ReportTrain & {
         routing_requirements: RoutingRequirement[];
-        signal_sightings: SignalSighting[];
         spacing_requirements: SpacingRequirement[];
         zone_updates: ZoneUpdate[];
       };

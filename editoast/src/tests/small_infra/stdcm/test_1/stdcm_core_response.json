@@ -155,14 +155,6 @@
                         "time_tail_free": 42.075
                     }
                 },
-                "signal_sightings": [
-                    {
-                        "offset": 0.0,
-                        "signal": "SA1",
-                        "state": "VL",
-                        "time": 0.0
-                    }
-                ],
                 "spacing_requirements": [],
                 "routing_requirements": [],
                 "speeds": [

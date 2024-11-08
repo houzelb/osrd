@@ -101,7 +101,6 @@ fun runScheduleMetadataExtractor(
             ZoneUpdate(rawInfra.getZoneName(it.zone), it.time, it.offset, it.isEntry)
         }
 
-    val signalSightings = mutableListOf<SignalSighting>()
     for ((i, pathSignal) in pathSignals.withIndex()) {
         val physicalSignal = loadedSignalInfra.getPhysicalSignal(pathSignal.signal)
         var sightOffset =
@@ -113,16 +112,6 @@ fun runScheduleMetadataExtractor(
             val previousSignalOffset = pathSignals[i - 1].pathOffset
             sightOffset = Offset.max(sightOffset, previousSignalOffset)
         }
-        signalSightings.add(
-            SignalSighting(
-                rawInfra.getPhysicalSignalName(
-                    loadedSignalInfra.getPhysicalSignal(pathSignal.signal)
-                )!!,
-                envelopeWithStops.interpolateArrivalAt(sightOffset.distance.meters).seconds,
-                sightOffset,
-                "VL" // TODO: find out the real state
-            )
-        )
     }
 
     val incrementalPath = incrementalPathOf(rawInfra, blockInfra)
@@ -184,7 +173,6 @@ fun runScheduleMetadataExtractor(
         reportTrain.speeds,
         reportTrain.energyConsumption,
         reportTrain.pathItemTimes,
-        signalSightings,
         zoneUpdates,
         spacingRequirements.requirements.map {
             SpacingRequirement(it.zone, it.beginTime.seconds, it.endTime.seconds)

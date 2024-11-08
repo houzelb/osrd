@@ -26,7 +26,6 @@ use std::hash::Hash;
 editoast_common::schemas! {
     CompleteReportTrain,
     RoutingRequirement,
-    SignalSighting,
     SpacingRequirement,
     RoutingZoneRequirement,
     ZoneUpdate,
@@ -306,20 +305,9 @@ pub struct ReportTrain {
 pub struct CompleteReportTrain {
     #[serde(flatten)]
     pub report_train: ReportTrain,
-    pub signal_sightings: Vec<SignalSighting>,
     pub zone_updates: Vec<ZoneUpdate>,
     pub spacing_requirements: Vec<SpacingRequirement>,
     pub routing_requirements: Vec<RoutingRequirement>,
-}
-
-#[derive(Debug, Clone, PartialEq, Hash, Serialize, Deserialize, ToSchema)]
-pub struct SignalSighting {
-    pub signal: String,
-    /// Time in ms
-    pub time: u64,
-    /// Position in mm
-    pub position: u64,
-    pub state: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Hash, Serialize, Deserialize, ToSchema)]

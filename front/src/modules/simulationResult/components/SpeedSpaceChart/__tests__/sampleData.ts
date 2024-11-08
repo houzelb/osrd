@@ -38,14 +38,6 @@ export const simulation: SimulationResponseSuccess = {
         ],
       },
     ],
-    signal_sightings: [
-      {
-        signal: 'signal',
-        state: 'state',
-        position: 0,
-        time: 0,
-      },
-    ],
     spacing_requirements: [{ begin_time: 0, end_time: 0, zone: 'zone' }],
     zone_updates: [
       {
