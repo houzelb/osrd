@@ -8,9 +8,12 @@ import ngeStyles from '@osrd-project/netzgrafik-frontend/dist/netzgrafik-fronten
 import ngeVendor from '@osrd-project/netzgrafik-frontend/dist/netzgrafik-frontend/vendor.js?url';
 /* eslint-enable import/extensions, import/no-unresolved */
 
+import i18n from 'i18n';
+
 import type { NetzgrafikDto, NGEEvent } from './types';
 
 interface NGEElement extends HTMLElement {
+  language: string;
   netzgrafikDto: NetzgrafikDto;
 }
 
@@ -68,6 +71,12 @@ const NGE = ({ dto, onOperation }: NGEProps) => {
       frame.removeEventListener('load', handleFrameLoad);
     };
   }, []);
+
+  useEffect(() => {
+    if (ngeRootElement && i18n.language) {
+      ngeRootElement.language = i18n.language;
+    }
+  }, [i18n.language, ngeRootElement]);
 
   useEffect(() => {
     if (ngeRootElement && dto) {
