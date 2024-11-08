@@ -3372,6 +3372,7 @@ export type TowedRollingStock = {
   length: number;
   locked: boolean;
   mass: number;
+  max_speed?: number | null;
   name: string;
   railjson_version: string;
   rolling_resistance: RollingResistancePerWeight;
@@ -3385,6 +3386,7 @@ export type TowedRollingStockForm = {
   length: number;
   locked: boolean;
   mass: number;
+  max_speed?: number | null;
   name: string;
   rolling_resistance: RollingResistancePerWeight;
   startup_acceleration: number;

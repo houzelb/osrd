@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { min } from 'lodash';
 import { useSelector } from 'react-redux';
 
 import type { LightRollingStockWithLiveries, TowedRollingStock } from 'common/api/osrdEditoastApi';
@@ -57,9 +58,8 @@ const useStdcmConsist = () => {
     }
 
     if (!maxSpeedChanged) {
-      dispatch(
-        updateMaxSpeed(rollingStock?.max_speed ? Math.floor(rollingStock.max_speed) : undefined)
-      );
+      const consistMaxSpeed = min([rollingStock?.max_speed, towed?.max_speed]);
+      dispatch(updateMaxSpeed(consistMaxSpeed ? Math.floor(consistMaxSpeed) : undefined));
     }
   };
 

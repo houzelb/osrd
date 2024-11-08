@@ -18,4 +18,5 @@ pub struct TowedRollingStock {
     /// The constant gamma braking coefficient used when NOT circulating
     /// under ETCS/ERTMS signaling system in m/s^2
     pub const_gamma: f64,
+    pub max_speed: Option<f64>,
 }

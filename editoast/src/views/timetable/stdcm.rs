@@ -26,6 +26,7 @@ use std::sync::Arc;
 use thiserror::Error;
 use utoipa::IntoParams;
 use utoipa::ToSchema;
+use validator::Validate;
 
 use crate::core::conflict_detection::Conflict;
 use crate::core::conflict_detection::TrainRequirements;
@@ -138,6 +139,8 @@ async fn stdcm(
     if !authorized {
         return Err(AuthorizationError::Unauthorized.into());
     }
+
+    stdcm_request.validate()?;
 
     let conn = &mut db_pool.get().await?;
 

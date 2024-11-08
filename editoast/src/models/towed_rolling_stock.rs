@@ -25,6 +25,8 @@ pub struct TowedRollingStockModel {
     pub mass: f64,
     /// In m
     pub length: f64,
+    /// In km/h
+    pub max_speed: Option<f64>,
     pub comfort_acceleration: f64,
     pub startup_acceleration: f64,
     pub inertia_coefficient: f64,
@@ -48,6 +50,7 @@ impl From<TowedRollingStockModel> for TowedRollingStock {
             inertia_coefficient: model.inertia_coefficient,
             rolling_resistance: model.rolling_resistance,
             const_gamma: model.const_gamma,
+            max_speed: model.max_speed,
         }
     }
 }

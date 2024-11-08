@@ -239,6 +239,7 @@ pub fn create_towed_rolling_stock() -> TowedRollingStock {
             C: 0.0002, // In N/(m/s)²
         },
         const_gamma: 1.0,
+        max_speed: Some(35.0),
         railjson_version: "3.4".to_string(),
     }
 }

@@ -700,6 +700,7 @@ diesel::table! {
         version -> Int8,
         #[max_length = 255]
         label -> Varchar,
+        max_speed -> Nullable<Float8>,
     }
 }
 
