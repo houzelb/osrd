@@ -11,6 +11,7 @@ use itertools::Itertools;
 use serde::Deserialize;
 use serde::Serialize;
 use utoipa::ToSchema;
+use validator::Validate;
 
 use crate::core::pathfinding::PathfindingInputError;
 use crate::error::Result;
@@ -65,7 +66,7 @@ struct StepTimingData {
 }
 
 /// An STDCM request
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Validate, ToSchema)]
 pub(super) struct Request {
     /// Deprecated, first step arrival time should be used instead
     pub(super) start_time: Option<DateTime<Utc>>,
@@ -102,10 +103,13 @@ pub(super) struct Request {
     #[schema(value_type = Option<String>, example = json!(["5%", "2min/100km"]))]
     pub(super) margin: Option<MarginValue>,
     /// Total mass of the consist in kg
+    #[validate(range(exclusive_min = 0.0))]
     pub(super) total_mass: Option<f64>,
     /// Total length of the consist in meters
+    #[validate(range(exclusive_min = 0.0))]
     pub(super) total_length: Option<f64>,
     /// Maximum speed of the consist in km/h
+    #[validate(range(exclusive_min = 0.0))]
     pub(super) max_speed: Option<f64>,
     pub(super) loading_gauge_type: Option<LoadingGaugeType>,
 }

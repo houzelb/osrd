@@ -114,10 +114,17 @@ impl PhysicsConsistParameters {
     }
 
     pub fn compute_max_speed(&self) -> f64 {
-        self.max_speed
-            .map(|max_speed_parameter| {
-                f64::min(self.traction_engine.max_speed, max_speed_parameter)
-            })
+        let max_speeds = [
+            self.max_speed,
+            self.towed_rolling_stock
+                .as_ref()
+                .and_then(|towed| towed.max_speed),
+            Some(self.traction_engine.max_speed),
+        ];
+        max_speeds
+            .into_iter()
+            .flatten()
+            .reduce(f64::min)
             .unwrap_or(self.traction_engine.max_speed)
     }
 
@@ -555,6 +562,7 @@ mod tests {
 
     #[test]
     fn physics_consist_max_speed() {
+        // Towed max speed 35
         let mut physics_consist = create_physics_consist();
         physics_consist.max_speed = Some(20.0); // m/s
         physics_consist.traction_engine.max_speed = 22.0; // m/s
@@ -569,6 +577,12 @@ mod tests {
 
         physics_consist.max_speed = None;
         assert_eq!(physics_consist.compute_max_speed(), 24.0);
+
+        physics_consist.traction_engine.max_speed = 40.0; // m/s
+        assert_eq!(physics_consist.compute_max_speed(), 35.0);
+
+        physics_consist.towed_rolling_stock = None;
+        assert_eq!(physics_consist.compute_max_speed(), 40.0);
     }
 
     #[test]

@@ -60,6 +60,7 @@ struct TowedRollingStock {
     inertia_coefficient: f64,
     rolling_resistance: RollingResistancePerWeight,
     const_gamma: f64,
+    max_speed: Option<f64>,
 }
 
 impl From<TowedRollingStockModel> for TowedRollingStock {
@@ -77,6 +78,7 @@ impl From<TowedRollingStockModel> for TowedRollingStock {
             inertia_coefficient: towed_rolling_stock.inertia_coefficient,
             rolling_resistance: towed_rolling_stock.rolling_resistance,
             const_gamma: towed_rolling_stock.const_gamma,
+            max_speed: towed_rolling_stock.max_speed,
         }
     }
 }
@@ -105,6 +107,7 @@ pub struct TowedRollingStockForm {
     pub inertia_coefficient: f64,
     pub rolling_resistance: RollingResistancePerWeight,
     pub const_gamma: f64,
+    pub max_speed: Option<f64>,
 }
 
 impl From<TowedRollingStockForm> for Changeset<TowedRollingStockModel> {
@@ -121,6 +124,7 @@ impl From<TowedRollingStockForm> for Changeset<TowedRollingStockModel> {
             .inertia_coefficient(towed_rolling_stock_form.inertia_coefficient)
             .rolling_resistance(towed_rolling_stock_form.rolling_resistance)
             .const_gamma(towed_rolling_stock_form.const_gamma)
+            .max_speed(towed_rolling_stock_form.max_speed)
     }
 }
 

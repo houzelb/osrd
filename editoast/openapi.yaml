@@ -10654,6 +10654,10 @@ components:
         mass:
           type: number
           format: double
+        max_speed:
+          type: number
+          format: double
+          nullable: true
         name:
           type: string
         railjson_version:
@@ -10707,6 +10711,10 @@ components:
         mass:
           type: number
           format: double
+        max_speed:
+          type: number
+          format: double
+          nullable: true
         name:
           type: string
         rolling_resistance:
