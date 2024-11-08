@@ -30,7 +30,7 @@ class SimulationRequest(
     @Json(name = "speed_limit_tag") val speedLimitTag: String?,
     @Json(name = "power_restrictions") val powerRestrictions: List<SimulationPowerRestrictionItem>,
     val options: TrainScheduleOptions,
-    @Json(name = "rolling_stock") val rollingStock: PhysicsRollingStockModel,
+    @Json(name = "physics_consist") val physicsConsist: PhysicsConsistModel,
     @Json(name = "electrical_profile_set_id") val electricalProfileSetId: String?
 ) {
     companion object {
@@ -57,7 +57,7 @@ enum class AllowanceDistribution {
     }
 }
 
-class PhysicsRollingStockModel(
+class PhysicsConsistModel(
     @Json(name = "effort_curves") val effortCurves: EffortCurve,
     @Json(name = "base_power_class") val basePowerClass: String?,
     val length: Length<RollingStock>,

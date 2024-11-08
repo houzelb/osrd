@@ -10,7 +10,7 @@ import fr.sncf.osrd.api.api_v2.WorkSchedule
 import fr.sncf.osrd.api.api_v2.conflicts.TrainRequirementsRequest
 import fr.sncf.osrd.api.api_v2.standalone_sim.MarginValue
 import fr.sncf.osrd.api.api_v2.standalone_sim.MarginValueAdapter
-import fr.sncf.osrd.api.api_v2.standalone_sim.PhysicsRollingStockModel
+import fr.sncf.osrd.api.api_v2.standalone_sim.PhysicsConsistModel
 import fr.sncf.osrd.railjson.schema.rollingstock.Comfort
 import fr.sncf.osrd.railjson.schema.rollingstock.RJSLoadingGaugeType
 import fr.sncf.osrd.railjson.schema.rollingstock.RJSRollingResistance
@@ -25,7 +25,7 @@ class STDCMRequestV2(
     @Json(name = "expected_version") var expectedVersion: String,
 
     // Rolling stock
-    @Json(name = "rolling_stock") val rollingStock: PhysicsRollingStockModel,
+    @Json(name = "physics_consist") val physicsConsist: PhysicsConsistModel,
 
     // Pathfinding inputs
     /// List of waypoints. Each waypoint is a list of track offsets

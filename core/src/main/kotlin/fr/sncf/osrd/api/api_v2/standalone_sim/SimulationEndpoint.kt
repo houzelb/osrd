@@ -45,7 +45,7 @@ class SimulationEndpoint(
                 electricalProfileSetManager.getProfileMap(request.electricalProfileSetId)
 
             // Parse rolling stocks
-            val rollingStock = parseRawRollingStock(request.rollingStock)
+            val rollingStock = parseRawRollingStock(request.physicsConsist)
 
             // Parse path
             val chunkPath = makeChunkPath(infra.rawInfra, request.path.trackSectionRanges)

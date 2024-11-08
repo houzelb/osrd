@@ -216,7 +216,7 @@ async fn stdcm(
         rolling_stock_supported_signaling_systems: rolling_stock
             .supported_signaling_systems
             .clone(),
-        rolling_stock: PhysicsConsistParameters {
+        physics_consist: PhysicsConsistParameters {
             max_speed: stdcm_request.max_speed,
             total_length: stdcm_request.total_length,
             total_mass: stdcm_request.total_mass,
