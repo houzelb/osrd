@@ -107,7 +107,7 @@ def test_between_trains(small_scenario: Scenario, fast_rolling_stock: int):
 
 def test_work_schedules(small_scenario: Scenario, fast_rolling_stock: int):
     requests.post(EDITOAST_URL + f"infra/{small_scenario.infra}/load")
-    start_time = datetime.datetime(2024, 1, 1, 14, 0, 0)
+    start_time = datetime.datetime(2024, 1, 1, 14, 0, 0, tzinfo=datetime.timezone.utc)
     end_time = start_time + datetime.timedelta(days=4)
     # TODO: we cannot delete work schedules for now, so let's give a unique name
     # to avoid collisions
@@ -217,10 +217,10 @@ def test_max_running_time(small_scenario: Scenario, fast_rolling_stock: int):
                    [                             ] < departure time window
     """
     requests.post(EDITOAST_URL + f"infra/{small_scenario.infra}/load")
-    origin_start_time = datetime.datetime(2024, 1, 1, 8, 0, 0)
-    origin_end_time = datetime.datetime(2025, 1, 1, 8, 0, 0)
-    destination_start_time = datetime.datetime(2023, 1, 1, 8, 0, 0)
-    destination_end_time = datetime.datetime(2024, 1, 1, 16, 0, 0)
+    origin_start_time = datetime.datetime(2024, 1, 1, 8, 0, 0, tzinfo=datetime.timezone.utc)
+    origin_end_time = datetime.datetime(2025, 1, 1, 8, 0, 0, tzinfo=datetime.timezone.utc)
+    destination_start_time = datetime.datetime(2023, 1, 1, 8, 0, 0, tzinfo=datetime.timezone.utc)
+    destination_end_time = datetime.datetime(2024, 1, 1, 16, 0, 0, tzinfo=datetime.timezone.utc)
     # TODO: we cannot delete work schedules for now, so let's give a unique name
     # to avoid collisions
     now = datetime.datetime.now()

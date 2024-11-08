@@ -3,8 +3,7 @@ use axum::extract::Path;
 use axum::extract::Query;
 use axum::extract::State;
 use axum::Extension;
-use chrono::Utc;
-use chrono::{DateTime, Duration, NaiveDateTime, TimeZone};
+use chrono::{DateTime, Duration, Utc};
 use editoast_authz::BuiltinRole;
 use editoast_derive::EditoastError;
 use editoast_models::DbConnection;
@@ -786,8 +785,8 @@ async fn build_temporary_speed_limits(
     Ok(applicable_speed_limits)
 }
 
-fn elapsed_since_time_ms(time: &NaiveDateTime, zero: &DateTime<Utc>) -> u64 {
-    max(0, (Utc.from_utc_datetime(time) - zero).num_milliseconds()) as u64
+fn elapsed_since_time_ms(time: &DateTime<Utc>, zero: &DateTime<Utc>) -> u64 {
+    max(0, (*time - zero).num_milliseconds()) as u64
 }
 
 /// Create steps from track_map and waypoints
@@ -1200,17 +1199,17 @@ mod tests {
 
     #[rstest]
     // A day before the 'start_time' -> FILTERED OUT
-    #[case("2024-03-13 06:00:00", "2024-03-13 12:00:00", true)]
+    #[case("2024-03-13 06:00:00Z", "2024-03-13 12:00:00Z", true)]
     // Finishing just after the 'start_time' -> KEPT
-    #[case("2024-03-14 06:00:00", "2024-03-14 08:01:00", false)]
+    #[case("2024-03-14 06:00:00Z", "2024-03-14 08:01:00Z", false)]
     // Starting after the 'latest_simulation_end' -> FILTERED OUT
-    #[case("2024-03-14 10:01:00", "2024-03-14 12:00:00", true)]
+    #[case("2024-03-14 10:01:00Z", "2024-03-14 12:00:00Z", true)]
     // Starting before the 'latest_simulation_end' -> KEPT
-    #[case("2024-03-14 09:59:00", "2024-03-14 12:00:00", false)]
+    #[case("2024-03-14 09:59:00Z", "2024-03-14 12:00:00Z", false)]
     // Starting before the 'start_time' and finishing after 'latest_simulation_end' -> KEPT
-    #[case("2024-03-14 06:00:00", "2024-03-14 12:00:00", false)]
+    #[case("2024-03-14 06:00:00Z", "2024-03-14 12:00:00Z", false)]
     // Starting after the 'start_time' and finishing before 'latest_simulation_end' -> KEPT
-    #[case("2024-03-14 08:30:00", "2024-03-14 09:30:00", false)]
+    #[case("2024-03-14 08:30:00Z", "2024-03-14 09:30:00Z", false)]
     fn filter_stdcm_work_schedules_with_window(
         #[case] ws_start_time: &str,
         #[case] ws_end_time: &str,
@@ -1219,9 +1218,10 @@ mod tests {
         // GIVEN
         let work_schedules = [WorkSchedule {
             id: rand::random::<i64>(),
-            start_date_time: NaiveDateTime::parse_from_str(ws_start_time, "%Y-%m-%d %H:%M:%S")
-                .unwrap(),
-            end_date_time: NaiveDateTime::parse_from_str(ws_end_time, "%Y-%m-%d %H:%M:%S").unwrap(),
+            start_date_time: DateTime::parse_from_rfc3339(ws_start_time)
+                .unwrap()
+                .to_utc(),
+            end_date_time: DateTime::parse_from_rfc3339(ws_end_time).unwrap().to_utc(),
             ..Default::default()
         }];
         let start_time = DateTime::parse_from_rfc3339("2024-03-14T08:00:00Z")
