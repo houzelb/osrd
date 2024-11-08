@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck disable=SC2317
 
 # This script reads newline separated commit titles from stdin
 # output an error message when titles are deemed invalid,
@@ -6,7 +7,6 @@
 
 if [ -z "$NOCOLOR" ]; then
     RED=$(tput setaf 1 2>/dev/null)
-    YELLOW=$(tput setaf 3 2>/dev/null)
     BLUE=$(tput setaf 4 2>/dev/null)
     RESET=$(tput sgr0 2>/dev/null)
 fi

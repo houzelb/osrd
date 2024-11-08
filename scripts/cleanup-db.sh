@@ -14,7 +14,7 @@ if [ "$#" -ne 0 ]; then
   exit 1
 fi
 
-root_path="$(realpath $(dirname "$0")/..)"
+root_path=$(realpath "$(dirname "$0")/..")
 
 # These variables are necessary to load the infra on the correct instance (the pr-infra or the dev one)
 OSRD_POSTGRES="osrd-postgres"
@@ -37,13 +37,13 @@ echo "Checking database exists..."
 DB_EXISTS="$(docker exec $OSRD_POSTGRES psql -p $OSRD_POSTGRES_PORT -c "SELECT EXISTS (SELECT FROM pg_stat_database WHERE datname = 'osrd');")"
 DB_EXISTS="$(echo "$DB_EXISTS" | grep -o -E '[tf]$')"
 
-if [ $DB_EXISTS = 't' ]; then
+if [ "$DB_EXISTS" = 't' ]; then
   echo "  Database 'osrd' found"
 else
   echo "  Database 'osrd' not found"
 fi
 
-if [ $DB_EXISTS = 't' ]; then
+if [ "$DB_EXISTS" = 't' ]; then
   # Check that no service is connected to the database
   echo "Checking database availability..."
 
@@ -56,7 +56,7 @@ if [ $DB_EXISTS = 't' ]; then
   DB_CONN="$(docker exec "$OSRD_POSTGRES" psql -p "$OSRD_POSTGRES_PORT" -c "SELECT numbackends FROM pg_stat_database WHERE datname = 'osrd';")"
   DB_CONN="$(echo "$DB_CONN" | grep -o -E '[0-9]+$')"
 
-  if [ $DB_CONN -ne 0 ]; then
+  if [ "$DB_CONN" -ne 0 ]; then
     echo "  The database can not be cleared."
     echo "  A process is connected to your database, please check it and close it."
     echo "  In doubt, you can shutdown the whole compose stack and only keep the database running."
@@ -77,6 +77,6 @@ docker exec "$OSRD_POSTGRES" psql -p "$OSRD_POSTGRES_PORT" -f //tmp/init.sql > /
 echo "Deleting valkey cache..."
 docker exec "$OSRD_VALKEY" valkey-cli -p "$OSRD_VALKEY_PORT" FLUSHALL > /dev/null 2>&1 || docker volume rm -f $OSRD_VALKEY_VOLUME > /dev/null
 
-echo "Cleanup done!\n"
+echo 'Cleanup done!'
 echo "You may want to apply migrations if you don't load a backup:"
 echo "'diesel migration run --migration-dir \"$root_path/editoast/migrations\"'  # 'docker compose up editoast' does it automatically"
