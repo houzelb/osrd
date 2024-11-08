@@ -12,10 +12,12 @@ import fr.sncf.osrd.utils.units.Distance
 fun buildElectrificationMap(path: PathProperties): DistanceRangeMap<Electrification> {
     val res: DistanceRangeMap<Electrification> = DistanceRangeMapImpl()
     res.put(Distance.ZERO, path.getLength(), NonElectrified())
-    res.updateMap(path.getElectrification()) { _: Electrification?, electrificationMode: String ->
+    res.updateMapIntersection(path.getElectrification()) {
+        _: Electrification?,
+        electrificationMode: String ->
         if (electrificationMode == "") NonElectrified() else Electrified(electrificationMode)
     }
-    res.updateMap(path.getNeutralSections()) {
+    res.updateMapIntersection(path.getNeutralSections()) {
         electrification: Electrification?,
         neutralSection: NeutralSection ->
         Neutral(neutralSection.lowerPantograph, electrification, neutralSection.isAnnouncement)
