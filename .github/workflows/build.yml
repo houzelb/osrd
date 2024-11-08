@@ -177,6 +177,34 @@ jobs:
           name: osrdyne-test
           path: osrd-osrdyne-test.tar
 
+  check_dockerfiles:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build dummy test_data and static_assets images
+        run: |
+          echo -e "FROM scratch" > Dockerfile.empty
+          docker build -t test_data -f Dockerfile.empty .
+          docker build -t static_assets -f Dockerfile.empty .
+
+      - name: Find and check all Dockerfiles using docker build --check
+        run: |
+          set -eo pipefail
+          find . -name 'Dockerfile*' -print0 | xargs -0 -I {} docker build --file {} --check .
+
+  check_scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Find and check all scripts using ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          ignore_names: gradlew
+
   check_generated_railjson_sync:
     runs-on: ubuntu-latest
     steps:
