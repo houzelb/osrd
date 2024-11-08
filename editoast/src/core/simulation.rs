@@ -61,10 +61,10 @@ pub struct PhysicsConsist {
     /// Mapping of power restriction code to power class
     #[serde(default)]
     pub power_restrictions: BTreeMap<String, String>,
-    /// The time the train takes before actually using electrical power (in miliseconds).
+    /// The time the train takes before actually using electrical power (in milliseconds).
     /// Is null if the train is not electric or the value not specified.
     pub electrical_power_startup_time: Option<u64>,
-    /// The time it takes to raise this train's pantograph in miliseconds.
+    /// The time it takes to raise this train's pantograph in milliseconds.
     /// Is null if the train is not electric or the value not specified.
     pub raise_pantograph_time: Option<u64>,
 }
@@ -180,18 +180,18 @@ impl PhysicsConsistParameters {
 
             let towed_mass = total_mass - traction_engine_mass; // kg
 
-            let traction_engine_solid_friction_a = traction_engine_rr.A * 1000.0; // convert from kN to N
-            let traction_engine_viscosity_friction_b = traction_engine_rr.B * 1000.0 * 3.6; // convert from kN/(km/h) to N/(m/s)
-            let traction_engine_aerodynamic_drag_c = traction_engine_rr.C * 1000.0 * 3.6 * 3.6; // convert from kN/(km/h)² to N/(m/s)²
+            let traction_engine_solid_friction_a = traction_engine_rr.A; // N
+            let traction_engine_viscosity_friction_b = traction_engine_rr.B; // N/(m/s)
+            let traction_engine_aerodynamic_drag_c = traction_engine_rr.C; // N/(m/s)²
 
-            let towed_solid_friction_a = towed_rs_rr.A * 1e-2 * towed_mass; // convert from daN/t to N
-            let towed_viscosity_friction_b = towed_rs_rr.B * 1e-2 * towed_mass * 3.6; // convert from (daN/t)/(km/h) to N/(m/s)
-            let towed_aerodynamic_drag_c = towed_rs_rr.C * 1e-2 * towed_mass * 3.6 * 3.6; // convert from (daN/t)/(km/h)² to N/(m/s)²
+            let towed_solid_friction_a = towed_rs_rr.A * towed_mass; // N
+            let towed_viscosity_friction_b = towed_rs_rr.B * towed_mass; // N/(m/s)
+            let towed_aerodynamic_drag_c = towed_rs_rr.C * towed_mass; // N/(m/s)²
 
-            let solid_friction_a = traction_engine_solid_friction_a + towed_solid_friction_a;
+            let solid_friction_a = traction_engine_solid_friction_a + towed_solid_friction_a; // N
             let viscosity_friction_b =
-                traction_engine_viscosity_friction_b + towed_viscosity_friction_b;
-            let aerodynamic_drag_c = traction_engine_aerodynamic_drag_c + towed_aerodynamic_drag_c;
+                traction_engine_viscosity_friction_b + towed_viscosity_friction_b; // N/(m/s)
+            let aerodynamic_drag_c = traction_engine_aerodynamic_drag_c + towed_aerodynamic_drag_c; // N/(m/s)²
 
             RollingResistance {
                 rolling_resistance_type: traction_engine_rr.rolling_resistance_type.clone(),
@@ -592,9 +592,9 @@ mod tests {
             physics_consist.compute_rolling_resistance(),
             RollingResistance {
                 rolling_resistance_type: "davis".to_string(),
-                A: 1350.0,
-                B: 48.6,
-                C: 7.387200000000001
+                A: 35001.0,
+                B: 350.01,
+                C: 7.0005,
             }
         );
 

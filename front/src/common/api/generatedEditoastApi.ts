@@ -2589,11 +2589,11 @@ export type RollingStockMetadata = {
   unit: string;
 };
 export type RollingResistance = {
-  /** Solid friction in kN */
+  /** Solid friction in N */
   A: number;
-  /** Viscosity friction in kN/(km/h) */
+  /** Viscosity friction in N/(m/s) */
   B: number;
-  /** Aerodynamic drag in kN/(km/h)² */
+  /** Aerodynamic drag in N/(m/s)² */
   C: number;
   type: string;
 };
@@ -3241,6 +3241,15 @@ export type TrainScheduleResult = TrainScheduleBase & {
   id: number;
   timetable_id: number;
 };
+export type RollingResistancePerWeight = {
+  /** Solid friction in N/kg */
+  A: number;
+  /** Viscosity friction in (N/kg)/(m/s) */
+  B: number;
+  /** Aerodynamic drag in (N/kg)/(m/s)² */
+  C: number;
+  type: string;
+};
 export type TowedRollingStock = {
   comfort_acceleration: number;
   gamma: Gamma;
@@ -3252,7 +3261,7 @@ export type TowedRollingStock = {
   mass: number;
   name: string;
   railjson_version: string;
-  rolling_resistance: RollingResistance;
+  rolling_resistance: RollingResistancePerWeight;
   startup_acceleration: number;
 };
 export type TowedRollingStockForm = {
@@ -3264,7 +3273,7 @@ export type TowedRollingStockForm = {
   locked: boolean;
   mass: number;
   name: string;
-  rolling_resistance: RollingResistance;
+  rolling_resistance: RollingResistancePerWeight;
   startup_acceleration: number;
 };
 export type TowedRollingStockLockedForm = {

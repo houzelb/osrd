@@ -18,7 +18,7 @@ use editoast_authz::BuiltinRole;
 use editoast_derive::EditoastError;
 use editoast_models::DbConnectionPoolV2;
 use editoast_schemas::rolling_stock::Gamma;
-use editoast_schemas::rolling_stock::RollingResistance;
+use editoast_schemas::rolling_stock::RollingResistancePerWeight;
 use editoast_schemas::rolling_stock::ROLLING_STOCK_RAILJSON_VERSION;
 use serde::Deserialize;
 use serde::Serialize;
@@ -59,7 +59,7 @@ struct TowedRollingStock {
     comfort_acceleration: f64,
     startup_acceleration: f64,
     inertia_coefficient: f64,
-    rolling_resistance: RollingResistance,
+    rolling_resistance: RollingResistancePerWeight,
     gamma: Gamma,
 }
 
@@ -104,7 +104,7 @@ pub struct TowedRollingStockForm {
     pub comfort_acceleration: f64,
     pub startup_acceleration: f64,
     pub inertia_coefficient: f64,
-    pub rolling_resistance: RollingResistance,
+    pub rolling_resistance: RollingResistancePerWeight,
     pub gamma: Gamma,
 }
 

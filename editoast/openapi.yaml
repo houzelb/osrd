@@ -8260,15 +8260,38 @@ components:
         A:
           type: number
           format: double
-          description: Solid friction in kN
+          description: Solid friction in N
         B:
           type: number
           format: double
-          description: Viscosity friction in kN/(km/h)
+          description: Viscosity friction in N/(m/s)
         C:
           type: number
           format: double
-          description: Aerodynamic drag in kN/(km/h)²
+          description: Aerodynamic drag in N/(m/s)²
+        type:
+          type: string
+      additionalProperties: false
+    RollingResistancePerWeight:
+      type: object
+      required:
+      - type
+      - A
+      - B
+      - C
+      properties:
+        A:
+          type: number
+          format: double
+          description: Solid friction in N/kg
+        B:
+          type: number
+          format: double
+          description: Viscosity friction in (N/kg)/(m/s)
+        C:
+          type: number
+          format: double
+          description: Aerodynamic drag in (N/kg)/(m/s)²
         type:
           type: string
       additionalProperties: false
@@ -10330,7 +10353,7 @@ components:
         railjson_version:
           type: string
         rolling_resistance:
-          $ref: '#/components/schemas/RollingResistance'
+          $ref: '#/components/schemas/RollingResistancePerWeight'
         startup_acceleration:
           type: number
           format: double
@@ -10380,7 +10403,7 @@ components:
         name:
           type: string
         rolling_resistance:
-          $ref: '#/components/schemas/RollingResistance'
+          $ref: '#/components/schemas/RollingResistancePerWeight'
         startup_acceleration:
           type: number
           format: double
