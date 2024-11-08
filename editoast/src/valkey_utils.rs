@@ -155,7 +155,7 @@ impl ValkeyConnection {
             Err(_) => {
                 return Err(RedisError::from((
                     ErrorKind::IoError,
-                    "An error occured serializing to json",
+                    "An error occurred serializing to json",
                 ))
                 .into())
             }
@@ -182,7 +182,7 @@ impl ValkeyConnection {
                     .map_err(|_| {
                         RedisError::from((
                             ErrorKind::IoError,
-                            "An error occured serializing to json",
+                            "An error occurred serializing to json",
                         ))
                         .into()
                     })
