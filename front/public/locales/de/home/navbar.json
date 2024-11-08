@@ -2,8 +2,11 @@
   "about": "Über OSRD",
   "attributions": "Zuweisungen",
   "disconnect": "Abmelden",
+  "help": "Hilfe",
   "informations": {
     "application": "Anwendung",
+    "collaborations": "Kooperationen",
+    "dataSources": "Datenquellen",
     "librairies": "Versionsinformationen",
     "version": "Version"
   },

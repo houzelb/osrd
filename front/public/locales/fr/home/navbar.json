@@ -5,6 +5,7 @@
   "help": "Aide",
   "informations": {
     "application": "Application",
+    "collaborations": "Collaborations",
     "dataSources": "Sources de données",
     "librairies": "Librairies & licences",
     "version": "Version"

@@ -7,7 +7,7 @@
     "@nivo/core": "^0.80.0",
     "@nivo/line": "^0.80.0",
     "@openapi-contrib/openapi-schema-to-json-schema": "^5.1.0",
-    "@osrd-project/netzgrafik-frontend": "0.0.0-snapshot.6d049b7244241254c33afc3818f40ec57ab57217",
+    "@osrd-project/netzgrafik-frontend": "0.0.0-snapshot.59a0e23312c449c8fda43c007c91e58745d76528",
     "@osrd-project/ui-core": "^0.0.53",
     "@osrd-project/ui-icons": "^0.0.53",
     "@osrd-project/ui-manchette": "^0.0.53",

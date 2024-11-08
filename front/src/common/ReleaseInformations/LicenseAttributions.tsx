@@ -11,6 +11,17 @@ type AttributionLicense = {
   license: string;
 };
 
+const COLLABORATIONS: AttributionLicense[] = [
+  {
+    license: 'Apache-2.0',
+    publisher: 'Apache',
+    copyright: '© 2024 Swiss Federal Railways SBB AG',
+    version: '',
+    name: 'Netzgrafik-Editor',
+    url: 'https://github.com/SchweizerischeBundesbahnen/netzgrafik-editor-frontend',
+  },
+];
+
 // Libs which are not in the package.json, so we add it statically
 const DATA_SOURCES: AttributionLicense[] = [
   {
@@ -78,7 +89,13 @@ const LicenseAttributions = () => {
 
   return (
     <div className="col-md-6 h-100 d-flex flex-column">
-      <h2 className="text-center mb-4">{t('informations.dataSources')}</h2>
+      <h2 className="text-center mb-4">{t('informations.collaborations')}</h2>
+      <div className="license-attributions">
+        {COLLABORATIONS.map((dataSource) => (
+          <LicenseCard attribution={dataSource} key={dataSource.name} />
+        ))}
+      </div>
+      <h2 className="text-center my-4">{t('informations.dataSources')}</h2>
       <div className="license-attributions">
         {DATA_SOURCES.map((dataSource) => (
           <LicenseCard attribution={dataSource} key={dataSource.name} />
