@@ -48,7 +48,7 @@ class PathfindingBlocksEndpointV2(private val infraManager: InfraManager) : Take
 
     override fun act(req: Request): Response {
         val recorder = DiagnosticRecorderImpl(false)
-        return try {
+        try {
             val body = RqPrint(req).printBody()
             val request =
                 pathfindingRequestAdapter.fromJson(body)
@@ -57,17 +57,17 @@ class PathfindingBlocksEndpointV2(private val infraManager: InfraManager) : Take
             val infra = infraManager.getInfra(request.infra, request.expectedVersion, recorder)
             val res = runPathfinding(infra, request)
             pathfindingLogger.info("Success")
-            RsJson(RsWithBody(pathfindingResponseAdapter.toJson(res)))
+            return RsJson(RsWithBody(pathfindingResponseAdapter.toJson(res)))
         } catch (error: NoPathFoundException) {
             pathfindingLogger.info("No path found")
-            RsJson(RsWithBody(pathfindingResponseAdapter.toJson(error.response)))
+            return RsJson(RsWithBody(pathfindingResponseAdapter.toJson(error.response)))
         } catch (ex: Throwable) {
             if (ex is OSRDError && ex.osrdErrorType.isRecoverable) {
                 pathfindingLogger.info("Pathfinding failed: ${ex.message}")
                 val response = PathfindingFailed(ex)
-                RsJson(RsWithBody(pathfindingResponseAdapter.toJson(response)))
+                return RsJson(RsWithBody(pathfindingResponseAdapter.toJson(response)))
             }
-            ExceptionHandler.handle(ex)
+            return ExceptionHandler.handle(ex)
         }
     }
 }
