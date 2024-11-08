@@ -87,7 +87,7 @@ class STDCMEndpointV2(private val infraManager: InfraManager) : Take {
                 buildTemporarySpeedLimitManager(infra, request.temporarySpeedLimits)
             val rollingStock =
                 parseRawRollingStock(
-                    request.rollingStock,
+                    request.physicsConsist,
                     request.rollingStockLoadingGauge,
                     request.rollingStockSupportedSignalingSystems
                 )

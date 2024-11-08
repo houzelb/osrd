@@ -586,7 +586,8 @@ fn build_simulation_request(
         speed_limit_tag: train_schedule.speed_limit_tag.clone(),
         power_restrictions,
         options: train_schedule.options.clone(),
-        rolling_stock: PhysicsConsistParameters::with_traction_engine(rolling_stock.into()).into(),
+        physics_consist: PhysicsConsistParameters::with_traction_engine(rolling_stock.into())
+            .into(),
         electrical_profile_set_id,
     }
 }

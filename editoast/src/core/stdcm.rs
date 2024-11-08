@@ -42,7 +42,7 @@ pub struct Request {
     /// The comfort of the train
     pub comfort: Comfort,
     pub speed_limit_tag: Option<String>,
-    pub rolling_stock: PhysicsConsist,
+    pub physics_consist: PhysicsConsist,
 
     // STDCM search parameters
     pub trains_requirements: HashMap<i64, TrainRequirements>,

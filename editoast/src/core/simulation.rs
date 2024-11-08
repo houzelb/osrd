@@ -443,7 +443,7 @@ pub struct SimulationRequest {
     pub speed_limit_tag: Option<String>,
     pub power_restrictions: Vec<SimulationPowerRestrictionItem>,
     pub options: TrainScheduleOptions,
-    pub rolling_stock: PhysicsConsist,
+    pub physics_consist: PhysicsConsist,
     pub electrical_profile_set_id: Option<i64>,
 }
 

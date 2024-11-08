@@ -10,17 +10,17 @@ import fr.sncf.osrd.train.RollingStock.*
 
 /** Parse the rolling stock model into something the backend can work with */
 fun parseRawRollingStock(
-    rawRollingStock: PhysicsRollingStockModel,
+    rawPhysicsConsist: PhysicsConsistModel,
     loadingGaugeType: RJSLoadingGaugeType = RJSLoadingGaugeType.G1,
     rollingStockSupportedSignalingSystems: List<String> = listOf(),
 ): RollingStock {
     // Parse effort_curves
-    val rawModes = rawRollingStock.effortCurves.modes
+    val rawModes = rawPhysicsConsist.effortCurves.modes
 
-    if (!rawModes.containsKey(rawRollingStock.effortCurves.defaultMode))
+    if (!rawModes.containsKey(rawPhysicsConsist.effortCurves.defaultMode))
         throw OSRDError.newInvalidRollingStockError(
             ErrorType.InvalidRollingStockDefaultModeNotFound,
-            rawRollingStock.effortCurves.defaultMode
+            rawPhysicsConsist.effortCurves.defaultMode
         )
 
     // Parse tractive effort curves modes
@@ -29,28 +29,28 @@ fun parseRawRollingStock(
         modes[key] = parseModeEffortCurves(value, "effort_curves.modes.$key")
     }
 
-    val rollingResistance = parseRollingResistance(rawRollingStock.rollingResistance)
+    val rollingResistance = parseRollingResistance(rawPhysicsConsist.rollingResistance)
 
     return RollingStock(
         "placeholder_name",
-        rawRollingStock.length.distance.meters,
-        rawRollingStock.mass.toDouble(),
-        rawRollingStock.inertiaCoefficient,
+        rawPhysicsConsist.length.distance.meters,
+        rawPhysicsConsist.mass.toDouble(),
+        rawPhysicsConsist.inertiaCoefficient,
         rollingResistance.A,
         rollingResistance.B,
         rollingResistance.C,
-        rawRollingStock.maxSpeed,
-        rawRollingStock.startupTime.seconds,
-        rawRollingStock.startupAcceleration,
-        rawRollingStock.comfortAcceleration,
-        rawRollingStock.constGamma,
+        rawPhysicsConsist.maxSpeed,
+        rawPhysicsConsist.startupTime.seconds,
+        rawPhysicsConsist.startupAcceleration,
+        rawPhysicsConsist.comfortAcceleration,
+        rawPhysicsConsist.constGamma,
         loadingGaugeType,
         modes,
-        rawRollingStock.effortCurves.defaultMode,
-        rawRollingStock.basePowerClass,
-        rawRollingStock.powerRestrictions,
-        rawRollingStock.electricalPowerStartupTime?.seconds,
-        rawRollingStock.raisePantographTime?.seconds,
+        rawPhysicsConsist.effortCurves.defaultMode,
+        rawPhysicsConsist.basePowerClass,
+        rawPhysicsConsist.powerRestrictions,
+        rawPhysicsConsist.electricalPowerStartupTime?.seconds,
+        rawPhysicsConsist.raisePantographTime?.seconds,
         rollingStockSupportedSignalingSystems.toTypedArray(),
     )
 }
