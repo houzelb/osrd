@@ -29,7 +29,7 @@
   "objectives": "objectifs",
   "openStudy": "Ouvrir",
   "projectBudget": "Budget estimé",
-  "projectBudgetInvalid": "Le budget du projet ne doit pas dépasser 2147483647",
+  "projectBudgetInvalid": "Le budget du projet doit être un entier positif et ne doit pas dépasser 2147483647 €",
   "projectCancel": "Annuler",
   "projectCreateButton": "Créer le projet",
   "projectCreationTitle": "Créer un projet",

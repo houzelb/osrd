@@ -21,7 +21,9 @@ const checkProjectFields = (
   objectives: isInvalidString(TEXT_AREA_MAX_LENGTH, project.objectives),
   description: isInvalidString(SMALL_TEXT_AREA_MAX_LENGTH, project.description),
   funders: isInvalidString(TEXT_INPUT_MAX_LENGTH, project.funders),
-  budget: (project.budget ?? 0) > 2147483647,
+  budget:
+    (project.budget ?? 0) > 2147483647 ||
+    (!Number.isInteger(project.budget) && project.budget !== null),
 });
 
 export default checkProjectFields;
