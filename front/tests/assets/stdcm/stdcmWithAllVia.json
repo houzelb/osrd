@@ -14,7 +14,7 @@
     "operationalPoint": "Mid_West_station",
     "code": "BV",
     "endStop": "",
-    "passageStop": "20:42",
+    "passageStop": "20:41",
     "startStop": "",
     "weight": "=",
     "refEngine": "="
@@ -24,7 +24,7 @@
     "operationalPoint": "Mid_East_station",
     "code": "BV",
     "endStop": "",
-    "passageStop": "20:47",
+    "passageStop": "20:46",
     "startStop": "",
     "weight": "=",
     "refEngine": "="
@@ -34,7 +34,7 @@
     "operationalPoint": "North_station",
     "code": "BV",
     "endStop": "",
-    "passageStop": "20:53",
+    "passageStop": "20:52",
     "startStop": "",
     "weight": "=",
     "refEngine": "="
@@ -43,7 +43,7 @@
     "index": 5,
     "operationalPoint": "South_station",
     "code": "BV",
-    "endStop": "20:57",
+    "endStop": "20:56",
     "passageStop": "",
     "startStop": "",
     "weight": "400t",
