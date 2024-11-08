@@ -14,6 +14,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    name: Build
     permissions:
       packages: write
     outputs:
@@ -179,6 +180,7 @@ jobs:
 
   check_dockerfiles:
     runs-on: ubuntu-latest
+    name: Check dockerfiles
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -196,6 +198,7 @@ jobs:
 
   check_scripts:
     runs-on: ubuntu-latest
+    name: Check scripts
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -207,6 +210,7 @@ jobs:
 
   check_generated_railjson_sync:
     runs-on: ubuntu-latest
+    name: Check generated railjson sync
     steps:
       - uses: actions/checkout@v4
       - name: Install poetry
@@ -232,6 +236,7 @@ jobs:
 
   check_railjson_generator:
     runs-on: ubuntu-latest
+    name: Check railjson generator
     steps:
       - uses: actions/checkout@v4
       - name: Install poetry
@@ -292,6 +297,7 @@ jobs:
 
   check_commits:
     runs-on: ubuntu-latest
+    name: Check commits
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -320,7 +326,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  final_newline_lint:
+  check_final_newline:
     runs-on: ubuntu-latest
     name: Check final newline
     steps:
@@ -344,6 +350,7 @@ jobs:
 
   check_integration_tests:
     runs-on: ubuntu-latest
+    name: Check integration tests
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -377,6 +384,7 @@ jobs:
 
   check_osrd_schema:
     runs-on: ubuntu-latest
+    name: Check osrd schema
     steps:
       - uses: actions/checkout@v4
       - name: Install poetry
@@ -414,6 +422,7 @@ jobs:
 
   check_toml:
     runs-on: ubuntu-latest
+    name: Check toml
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -427,6 +436,7 @@ jobs:
 
   check_infra_schema_sync:
     runs-on: ubuntu-latest
+    name: Check infra schema sync
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -445,6 +455,7 @@ jobs:
 
   check_front_rtk_sync:
     runs-on: ubuntu-latest
+    name: Check front rtk sync
     needs:
       - build
 
@@ -480,6 +491,7 @@ jobs:
 
   check_core:
     runs-on: ubuntu-latest
+    name: Check core
     needs:
       - build
     steps:
@@ -531,7 +543,7 @@ jobs:
 
   check_editoast_tests:
     runs-on: ubuntu-latest
-
+    name: Check editoast tests
     needs:
       - build
 
@@ -604,7 +616,7 @@ jobs:
     # check to complete. As editoast tests take while to run, we don't want this to
     # be on the hot path
     runs-on: ubuntu-latest
-
+    name: Check editoast lints
     needs:
       - build
     steps:
@@ -651,7 +663,7 @@ jobs:
   check_editoast_openapi:
     # for the same reason as check_editoast_lints, we run this in a separate job
     runs-on: ubuntu-latest
-
+    name: Check editoast openapi
     needs:
       - build
     steps:
@@ -696,6 +708,7 @@ jobs:
 
   check_gateway:
     runs-on: ubuntu-latest
+    name: Check gateway
     needs:
       - build
 
@@ -758,6 +771,7 @@ jobs:
 
   check_osrdyne:
     runs-on: ubuntu-latest
+    name: Check osrdyne
     needs:
       - build
 
@@ -820,6 +834,7 @@ jobs:
 
   check_front:
     runs-on: ubuntu-latest
+    name: Check front
     needs:
       - build
 
@@ -874,6 +889,7 @@ jobs:
 
   integration_tests:
     runs-on: ubuntu-latest
+    name: Integration tests
     needs:
       - build
     steps:
@@ -984,6 +1000,7 @@ jobs:
 
   end_to_end_tests:
     runs-on: ubuntu-latest
+    name: End to end tests
     needs:
       - build
     steps:
@@ -1086,6 +1103,7 @@ jobs:
 
   check_reuse_compliance:
     runs-on: ubuntu-latest
+    name: Check reuse compliance
     steps:
       - uses: actions/checkout@v4
       - name: REUSE Compliance Check
