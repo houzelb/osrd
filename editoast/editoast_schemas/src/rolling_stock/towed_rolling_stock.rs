@@ -1,5 +1,5 @@
 use super::Gamma;
-use super::RollingResistance;
+use super::RollingResistancePerWeight;
 
 #[derive(Debug, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct TowedRollingStock {
@@ -15,6 +15,6 @@ pub struct TowedRollingStock {
     /// In m/s²
     pub startup_acceleration: f64,
     pub inertia_coefficient: f64,
-    pub rolling_resistance: RollingResistance,
+    pub rolling_resistance: RollingResistancePerWeight,
     pub gamma: Gamma,
 }

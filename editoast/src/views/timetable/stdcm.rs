@@ -900,9 +900,9 @@ mod tests {
             physics_consist.rolling_resistance,
             RollingResistance {
                 rolling_resistance_type: "davis".to_string(),
-                A: 2000.0,
-                B: 72.0,
-                C: 9.072000000000001
+                A: 100001.0,
+                B: 1000.01,
+                C: 20.0005
             }
         );
     }

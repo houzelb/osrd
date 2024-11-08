@@ -15,6 +15,7 @@ use editoast_schemas::rolling_stock::EffortCurves;
 use editoast_schemas::rolling_stock::Gamma;
 use editoast_schemas::rolling_stock::LoadingGaugeType;
 use editoast_schemas::rolling_stock::RollingResistance;
+use editoast_schemas::rolling_stock::RollingResistancePerWeight;
 use editoast_schemas::rolling_stock::RollingStock;
 use editoast_schemas::rolling_stock::RollingStockSupportedSignalingSystems;
 use editoast_schemas::rolling_stock::TowedRollingStock;
@@ -230,11 +231,11 @@ pub fn create_towed_rolling_stock() -> TowedRollingStock {
         comfort_acceleration: 0.2, // In m/s²
         startup_acceleration: 0.06,
         inertia_coefficient: 1.05,
-        rolling_resistance: RollingResistance {
+        rolling_resistance: RollingResistancePerWeight {
             rolling_resistance_type: "davis".to_string(),
-            A: 1.0,    // In kN
-            B: 0.01,   // In kN/(km/h)
-            C: 0.0002, // In kN/(km/h)²
+            A: 1.0,    // In N
+            B: 0.01,   // In N/(m/s)
+            C: 0.0002, // In N/(m/s)²
         },
         gamma: Gamma {
             gamma_type: "CONST".to_string(),
@@ -268,9 +269,9 @@ pub fn create_simple_rolling_stock() -> RollingStock {
         railjson_version: "12".to_string(),
         rolling_resistance: RollingResistance {
             rolling_resistance_type: "davis".to_string(),
-            A: 1.0,    // In kN
-            B: 0.01,   // In kN/(km/h)
-            C: 0.0005, // In kN/(km/h)²
+            A: 1.0,    // In N
+            B: 0.01,   // In N/(m/s)
+            C: 0.0005, // In N/(m/s)²
         },
         length: 140.0,   // m
         mass: 15000.0,   // kg

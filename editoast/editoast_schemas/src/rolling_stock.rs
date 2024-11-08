@@ -10,6 +10,7 @@ pub use effort_curves::ModeEffortCurves;
 
 mod rolling_resistance;
 pub use rolling_resistance::RollingResistance;
+pub use rolling_resistance::RollingResistancePerWeight;
 
 mod energy_source;
 pub use energy_source::EnergySource;
