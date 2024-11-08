@@ -6,6 +6,12 @@
 set -e
 
 # We override the default docker-compose file with "host" and "single-worker" versions in the docker folder
+
+# From docker/docker-compose.single-worker.yml, profiles are provided:
+# - no profile means all other services (except editoast and core)
+# - `--profile "*"` means all services
+# - `--profile with-editoast` means all other services and editoast
+# - `--profile with-core` means all other services and core
 docker compose \
     -p "osrd" \
     -f "docker-compose.yml" \

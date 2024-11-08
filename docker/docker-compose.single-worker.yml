@@ -2,6 +2,12 @@ services:
   editoast:
     environment:
       - EDITOAST_CORE_SINGLE_WORKER=true
+    profiles:
+      - with-editoast
+
+  wait-healthy:
+    profiles:
+      - with-editoast
 
   osrdyne:
     volumes: !reset []
@@ -16,3 +22,5 @@ services:
       - /bin/sh
       - -c
       - "exec java $JAVA_OPTS -ea -jar /app/osrd_core.jar worker"
+    profiles:
+      - with-core
