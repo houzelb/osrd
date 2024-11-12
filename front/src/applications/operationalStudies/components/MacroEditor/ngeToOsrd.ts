@@ -55,7 +55,6 @@ const getTrainrunSectionsByTrainrunId = (netzgrafikDto: NetzgrafikDto, trainrunI
   // source port.
   let departureSection: TrainrunSectionDto | undefined;
   const sectionsByPrevTargetPortId = new Map<number, TrainrunSectionDto>();
-  // eslint-disable-next-line no-restricted-syntax
   for (const section of sections) {
     const sourceNode = getNodeById(netzgrafikDto.nodes, section.sourceNodeId)!;
     const transition = sourceNode.transitions.find(
@@ -177,7 +176,6 @@ const createTrainSchedulePayload = async ({
   oldStartDate: Date;
   trainSchedule?: TrainScheduleBase;
 }) => {
-  // TODO: check that the trainrunSections format is still compatible
   const pathPromise = trainrunSections.map(async (section, index) => {
     const sourceNode = getNodeById(nodes, section.sourceNodeId);
     const targetNode = getNodeById(nodes, section.targetNodeId);
