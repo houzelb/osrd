@@ -219,7 +219,12 @@ const createTrainSchedulePayload = async ({
   const schedule = trainrunSections.flatMap((section, index) => {
     const nextSection = trainrunSections[index + 1];
 
-    // TODO: extract isNonStopTransit from transitions
+    const node = getNodeById(nodes, section.targetNodeId)!;
+    const transition = node.transitions.find(
+      (tr) => tr.port1Id === section.targetPortId || tr.port2Id === section.targetPortId
+    );
+    const isNonStopTransit = transition?.isNonStopTransit ?? false;
+
     let arrival = getTimeLockDate(section.targetArrival, startTimeLock, startDate);
     const departure = nextSection
       ? getTimeLockDate(nextSection.sourceDeparture, startTimeLock, startDate)
@@ -234,7 +239,7 @@ const createTrainSchedulePayload = async ({
     return {
       at: `${section.targetNodeId}-${index + 1}`,
       arrival: formatDateDifference(arrival, startDate),
-      stop_for: departure ? formatDateDifference(departure, arrival) : null,
+      stop_for: departure && !isNonStopTransit ? formatDateDifference(departure, arrival) : null,
     };
   });
 
