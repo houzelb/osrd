@@ -114,7 +114,7 @@ pub fn search(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 /// This derive provides the implementation the `SearchConfigStore` trait.
 /// Each struct that derives `Search` will be saved and the struct deriving
 /// `SearchConfigStore` will implement a `find(name: &str)` function that
-/// given a seach object name, returns the `SearchConfig` of the search object
+/// given a search object name, returns the `SearchConfig` of the search object
 /// matching.
 ///
 /// ```ignore
@@ -188,10 +188,10 @@ pub fn search_config_store(input: proc_macro::TokenStream) -> proc_macro::TokenS
 ///
 /// * `#[model(table = crate::table::osrd_yourtable")]` (**REQUIRED**): the path to the diesel table
 /// * `#[model(row(type_name = "YourRowType"))]`: the name of the row struct (defaults to `ModelRow`)
-/// * `#[model(row(derive(ADDITIONAL_DERIVES*,)))]`: additional derives for the row struct (always implicitely derives `Queryable` and `QueryableByName`)
+/// * `#[model(row(derive(ADDITIONAL_DERIVES*,)))]`: additional derives for the row struct (always implicitly derives `Queryable` and `QueryableByName`)
 /// * `#[model(row(public))]`: make the row struct fields `pub` (private by default)
 /// * `#[model(changeset(type_name = "YourChangesetType"))]`: the name of the changeset struct (defaults to `ModelChangeset`)
-/// * `#[model(changeset(derive(ADDITIONAL_DERIVES*,)))]`: additional derives for the changeset struct (always implicitely derives `Default, Queryable, QueryableByName, AsChangeset, Insertable`)
+/// * `#[model(changeset(derive(ADDITIONAL_DERIVES*,)))]`: additional derives for the changeset struct (always implicitly derives `Default, Queryable, QueryableByName, AsChangeset, Insertable`)
 /// * `#[model(changeset(public))]`: make the changeset struct fields `pub` (private by default)
 /// * `#[model(identifier = IDENTIFIER)]` (multiple): just like `#[model(identifier)]` for fields, but at the struct level.
 ///     `IDENTIFIER` can be a compound identifier with the syntax `(field1, field2, ...)` (e.g.: `#[model(identifier = (infra_id, obj_id))]`).
