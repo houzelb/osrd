@@ -111,6 +111,10 @@ impl ModelConfig {
             .filter(|field| !self.is_primary(field))
             .filter(|field| !field.builder_skip)
     }
+
+    pub(super) fn columns(&self) -> impl Iterator<Item = &syn::Ident> {
+        self.fields.iter().map(ModelField::column_ident)
+    }
 }
 
 impl ModelField {

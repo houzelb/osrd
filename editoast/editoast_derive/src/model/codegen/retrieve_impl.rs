@@ -9,6 +9,7 @@ pub(crate) struct RetrieveImpl {
     pub(super) table_mod: syn::Path,
     pub(super) row: syn::Ident,
     pub(super) identifier: Identifier,
+    pub(super) columns: Vec<syn::Ident>,
 }
 
 impl ToTokens for RetrieveImpl {
@@ -19,6 +20,7 @@ impl ToTokens for RetrieveImpl {
             table_mod,
             row,
             identifier,
+            columns,
         } = self;
         let ty = identifier.get_type();
         let id_ident = identifier.get_lvalue();
@@ -42,6 +44,7 @@ impl ToTokens for RetrieveImpl {
                     tracing::Span::current().record("query_id", tracing::field::debug(#id_ref_ident));
                     dsl::#table_name
                         .#(filter(#eqs)).*
+                        .select((#(dsl::#columns,)*))
                         .first::<#row>(conn.write().await.deref_mut())
                         .await
                         .map(Into::into)

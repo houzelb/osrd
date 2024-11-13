@@ -10,6 +10,7 @@ pub(crate) struct UpdateImpl {
     pub(super) row: syn::Ident,
     pub(super) changeset: syn::Ident,
     pub(super) identifier: Identifier,
+    pub(super) columns: Vec<syn::Ident>,
 }
 
 impl ToTokens for UpdateImpl {
@@ -21,6 +22,7 @@ impl ToTokens for UpdateImpl {
             row,
             changeset,
             identifier,
+            columns,
         } = self;
         let ty = identifier.get_type();
         let id_ident = identifier.get_lvalue();
@@ -45,6 +47,7 @@ impl ToTokens for UpdateImpl {
                     tracing::Span::current().record("query_id", tracing::field::debug(#id_ref_ident));
                     diesel::update(dsl::#table_name.#(filter(#eqs)).*)
                         .set(&self)
+                        .returning((#(dsl::#columns,)*))
                         .get_result::<#row>(conn.write().await.deref_mut())
                         .await
                         .map(Into::into)

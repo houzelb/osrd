@@ -12,6 +12,7 @@ pub(crate) struct CreateBatchWithKeyImpl {
     pub(super) changeset: syn::Ident,
     pub(super) field_count: usize,
     pub(super) identifier: Identifier,
+    pub(super) columns: Vec<syn::Ident>,
 }
 
 impl ToTokens for CreateBatchWithKeyImpl {
@@ -25,6 +26,7 @@ impl ToTokens for CreateBatchWithKeyImpl {
             changeset,
             field_count,
             identifier,
+            columns,
         } = self;
         let ty = identifier.get_type();
         let span_name = format!("model:create_batch_with_key<{}>", model);
@@ -57,6 +59,7 @@ impl ToTokens for CreateBatchWithKeyImpl {
                         chunk => {
                             diesel::insert_into(dsl::#table_name)
                                 .values(chunk)
+                                .returning((#(dsl::#columns,)*))
                                 .load_stream::<#row>(conn.write().await.deref_mut())
                                 .await
                                 .map(|s| {
