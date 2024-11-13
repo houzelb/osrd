@@ -61,7 +61,7 @@ pub struct SignalUpdatesResponse {
     pub signal_updates: HashMap<i64, Vec<SignalUpdate>>,
 }
 
-impl<'a> AsCoreRequest<Json<SignalUpdatesResponse>> for SignalUpdatesRequest<'a> {
+impl AsCoreRequest<Json<SignalUpdatesResponse>> for SignalUpdatesRequest<'_> {
     const METHOD: reqwest::Method = reqwest::Method::POST;
     const URL_PATH: &'static str = "/v2/signal_projection";
 

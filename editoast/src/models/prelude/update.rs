@@ -109,10 +109,10 @@ pub trait Save<K: Send>: Sized {
 }
 
 #[async_trait::async_trait]
-impl<'a, K, M> Save<K> for M
+impl<K, M> Save<K> for M
 where
     for<'async_trait> K: Send + Clone + 'async_trait,
-    M: Model + PreferredId<K> + Clone + Send + 'a,
+    M: Model + PreferredId<K> + Clone + Send,
     <M as Model>::Changeset: Update<K, M> + Send,
 {
     async fn save(&mut self, conn: &mut DbConnection) -> Result<()> {

@@ -90,7 +90,7 @@ pub struct PropertyZoneValues {
     values: Vec<String>,
 }
 
-impl<'a> AsCoreRequest<Json<PathPropertiesResponse>> for PathPropertiesRequest<'a> {
+impl AsCoreRequest<Json<PathPropertiesResponse>> for PathPropertiesRequest<'_> {
     const METHOD: reqwest::Method = reqwest::Method::POST;
     const URL_PATH: &'static str = "/v2/path_properties";
 
