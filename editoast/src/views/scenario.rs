@@ -119,8 +119,6 @@ pub async fn check_project_study(
 #[editoast_error(base_id = "scenario")]
 #[allow(clippy::enum_variant_names)]
 pub enum ScenarioError {
-    /// Couldn't found the scenario with the given scenario ID
-
     #[error("Scenario '{scenario_id}', could not be found")]
     #[editoast_error(status = 404)]
     NotFound { scenario_id: i64 },

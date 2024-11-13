@@ -171,7 +171,7 @@ impl EditoastError for RedisError {
     }
 }
 
-/// Handle all json errors
+// Handle all json errors
 
 /// Handle all json errors
 impl EditoastError for ValidationErrors {
