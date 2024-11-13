@@ -68,7 +68,7 @@ pub type Changeset<M> = <M as Model>::Changeset;
 
 /// A struct persisting the column and type information of each model field
 ///
-/// This struct is instanciated by the `Model` derive macro and shouldn't be
+/// This struct is instantiated by the `Model` derive macro and shouldn't be
 /// used manually. The macro expansion also provides a few methods such as
 /// `eq` or `asc` that can be used in conjunction with [SelectionSettings].
 pub struct ModelField<M, T, Column>(PhantomData<(M, T, Column)>);

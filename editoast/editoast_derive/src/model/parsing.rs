@@ -64,7 +64,7 @@ impl ModelConfig {
             .collect();
 
         // collect identifiers from struct-level annotations...
-        let mut raw_identfiers: HashSet<_> = options
+        let mut raw_identifiers: HashSet<_> = options
             .identifiers
             .iter()
             .cloned()
@@ -116,10 +116,10 @@ impl ModelConfig {
             }
         };
 
-        raw_identfiers.insert(primary_field.clone());
-        raw_identfiers.insert(preferred_identifier.clone());
+        raw_identifiers.insert(primary_field.clone());
+        raw_identifiers.insert(preferred_identifier.clone());
 
-        let typed_identifiers = raw_identfiers
+        let typed_identifiers = raw_identifiers
             .iter()
             .cloned()
             .map(|id| Identifier::new(id, &fields))
