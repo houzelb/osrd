@@ -10,6 +10,7 @@ pub(crate) struct RetrieveBatchImpl {
     pub(super) chunk_size_limit: usize,
     pub(super) row: syn::Ident,
     pub(super) identifier: Identifier,
+    pub(super) columns: Vec<syn::Ident>,
 }
 
 impl ToTokens for RetrieveBatchImpl {
@@ -21,6 +22,7 @@ impl ToTokens for RetrieveBatchImpl {
             chunk_size_limit,
             row,
             identifier,
+            columns,
         } = self;
         let ty = identifier.get_type();
         let id_ident = identifier.get_lvalue();
@@ -63,6 +65,7 @@ impl ToTokens for RetrieveBatchImpl {
                                 query = query.or_filter(#filters);
                             }
                             query
+                                .select((#(dsl::#columns,)*))
                                 .load_stream::<#row>(conn.write().await.deref_mut())
                                 .await
                                 .map(|s| s.map_ok(<#model as Model>::from_row).try_collect::<Vec<_>>())?
@@ -99,6 +102,7 @@ impl ToTokens for RetrieveBatchImpl {
                                 query = query.or_filter(#filters);
                             }
                             query
+                                .select((#(dsl::#columns,)*))
                                 .load_stream::<#row>(conn.write().await.deref_mut())
                                 .await
                                 .map(|s| {

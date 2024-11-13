@@ -12,6 +12,7 @@ pub(crate) struct UpdateBatchImpl {
     pub(super) changeset: syn::Ident,
     pub(super) identifier: Identifier,
     pub(super) primary_key_column: syn::Ident,
+    pub(super) columns: Vec<syn::Ident>,
 }
 
 impl ToTokens for UpdateBatchImpl {
@@ -25,6 +26,7 @@ impl ToTokens for UpdateBatchImpl {
             identifier,
             changeset,
             primary_key_column,
+            columns,
         } = self;
         let ty = identifier.get_type();
         let id_ident = identifier.get_lvalue();
@@ -70,6 +72,7 @@ impl ToTokens for UpdateBatchImpl {
                             diesel::update(dsl::#table_name)
                                 .filter(dsl::#primary_key_column.eq_any(query))
                                 .set(&self)
+                                .returning((#(dsl::#columns,)*))
                                 .load_stream::<#row>(conn.write().await.deref_mut())
                                 .await
                                 .map(|s| s.map_ok(<#model as Model>::from_row).try_collect::<Vec<_>>())?
@@ -111,6 +114,7 @@ impl ToTokens for UpdateBatchImpl {
                             diesel::update(dsl::#table_name)
                                 .filter(dsl::#primary_key_column.eq_any(query))
                                 .set(&self)
+                                .returning((#(dsl::#columns,)*))
                                 .load_stream::<#row>(conn.write().await.deref_mut())
                                 .await
                                 .map(|s| {

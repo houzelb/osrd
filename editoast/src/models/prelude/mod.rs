@@ -14,10 +14,6 @@ pub use list::*;
 pub use retrieve::*;
 pub use update::*;
 
-use diesel::pg::Pg;
-use diesel::AsChangeset;
-use diesel::QueryableByName;
-
 /// A struct that can be saved to and read from the database using diesel's interface
 ///
 /// The `Self::Row` type is a struct that precisely maps the columns of the
@@ -32,8 +28,8 @@ use diesel::QueryableByName;
 /// derive macro instead.
 // FIXME: that Clone requirement is not necessary, see problematic line below
 pub trait Model: std::fmt::Debug + Clone + Sized + Send {
-    type Row: QueryableByName<Pg> + Into<Self> + Send;
-    type Changeset: AsChangeset + Default + From<Self> + Send;
+    type Row: Into<Self> + Send;
+    type Changeset: Default + From<Self> + Send;
     type Table: diesel::Table + Send;
 
     /// Returns an empty changeset for this model

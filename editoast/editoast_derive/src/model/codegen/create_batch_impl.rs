@@ -9,6 +9,7 @@ pub(crate) struct CreateBatchImpl {
     pub(super) row: syn::Ident,
     pub(super) changeset: syn::Ident,
     pub(super) field_count: usize,
+    pub(super) columns: Vec<syn::Ident>,
 }
 
 impl ToTokens for CreateBatchImpl {
@@ -21,6 +22,7 @@ impl ToTokens for CreateBatchImpl {
             row,
             changeset,
             field_count,
+            columns,
         } = self;
         let span_name = format!("model:create_batch<{}>", model);
 
@@ -51,6 +53,7 @@ impl ToTokens for CreateBatchImpl {
                         chunk => {
                             diesel::insert_into(dsl::#table_name)
                                 .values(chunk)
+                                .returning((#(dsl::#columns,)*))
                                 .load_stream::<#row>(conn.write().await.deref_mut())
                                 .await
                                 .map(|s| s.map_ok(<#model as Model>::from_row).try_collect::<Vec<_>>())?

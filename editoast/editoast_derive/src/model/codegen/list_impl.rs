@@ -5,6 +5,7 @@ pub(crate) struct ListImpl {
     pub(super) model: syn::Ident,
     pub(super) table_mod: syn::Path,
     pub(super) row: syn::Ident,
+    pub(super) columns: Vec<syn::Ident>,
 }
 
 impl ToTokens for ListImpl {
@@ -13,6 +14,7 @@ impl ToTokens for ListImpl {
             model,
             table_mod,
             row,
+            columns,
         } = self;
         let span_name = format!("model:list<{}>", model);
 
@@ -34,6 +36,7 @@ impl ToTokens for ListImpl {
                     use diesel::QueryDsl;
                     use diesel_async::RunQueryDsl;
                     use futures_util::stream::TryStreamExt;
+                    use #table_mod::dsl;
                     use std::ops::DerefMut;
 
                     let mut query = #table_mod::table.into_boxed();
@@ -59,6 +62,7 @@ impl ToTokens for ListImpl {
                     }
 
                     let results: Vec<#model> = query
+                        .select((#(dsl::#columns,)*))
                         .load_stream::<#row>(conn.write().await.deref_mut())
                         .await?
                         .map_ok(<#model as crate::models::prelude::Model>::from_row)
