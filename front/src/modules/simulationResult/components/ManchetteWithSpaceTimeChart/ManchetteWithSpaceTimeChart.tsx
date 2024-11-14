@@ -163,14 +163,18 @@ const ManchetteWithSpaceTimeChartWrapper = ({
   return (
     <div className="manchette-space-time-chart-wrapper">
       <div className="header">
-        <ManchetteMenuButton setWaypointsPanelIsOpen={setWaypointsPanelIsOpen} />
-        {waypointsPanelIsOpen && waypointsPanelData && (
-          <WaypointsPanel
-            waypointsPanelIsOpen={waypointsPanelIsOpen}
-            setWaypointsPanelIsOpen={setWaypointsPanelIsOpen}
-            waypoints={operationalPoints}
-            waypointsPanelData={waypointsPanelData}
-          />
+        {waypointsPanelData && (
+          <>
+            <ManchetteMenuButton setWaypointsPanelIsOpen={setWaypointsPanelIsOpen} />
+            {waypointsPanelIsOpen && (
+              <WaypointsPanel
+                waypointsPanelIsOpen={waypointsPanelIsOpen}
+                setWaypointsPanelIsOpen={setWaypointsPanelIsOpen}
+                waypoints={operationalPoints}
+                waypointsPanelData={waypointsPanelData}
+              />
+            )}
+          </>
         )}
       </div>
       <div className="header-separator" />
