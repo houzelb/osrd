@@ -1147,18 +1147,18 @@
   resolved "https://registry.yarnpkg.com/@osrd-project/netzgrafik-frontend/-/netzgrafik-frontend-0.0.0-snapshot.6d049b7244241254c33afc3818f40ec57ab57217.tgz#40e507bb3e05be9c6dc07f6ed5533c3db5426d24"
   integrity sha512-lK/r4qYPeibUtoumN/oaj1spoL7S7lK0J3ZLIf2pm/xCjbK/Gx+8QLNDz6PMoKlG19RUbFc765qybzADo3e3pg==
 
-"@osrd-project/ui-core@^0.0.52":
-  version "0.0.52"
-  resolved "https://registry.yarnpkg.com/@osrd-project/ui-core/-/ui-core-0.0.52.tgz#c32aedfd1a9cc6f4651de8420c3d916596621c7d"
-  integrity sha512-9OZ01/L3/A5ADZzeFoI9sBF7pZc8xex6D1TSds3xE353zy3man29qwncdL9aTwy4AVfzv3aeub5a3y74UwcFLQ==
+"@osrd-project/ui-core@^0.0.53":
+  version "0.0.53"
+  resolved "https://registry.yarnpkg.com/@osrd-project/ui-core/-/ui-core-0.0.53.tgz#c5113da770fb16b37992447d0b7ea0e7202da302"
+  integrity sha512-MtuuuQyW1Ol2J0/PyglsaPMpL4mQTLmhyMroIBoAdCe/NHBc9uRsTUiySbaYq9sd/lNZVmDR/0wfeGtvNXipww==
   dependencies:
     classnames "^2.5.1"
     tailwindcss "^3.4.1"
 
-"@osrd-project/ui-icons@^0.0.52":
-  version "0.0.52"
-  resolved "https://registry.yarnpkg.com/@osrd-project/ui-icons/-/ui-icons-0.0.52.tgz#90221c4a2f3ef3c8c77304a34cf960e2693964da"
-  integrity sha512-VvtmcAmum4NForLqhc4xSKtwmuv+jKrG2kzKtAsqX/5khcxQqlJLOQ1vQyvgkA00Axcu+xIAOfmryOr+ie6BmA==
+"@osrd-project/ui-icons@^0.0.53":
+  version "0.0.53"
+  resolved "https://registry.yarnpkg.com/@osrd-project/ui-icons/-/ui-icons-0.0.53.tgz#bb346b7b3cd9bc4823a986e4c91ca2b374e2f1bd"
+  integrity sha512-K8EjMHIK1kyTk5rTmkejYjGIjv54YJ5peR5lgcVImdGyd0P77MsgTFWeC5r+RUXKohlErYFqEkMTwt59TzdlZg==
 
 "@osrd-project/ui-manchette-with-spacetimechart@^0.0.53":
   version "0.0.53"
@@ -1189,17 +1189,20 @@
     lodash "^4.17.21"
     vitest "^2.1.1"
 
-"@osrd-project/ui-speedspacechart@^0.0.52":
-  version "0.0.52"
-  resolved "https://registry.yarnpkg.com/@osrd-project/ui-speedspacechart/-/ui-speedspacechart-0.0.52.tgz#0499eb4d4bf1045be3e21a2217ca97ce9818db4b"
-  integrity sha512-ankWgmHbHiR2/kMQm3f86GlcHL3JwjD989/rYGXZj+ClrLuDoQE+l9j5deZihol+qE/ODy+l8x8CS6FtHvd/Jg==
+"@osrd-project/ui-speedspacechart@^0.0.53":
+  version "0.0.53"
+  resolved "https://registry.yarnpkg.com/@osrd-project/ui-speedspacechart/-/ui-speedspacechart-0.0.53.tgz#32b5fb5d6fceef5163ed997859cd60d6da134387"
+  integrity sha512-bRQZj3XYmcGkX7hToUsyXsIrC6J7BuzEAUjp4v5xeYn5C22JMC/+wv8wJoNn8yI4+gVVd0Aj0Jx4YZnpwvWaEA==
   dependencies:
-    "@osrd-project/ui-core" "^0.0.52"
-    "@osrd-project/ui-icons" "^0.0.52"
-    "@types/d3" "^7.4.3"
+    "@osrd-project/ui-core" "^0.0.53"
+    "@osrd-project/ui-icons" "^0.0.53"
+    "@types/chroma-js" "^2.4.4"
+    "@types/d3-selection" "^3.0.0"
+    "@types/d3-zoom" "^3.0.0"
     chroma-js "^3.1.1"
     classnames "^2.5.1"
-    d3 "^7.9.0"
+    d3-selection "^3.0.0"
+    d3-zoom "^3.0.0"
     tailwindcss "^3.4.1"
 
 "@pkgjs/parseargs@^0.11.0":
@@ -2227,6 +2230,11 @@
   resolved "https://registry.yarnpkg.com/@types/d3-selection/-/d3-selection-3.0.10.tgz#98cdcf986d0986de6912b5892e7c015a95ca27fe"
   integrity sha512-cuHoUgS/V3hLdjJOLTT691+G2QoqAjCVLmr4kJXR4ha56w1Zdu8UUQ5TxLRqudgNjwXeQxKMq4j+lyf9sWuslg==
 
+"@types/d3-selection@^3.0.0":
+  version "3.0.11"
+  resolved "https://registry.yarnpkg.com/@types/d3-selection/-/d3-selection-3.0.11.tgz#bd7a45fc0a8c3167a631675e61bc2ca2b058d4a3"
+  integrity sha512-bhAXu23DJWsrI45xafYpkQ4NtcKMwWnAC/vKrd2l+nxMFuvOT3XMYTIj2opv8vq8AO5Yh7Qac/nSeP/3zjTK0w==
+
 "@types/d3-shape@*":
   version "3.1.6"
   resolved "https://registry.yarnpkg.com/@types/d3-shape/-/d3-shape-3.1.6.tgz#65d40d5a548f0a023821773e39012805e6e31a72"
@@ -2256,7 +2264,7 @@
   dependencies:
     "@types/d3-selection" "*"
 
-"@types/d3-zoom@*":
+"@types/d3-zoom@*", "@types/d3-zoom@^3.0.0":
   version "3.0.8"
   resolved "https://registry.yarnpkg.com/@types/d3-zoom/-/d3-zoom-3.0.8.tgz#dccb32d1c56b1e1c6e0f1180d994896f038bc40b"
   integrity sha512-iqMC4/YlFCSlO8+2Ii1GGGliCAY4XdeG748w5vQUbevlbDu0zSjH/+jojorQVBK/se0j6DUFNPBGSqD3YWYnDw==
@@ -4232,7 +4240,7 @@ d3-scale@^3.2.3:
     d3-time "^2.1.1"
     d3-time-format "2 - 3"
 
-"d3-selection@2 - 3", d3-selection@3:
+"d3-selection@2 - 3", d3-selection@3, d3-selection@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/d3-selection/-/d3-selection-3.0.0.tgz#c25338207efa72cc5b9bd1458a1a41901f1e1b31"
   integrity sha512-fmTRWbNMmsmWq6xJV8D19U/gw/bwrHfNXxrIN+HfZgnzqTHp9jOmKMhsTUjXOJnZOdZY9Q28y4yebKzqDKlxlQ==
@@ -4300,7 +4308,7 @@ d3-time@^1.0.11:
     d3-interpolate "1 - 3"
     d3-timer "1 - 3"
 
-d3-zoom@3:
+d3-zoom@3, d3-zoom@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/d3-zoom/-/d3-zoom-3.0.0.tgz#d13f4165c73217ffeaa54295cd6969b3e7aee8f3"
   integrity sha512-b8AmV3kfQaqWAuacbPuNbL6vahnOJflOhexLzMMNLga62+/nh0JzvJ0aO/5a5MVgUFGS7Hu1P9P03o3fJkDCyw==
@@ -4311,7 +4319,7 @@ d3-zoom@3:
     d3-selection "2 - 3"
     d3-transition "2 - 3"
 
-d3@^7.8.5, d3@^7.9.0:
+d3@^7.8.5:
   version "7.9.0"
   resolved "https://registry.yarnpkg.com/d3/-/d3-7.9.0.tgz#579e7acb3d749caf8860bd1741ae8d371070cd5d"
   integrity sha512-e1U46jVP+w7Iut8Jt8ri1YsPOvFpg46k+K8TpCb0P+zjCkjkPnV7WzfDJzMHy1LnA+wj5pLT1wjO901gLXeEhA==
