@@ -285,7 +285,7 @@ jobs:
           poetry run pytest --cov --cov-report=xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           name: codecov
           flags: railjson_generator
@@ -518,7 +518,7 @@ jobs:
           exit $(docker wait core-test)
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           name: codecov
           flags: core
@@ -602,7 +602,7 @@ jobs:
           exit $(docker wait editoast-test)
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           name: codecov
           flags: editoast
@@ -737,7 +737,7 @@ jobs:
           exit $(docker wait gateway-test)
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           name: codecov
           flags: gateway
@@ -800,7 +800,7 @@ jobs:
           exit $(docker wait osrdyne-test)
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           name: codecov
           flags: osrdyne
@@ -878,7 +878,7 @@ jobs:
           exit $(docker wait front-test)
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           name: codecov
           flags: front
@@ -978,7 +978,7 @@ jobs:
           poetry -C tests run pytest --cov --cov-report=xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           name: codecov
           flags: tests
