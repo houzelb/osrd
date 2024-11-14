@@ -57,7 +57,7 @@
       "remainingWorkConflicts_one": "un autre conflit avec des travaux",
       "workConflictSameDay": "travaux de <strong>{{waypointBefore}}</strong> à <strong>{{waypointAfter}}</strong> le {{startDate}} entre {{startTime}} et {{endTime}}",
       "workConflict": "travaux de <strong>{{waypointBefore}}</strong> à <strong>{{waypointAfter}}</strong> du {{startDate}} à {{startTime}} au {{endDate}} à {{endTime}}",
-      "changeSearchCriteria": "Vous pouvez modifier vos critères de recherche pour trouver une solution",
+      "changeSearchCriteria": "Vous pouvez modifier vos critères de recherche pour trouver une solution.",
       "retainThisSimulation": "Retenir cette simulation",
       "simulationName": {
         "withOutputs": "Simulation n°{{id}}",
