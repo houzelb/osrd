@@ -196,6 +196,8 @@
       width: 100%;
       min-width: 28.125rem;
       height: calc(100vh - 4rem);
+      position: sticky;
+      top: 32px;
     }
   }
 
