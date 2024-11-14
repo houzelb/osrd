@@ -201,7 +201,7 @@ editoast_models = { workspace = true, features = ["testing"] }
 editoast_osrdyne_client = { workspace = true, features = ["mock_client"] }
 pretty_assertions.workspace = true
 rstest.workspace = true
-serial_test = "3.1.1"
+serial_test = "3.2.0"
 tempfile.workspace = true
 
 [lints]
