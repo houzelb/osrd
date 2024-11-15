@@ -365,19 +365,24 @@ export const usePathfinding = (
               } else {
                 pathfindingDispatch({
                   type: 'PATHFINDING_INCOMPATIBLE_CONSTRAINTS',
-                  message: `pathfindingErrors.${pathfindingResult.error_type}`,
+                  message: t(`pathfindingErrors.${pathfindingResult.error_type}`),
                 });
               }
             }
           } else if (pathfindingResult.failed_status === 'internal_error') {
+            const translationKey = pathfindingResult.core_error.type.startsWith('core:')
+              ? pathfindingResult.core_error.type.replace('core:', '')
+              : pathfindingResult.core_error.type;
             pathfindingDispatch({
               type: 'PATHFINDING_ERROR',
-              message: `pathfindingErrors.${pathfindingResult.core_error.message}`,
+              message: t(`coreErrors.${translationKey}`, {
+                defaultValue: pathfindingResult.core_error.message,
+              }),
             });
           } else {
             pathfindingDispatch({
               type: 'PATHFINDING_ERROR',
-              message: `pathfindingErrors.${pathfindingResult.error_type}`,
+              message: t(`pathfindingErrors.${pathfindingResult.error_type}`),
             });
           }
         } catch (e) {
