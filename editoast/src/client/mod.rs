@@ -1,4 +1,5 @@
 pub mod electrical_profiles_commands;
+pub mod group;
 pub mod healthcheck;
 pub mod import_rolling_stock;
 pub mod infra_commands;
@@ -9,6 +10,7 @@ pub mod search_commands;
 pub mod stdcm_search_env_commands;
 mod telemetry_config;
 pub mod timetables_commands;
+pub mod user;
 mod valkey_config;
 
 use std::env;
@@ -20,6 +22,7 @@ use clap::Subcommand;
 use clap::ValueEnum;
 use derivative::Derivative;
 use editoast_derive::EditoastError;
+use group::GroupCommand;
 use import_rolling_stock::ImportRollingStockArgs;
 use infra_commands::InfraCommands;
 pub use postgres_config::PostgresConfig;
@@ -33,6 +36,7 @@ pub use telemetry_config::TelemetryKind;
 use thiserror::Error;
 use timetables_commands::TimetablesCommands;
 use url::Url;
+use user::UserCommand;
 pub use valkey_config::ValkeyConfig;
 
 use crate::error::Result;
@@ -90,6 +94,10 @@ pub enum Commands {
     STDCMSearchEnv(StdcmSearchEnvCommands),
     #[command(subcommand, about, long_about = "Roles related commands")]
     Roles(RolesCommand),
+    #[command(subcommand, about, long_about = "Group related commands")]
+    Group(GroupCommand),
+    #[command(subcommand, about, long_about = "User related commands")]
+    User(UserCommand),
     #[command(about, long_about = "Healthcheck")]
     Healthcheck(CoreArgs),
 }

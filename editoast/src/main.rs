@@ -13,6 +13,8 @@ mod views;
 
 use clap::Parser;
 use client::electrical_profiles_commands::*;
+use client::group;
+use client::group::GroupCommand;
 use client::healthcheck::healthcheck_cmd;
 use client::import_rolling_stock::*;
 use client::infra_commands::*;
@@ -23,6 +25,8 @@ use client::runserver::runserver;
 use client::search_commands::*;
 use client::stdcm_search_env_commands::handle_stdcm_search_env_command;
 use client::timetables_commands::*;
+use client::user;
+use client::user::UserCommand;
 use client::Client;
 use client::Color;
 use client::Commands;
@@ -230,6 +234,34 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
                     .await
                     .map_err(Into::into)
             }
+        },
+        Commands::Group(group_command) => match group_command {
+            GroupCommand::Create(create_args) => {
+                group::create_group(create_args, Arc::new(db_pool))
+                    .await
+                    .map_err(Into::into)
+            }
+            GroupCommand::List => group::list_group(Arc::new(db_pool))
+                .await
+                .map_err(Into::into),
+            GroupCommand::Include(include_args) => {
+                group::include_group(include_args, Arc::new(db_pool))
+                    .await
+                    .map_err(Into::into)
+            }
+            GroupCommand::Exclude(exclude_args) => {
+                group::exclude_group(exclude_args, Arc::new(db_pool))
+                    .await
+                    .map_err(Into::into)
+            }
+        },
+        Commands::User(user_command) => match user_command {
+            UserCommand::List(list_args) => user::list_user(list_args, Arc::new(db_pool))
+                .await
+                .map_err(Into::into),
+            UserCommand::Add(add_args) => user::add_user(add_args, Arc::new(db_pool))
+                .await
+                .map_err(Into::into),
         },
         Commands::Healthcheck(core_config) => {
             healthcheck_cmd(db_pool.into(), valkey_config, core_config)
