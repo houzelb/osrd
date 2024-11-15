@@ -1,7 +1,5 @@
 import * as d3 from 'd3';
-import { uniq } from 'lodash';
 
-import type { TrackSectionEntity } from 'applications/editor/tools/trackEdition/types';
 import type {
   OperationalPointWithTimeAndSpeed,
   PathPropertiesFormatted,
@@ -9,13 +7,11 @@ import type {
 } from 'applications/operationalStudies/types';
 import { convertDepartureTimeIntoSec } from 'applications/operationalStudies/utils';
 import {
-  osrdEditoastApi,
   type ReportTrain,
   type TrackSection,
   type TrainScheduleBase,
 } from 'common/api/osrdEditoastApi';
 import type { SpeedRanges } from 'reducers/simulationResults/types';
-import { store } from 'store';
 import { mmToM, msToKmhRounded } from 'utils/physics';
 import { ISO8601Duration2sec, ms2sec } from 'utils/timeManipulation';
 
@@ -108,20 +104,8 @@ export const formatOperationalPoints = async (
   operationalPoints: PathPropertiesFormatted['operationalPoints'],
   simulatedTrain: SimulationResponseSuccess,
   train: TrainScheduleBase,
-  infraId: number
+  trackSections: Record<string, TrackSection>
 ): Promise<OperationalPointWithTimeAndSpeed[]> => {
-  // Get operational points metadata
-  const trackIds = uniq(operationalPoints.map((op) => op.part.track));
-  const trackSections = await store
-    .dispatch(
-      osrdEditoastApi.endpoints.postInfraByInfraIdObjectsAndObjectType.initiate({
-        infraId,
-        objectType: 'TrackSection',
-        body: trackIds,
-      })
-    )
-    .unwrap();
-
   // Format operational points
   const formattedStops: OperationalPointWithTimeAndSpeed[] = [];
 
@@ -147,14 +131,11 @@ export const formatOperationalPoints = async (
       }
     }
 
-    const associatedTrackSection = trackSections.find(
-      (trackSection) => (trackSection.railjson as TrackSection).id === op.part.track
-    );
+    const associatedTrackSection = trackSections[op.part.track];
 
     let metadata;
     if (associatedTrackSection) {
-      metadata = (associatedTrackSection.railjson as TrackSectionEntity['properties']).extensions
-        ?.sncf;
+      metadata = associatedTrackSection.extensions?.sncf;
     }
 
     const opCommonProp = {

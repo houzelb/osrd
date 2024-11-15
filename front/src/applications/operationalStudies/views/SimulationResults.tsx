@@ -71,8 +71,7 @@ const SimulationResults = ({
   const { operationalPoints, loading: formattedOpPointsLoading } = useFormattedOperationalPoints(
     selectedTrainSchedule,
     trainSimulation,
-    pathProperties,
-    infraId
+    pathProperties
   );
 
   // Compute path items coordinates in order to place them on the map
