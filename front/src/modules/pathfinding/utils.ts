@@ -2,6 +2,7 @@ import { compact } from 'lodash';
 
 import type {
   GeoJsonLineString,
+  PathItemLocation,
   PathProperties,
   PathfindingInput,
   PostInfraByInfraIdPathfindingBlocksApiArg,
@@ -59,7 +60,7 @@ export const getPathfindingQuery = ({
 }: {
   infraId?: number;
   rollingStock?: RollingStockWithLiveries;
-  pathSteps: (PathStep | null)[];
+  pathSteps: (PathItemLocation | null)[];
 }): PostInfraByInfraIdPathfindingBlocksApiArg | null => {
   const origin = pathSteps.at(0);
   const destination = pathSteps.at(-1);

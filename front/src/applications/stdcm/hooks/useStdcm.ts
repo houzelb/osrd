@@ -119,7 +119,7 @@ const useStdcm = ({
             rollingStock: stdcmRollingStock,
             creationDate: new Date(),
             speedLimitByTag,
-            simulationPathSteps: osrdconf.pathSteps,
+            simulationPathSteps: osrdconf.stdcmPathSteps,
             path: response.pathfinding_result,
           } as StdcmConflictsResponse);
           setStdcmTrainConflicts(response.conflicts); // Set conflicts

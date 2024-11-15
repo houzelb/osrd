@@ -23,6 +23,7 @@ type StdcmOpScheduleProps = {
   }) => void;
   opScheduleTimeType: ArrivalTimeTypes;
   opTimingData?: {
+    date: Date;
     arrivalDate: string;
     arrivalTime: string;
     arrivalTimehours: number;
@@ -61,11 +62,12 @@ const StdcmOpSchedule = ({
     useMemo(() => {
       const isArrivalDateValid =
         opTimingData?.arrivalDate &&
-        isArrivalDateInSearchTimeWindow(new Date(opTimingData.arrivalDate), searchDatetimeWindow);
+        isArrivalDateInSearchTimeWindow(opTimingData.date, searchDatetimeWindow);
+
       return {
         arrivalDate:
           opTimingData && isArrivalDateValid
-            ? new Date(opTimingData.arrivalDate)
+            ? opTimingData.date
             : defaultDate(searchDatetimeWindow?.begin),
         arrivalTime: opTimingData?.arrivalTime,
         arrivalTimeHours: opTimingData?.arrivalTimehours,

@@ -10,7 +10,6 @@ import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
 import type { StdcmPathStep } from 'reducers/osrdconf/types';
 import { useAppDispatch } from 'store';
-import { formatDurationAsISO8601 } from 'utils/timeManipulation';
 
 import StdcmCard from './StdcmCard';
 import StdcmDefaultCard from './StdcmDefaultCard';
@@ -31,8 +30,12 @@ const StdcmVias = ({ disabled = false }: StdcmConfigCardProps) => {
   const intermediatePoints = useMemo(() => pathSteps.slice(1, -1), [pathSteps]);
 
   const updateStopType = (newStopType: StdcmStopTypes, pathStep: StdcmPathStep) => {
-    const defaultStopTime =
-      newStopType === StdcmStopTypes.DRIVER_SWITCH ? formatDurationAsISO8601(3 * 60) : '';
+    let defaultStopTime: number | undefined;
+    if (newStopType === StdcmStopTypes.DRIVER_SWITCH) {
+      defaultStopTime = 3;
+    } else if (newStopType === StdcmStopTypes.SERVICE_STOP) {
+      defaultStopTime = 0;
+    }
     dispatch(
       updateStdcmPathStep({
         id: pathStep.id,
@@ -42,10 +45,11 @@ const StdcmVias = ({ disabled = false }: StdcmConfigCardProps) => {
   };
 
   const updateStopDuration = (stopTime: string, pathStep: StdcmPathStep) => {
+    const stopFor = stopTime ? Number(stopTime) : undefined;
     dispatch(
       updateStdcmPathStep({
         id: pathStep.id,
-        updates: { stopFor: formatDurationAsISO8601(Number(stopTime) * 60) },
+        updates: { stopFor },
       })
     );
   };
@@ -93,7 +97,11 @@ const StdcmVias = ({ disabled = false }: StdcmConfigCardProps) => {
               disabled={disabled}
               className="via"
             >
-              <StdcmOperationalPoint point={pathStep} opPointId={pathStep.id} disabled={disabled} />
+              <StdcmOperationalPoint
+                location={pathStep.location}
+                pathStepId={pathStep.id}
+                disabled={disabled}
+              />
               <StdcmStopType
                 stopTypes={pathStep.stopType}
                 updatePathStepStopType={(newStopType) => updateStopType(newStopType, pathStep)}

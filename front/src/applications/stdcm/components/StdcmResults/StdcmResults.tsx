@@ -6,6 +6,7 @@ import { useTranslation, Trans } from 'react-i18next';
 
 import useConflictsMessages from 'applications/stdcm/hooks/useConflictsMessages';
 import type { StdcmSimulation } from 'applications/stdcm/types';
+import { extractMarkersInfo } from 'applications/stdcm/utils';
 import {
   generateCodeNumber,
   getOperationalPointsWithTimes,
@@ -67,7 +68,12 @@ const StcdmResults = ({
     );
   }, [outputs]);
 
-  const simulationPathSteps = hasSimulationResults ? outputs.results.simulationPathSteps : [];
+  const markersInfo = useMemo(() => {
+    if (!hasSimulationResults) {
+      return [];
+    }
+    return extractMarkersInfo(outputs.results.simulationPathSteps);
+  }, [hasSimulationResults, outputs]);
 
   return (
     <>
@@ -168,7 +174,7 @@ const StcdmResults = ({
             isFeasible={!hasConflictResults}
             setMapCanvas={setMapCanvas}
             pathGeometry={outputs?.pathProperties?.geometry}
-            simulationPathSteps={simulationPathSteps}
+            simulationPathSteps={markersInfo}
           />
         </div>
       </div>

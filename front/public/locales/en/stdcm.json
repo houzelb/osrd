@@ -21,7 +21,9 @@
     "datePickerErrors": {
       "invalidInput": "The date must be formatted as dd/mm/yy",
       "invalidDate": "Select a date between {{startDate}} and {{endDate}}"
-    }
+    },
+    "incompleteForm": "Incomplete form",
+    "viaNotDefined": "Au moins une localisation n'est pas renseignée"
   },
   "indicateAnteriorPath": "Indicate anterior path",
   "indicatePosteriorPath": "Indicate posterior path",

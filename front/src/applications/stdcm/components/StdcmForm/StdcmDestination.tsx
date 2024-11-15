@@ -3,12 +3,12 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
+import { getTimesInfoFromDate } from 'applications/stdcm/utils';
 import DestinationIcon from 'assets/pictures/mapMarkers/destination.svg';
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
 import { useAppDispatch } from 'store';
-import { extractDateAndTimefromISO, generateISODateFromDateTime } from 'utils/date';
 
 import StdcmCard from './StdcmCard';
 import StdcmOperationalPoint from './StdcmOperationalPoint';
@@ -27,9 +27,7 @@ const StdcmDestination = ({ disabled = false }: StdcmConfigCardProps) => {
 
   const { destinationArrival, destinationToleranceValues } = useMemo(
     () => ({
-      destinationArrival: destination.arrival
-        ? extractDateAndTimefromISO(destination.arrival)
-        : undefined,
+      destinationArrival: getTimesInfoFromDate(destination.arrival),
       destinationToleranceValues: {
         arrivalToleranceBefore: destination.tolerances?.before || 0,
         arrivalToleranceAfter: destination.tolerances?.after || 0,
@@ -38,11 +36,12 @@ const StdcmDestination = ({ disabled = false }: StdcmConfigCardProps) => {
     [destination]
   );
 
-  const onArrivalChange = (schedule: ScheduleConstraint) => {
+  const onArrivalChange = ({ date, hours, minutes }: ScheduleConstraint) => {
+    date.setHours(hours, minutes);
     dispatch(
       updateStdcmPathStep({
         id: destination.id,
-        updates: { arrival: generateISODateFromDateTime(schedule) },
+        updates: { arrival: date },
       })
     );
   };
@@ -74,9 +73,11 @@ const StdcmDestination = ({ disabled = false }: StdcmConfigCardProps) => {
       disabled={disabled}
       className="extremity"
     >
-      {'uic' in destination && (
-        <StdcmOperationalPoint point={destination} opPointId={destination.id} disabled={disabled} />
-      )}
+      <StdcmOperationalPoint
+        location={destination.location}
+        pathStepId={destination.id}
+        disabled={disabled}
+      />
       <StdcmOpSchedule
         onArrivalChange={onArrivalChange}
         onArrivalTypeChange={onArrivalTypeChange}

@@ -3,12 +3,12 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
+import { getTimesInfoFromDate } from 'applications/stdcm/utils';
 import OriginIcon from 'assets/pictures/mapMarkers/start.svg';
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
 import { useAppDispatch } from 'store';
-import { extractDateAndTimefromISO, generateISODateFromDateTime } from 'utils/date';
 
 import StdcmCard from './StdcmCard';
 import StdcmOperationalPoint from './StdcmOperationalPoint';
@@ -26,7 +26,7 @@ const StdcmOrigin = ({ disabled = false }: StdcmConfigCardProps) => {
 
   const { originArrival, originToleranceValues } = useMemo(
     () => ({
-      originArrival: origin.arrival ? extractDateAndTimefromISO(origin.arrival) : undefined,
+      originArrival: getTimesInfoFromDate(origin.arrival),
       originToleranceValues: {
         arrivalToleranceBefore: origin.tolerances?.before || 0,
         arrivalToleranceAfter: origin.tolerances?.after || 0,
@@ -35,11 +35,12 @@ const StdcmOrigin = ({ disabled = false }: StdcmConfigCardProps) => {
     [origin]
   );
 
-  const onOriginArrivalChange = (schedule: ScheduleConstraint) => {
+  const onOriginArrivalChange = ({ date, hours, minutes }: ScheduleConstraint) => {
+    date.setHours(hours, minutes);
     dispatch(
       updateStdcmPathStep({
         id: origin.id,
-        updates: { arrival: generateISODateFromDateTime(schedule) },
+        updates: { arrival: date },
       })
     );
   };
@@ -76,9 +77,11 @@ const StdcmOrigin = ({ disabled = false }: StdcmConfigCardProps) => {
       disabled={disabled}
       hasTip
     >
-      {'uic' in origin && (
-        <StdcmOperationalPoint point={origin} opPointId={origin.id} disabled={disabled} />
-      )}
+      <StdcmOperationalPoint
+        location={origin.location}
+        pathStepId={origin.id}
+        disabled={disabled}
+      />
       <StdcmOpSchedule
         onArrivalChange={onOriginArrivalChange}
         onArrivalTypeChange={onOriginArrivalTypeChange}

@@ -1,24 +1,26 @@
 import type { TFunction } from 'i18next';
 
-import type { PathStep } from 'reducers/osrdconf/types';
-import { extractHHMM } from 'utils/date';
+import type { StdcmPathStep } from 'reducers/osrdconf/types';
+import { dateToHHMMSS } from 'utils/date';
 
 import { StdcmConfigErrorTypes, ArrivalTimeTypes, type StdcmConfigErrors } from '../types';
 
 const checkStdcmConfigErrors = (
   pathfindingStateError: boolean,
-  origin: PathStep | null,
-  destination: PathStep | null,
-  pathSteps: (PathStep | null)[],
+  pathSteps: StdcmPathStep[],
   t: TFunction
 ): StdcmConfigErrors | undefined => {
-  const isOneOpPointMissing = !origin || !destination;
-  if (isOneOpPointMissing) {
-    return undefined;
+  if (pathSteps.some((step) => !step.location)) {
+    return { errorType: StdcmConfigErrorTypes.MISSING_LOCATION };
   }
 
-  if (pathSteps.some((step) => step === null || ('uic' in step && step.uic === -1))) {
-    return { errorType: StdcmConfigErrorTypes.MISSING_LOCATION };
+  const origin = pathSteps.at(0)!;
+  const destination = pathSteps.at(-1)!;
+  if (origin.isVia) {
+    throw new Error('First step can not be a via');
+  }
+  if (destination.isVia) {
+    throw new Error('Last step can not be a via');
   }
 
   if (pathfindingStateError) {
@@ -45,10 +47,10 @@ const checkStdcmConfigErrors = (
       errorType: StdcmConfigErrorTypes.BOTH_POINT_SCHEDULED,
       errorDetails: {
         originTime: origin?.arrival
-          ? t('leaveAt', { time: extractHHMM(origin.arrival) })
+          ? t('leaveAt', { time: dateToHHMMSS(origin.arrival, { withoutSeconds: true }) })
           : t('departureTime'),
         destinationTime: destination?.arrival
-          ? t('arriveAt', { time: extractHHMM(destination.arrival) })
+          ? t('arriveAt', { time: dateToHHMMSS(destination.arrival, { withoutSeconds: true }) })
           : t('destinationTime'),
       },
     };

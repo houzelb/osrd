@@ -21,7 +21,9 @@
     "datePickerErrors": {
       "invalidInput": "Saississez une date au format dd/mm/yy",
       "invalidDate": "Renseignez une date entre le {{startDate}} et le {{endDate}}"
-    }
+    },
+    "incompleteForm": "Formulaire incomplet",
+    "viaNotDefined": "Au moins une localisation n'est pas renseignée"
   },
   "indicateAnteriorPath": "Indiquer le sillon antérieur",
   "indicatePosteriorPath": "Indiquer le sillon postérieur",

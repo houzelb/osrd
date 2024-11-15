@@ -26,10 +26,7 @@ const useStaticPathfinding = (infra?: InfraWithState) => {
     osrdEditoastApi.endpoints.postInfraByInfraIdPathfindingBlocks.useLazyQuery();
 
   const pathStepsLocations = useMemo(
-    () =>
-      compact(
-        pathSteps.map((step) => (step && (!('uic' in step) || step.uic !== -1) ? step : null))
-      ),
+    () => compact(pathSteps.map((step) => step.location)),
     [pathSteps]
   );
 

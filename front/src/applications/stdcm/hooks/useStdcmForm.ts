@@ -6,9 +6,9 @@ import useStdcmTowedRollingStock from 'applications/stdcm/hooks/useStdcmTowedRol
 import { useOsrdConfSelectors } from 'common/osrdContext';
 import { useStoreDataForRollingStockSelector } from 'modules/rollingStock/components/RollingStockSelector/useStoreDataForRollingStockSelector';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
-import { extractDateAndTimefromISO } from 'utils/date';
 
 import type { StdcmSimulationInputs } from '../types';
+import { getTimesInfoFromDate } from '../utils';
 
 const useStdcmForm = (): StdcmSimulationInputs => {
   const {
@@ -32,7 +32,7 @@ const useStdcmForm = (): StdcmSimulationInputs => {
   const towedRollingStock = useStdcmTowedRollingStock();
 
   const currentSimulationInputs = useMemo(() => {
-    const originArrival = origin?.arrival ? extractDateAndTimefromISO(origin.arrival) : undefined;
+    const originArrival = getTimesInfoFromDate(origin.arrival);
 
     return {
       pathSteps,

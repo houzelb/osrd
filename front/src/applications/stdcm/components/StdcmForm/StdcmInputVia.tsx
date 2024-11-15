@@ -4,35 +4,20 @@ import { Input } from '@osrd-project/ui-core';
 import { debounce } from 'lodash';
 import { useTranslation } from 'react-i18next';
 
-import type { PathStep } from 'reducers/osrdconf/types';
-import { ISO8601Duration2sec, secToMin } from 'utils/timeManipulation';
-
 import { StdcmStopTypes } from '../../types';
 
 type StdcmInputViaProps = {
   stopType: StdcmStopTypes;
-  stopDuration: PathStep['stopFor'];
+  stopDuration?: number;
   updatePathStepStopTime: (stopTime: string) => void;
 };
 
 const StdcmInputVia = ({ stopType, stopDuration, updatePathStepStopTime }: StdcmInputViaProps) => {
   const { t } = useTranslation('stdcm');
 
-  const computedStopTime = useMemo(() => {
-    const duration = stopDuration ? `${secToMin(ISO8601Duration2sec(stopDuration))}` : '';
-    switch (stopType) {
-      case StdcmStopTypes.PASSAGE_TIME:
-        return '0';
-      case StdcmStopTypes.DRIVER_SWITCH:
-        return duration || '3';
-      default:
-        return duration || '0';
-    }
-  }, [stopDuration, stopType]);
+  const [pathStepStopTime, setPathStepStopTime] = useState('');
 
-  const [pathStepStopTime, setPathStepStopTime] = useState(computedStopTime);
-
-  const stopWarning = stopType === StdcmStopTypes.DRIVER_SWITCH && Number(computedStopTime) < 3;
+  const stopWarning = stopType === StdcmStopTypes.DRIVER_SWITCH && stopDuration && stopDuration < 3;
 
   const debounceUpdatePathStepStopTime = useMemo(
     () => debounce((value) => updatePathStepStopTime(value), 300),
@@ -40,8 +25,8 @@ const StdcmInputVia = ({ stopType, stopDuration, updatePathStepStopTime }: Stdcm
   );
 
   useEffect(() => {
-    setPathStepStopTime(computedStopTime);
-  }, [computedStopTime]);
+    setPathStepStopTime(stopDuration !== undefined ? `${stopDuration}` : '');
+  }, [stopDuration]);
 
   return (
     stopType !== StdcmStopTypes.PASSAGE_TIME && (

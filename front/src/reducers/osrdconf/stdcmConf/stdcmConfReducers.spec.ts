@@ -1,6 +1,8 @@
+import nextId from 'react-id-generator';
 import { describe, it, expect } from 'vitest';
 
 import { ArrivalTimeTypes, StdcmStopTypes } from 'applications/stdcm/types';
+import getStepLocation from 'modules/pathfinding/helpers/getStepLocation';
 import {
   stdcmConfInitialState,
   stdcmConfSlice,
@@ -54,7 +56,7 @@ const stdcmPathSteps = pathSteps.map(
           }),
     }) as StdcmPathStep
 );
-const [_brest, rennes, _lemans, paris] = stdcmPathSteps;
+const [_brest, rennes, _lemans, paris] = pathSteps;
 
 const initialStateSTDCMConfig = {
   rollingStockID: 10,
@@ -97,17 +99,37 @@ describe('stdcmConfReducers', () => {
 
   it('should handle updateStdcmConfigWithData', () => {
     const store = createStore(initialStateSTDCMConfig);
+    const parisStdcm = {
+      id: nextId(),
+      isVia: false,
+      arrivalType: ArrivalTimeTypes.PRECISE_TIME,
+      location: {
+        ...getStepLocation(paris),
+        coordinates: paris.coordinates as [number, number],
+        name: paris.id,
+      },
+    } as StdcmPathStep;
+    const rennesStdcm = {
+      id: nextId(),
+      isVia: false,
+      arrivalType: ArrivalTimeTypes.ASAP,
+      location: {
+        ...getStepLocation(rennes),
+        coordinates: rennes.coordinates as [number, number],
+        name: rennes.id,
+      },
+    } as StdcmPathStep;
     store.dispatch(
       stdcmConfSliceActions.updateStdcmConfigWithData({
         rollingStockID: 20,
-        stdcmPathSteps: [paris, rennes],
+        stdcmPathSteps: [parisStdcm, rennesStdcm],
         speedLimitByTag: 'new-tag',
       })
     );
 
     const state = store.getState()[stdcmConfSlice.name];
     expect(state.rollingStockID).toBe(20);
-    expect(state.stdcmPathSteps).toEqual([paris, rennes]);
+    expect(state.stdcmPathSteps).toEqual([parisStdcm, rennesStdcm]);
     expect(state.speedLimitByTag).toBe('new-tag');
   });
 
@@ -144,7 +166,7 @@ describe('stdcmConfReducers', () => {
       expect(origin.isVia).toBe(false);
       const updates = {
         arrivalType: ArrivalTimeTypes.ASAP,
-        arrival: '2024-08-12T15:45:00.000+02:00',
+        arrival: new Date('2024-08-12T15:45:00.000+02:00'),
         tolerances: {
           before: 60,
           after: 60,
@@ -161,7 +183,7 @@ describe('stdcmConfReducers', () => {
       expect(via.isVia).toBe(true);
       const updates = {
         stopType: StdcmStopTypes.DRIVER_SWITCH,
-        stopFor: 'PT60',
+        stopFor: 1,
       };
 
       store.dispatch(stdcmConfSliceActions.updateStdcmPathStep({ id: via.id, updates }));
@@ -174,7 +196,7 @@ describe('stdcmConfReducers', () => {
       expect(destination.isVia).toBe(false);
       const updates = {
         arrivalType: ArrivalTimeTypes.ASAP,
-        arrival: '2024-08-12T15:45:00.000+02:00',
+        arrival: new Date('2024-08-12T15:45:00.000+02:00'),
         tolerances: {
           before: 60,
           after: 60,

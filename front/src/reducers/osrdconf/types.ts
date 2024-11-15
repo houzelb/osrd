@@ -10,6 +10,7 @@ import type {
 import type {
   Comfort,
   Distribution,
+  OperationalPointReference,
   PathItemLocation,
   ReceptionSignal,
 } from 'common/api/osrdEditoastApi';
@@ -91,6 +92,19 @@ export type PathStep = PathItemLocation & {
   isInvalid?: boolean;
 };
 
-export type StdcmPathStep = PathStep & {
-  tolerances?: { before: number; after: number };
-} & ({ isVia: true; stopType: StdcmStopTypes } | { isVia: false; arrivalType: ArrivalTimeTypes });
+export type StdcmPathStep = {
+  id: string;
+  location?: Extract<OperationalPointReference, { uic: number }> & {
+    secondary_code: string;
+    name: string;
+    coordinates: [number, number];
+  };
+} & (
+  | { isVia: true; stopType: StdcmStopTypes; stopFor?: number /* in minutes */ }
+  | {
+      isVia: false;
+      arrivalType: ArrivalTimeTypes;
+      arrival?: Date;
+      tolerances?: { before: number; after: number };
+    }
+);
