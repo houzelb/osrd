@@ -13,7 +13,7 @@ import type {
 } from 'common/api/osrdEditoastApi';
 import type { SpeedSpaceChartData } from 'modules/simulationResult/types';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
-import type { PathStep, StdcmPathStep } from 'reducers/osrdconf/types';
+import type { StdcmPathStep } from 'reducers/osrdconf/types';
 import type { ValueOf } from 'utils/types';
 
 export type StdcmRequestStatus = ValueOf<typeof STDCM_REQUEST_STATUS>;
@@ -26,7 +26,7 @@ export type StdcmSuccessResponse = Omit<
   rollingStock: LightRollingStock;
   creationDate: Date;
   speedLimitByTag?: string;
-  simulationPathSteps: PathStep[];
+  simulationPathSteps: StdcmPathStep[];
 };
 
 export type StdcmConflictsResponse = Extract<
@@ -36,7 +36,7 @@ export type StdcmConflictsResponse = Extract<
   rollingStock: LightRollingStock;
   creationDate: Date;
   speedLimitByTag?: string;
-  simulationPathSteps: PathStep[];
+  simulationPathSteps: StdcmPathStep[];
   path: PathfindingResultSuccess;
 };
 

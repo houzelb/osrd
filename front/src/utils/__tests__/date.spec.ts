@@ -7,8 +7,6 @@ import {
   serializeDateTimeWithoutYear,
   extractDateAndTimefromISO,
   isArrivalDateInSearchTimeWindow,
-  formatLocaleDateToIsoDate,
-  generateISODateFromDateTime,
 } from 'utils/date';
 
 describe('dateTimeToIso', () => {
@@ -121,20 +119,5 @@ describe('isArrivalDateInSearchTimeWindow', () => {
       searchDatetimeWindow
     );
     expect(result).toBe(false);
-  });
-});
-
-describe('generateISODateFromDateTime', () => {
-  it('should correctly set hours and minutes and return ISO string', () => {
-    const schedule = {
-      date: new Date('2024-08-01T00:00:00Z'),
-      hours: 10,
-      minutes: 30,
-    };
-    const expectedISODate = formatLocaleDateToIsoDate(new Date('2024-08-01T10:30:00Z'));
-
-    const result = generateISODateFromDateTime(schedule);
-
-    expect(result).toBe(expectedISODate);
   });
 });

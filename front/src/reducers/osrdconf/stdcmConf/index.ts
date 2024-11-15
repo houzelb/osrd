@@ -16,18 +16,15 @@ import type { ArrayElement } from 'utils/types';
 const DEFAULT_TOLERANCE = 1800; // 30min
 
 export const stdcmConfInitialState: OsrdStdcmConfState = {
-  // TODO: remove all the default uic values
   stdcmPathSteps: [
     {
       id: nextId(),
-      uic: -1,
       isVia: false,
       arrivalType: ArrivalTimeTypes.PRECISE_TIME,
       tolerances: { before: DEFAULT_TOLERANCE, after: DEFAULT_TOLERANCE },
     },
     {
       id: nextId(),
-      uic: -1,
       isVia: false,
       arrivalType: ArrivalTimeTypes.ASAP,
       tolerances: { before: DEFAULT_TOLERANCE, after: DEFAULT_TOLERANCE },
@@ -161,7 +158,6 @@ export const stdcmConfSlice = createSlice({
       // Index takes count of the origin in the array
       state.stdcmPathSteps = addElementAtIndex(state.stdcmPathSteps, action.payload, {
         id: nextId(),
-        uic: -1,
         stopType: StdcmStopTypes.PASSAGE_TIME,
         isVia: true,
       });

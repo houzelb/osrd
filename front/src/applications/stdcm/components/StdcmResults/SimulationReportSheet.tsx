@@ -2,18 +2,28 @@ import { useEffect, useState } from 'react';
 
 import { Table, TR, TH, TD } from '@ag-media/react-pdf-table';
 import { Page, Text, Image, Document, View, Link } from '@react-pdf/renderer';
+import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import iconAlert from 'assets/simulationReportSheet/icon_alert_fill.png';
 import logoSNCF from 'assets/simulationReportSheet/logo_sncf_reseau.png';
-import type { PathStep } from 'reducers/osrdconf/types';
-import { extractHHMM, formatDateToString, formatDay } from 'utils/date';
+import type { StdcmPathStep } from 'reducers/osrdconf/types';
+import { dateToHHMMSS, formatDateToString, formatDay } from 'utils/date';
 import { msToKmh } from 'utils/physics';
 import { capitalizeFirstLetter } from 'utils/strings';
 
 import styles from './SimulationReportStyleSheet';
 import type { SimulationReportSheetProps } from '../../types';
 import { base64ToJpeg, getStopDurationTime } from '../../utils/formatSimulationReportSheet';
+
+const getSecondaryCode = ({ location }: StdcmPathStep) => location!.secondary_code;
+
+const getStopType = (step: StdcmPathStep, t: TFunction) => {
+  if (!step.isVia) {
+    return t('serviceStop');
+  }
+  return capitalizeFirstLetter(t(`stdcm:trainPath.stopType.${step.stopType}`));
+};
 
 const SimulationReportSheet = ({
   stdcmLinkedPaths,
@@ -65,13 +75,10 @@ const SimulationReportSheet = ({
     [mapImageUrl]
   );
 
-  const getArrivalTime = (
-    step: PathStep,
-    { isFirstStep, isLastStep }: { isFirstStep?: boolean; isLastStep?: boolean }
-  ) => {
-    if (isFirstStep || isLastStep) {
+  const getArrivalTime = (step: StdcmPathStep) => {
+    if (!step.isVia) {
       if (step.arrival && step.arrivalType === 'preciseTime') {
-        return extractHHMM(step.arrival);
+        return dateToHHMMSS(step.arrival, { withoutSeconds: true });
       }
       return t('asap');
     }
@@ -191,8 +198,6 @@ const SimulationReportSheet = ({
                   </View>
                 </TH>
                 {stdcmData.simulationPathSteps.map((step, index) => {
-                  const isFirstStep = index === 0;
-                  const isLastStep = index === stdcmData.simulationPathSteps.length - 1;
                   renderedIndex += 1;
                   return (
                     <TR key={index} style={styles.convoyAndRoute.stopTableTbody}>
@@ -201,33 +206,27 @@ const SimulationReportSheet = ({
                       </View>
                       <View style={styles.convoyAndRoute.stopTableOpWidth}>
                         <TD style={styles.convoyAndRoute.stopTableOpColumn}>
-                          {step.name || 'Unknown'}
+                          {step.location!.name}
                         </TD>
                       </View>
                       <View style={styles.convoyAndRoute.stopTableChWidth}>
                         <TD style={styles.convoyAndRoute.stopTableChColumn}>
-                          {'secondary_code' in step ? step.secondary_code : undefined}
+                          {getSecondaryCode(step)}
                         </TD>
                       </View>
                       <View style={styles.convoyAndRoute.stopTableEndWidth}>
                         <TD style={styles.convoyAndRoute.stopTableItalicColumn}>
-                          {getArrivalTime(step, { isLastStep })}
+                          {getArrivalTime(step)}
                         </TD>
                       </View>
                       <View style={styles.convoyAndRoute.stopTableStartWidth}>
                         <TD style={styles.convoyAndRoute.stopTableStartColumn}>
-                          {getArrivalTime(step, { isFirstStep })}
+                          {getArrivalTime(step)}
                         </TD>
                       </View>
                       <View style={styles.convoyAndRoute.stopTableStopTypeWidth}>
                         <TD style={styles.convoyAndRoute.stopTableItalicColumn}>
-                          {isFirstStep || isLastStep
-                            ? t('serviceStop')
-                            : capitalizeFirstLetter(
-                                t(
-                                  `stdcm:trainPath.stopType.${stdcmData.simulationPathSteps[index].stopType}`
-                                )
-                              )}
+                          {getStopType(step, t)}
                         </TD>
                       </View>
                     </TR>
@@ -308,10 +307,8 @@ const SimulationReportSheet = ({
                 const isViaInSimulationPath = stdcmData.simulationPathSteps
                   .slice(1, -1)
                   .some(
-                    (pathStep) =>
-                      pathStep.name === step.name &&
-                      'secondary_code' in pathStep &&
-                      pathStep.secondary_code === step.ch
+                    (s) =>
+                      s.location && s.location.name === step.name && getSecondaryCode(s) === step.ch
                   );
                 const isViaWithoutStop = isViaInSimulationPath && step.duration === 0;
                 const isNotExtremity = !isFirstStep && !isLastStep;

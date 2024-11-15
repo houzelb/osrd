@@ -1,6 +1,6 @@
 import type { Action, Reducer, ReducersMapObject, AnyAction } from 'redux';
 import type { PersistConfig } from 'redux-persist';
-import { persistCombineReducers, persistReducer } from 'redux-persist';
+import { createTransform, persistCombineReducers, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // defaults to localStorage
 import createCompressor from 'redux-persist-transform-compress';
 import { createFilter } from 'redux-persist-transform-filter';
@@ -57,12 +57,26 @@ const saveUserFilter = createFilter('user', userWhiteList);
 
 const saveMainFilter = createFilter('main', mainWhiteList);
 
+// Deserialize date strings coming from local storage
+const dateTransform = createTransform(
+  null,
+  (outboundState: { arrival?: string }[]) =>
+    outboundState.map(({ arrival, ...step }) => {
+      if (arrival) {
+        return { ...step, arrival: new Date(arrival) };
+      }
+      return step;
+    }),
+  { whitelist: ['stdcmPathSteps'] }
+);
+
 // Useful to only blacklist a sub-propertie of osrdconf
 const buildOsrdConfPersistConfig = <T extends OsrdConfState>(
   slice: ConfSlice
 ): PersistConfig<T> => ({
   key: slice.name,
   storage,
+  transforms: [dateTransform],
   blacklist: ['featureInfoClick'],
 });
 

@@ -13,7 +13,7 @@ import { setFailure } from 'reducers/main';
 import type { OsrdStdcmConfState, StandardAllowance } from 'reducers/osrdconf/types';
 import { dateTimeFormatting } from 'utils/date';
 import { kmhToMs, tToKg } from 'utils/physics';
-import { ISO8601Duration2sec, sec2ms } from 'utils/timeManipulation';
+import { minToMs, sec2ms } from 'utils/timeManipulation';
 
 import createMargin from './createMargin';
 import { StdcmStopTypes } from '../types';
@@ -62,7 +62,17 @@ export const checkStdcmConf = (
     maxSpeed,
   } = osrdconf;
   let error = false;
-  if (pathSteps[0] === null) {
+
+  const origin = pathSteps.at(0)!;
+  if (origin.isVia) {
+    throw new Error('First step should not be a via');
+  }
+  const destination = pathSteps.at(-1)!;
+  if (destination.isVia) {
+    throw new Error('First step should not be a via');
+  }
+
+  if (!origin.location) {
     error = true;
     dispatch(
       setFailure({
@@ -71,7 +81,7 @@ export const checkStdcmConf = (
       })
     );
   }
-  if (pathSteps[pathSteps.length - 1] === null) {
+  if (!destination.location) {
     error = true;
     dispatch(
       setFailure({
@@ -108,12 +118,9 @@ export const checkStdcmConf = (
     );
   }
 
-  const origin = pathSteps.at(0);
-  const destination = pathSteps.at(-1);
-
-  const originArrival = origin?.arrival;
-  const destinationArrival = destination?.arrival;
-  const isDepartureScheduled = origin?.arrivalType === 'preciseTime';
+  const originArrival = origin.arrival;
+  const destinationArrival = destination.arrival;
+  const isDepartureScheduled = origin.arrivalType === 'preciseTime';
 
   const startDateTime = isDepartureScheduled
     ? new Date(originArrival!)
@@ -136,25 +143,37 @@ export const checkStdcmConf = (
     );
   }
 
+  if (pathSteps.some((step) => !step.location)) {
+    error = true;
+    dispatch(
+      setFailure({
+        name: t('stdcm:form.incompleteForm'),
+        message: t('stdcm:form.viaNotDefined'),
+      })
+    );
+  }
+
   if (error) return null;
 
   const path = compact(osrdconf.stdcmPathSteps).map((step) => {
-    const { arrival, tolerances, stopFor, arrivalType } = step;
-    const location = getStepLocation(step);
+    const location = getStepLocation(step.location!);
 
     let timingData: PathfindingItem['timing_data'] | undefined;
     let duration: number | undefined;
     if (step.isVia) {
-      if (step.stopType !== StdcmStopTypes.PASSAGE_TIME) {
-        duration = stopFor ? sec2ms(ISO8601Duration2sec(stopFor) || Number(stopFor)) : 0;
+      const { stopFor } = step;
+      if (step.stopType !== StdcmStopTypes.PASSAGE_TIME && stopFor !== undefined) {
+        duration = minToMs(stopFor);
       }
     } else {
       // if the step is either the origin or the destination,
-      // it must have a duration
+      // it must have a duration (because it's a stop)
       duration = 0;
+
+      const { arrival, tolerances, arrivalType } = step;
       if (arrivalType === 'preciseTime' && arrival) {
         timingData = {
-          arrival_time: arrival,
+          arrival_time: arrival.toISOString(),
           arrival_time_tolerance_before: sec2ms(tolerances?.before ?? 0),
           arrival_time_tolerance_after: sec2ms(tolerances?.after ?? 0),
         };

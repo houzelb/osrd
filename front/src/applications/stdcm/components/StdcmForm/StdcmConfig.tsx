@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from '@osrd-project/ui-core';
 import { ArrowDown, ArrowUp } from '@osrd-project/ui-icons';
 import cx from 'classnames';
-import { compact } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
+import { extractMarkersInfo } from 'applications/stdcm/utils';
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import useInfraStatus from 'modules/pathfinding/hooks/useInfraStatus';
 import { Map } from 'modules/trainschedule/components/ManageTrainSchedule';
@@ -83,15 +83,11 @@ const StdcmConfig = ({
 
   const disabled = isPending || retainedSimulationIndex > -1;
 
+  const markersInfo = useMemo(() => extractMarkersInfo(pathSteps), [pathSteps]);
+
   const startSimulation = () => {
     const isPathfindingFailed = !!pathfinding && pathfinding.status !== 'success';
-    const formErrorsStatus = checkStdcmConfigErrors(
-      isPathfindingFailed,
-      origin,
-      destination,
-      compact(pathSteps),
-      t
-    );
+    const formErrorsStatus = checkStdcmConfigErrors(isPathfindingFailed, pathSteps, t);
     if (pathfinding?.status === 'success' && !formErrorsStatus) {
       launchStdcmRequest();
     } else {
@@ -113,16 +109,15 @@ const StdcmConfig = ({
   };
 
   useEffect(() => {
-    const isPathfindingFailed = !!pathfinding && pathfinding.status !== 'success';
-    const formErrorsStatus = checkStdcmConfigErrors(
-      isPathfindingFailed,
-      origin,
-      destination,
-      [],
-      t
-    );
-    setFormErrors(formErrorsStatus);
-  }, [origin, destination, pathfinding]);
+    if (pathfinding) {
+      const formErrorsStatus = checkStdcmConfigErrors(
+        pathfinding.status !== 'success',
+        pathSteps,
+        t
+      );
+      setFormErrors(formErrorsStatus);
+    }
+  }, [pathfinding]);
 
   useEffect(() => {
     if (!isDebugMode) {
@@ -221,7 +216,7 @@ const StdcmConfig = ({
             preventPointSelection
             pathGeometry={pathfinding?.geometry}
             showStdcmAssets
-            simulationPathSteps={pathSteps}
+            simulationPathSteps={markersInfo}
           />
         </div>
       </div>

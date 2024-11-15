@@ -16,6 +16,10 @@ export function ms2sec(ms: number) {
   return ms / 1000;
 }
 
+export function minToMs(min: number) {
+  return min * 60 * 1000;
+}
+
 export function datetime2string(ts: string | number | Date): TimeString {
   const datetime = new Date(ts);
   return datetime.toLocaleString();
