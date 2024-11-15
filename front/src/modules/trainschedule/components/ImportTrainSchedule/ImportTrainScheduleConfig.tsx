@@ -170,28 +170,21 @@ const ImportTrainScheduleConfig = ({
     startDate: string
   ): Step[] =>
     ocpTTs
-      .map((ocpTT, index): Step | null => {
+      .map((ocpTT): Step | null => {
         const ocpRef = ocpTT.getAttribute('ocpRef');
         const times = ocpTT.getElementsByTagName('times')[0];
+        const isLastOcp = ocpTT === ocpTTs.at(-1);
+        const ocpType = ocpTT.getAttribute('ocpType');
         let departureTime = times?.getAttribute('departure') || '';
-        let arrivalTime = times?.getAttribute('arrival') || '';
-
-        const isLastOcpTT = index === ocpTTs.length - 1;
-
-        if (isLastOcpTT) {
-          arrivalTime = cleanTimeFormat(departureTime) || cleanTimeFormat(arrivalTime); // For the last sequence, arrival equals departure
-          departureTime = cleanTimeFormat(arrivalTime) || cleanTimeFormat(departureTime);
-        } else if (index !== 0) {
-          arrivalTime = times?.getAttribute('arrival') || times?.getAttribute('departure') || '';
-          arrivalTime = cleanTimeFormat(arrivalTime);
-          departureTime = times?.getAttribute('departure') || times?.getAttribute('arrival') || '';
-          departureTime = cleanTimeFormat(departureTime);
-        }
+        let arrivalTime = ocpType === 'pass' ? departureTime : times?.getAttribute('arrival') || '';
+        arrivalTime = cleanTimeFormat(arrivalTime);
+        departureTime = cleanTimeFormat(departureTime);
 
         if (!ocpRef) {
           console.error('ocpRef is null or undefined');
           return null;
         }
+
         const operationalPoint = cichDict[ocpRef];
 
         if (!operationalPoint) {
@@ -203,13 +196,30 @@ const ImportTrainScheduleConfig = ({
         const formattedArrivalTime = `${startDate} ${arrivalTime}`;
         const formattedDepartureTime = `${startDate} ${departureTime}`;
 
+        let stopFor: number | undefined;
+
+        const arrivalDate = new Date(`${startDate}T${arrivalTime}`);
+        const departureDate = new Date(`${startDate}T${departureTime}`);
+        if (ocpType === 'stop') {
+          if (arrivalTime && departureTime) {
+            stopFor = Math.round((departureDate.getTime() - arrivalDate.getTime()) / 1000);
+          } else {
+            stopFor = 0;
+          }
+        } else if (ocpType === 'pass') {
+          if (isLastOcp) {
+            stopFor = 0;
+          }
+        }
+
         return {
           id: nextId(),
           uic,
           chCode,
           name: ocpRef,
-          arrivalTime: cleanTimeFormat(formattedArrivalTime),
-          departureTime: cleanTimeFormat(formattedDepartureTime),
+          arrivalTime: formattedArrivalTime,
+          departureTime: formattedDepartureTime,
+          duration: stopFor,
         } as Step;
       })
       .filter((step): step is Step => step !== null);
