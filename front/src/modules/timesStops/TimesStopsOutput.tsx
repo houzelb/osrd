@@ -5,7 +5,6 @@ import type {
   SimulationResponseSuccess,
 } from 'applications/operationalStudies/types';
 import type { PathfindingResultSuccess, TrainScheduleResult } from 'common/api/osrdEditoastApi';
-import { Loader } from 'common/Loaders/Loader';
 import type { TrainScheduleWithDetails } from 'modules/trainschedule/components/Timetable/types';
 import { NO_BREAK_SPACE } from 'utils/strings';
 
@@ -37,15 +36,6 @@ const TimesStopsOutput = ({
     selectedTrainSchedule,
     path
   );
-
-  if (dataIsLoading || !trainSummary || !operationalPoints || !selectedTrainSchedule) {
-    return (
-      <div style={{ height: '600px' }}>
-        <Loader />
-      </div>
-    );
-  }
-
   return (
     <TimesStops
       rows={enrichedOperationalPoints}
@@ -63,6 +53,7 @@ const TimesStopsOutput = ({
         });
       }}
       headerRowHeight={40}
+      dataIsLoading={dataIsLoading || !trainSummary || !operationalPoints || !selectedTrainSchedule}
     />
   );
 };

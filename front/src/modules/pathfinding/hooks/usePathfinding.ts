@@ -4,6 +4,7 @@ import { compact, isEqual, isObject } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
+import { useScenarioContext } from 'applications/operationalStudies/hooks/useScenarioContext';
 import type { ManageTrainSchedulePathProperties } from 'applications/operationalStudies/types';
 import type {
   PathfindingInputError,
@@ -16,7 +17,7 @@ import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import { initialState } from 'modules/pathfinding/consts';
 import type { PathfindingAction, PathfindingState } from 'modules/pathfinding/types';
 import {
-  formatSuggestedOperationalPointsWithTrackName,
+  formatSuggestedOperationalPoints,
   getPathfindingQuery,
   matchPathStepAndOp,
   upsertPathStepsInOPs,
@@ -150,9 +151,8 @@ export const usePathfinding = (
 ) => {
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
   const dispatch = useAppDispatch();
-  const { getInfraID, getOrigin, getDestination, getVias, getPathSteps, getPowerRestriction } =
+  const { getOrigin, getDestination, getVias, getPathSteps, getPowerRestriction } =
     useOsrdConfSelectors();
-  const infraId = useSelector(getInfraID, isEqual);
   const origin = useSelector(getOrigin, isEqual);
   const destination = useSelector(getDestination, isEqual);
   const vias = useSelector(getVias(), isEqual);
@@ -178,6 +178,7 @@ export const usePathfinding = (
     osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useMutation();
 
   const { updatePathSteps } = useOsrdConfActions();
+  const { infraId } = useScenarioContext();
 
   const generatePathfindingParams = (): PostInfraByInfraIdPathfindingBlocksApiArg | null => {
     setPathProperties?.(undefined);
@@ -294,14 +295,11 @@ export const usePathfinding = (
               await postPathProperties(pathPropertiesParams).unwrap();
 
             if (electrifications && geometry && operational_points) {
-              const suggestedOperationalPoints: SuggestedOP[] =
-                await formatSuggestedOperationalPointsWithTrackName(
-                  operational_points,
-                  geometry,
-                  pathResult.length,
-                  infraId,
-                  dispatch
-                );
+              const suggestedOperationalPoints: SuggestedOP[] = formatSuggestedOperationalPoints(
+                operational_points,
+                geometry,
+                pathResult.length
+              );
 
               // We update existing pathsteps with coordinates, positionOnPath and kp corresponding to the new pathfinding result
               const updatedPathSteps: (PathStep | null)[] = pathSteps.map((step, i) => {

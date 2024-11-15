@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { keyBy } from 'lodash';
 import { useTranslation } from 'react-i18next';
 
+import { useScenarioContext } from 'applications/operationalStudies/hooks/useScenarioContext';
 import type {
   PathPropertiesFormatted,
   SimulationResponseSuccess,
@@ -27,6 +28,9 @@ const useOutputTableData = (
   path?: PathfindingResultSuccess
 ): TimeStopsRow[] => {
   const { t } = useTranslation('timesStops');
+  const { getTrackSectionsByIds } = useScenarioContext();
+
+  const [rows, setRows] = useState<TimeStopsRow[]>([]);
 
   const scheduleByAt: Record<string, ScheduleEntry> = keyBy(selectedTrainSchedule?.schedule, 'at');
   const theoreticalMargins = selectedTrainSchedule && getTheoreticalMargins(selectedTrainSchedule);
@@ -101,44 +105,57 @@ const useOutputTableData = (
         positionOnPath: path.path_item_positions[index],
       };
     });
-  }, [selectedTrainSchedule, path, trainSummary?.pathItemTimes, startDatetime]);
+  }, [selectedTrainSchedule, path, trainSummary?.pathItemTimes]);
 
-  const rows: TimeStopsRow[] = useMemo(() => {
-    if (!operationalPoints || !startDatetime) return [];
+  useEffect(() => {
+    const formatRows = async () => {
+      if (!operationalPoints || !startDatetime) {
+        setRows([]);
+        return;
+      }
 
-    return operationalPoints.map((op) => {
-      const matchingPathStep = pathStepRows.find(
-        (pathStepRow) => op.position === pathStepRow.positionOnPath
-      );
-      if (matchingPathStep) {
+      const trackIds = operationalPoints.map((op) => op.part.track);
+      const trackSections = await getTrackSectionsByIds(trackIds);
+
+      const formattedRows = operationalPoints.map((op) => {
+        const matchingPathStep = pathStepRows.find(
+          (pathStepRow) => op.position === pathStepRow.positionOnPath
+        );
+        if (matchingPathStep) {
+          return {
+            ...matchingPathStep,
+            opId: op.id,
+            name: op.extensions?.identifier?.name,
+            ch: op.extensions?.sncf?.ch,
+            trackName: trackSections[op.part.track]?.extensions?.sncf?.track_name,
+          };
+        }
+
+        // compute arrival time
+        const matchingReportTrainIndex = simulatedTrain.positions.findIndex(
+          (position) => position === op.position
+        );
+
+        const time =
+          matchingReportTrainIndex === -1
+            ? interpolateValue(simulatedTrain, op.position, 'times')
+            : simulatedTrain.times[matchingReportTrainIndex];
+        const calculatedArrival = new Date(startDatetime.getTime() + time);
+
         return {
-          ...matchingPathStep,
+          isWaypoint: false,
           opId: op.id,
           name: op.extensions?.identifier?.name,
           ch: op.extensions?.sncf?.ch,
+          calculatedArrival: dateToHHMMSS(calculatedArrival),
+          trackName: trackSections[op.part.track]?.extensions?.sncf?.track_name,
         };
-      }
+      });
+      setRows(formattedRows);
+    };
 
-      // compute arrival time
-      const matchingReportTrainIndex = simulatedTrain.positions.findIndex(
-        (position) => position === op.position
-      );
-
-      const time =
-        matchingReportTrainIndex === -1
-          ? interpolateValue(simulatedTrain, op.position, 'times')
-          : simulatedTrain.times[matchingReportTrainIndex];
-      const calculatedArrival = new Date(startDatetime.getTime() + time);
-
-      return {
-        isWaypoint: false,
-        opId: op.id,
-        name: op.extensions?.identifier?.name,
-        ch: op.extensions?.sncf?.ch,
-        calculatedArrival: dateToHHMMSS(calculatedArrival),
-      };
-    });
-  }, [operationalPoints, pathStepRows, simulatedTrain, startDatetime]);
+    formatRows();
+  }, [operationalPoints, pathStepRows, simulatedTrain, getTrackSectionsByIds]);
 
   return rows;
 };

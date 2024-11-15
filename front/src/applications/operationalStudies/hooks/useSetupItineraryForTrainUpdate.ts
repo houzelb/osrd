@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 
 import { type Position } from '@turf/helpers';
 import { omit } from 'lodash';
-import { useSelector } from 'react-redux';
 
 import {
   osrdEditoastApi,
@@ -13,9 +12,9 @@ import {
   type TrainScheduleResult,
   type PathfindingResult,
 } from 'common/api/osrdEditoastApi';
-import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
+import { useOsrdConfActions } from 'common/osrdContext';
 import {
-  formatSuggestedOperationalPointsWithTrackName,
+  formatSuggestedOperationalPoints,
   matchPathStepAndOp,
   upsertPathStepsInOPs,
 } from 'modules/pathfinding/utils';
@@ -29,6 +28,7 @@ import { castErrorToFailure } from 'utils/error';
 import { getPointCoordinates } from 'utils/geometry';
 
 import type { ManageTrainSchedulePathProperties } from '../types';
+import { useScenarioContext } from './useScenarioContext';
 
 type ItineraryForTrainUpdate = {
   pathSteps: (PathStep | null)[];
@@ -64,8 +64,6 @@ const useSetupItineraryForTrainUpdate = (
   setPathProperties: (pathProperties: ManageTrainSchedulePathProperties) => void,
   trainIdToEdit: number
 ) => {
-  const { getInfraID } = useOsrdConfSelectors();
-  const infraId = useSelector(getInfraID);
   const dispatch = useAppDispatch();
 
   const { updatePathSteps } = useOsrdConfActions();
@@ -77,6 +75,7 @@ const useSetupItineraryForTrainUpdate = (
     osrdEditoastApi.endpoints.postInfraByInfraIdPathfindingBlocks.useMutation();
   const [postPathProperties] =
     osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useMutation();
+  const { infraId } = useScenarioContext();
 
   useEffect(() => {
     const computeItineraryForTrainUpdate = async (
@@ -124,14 +123,11 @@ const useSetupItineraryForTrainUpdate = (
       const stepsCoordinates = pathfindingResult.path_item_positions.map((position) =>
         getPointCoordinates(geometry, pathfindingResult.length, position)
       );
-      const suggestedOperationalPoints: SuggestedOP[] =
-        await formatSuggestedOperationalPointsWithTrackName(
-          operational_points,
-          geometry,
-          pathfindingResult.length,
-          infraId,
-          dispatch
-        );
+      const suggestedOperationalPoints: SuggestedOP[] = formatSuggestedOperationalPoints(
+        operational_points,
+        geometry,
+        pathfindingResult.length
+      );
 
       const computedpathSteps = computeBasePathSteps(trainSchedule);
       const updatedPathSteps: PathStep[] = updatePathStepsFromOperationalPoints(

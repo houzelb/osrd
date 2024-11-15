@@ -3,6 +3,8 @@ import { DynamicDataSheetGrid, type DataSheetGridProps } from 'react-datasheet-g
 import type { Operation } from 'react-datasheet-grid/dist/types';
 import { useTranslation } from 'react-i18next';
 
+import { Loader } from 'common/Loaders/Loader';
+
 import { useTimeStopsColumns } from './hooks/useTimeStopsColumns';
 import { type TableType, type TimeStopsRow } from './types';
 
@@ -13,6 +15,7 @@ type TimesStopsProps<T extends TimeStopsRow> = {
   stickyRightColumn?: DataSheetGridProps['stickyRightColumn'];
   headerRowHeight?: number;
   onChange?: (newRows: T[], operation: Operation) => void;
+  dataIsLoading: boolean;
 };
 
 const TimesStops = <T extends TimeStopsRow>({
@@ -22,10 +25,19 @@ const TimesStops = <T extends TimeStopsRow>({
   stickyRightColumn,
   headerRowHeight,
   onChange,
+  dataIsLoading,
 }: TimesStopsProps<T>) => {
   const { t } = useTranslation('timesStops');
 
   const columns = useTimeStopsColumns(tableType, rows);
+
+  if (dataIsLoading) {
+    return (
+      <div style={{ height: '600px' }}>
+        <Loader />
+      </div>
+    );
+  }
 
   if (!rows) {
     return (

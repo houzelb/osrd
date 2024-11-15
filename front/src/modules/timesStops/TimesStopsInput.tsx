@@ -5,6 +5,7 @@ import { isEqual, isNil } from 'lodash';
 import type { Operation } from 'react-datasheet-grid/dist/types';
 import { useTranslation } from 'react-i18next';
 
+import { useScenarioContext } from 'applications/operationalStudies/hooks/useScenarioContext';
 import { useOsrdConfActions } from 'common/osrdContext';
 import { isVia, matchPathStepAndOp } from 'modules/pathfinding/utils';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
@@ -68,6 +69,7 @@ const TimesStopsInput = ({ allWaypoints, startTime, pathSteps }: TimesStopsInput
   const { updatePathSteps, upsertSeveralViasFromSuggestedOP } = useOsrdConfActions();
 
   const [rows, setRows] = useState<TimesStopsInputRow[]>([]);
+  const { getTrackSectionsByIds, trackSectionsLoading } = useScenarioContext();
 
   const clearPathStep = (rowData: TimesStopsInputRow) => {
     const index = pathSteps.findIndex(
@@ -123,16 +125,26 @@ const TimesStopsInput = ({ allWaypoints, startTime, pathSteps }: TimesStopsInput
   );
 
   useEffect(() => {
-    if (allWaypoints) {
-      const suggestedOPs = formatSuggestedViasToRowVias(
-        allWaypoints,
-        pathSteps || [],
-        t,
-        startTime,
-        TableType.Input
-      );
-      setRows(updateDaySinceDeparture(suggestedOPs, startTime, { keepFirstIndexArrival: true }));
-    }
+    const fetchAndFormatRows = async () => {
+      if (allWaypoints) {
+        const trackIds = allWaypoints.map((op) => op.track);
+        const trackSections = await getTrackSectionsByIds(trackIds);
+        const suggestedOPsWithTrackNames = allWaypoints.map((op) => ({
+          ...op,
+          trackName: trackSections[op.track]?.extensions?.sncf?.track_name,
+        }));
+        const formatedRows = formatSuggestedViasToRowVias(
+          suggestedOPsWithTrackNames,
+          pathSteps || [],
+          t,
+          startTime,
+          TableType.Input
+        );
+        setRows(updateDaySinceDeparture(formatedRows, startTime, { keepFirstIndexArrival: true }));
+      }
+    };
+
+    fetchAndFormatRows();
   }, [allWaypoints, pathSteps, startTime]);
 
   return (
@@ -150,6 +162,7 @@ const TimesStopsInput = ({ allWaypoints, startTime, pathSteps }: TimesStopsInput
           }),
       }}
       onChange={onChange}
+      dataIsLoading={trackSectionsLoading}
     />
   );
 };

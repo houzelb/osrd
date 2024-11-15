@@ -1,19 +1,15 @@
-import { compact, uniq } from 'lodash';
+import { compact } from 'lodash';
 
-import type { TrackSectionEntity } from 'applications/editor/tools/trackEdition/types';
-import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import type {
   GeoJsonLineString,
   PathProperties,
   PathfindingInput,
   PostInfraByInfraIdPathfindingBlocksApiArg,
   RollingStockWithLiveries,
-  TrackSection,
 } from 'common/api/osrdEditoastApi';
 import { getSupportedElectrification, isThermal } from 'modules/rollingStock/helpers/electric';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import type { PathStep } from 'reducers/osrdconf/types';
-import type { AppDispatch } from 'store';
 import { addElementAtIndex } from 'utils/array';
 import { getPointCoordinates } from 'utils/geometry';
 
@@ -21,8 +17,8 @@ import getStepLocation from './helpers/getStepLocation';
 
 export const formatSuggestedOperationalPoints = (
   operationalPoints: NonNullable<Required<PathProperties['operational_points']>>,
-  geometry: GeoJsonLineString,
-  pathLength: number
+  geometry?: GeoJsonLineString,
+  pathLength?: number
 ): SuggestedOP[] =>
   operationalPoints.map((op) => ({
     opId: op.id,
@@ -37,54 +33,12 @@ export const formatSuggestedOperationalPoints = (
     offsetOnTrack: op.part.position,
     track: op.part.track,
     positionOnPath: op.position,
-    coordinates: getPointCoordinates(geometry, pathLength, op.position),
+    coordinates:
+      (geometry !== undefined &&
+        pathLength !== undefined &&
+        getPointCoordinates(geometry, pathLength, op.position)) ||
+      undefined,
   }));
-
-export const formatSuggestedOperationalPointsWithTrackName = async (
-  operationalPoints: NonNullable<Required<PathProperties['operational_points']>>,
-  geometry: GeoJsonLineString,
-  pathLength: number,
-  infraId: number,
-  dispatch: AppDispatch
-): Promise<SuggestedOP[]> => {
-  // Extract track IDs to fetch track names
-  const trackIds = uniq(operationalPoints.map((op) => op.part.track));
-  const trackSections = await dispatch(
-    osrdEditoastApi.endpoints.postInfraByInfraIdObjectsAndObjectType.initiate({
-      infraId,
-      objectType: 'TrackSection',
-      body: trackIds,
-    })
-  ).unwrap();
-
-  return operationalPoints.map((op) => {
-    const associatedTrackSection = trackSections.find(
-      (trackSection) => (trackSection.railjson as TrackSection).id === op.part.track
-    );
-
-    const trackName = associatedTrackSection
-      ? (associatedTrackSection.railjson as TrackSectionEntity['properties']).extensions?.sncf
-          ?.track_name
-      : null;
-
-    return {
-      opId: op.id,
-      name: op.extensions?.identifier?.name,
-      uic: op.extensions?.identifier?.uic,
-      ch: op.extensions?.sncf?.ch,
-      kp: op.part.extensions?.sncf?.kp,
-      chLongLabel: op.extensions?.sncf?.ch_long_label,
-      chShortLabel: op.extensions?.sncf?.ch_short_label,
-      ci: op.extensions?.sncf?.ci,
-      trigram: op.extensions?.sncf?.trigram,
-      offsetOnTrack: op.part.position,
-      track: op.part.track,
-      positionOnPath: op.position,
-      coordinates: getPointCoordinates(geometry, pathLength, op.position),
-      trackName: trackName || undefined,
-    };
-  });
-};
 
 export const matchPathStepAndOp = (
   step: PathStep,
