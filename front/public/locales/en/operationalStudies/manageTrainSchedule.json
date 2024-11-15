@@ -9,6 +9,9 @@
   "cancelPathfinding": "Cancel",
   "chooseOnMap": "Choose on the map",
   "composition": "Composition",
+  "coreErrors": {
+    "path_with_repeated_tracks": "The path goes over the same track multiple times"
+  },
   "deleteVias": "Delete steps",
   "deleteRoute": "Delete the route",
   "destination": "Destination",

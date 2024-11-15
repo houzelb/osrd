@@ -9,6 +9,9 @@
   "cancelPathfinding": "Annuler",
   "chooseOnMap": "Choisir sur la carte",
   "composition": "Composition",
+  "coreErrors": {
+    "path_with_repeated_tracks": "Le chemin emprunte plusieurs fois la même voie"
+  },
   "deleteRoute": "Supprimer l'itinéraire",
   "deleteVias": "Supprimer les étapes",
   "destination": "Destination",
