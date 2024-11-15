@@ -11,8 +11,18 @@ import stdcmVia from 'assets/pictures/mapMarkers/intermediate-point.svg';
 import stdcmOrigin from 'assets/pictures/mapMarkers/start.svg';
 import originSVG from 'assets/pictures/origin.svg';
 import viaSVG from 'assets/pictures/via.svg';
-import type { PathStep } from 'reducers/osrdconf/types';
 import { getNearestTrack } from 'utils/mapHelper';
+
+export type MarkerInformation = {
+  name?: string;
+  coordinates?: number[] | Position;
+  metadata?: {
+    lineCode: number;
+    lineName: string;
+    trackName: string;
+    trackNumber: number;
+  };
+};
 
 enum MARKER_TYPE {
   ORIGIN = 'origin',
@@ -20,8 +30,8 @@ enum MARKER_TYPE {
   DESTINATION = 'destination',
 }
 
-type MarkerInformation = {
-  marker: PathStep;
+type MarkerProperties = {
+  marker: MarkerInformation;
   coordinates: number[] | Position;
   imageSource: string;
 } & (
@@ -36,7 +46,7 @@ type MarkerInformation = {
 
 type ItineraryMarkersProps = {
   map: Map;
-  simulationPathSteps: PathStep[];
+  simulationPathSteps: MarkerInformation[];
   showStdcmAssets: boolean;
 };
 
@@ -44,7 +54,7 @@ const formatPointWithNoName = (
   lineCode: number,
   lineName: string,
   trackName: string,
-  markerType: MarkerInformation['type']
+  markerType: MarkerProperties['type']
 ) => (
   <>
     <div className="main-line">
@@ -55,7 +65,7 @@ const formatPointWithNoName = (
   </>
 );
 
-const extractMarkerInformation = (pathSteps: (PathStep | null)[], showStdcmAssets: boolean) =>
+const extractMarkerInformation = (pathSteps: MarkerInformation[], showStdcmAssets: boolean) =>
   pathSteps.reduce((acc, cur, index) => {
     if (cur && cur.coordinates) {
       if (index === 0) {
@@ -83,7 +93,7 @@ const extractMarkerInformation = (pathSteps: (PathStep | null)[], showStdcmAsset
       }
     }
     return acc;
-  }, [] as MarkerInformation[]);
+  }, [] as MarkerProperties[]);
 
 const ItineraryMarkers = ({ map, simulationPathSteps, showStdcmAssets }: ItineraryMarkersProps) => {
   const markersInformation = useMemo(
@@ -92,7 +102,7 @@ const ItineraryMarkers = ({ map, simulationPathSteps, showStdcmAssets }: Itinera
   );
 
   const getMarkerDisplayInformation = useCallback(
-    (markerInfo: MarkerInformation) => {
+    (markerInfo: MarkerProperties) => {
       const {
         marker: { coordinates: markerCoordinates, metadata: markerMetadata },
         type: markerType,
