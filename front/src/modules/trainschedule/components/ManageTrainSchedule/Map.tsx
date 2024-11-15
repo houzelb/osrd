@@ -48,12 +48,13 @@ import RenderPopup from 'modules/trainschedule/components/ManageTrainSchedule/Ma
 import { updateViewport } from 'reducers/map';
 import type { Viewport } from 'reducers/map';
 import { getMap, getTerrain3DExaggeration } from 'reducers/map/selectors';
-import type { PathStep } from 'reducers/osrdconf/types';
 import { useAppDispatch } from 'store';
 import { getMapMouseEventNearestFeature } from 'utils/mapHelper';
 
 import ItineraryLayer from './ManageTrainScheduleMap/ItineraryLayer';
-import ItineraryMarkers from './ManageTrainScheduleMap/ItineraryMarkers';
+import ItineraryMarkers, {
+  type MarkerInformation,
+} from './ManageTrainScheduleMap/ItineraryMarkers';
 
 type MapProps = {
   pathProperties?: ManageTrainSchedulePathProperties;
@@ -64,7 +65,7 @@ type MapProps = {
   hideItinerary?: boolean;
   preventPointSelection?: boolean;
   mapId?: string;
-  simulationPathSteps: PathStep[];
+  simulationPathSteps: MarkerInformation[];
   showStdcmAssets?: boolean;
   isFeasible?: boolean;
 };
