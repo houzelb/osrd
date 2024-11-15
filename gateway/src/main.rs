@@ -61,6 +61,9 @@ async fn main() -> std::io::Result<()> {
     // Enable telemetry
     config.telemetry.enable();
 
+    // CORS configuration
+    let allowed_origins = config.allowed_origins.clone();
+
     // Start server
     HttpServer::new(move || {
         let session_middleware =
@@ -71,7 +74,18 @@ async fn main() -> std::io::Result<()> {
                 .cookie_name("gateway".to_string())
                 .build();
 
+        let cors = if let Some(allowed_origins) = &allowed_origins {
+            let mut cors = actix_cors::Cors::default();
+            for origin in allowed_origins {
+                cors = cors.allowed_origin(origin);
+            }
+            cors.allow_any_method().allow_any_header().max_age(3600)
+        } else {
+            actix_cors::Cors::default()
+        };
+
         let mut app = App::new()
+            .wrap(cors)
             .wrap(RequestTracing::new())
             .wrap(Compress::default()) // enable compress
             .route("/health", web::get().to(|| async { "OK" }))

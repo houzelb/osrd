@@ -183,6 +183,8 @@ pub struct ProxyConfig {
     pub auth: AuthConfig,
     /// Telemetry configuration
     pub telemetry: Telemetry,
+    /// Allowed origins for CORS (when empty, CORS is disabled entirely)
+    pub allowed_origins: Option<Vec<String>>,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -209,6 +211,7 @@ impl Default for ProxyConfig {
             telemetry: Telemetry {
                 tracing: TracingTelemetry::None,
             },
+            allowed_origins: None,
         }
     }
 }
