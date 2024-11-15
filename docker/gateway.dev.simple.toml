@@ -5,6 +5,7 @@
 secret_key = "NOT+A+SECRET++NOT+A+SECRET++NOT+A+SECRET++NOT+A+SECRET++NOT+A+SECRET++NOT+A+SECRET++NOT+A+SECRET"
 
 listen_addr = "0.0.0.0"
+allowed_origins = ["http://localhost:3000"]
 
 [telemetry.tracing]
 enable = true
