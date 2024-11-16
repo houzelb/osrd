@@ -2,6 +2,7 @@
 *.backup
 __pycache__
 .vscode
+.idea
 
 # Direnv
 .envrc
