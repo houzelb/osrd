@@ -1,0 +1,9 @@
+ARG PLAYWRIGHT_VERSION=latest
+ARG FRONT_TESTS_IMAGE=front_tests:latest
+
+FROM $FRONT_TESTS_IMAGE AS front-tests
+
+FROM mcr.microsoft.com/playwright:$PLAYWRIGHT_VERSION
+COPY --from=front-tests /app /app/front
+COPY --from=front-tests /tests /app/tests
+WORKDIR /app/front
