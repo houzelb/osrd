@@ -49,15 +49,15 @@
       margin-inline: 10px;
       background-color: var(--grey20);
     }
+
+    .active {
+      color: var(--grey90);
+      font-weight: 600;
+    }
   }
 
   .micro-macro-buttons:hover {
     background-color: var(--white100);
-  }
-
-  .active {
-    color: var(--grey90);
-    font-weight: 600;
   }
 
   .scenario-timetable-collapsed {
