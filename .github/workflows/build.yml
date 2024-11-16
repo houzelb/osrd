@@ -188,8 +188,9 @@ jobs:
       - name: Build dummy test_data and static_assets images
         run: |
           echo -e "FROM scratch" > Dockerfile.empty
-          docker build -t test_data -f Dockerfile.empty .
-          docker build -t static_assets -f Dockerfile.empty .
+          docker build -t test_data - <Dockerfile.empty
+          docker build -t static_assets - <Dockerfile.empty
+          docker build -t front_tests:latest - <Dockerfile.empty
 
       - name: Find and check all Dockerfiles using docker build --check
         run: |
@@ -1054,6 +1055,24 @@ jobs:
           docker load --input ./osrd-front-nginx.tar
           docker load --input ./osrd-osrdyne.tar
 
+      - name: Detect Playwright version
+        id: detect_playwright_version
+        run: |
+          PLAYWRIGHT_VERSION=$(cd front && yarn list --pattern playwright --json | jq -r '.data.trees[].name | split("@")[-1]' | sort -u)
+          if [ "$(echo "$PLAYWRIGHT_VERSION" | wc -l)" -ne 1 ]; then
+              echo "Error: Zero or multiple playwright versions found: $PLAYWRIGHT_VERSION" >&2
+              exit 1
+          fi
+          echo "Detected Playwright version: $PLAYWRIGHT_VERSION"
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+
+      - name: Build Playwright container
+        run: |
+          docker build --build-arg PLAYWRIGHT_VERSION=v$PLAYWRIGHT_VERSION \
+            --build-arg FRONT_TESTS_IMAGE=${{ fromJSON(needs.build.outputs.stable_tags).front-tests }} \
+            -t osrd-playwright:latest \
+            - <docker/Dockerfile.playwright-ci
+
       - name: Startup the test infrastructure
         id: start_playwright_worker
         run: |
@@ -1077,10 +1096,9 @@ jobs:
         run: |
           docker run --init --name=playwright-test --net=host \
             -e CI=true \
-            -v $PWD/front/test-results:/app/test-results \
-            ${{ fromJSON(needs.build.outputs.stable_tags).front-tests }} \
-            /bin/sh -c "npx playwright install --with-deps && yarn e2e-tests"
-
+            --ipc=host \
+            -v "$PWD/front/test-results:/app/front/test-results" \
+            osrd-playwright:latest yarn playwright test
           exit $(docker wait playwright-test)
 
       - uses: actions/upload-artifact@v4
