@@ -74,7 +74,7 @@ describe('updateRowTimesAndMargin', () => {
         name: 'Gr',
         arrival: undefined,
         isMarginValid: true,
-        onStopSignal: false,
+        onStopSignal: undefined,
         theoreticalMargin: '0%',
       });
     });
@@ -182,7 +182,7 @@ describe('updateRowTimesAndMargin', () => {
         departure: undefined,
         stopFor: undefined,
         isMarginValid: true,
-        onStopSignal: false,
+        onStopSignal: undefined,
       });
     });
   });

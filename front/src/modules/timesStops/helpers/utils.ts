@@ -196,7 +196,11 @@ export function updateRowTimesAndMargin(
       newRowData.stopFor = undefined;
     }
   }
-  if (!newRowData.stopFor && op.fromRowIndex !== allWaypointsLength - 1) {
+  if (
+    !newRowData.stopFor &&
+    newRowData.onStopSignal &&
+    op.fromRowIndex !== allWaypointsLength - 1
+  ) {
     newRowData.onStopSignal = false;
   }
   newRowData.isMarginValid = !(
@@ -211,6 +215,21 @@ export function updateRowTimesAndMargin(
     }
   }
   return newRowData;
+}
+
+/**
+ * This function is called before comparing rows to prevent a change from undefined to null (or the reverse)
+ * from being treated as an actual update of a row (otherwise changes would occur on deletion of an undefined field)
+ */
+export function normalizeNullablesInRow(row: TimesStopsInputRow): TimesStopsInputRow {
+  const normalizedRow = { ...row };
+  if (normalizedRow.stopFor === null) {
+    normalizedRow.stopFor = undefined;
+  }
+  if (normalizedRow.theoreticalMargin === null) {
+    normalizedRow.theoreticalMargin = undefined;
+  }
+  return normalizedRow;
 }
 
 /**

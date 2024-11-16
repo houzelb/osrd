@@ -15,6 +15,7 @@ import {
   durationSinceStartTime,
   formatSuggestedViasToRowVias,
   onStopSignalToReceptionSignal,
+  normalizeNullablesInRow,
   updateDaySinceDeparture,
   updateRowTimesAndMargin,
 } from './helpers/utils';
@@ -125,7 +126,10 @@ const TimesStopsInput = ({ allWaypoints, startTime, pathSteps }: TimesStopsInput
         setRows(newRows);
       } else {
         const newVias = updatedRows
-          .filter((row, index) => !isEqual(row, rows[index]))
+          .filter(
+            (row, index) =>
+              !isEqual(normalizeNullablesInRow(row), normalizeNullablesInRow(rows[index]))
+          )
           .map(({ shortSlipDistance, onStopSignal, arrival, departure, ...row }) => ({
             ...row,
             arrival: durationSinceStartTime(startTime, arrival),
