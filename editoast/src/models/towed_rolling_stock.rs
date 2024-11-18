@@ -18,6 +18,7 @@ pub struct TowedRollingStockModel {
     pub id: i64,
     #[model(identifier)]
     pub name: String,
+    pub label: String,
     pub railjson_version: String,
     pub locked: bool,
 
@@ -34,7 +35,6 @@ pub struct TowedRollingStockModel {
     pub gamma: Gamma,
 
     pub version: i64,
-    pub label: String,
 }
 
 impl From<TowedRollingStockModel> for TowedRollingStock {
