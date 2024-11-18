@@ -158,10 +158,9 @@ const ImportTrainScheduleConfig = ({
       });
     }
   }
-  // EXTRACT-CI-CH-CODE
   const extractCiChCode = (code: string) => {
     const [ciCode, chCode] = code.split('/');
-    return { ciCode: ciCode || '', chCode: chCode || '' };
+    return { ciCode, chCode };
   };
 
   const cleanTimeFormat = (time: string): string => time.replace(/\.0$/, ''); // Remove the '.0' if it's at the end of the time string
