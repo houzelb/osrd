@@ -62,7 +62,7 @@ export type TrainScheduleImportConfig = {
 };
 
 export type CichDictValue = {
-  ciCode: number | string;
+  ciCode: number;
   chCode?: string;
 };
 
