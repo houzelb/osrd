@@ -7,9 +7,14 @@
       width: 3rem;
       overflow: hidden;
       padding-bottom: 0.25rem;
-      img {
-        height: 1rem;
-      }
+        img {
+          height: 1rem;
+          object-fit: cover;
+          object-position: left;
+          transform: scaleX(-1);
+          mask-image: linear-gradient(90deg, black 80%, rgba(0, 0, 0, 0));
+          -webkit-mask-image: linear-gradient(90deg, black 80%, rgba(0, 0, 0, 0));
+        }
     }
     img {
       height: 1.5rem;
