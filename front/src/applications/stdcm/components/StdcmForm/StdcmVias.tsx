@@ -90,19 +90,15 @@ const StdcmVias = ({ disabled = false }: StdcmConfigCardProps) => {
               className="via"
             >
               <StdcmOperationalPoint point={pathStep} opPointId={pathStep.id} disabled={disabled} />
-              {'uic' in pathStep && pathStep.uic !== -1 && (
-                <>
-                  <StdcmStopType
-                    stopTypes={pathStep.stopType}
-                    updatePathStepStopType={(newStopType) => updateStopType(newStopType, pathStep)}
-                  />
-                  <StdcmInputVia
-                    stopType={pathStep.stopType}
-                    stopDuration={pathStep.stopFor}
-                    updatePathStepStopTime={(e) => updateStopDuration(e, pathStep)}
-                  />
-                </>
-              )}
+              <StdcmStopType
+                stopTypes={pathStep.stopType}
+                updatePathStepStopType={(newStopType) => updateStopType(newStopType, pathStep)}
+              />
+              <StdcmInputVia
+                stopType={pathStep.stopType}
+                stopDuration={pathStep.stopFor}
+                updatePathStepStopTime={(e) => updateStopDuration(e, pathStep)}
+              />
             </StdcmCard>
           </div>
         );
