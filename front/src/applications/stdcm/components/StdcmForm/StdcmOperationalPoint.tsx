@@ -27,9 +27,11 @@ function formatChCode(chCode: string) {
 const StdcmOperationalPoint = ({ point, opPointId, disabled }: StdcmOperationalPointProps) => {
   const { t } = useTranslation('stdcm');
   const dispatch = useAppDispatch();
+  const pointCh =
+    'secondary_code' in point && point.secondary_code ? point.secondary_code : undefined;
 
   const { searchTerm, chCodeFilter, sortedSearchResults, setSearchTerm, setChCodeFilter } =
-    useSearchOperationalPoint({ initialSearchTerm: point.name, initialChCodeFilter: point.ch });
+    useSearchOperationalPoint({ initialSearchTerm: point.name, initialChCodeFilter: pointCh });
 
   const { updateStdcmPathStep } = useOsrdConfActions() as StdcmConfSliceActions;
 
@@ -75,15 +77,15 @@ const StdcmOperationalPoint = ({ point, opPointId, disabled }: StdcmOperationalP
   );
 
   const dispatchNewPoint = (p?: SearchResultItemOperationalPoint) => {
-    if (p && p.ch === point.ch && 'uic' in point && p.uic === point.uic) return;
+    if (p && 'uic' in point && p.ch === point.secondary_code && p.uic === point.uic) return;
     const newPoint = p
       ? {
           name: p.name,
-          ch: p.ch,
+          secondary_code: p.ch,
           uic: p.uic,
           coordinates: p.geographic.coordinates,
         }
-      : { name: undefined, ch: undefined, uic: -1, coordinates: undefined };
+      : { name: undefined, secondary_code: undefined, uic: -1, coordinates: undefined };
     dispatch(updateStdcmPathStep({ id: point.id, updates: newPoint }));
   };
 
@@ -124,7 +126,7 @@ const StdcmOperationalPoint = ({ point, opPointId, disabled }: StdcmOperationalP
   useEffect(() => {
     if (point) {
       setSearchTerm(point.name || '');
-      setChCodeFilter(point.ch || '');
+      setChCodeFilter(pointCh || '');
     } else {
       setSearchTerm('');
       setChCodeFilter(undefined);

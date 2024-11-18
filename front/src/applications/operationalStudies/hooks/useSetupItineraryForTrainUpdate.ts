@@ -46,11 +46,11 @@ export function updatePathStepsFromOperationalPoints(
       matchPathStepAndOp(step, suggestedOp)
     );
 
-    const { kp, name, ch } = correspondingOp || step;
+    const { kp, name } = correspondingOp || step;
 
     return {
       ...step,
-      ch,
+      ...(correspondingOp && { secondary_code: correspondingOp.ch }),
       kp,
       name,
       positionOnPath: pathfindingResult.path_item_positions[i],

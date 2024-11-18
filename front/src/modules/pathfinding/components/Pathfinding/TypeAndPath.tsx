@@ -167,7 +167,6 @@ const TypeAndPath = ({ setDisplayTypeAndPath }: TypeAndPathProps) => {
         .filter((op) => op.trigram !== '')
         .map(({ uic, ch }) => ({
           uic,
-          ch,
           secondary_code: ch,
           id: nextId(),
         }));

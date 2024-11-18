@@ -44,10 +44,10 @@ export const matchPathStepAndOp = (
     return step.operational_point === op.opId;
   }
   if ('uic' in step) {
-    return step.uic === op.uic && step.ch === op.ch;
+    return step.uic === op.uic && step.secondary_code === op.ch;
   }
   if ('trigram' in step) {
-    return step.trigram === op.trigram && step.ch === op.ch;
+    return step.trigram === op.trigram && step.secondary_code === op.ch;
   }
   return step.track === op.track && step.offset === op.offsetOnTrack;
 };
