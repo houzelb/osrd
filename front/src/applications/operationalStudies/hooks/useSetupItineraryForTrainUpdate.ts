@@ -14,7 +14,11 @@ import {
   type PathfindingResult,
 } from 'common/api/osrdEditoastApi';
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
-import { formatSuggestedOperationalPoints, upsertPathStepsInOPs } from 'modules/pathfinding/utils';
+import {
+  formatSuggestedOperationalPoints,
+  matchPathStepAndOp,
+  upsertPathStepsInOPs,
+} from 'modules/pathfinding/utils';
 import { getSupportedElectrification, isThermal } from 'modules/rollingStock/helpers/electric';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import computeBasePathSteps from 'modules/trainschedule/helpers/computeBasePathSteps';
@@ -38,26 +42,9 @@ export function updatePathStepsFromOperationalPoints(
   stepsCoordinates: Position[]
 ) {
   const updatedPathSteps: PathStep[] = pathSteps.map((step, i) => {
-    const correspondingOp = suggestedOperationalPoints.find((suggestedOp) => {
-      if ('uic' in step) {
-        const condition = suggestedOp.uic === step.uic;
-        if ('ch' in step) {
-          return condition && suggestedOp.ch === step.ch;
-        }
-        // When importing train from open data or from files, secondary_code might not always exist
-        if (step.secondary_code) {
-          return condition && suggestedOp.ch === step.secondary_code;
-        }
-        return condition;
-      }
-      if ('trigram' in step) {
-        const condition = suggestedOp.trigram === step.trigram;
-        if (step.secondary_code) {
-          return condition && suggestedOp.ch === step.secondary_code;
-        }
-      }
-      return false;
-    });
+    const correspondingOp = suggestedOperationalPoints.find((suggestedOp) =>
+      matchPathStepAndOp(step, suggestedOp)
+    );
 
     const { kp, name, ch } = correspondingOp || step;
 
