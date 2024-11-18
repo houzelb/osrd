@@ -3,9 +3,7 @@ import type { Draft } from 'immer';
 import { omit } from 'lodash';
 
 import { type StdcmStopTypes } from 'applications/stdcm/types';
-import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import { type InfraStateReducers, buildInfraStateReducers, infraState } from 'reducers/infra';
-import { upsertPathStep } from 'reducers/osrdconf/helpers';
 import type {
   OperationalStudiesConfSlice,
   OperationalStudiesConfSliceActions,
@@ -68,8 +66,6 @@ interface CommonConfReducers<S extends OsrdConfState> extends InfraStateReducers
   ['updatePathSteps']: CaseReducer<S, PayloadAction<S['pathSteps']>>;
   ['replaceItinerary']: CaseReducer<S, PayloadAction<S['pathSteps']>>;
   ['deleteItinerary']: CaseReducer<S>;
-  ['upsertViaFromSuggestedOP']: CaseReducer<S, PayloadAction<SuggestedOP>>;
-  ['upsertSeveralViasFromSuggestedOP']: CaseReducer<S, PayloadAction<SuggestedOP[]>>;
   ['updateRollingStockComfort']: CaseReducer<S, PayloadAction<S['rollingStockComfort']>>;
   ['updateStartTime']: CaseReducer<S, PayloadAction<S['startTime']>>;
 }
@@ -166,16 +162,6 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
     replaceItinerary(state: Draft<S>, action: PayloadAction<S['pathSteps']>) {
       state.pathSteps = action.payload;
       state.powerRestriction = [];
-    },
-    // Use this action to transform an op to via from times and stop table or
-    // from the suggested via modal
-    upsertViaFromSuggestedOP(state: Draft<S>, action: PayloadAction<SuggestedOP>) {
-      upsertPathStep(state.pathSteps, action.payload);
-    },
-    upsertSeveralViasFromSuggestedOP(state: Draft<S>, action: PayloadAction<SuggestedOP[]>) {
-      action.payload.forEach((suggestedOp) => {
-        upsertPathStep(state.pathSteps, suggestedOp);
-      });
     },
     updateRollingStockComfort(state: Draft<S>, action: PayloadAction<S['rollingStockComfort']>) {
       state.rollingStockComfort = action.payload;
