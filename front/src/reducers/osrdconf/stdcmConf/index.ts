@@ -163,7 +163,7 @@ export const stdcmConfSlice = createSlice({
       }>
     ) {
       const { linkedPathStep, trainName, pathStep, pathStepId } = action.payload;
-      const { name, ch, uic, geographic, isoArrivalTime, date, time, trigram } = pathStep;
+      const { name, ch, uic, geographic, isoArrivalTime, date, time } = pathStep;
       const newPathStep = {
         name,
         ch,
@@ -171,7 +171,6 @@ export const stdcmConfSlice = createSlice({
         uic,
         coordinates: geographic.coordinates,
         arrival: isoArrivalTime,
-        trigram,
         ...(linkedPathStep === 'origin' && { arrivalType: ArrivalTimeTypes.PRECISE_TIME }),
       };
 
