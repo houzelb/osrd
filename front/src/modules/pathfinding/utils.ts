@@ -121,9 +121,9 @@ export const upsertPathStepsInOPs = (ops: SuggestedOP[], pathSteps: PathStep[]):
       } else {
         updatedOPs.push(formattedStep);
       }
-    } else if ('uic' in step) {
+    } else {
       updatedOPs = updatedOPs.map((op) => {
-        if (op.uic === step.uic && op.ch === step.ch && op.kp === step.kp) {
+        if (matchPathStepAndOp(step, op) && op.kp === step.kp) {
           return {
             ...op,
             stopFor,
