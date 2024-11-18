@@ -205,7 +205,9 @@ const SimulationReportSheet = ({
                         </TD>
                       </View>
                       <View style={styles.convoyAndRoute.stopTableChWidth}>
-                        <TD style={styles.convoyAndRoute.stopTableChColumn}>{step.ch}</TD>
+                        <TD style={styles.convoyAndRoute.stopTableChColumn}>
+                          {'secondary_code' in step ? step.secondary_code : undefined}
+                        </TD>
                       </View>
                       <View style={styles.convoyAndRoute.stopTableEndWidth}>
                         <TD style={styles.convoyAndRoute.stopTableItalicColumn}>
@@ -305,7 +307,12 @@ const SimulationReportSheet = ({
                 const prevStep = operationalPointsList[index - 1];
                 const isViaInSimulationPath = stdcmData.simulationPathSteps
                   .slice(1, -1)
-                  .some((pathStep) => pathStep.name === step.name && pathStep.ch === step.ch);
+                  .some(
+                    (pathStep) =>
+                      pathStep.name === step.name &&
+                      'secondary_code' in pathStep &&
+                      pathStep.secondary_code === step.ch
+                  );
                 const isViaWithoutStop = isViaInSimulationPath && step.duration === 0;
                 const isNotExtremity = !isFirstStep && !isLastStep;
                 const isStepWithDuration = step.duration !== 0 && !isLastStep;

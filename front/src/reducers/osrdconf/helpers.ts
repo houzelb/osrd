@@ -87,7 +87,6 @@ export function upsertPathStep(statePathSteps: (PathStep | null)[], op: Suggeste
       'coordinates',
       'positionOnPath',
       'name',
-      'ch',
       'kp',
       'stopFor',
       'arrival',
@@ -98,7 +97,7 @@ export function upsertPathStep(statePathSteps: (PathStep | null)[], op: Suggeste
     ]),
     id: nextId(),
     ...(op.uic
-      ? { uic: op.uic }
+      ? { uic: op.uic, secondary_code: op.ch }
       : {
           track: op.track,
           offset: op.offsetOnTrack,

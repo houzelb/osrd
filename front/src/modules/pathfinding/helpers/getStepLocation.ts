@@ -12,12 +12,12 @@ const getStepLocation = (step: PathStep | StdcmPathStep): PathItemLocation => {
     return { operational_point: step.operational_point };
   }
   if ('trigram' in step) {
-    return { trigram: step.trigram, secondary_code: step.ch };
+    return { trigram: step.trigram, secondary_code: step.secondary_code };
   }
   if (step.uic === -1) {
     throw new Error('Invalid UIC');
   }
-  return { uic: step.uic, secondary_code: step.ch };
+  return { uic: step.uic, secondary_code: step.secondary_code };
 };
 
 export default getStepLocation;

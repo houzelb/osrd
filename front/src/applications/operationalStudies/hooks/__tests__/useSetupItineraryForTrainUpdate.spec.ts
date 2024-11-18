@@ -145,14 +145,14 @@ describe('updatePathStepsFrom', () => {
           id: 'id79',
           deleted: false,
           uic: 87747006,
-          ch: 'BV',
+          secondary_code: 'BV',
           name: '87747006',
         },
         {
           id: 'id87',
           deleted: false,
           uic: 87747006,
-          ch: 'P2',
+          secondary_code: 'P2',
           name: '87747006',
           arrival: '15:00:00',
           stopFor: null,
@@ -161,7 +161,7 @@ describe('updatePathStepsFrom', () => {
           id: 'id80',
           deleted: false,
           uic: 87747337,
-          ch: 'BV',
+          secondary_code: 'BV',
           name: '87747337',
           arrival: null,
           stopFor: '0',
@@ -186,7 +186,7 @@ describe('updatePathStepsFrom', () => {
           id: 'id79',
           deleted: false,
           uic: 87747006,
-          ch: 'BV',
+          secondary_code: 'BV',
           name: 'Grenadille',
           kp: '130+538',
           positionOnPath: 0,
@@ -196,7 +196,7 @@ describe('updatePathStepsFrom', () => {
           id: 'id87',
           deleted: false,
           uic: 87747006,
-          ch: 'P2', // should not be BV here, it has the same uic but not the same ch
+          secondary_code: 'P2', // should not be BV here, it has the same uic but not the same ch
           name: 'Grenadille',
           arrival: '15:00:00',
           stopFor: null,
@@ -208,7 +208,7 @@ describe('updatePathStepsFrom', () => {
           id: 'id80',
           deleted: false,
           uic: 87747337,
-          ch: 'BV',
+          secondary_code: 'BV',
           name: 'Voreppe',
           arrival: null,
           stopFor: '0',
@@ -226,20 +226,20 @@ describe('updatePathStepsFrom', () => {
         {
           id: 'whatev-0',
           trigram: 'GE',
-          ch: 'BV',
+          secondary_code: 'BV',
           name: '87747006',
         },
         {
           id: 'whatev-1',
           trigram: 'GE',
-          ch: 'P2',
+          secondary_code: 'P2',
           name: '87747006',
           arrival: '15:00:00',
         },
         {
           id: 'who-0',
           trigram: 'VPE',
-          ch: 'BV',
+          secondary_code: 'BV',
           name: '87747337',
         },
       ];
@@ -260,8 +260,8 @@ describe('updatePathStepsFrom', () => {
       const expected = [
         {
           id: 'whatev-0',
-          ch: 'BV',
           trigram: 'GE',
+          secondary_code: 'BV',
           name: 'Grenadille',
           kp: '130+538',
           positionOnPath: 0,
@@ -269,8 +269,8 @@ describe('updatePathStepsFrom', () => {
         },
         {
           id: 'whatev-1',
-          ch: 'P2',
           trigram: 'GE',
+          secondary_code: 'P2',
           name: 'Grenadille',
           arrival: '15:00:00',
           kp: '129+952',
@@ -279,8 +279,8 @@ describe('updatePathStepsFrom', () => {
         },
         {
           id: 'who-0',
-          ch: 'BV',
           trigram: 'VPE',
+          secondary_code: 'BV',
           name: 'Voreppe',
           kp: '117+422',
           positionOnPath: 13116000,
@@ -295,20 +295,20 @@ describe('updatePathStepsFrom', () => {
         {
           id: 'whatev-0',
           trigram: 'GE',
-          ch: 'BV',
+          secondary_code: 'BV',
           name: '87747006',
         },
         {
           id: 'whatev-1',
           trigram: 'GE',
-          ch: 'P2',
+          secondary_code: 'P2',
           name: '87747006',
           arrival: '15:00:00',
         },
         {
           id: 'who-0',
           trigram: 'VPE',
-          ch: 'BV',
+          secondary_code: 'BV',
           name: '87747337',
         },
       ];
@@ -329,7 +329,7 @@ describe('updatePathStepsFrom', () => {
       const expected = [
         {
           id: 'whatev-0',
-          ch: 'BV',
+          secondary_code: 'BV',
           trigram: 'GE',
           name: '87747006',
           kp: undefined,
@@ -338,7 +338,7 @@ describe('updatePathStepsFrom', () => {
         },
         {
           id: 'whatev-1',
-          ch: 'P2',
+          secondary_code: 'P2',
           trigram: 'GE',
           name: '87747006',
           arrival: '15:00:00',
@@ -348,7 +348,7 @@ describe('updatePathStepsFrom', () => {
         },
         {
           id: 'who-0',
-          ch: 'BV',
+          secondary_code: 'BV',
           trigram: 'VPE',
           name: '87747337',
           kp: undefined,

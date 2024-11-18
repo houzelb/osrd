@@ -297,7 +297,7 @@ export const usePathfinding = (
           ...(correspondingOp && {
             name: correspondingOp.name,
             uic: correspondingOp.uic,
-            ch: correspondingOp.ch,
+            secondary_code: correspondingOp.ch,
             kp: correspondingOp.kp,
             coordinates: correspondingOp.coordinates,
           }),
