@@ -61,10 +61,10 @@ pub struct PhysicsConsist {
     /// Mapping of power restriction code to power class
     #[serde(default)]
     pub power_restrictions: BTreeMap<String, String>,
-    /// The time the train takes before actually using electrical power (in miliseconds).
+    /// The time the train takes before actually using electrical power (in milliseconds).
     /// Is null if the train is not electric or the value not specified.
     pub electrical_power_startup_time: Option<u64>,
-    /// The time it takes to raise this train's pantograph in miliseconds.
+    /// The time it takes to raise this train's pantograph in milliseconds.
     /// Is null if the train is not electric or the value not specified.
     pub raise_pantograph_time: Option<u64>,
 }
@@ -473,6 +473,21 @@ impl AsCoreRequest<Json<SimulationResponse>> for SimulationRequest {
 
     fn infra_id(&self) -> Option<i64> {
         Some(self.infra)
+    }
+}
+
+impl SimulationResponse {
+    pub fn simulation_run_time(&self) -> Option<u64> {
+        if let SimulationResponse::Success { provisional, .. } = self {
+            Some(
+                *provisional
+                    .times
+                    .last()
+                    .expect("core error: empty simulation result"),
+            )
+        } else {
+            None
+        }
     }
 }
 
