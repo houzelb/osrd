@@ -6,7 +6,7 @@ import type { Operation } from 'react-datasheet-grid/dist/types';
 import { useTranslation } from 'react-i18next';
 
 import { useOsrdConfActions } from 'common/osrdContext';
-import { isVia } from 'modules/pathfinding/utils';
+import { isVia, matchPathStepAndOp } from 'modules/pathfinding/utils';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import type { PathStep } from 'reducers/osrdconf/types';
 import { useAppDispatch } from 'store';
@@ -69,24 +69,9 @@ const TimesStopsInput = ({ allWaypoints, startTime, pathSteps }: TimesStopsInput
   const [rows, setRows] = useState<TimesStopsInputRow[]>([]);
 
   const clearPathStep = (rowData: TimesStopsInputRow) => {
-    const isMatchingUICStep = (step: PathStep) =>
-      'uic' in step &&
-      step.uic === rowData.uic &&
-      step.ch === rowData.ch &&
-      step.name === rowData.name;
-
-    const isMatchingTrackStep = (step: PathStep) =>
-      'track' in step &&
-      step.track === rowData.track &&
-      step.positionOnPath === rowData.positionOnPath &&
-      step.offset === rowData.offsetOnTrack &&
-      step.id === rowData.opId;
-
     const index = pathSteps.findIndex(
-      (step) => isMatchingUICStep(step) || isMatchingTrackStep(step)
+      (step) => matchPathStepAndOp(step, rowData) && step.positionOnPath === rowData.positionOnPath
     );
-
-    if (index === -1) return;
 
     const updatedPathSteps = pathSteps.map((step, i) => {
       if (i === index) {
