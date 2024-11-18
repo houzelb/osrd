@@ -226,20 +226,20 @@ describe('updatePathStepsFrom', () => {
         {
           id: 'whatev-0',
           trigram: 'GE',
-          secondary_code: 'BV',
+          ch: 'BV',
           name: '87747006',
         },
         {
           id: 'whatev-1',
           trigram: 'GE',
-          secondary_code: 'P2',
+          ch: 'P2',
           name: '87747006',
           arrival: '15:00:00',
         },
         {
           id: 'who-0',
           trigram: 'VPE',
-          secondary_code: 'BV',
+          ch: 'BV',
           name: '87747337',
         },
       ];
@@ -262,7 +262,6 @@ describe('updatePathStepsFrom', () => {
           id: 'whatev-0',
           ch: 'BV',
           trigram: 'GE',
-          secondary_code: 'BV',
           name: 'Grenadille',
           kp: '130+538',
           positionOnPath: 0,
@@ -272,7 +271,6 @@ describe('updatePathStepsFrom', () => {
           id: 'whatev-1',
           ch: 'P2',
           trigram: 'GE',
-          secondary_code: 'P2',
           name: 'Grenadille',
           arrival: '15:00:00',
           kp: '129+952',
@@ -282,7 +280,6 @@ describe('updatePathStepsFrom', () => {
         {
           id: 'who-0',
           ch: 'BV',
-          secondary_code: 'BV',
           trigram: 'VPE',
           name: 'Voreppe',
           kp: '117+422',
