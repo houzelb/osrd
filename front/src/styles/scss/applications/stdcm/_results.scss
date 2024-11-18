@@ -7,12 +7,12 @@
     position: relative;
     color: rgb(0, 0, 0);
     font-weight: 600;
-    font-size: 1.125rem;
-    line-height: 1.5rem;
-    margin-bottom: 2.25rem;
+    font-size: 18px;
+    line-height: 24px;
+    margin-bottom: 36px;
 
     &.with-error-status {
-      margin-top: 10rem;
+      margin-top: 160px;
     }
 
     .simulation-list-wrapper {
@@ -21,11 +21,11 @@
 
       .scroll-btn {
         position: absolute;
-        border-radius: 0.375rem;
-        box-shadow: 0rem 0rem 0rem 0.125rem rgba(255, 255, 255, 1) inset;
+        border-radius: 6px;
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 1) inset;
         background-color: rgba(246, 248, 249, 1);
-        width: 3rem;
-        height: 3rem;
+        width: 48px;
+        height: 48px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -36,11 +36,11 @@
         }
 
         &.left {
-          left: -0.75rem;
+          left: -12px;
         }
 
         &.right {
-          right: -0.75rem;
+          right: -12px;
         }
       }
 
@@ -51,20 +51,20 @@
         overflow-x: hidden;
 
         .simulation-item {
-          width: 7.813rem;
+          width: 125px;
           display: inline-block;
-          margin: 0.563rem 4rem 0 0;
+          margin: 9px 64px 0 0;
           cursor: pointer;
 
           .creation-date {
             color: rgba(182, 178, 175, 1);
             font-weight: 400;
-            font-size: 0.875rem;
-            line-height: 1.25rem;
+            font-size: 14px;
+            line-height: 20px;
             letter-spacing: 0;
             text-align: left;
-            padding-top: 0.25rem;
-            padding-bottom: 0.688rem;
+            padding-top: 4px;
+            padding-bottom: 11px;
           }
 
           .simulation-name {
@@ -76,7 +76,7 @@
 
             .check-circle {
               color: rgb(60, 202, 128);
-              padding-left: 0.5rem;
+              padding-left: 8px;
             }
           }
 
@@ -92,7 +92,7 @@
             .selected-simulation-indicator {
               width: 100%;
               background-color: rgba(92, 89, 85, 1);
-              height: 0.25rem;
+              height: 4px;
             }
           }
 
@@ -118,8 +118,8 @@
     .separator {
       width: 100%;
       position: absolute;
-      bottom: 0.25rem;
-      border-bottom: 0.063rem solid rgb(182, 178, 175);
+      bottom: 4px;
+      border-bottom: 1px solid rgb(182, 178, 175);
     }
   }
 
@@ -137,10 +137,10 @@
       }
 
       .table-container {
-        margin-right: 2rem;
+        margin-right: 32px;
 
         .table-results {
-          border-radius: 0.375rem;
+          border-radius: 6px;
           background-color: rgba(0, 0, 0, 0.05);
 
           thead {
@@ -150,13 +150,13 @@
           }
 
           th {
-            height: 2rem;
-            font-size: 0.875rem;
+            height: 32px;
+            font-size: 14px;
             font-weight: 400;
             text-transform: capitalize;
             color: rgb(121, 118, 113);
-            padding-top: 0.313rem;
-            padding-bottom: 0.313rem;
+            padding-top: 5px;
+            padding-bottom: 5px;
             vertical-align: middle;
           }
           th:last-child {
@@ -169,41 +169,41 @@
             background-color: rgb(246, 248, 249);
           }
           td {
-            height: 2rem;
-            font-size: 0.875rem;
+            height: 32px;
+            font-size: 14px;
             font-weight: 400;
             color: rgb(49, 46, 43);
-            line-height: 1.25rem;
+            line-height: 20px;
             vertical-align: middle;
           }
           .index {
-            padding-left: 2rem;
+            padding-left: 32px;
           }
           .pr {
-            padding-right: 12.438rem;
+            padding-right: 199px;
           }
           .ch {
-            padding-right: 2.25rem;
+            padding-right: 36px;
           }
           .stop {
-            font-size: 0.875rem;
+            font-size: 14px;
             font-weight: 600;
             color: rgb(0, 0, 0);
-            line-height: 1.25rem;
-            width: 4.688rem;
+            line-height: 20px;
+            width: 75px;
           }
           .stop-with-duration {
-            font-size: 0.875rem;
+            font-size: 14px;
             color: rgb(255, 255, 255);
             background-color: rgb(33, 100, 130);
-            border-radius: 0.625rem;
-            margin-top: 0.375rem;
-            margin-bottom: 0.375rem;
-            margin-right: 1.813rem;
+            border-radius: 10px;
+            margin-top: 6px;
+            margin-bottom: 6px;
+            margin-right: 29px;
             text-align: center;
           }
           .weight {
-            padding-left: 2.063rem;
+            padding-left: 33px;
             color: '#797671';
 
             &.lastStep {
@@ -217,26 +217,26 @@
         .results-buttons {
           position: sticky;
           bottom: 0;
-          height: 6.5rem;
+          height: 104px;
           background-color: #dde3e6;
           display: flex;
           justify-content: space-between;
-          border-bottom-left-radius: 0.375rem;
-          border-bottom-right-radius: 0.375rem;
+          border-bottom-left-radius: 6px;
+          border-bottom-right-radius: 6px;
 
           &.simulation-retained {
             border-radius: 0;
           }
           .button-display-all-PR {
-            padding-top: 2rem;
-            padding-left: 2.25rem;
+            padding-top: 32px;
+            padding-left: 36px;
           }
           .button-get-simulation {
-            padding-top: 2rem;
-            padding-right: 2.25rem;
+            padding-top: 32px;
+            padding-right: 36px;
           }
           .selected-simulation {
-            padding-top: 0.6rem;
+            padding-top: 9.6px;
           }
         }
       }
@@ -244,21 +244,21 @@
       .upgrade {
         display: flex;
         flex-direction: column;
-        margin-right: 2rem;
-        margin-top: 3.5rem;
-        border-top: 0.313rem solid rgb(211, 209, 207);
+        margin-right: 32px;
+        margin-top: 56px;
+        border-top: 5px solid rgb(211, 209, 207);
         .text {
           color: rgb(0, 0, 0);
-          margin-left: 0.5rem;
+          margin-left: 8px;
           .title {
             font-weight: 600;
-            font-size: 1.125rem;
-            padding-top: 1.563rem;
+            font-size: 18px;
+            padding-top: 25px;
             display: flex;
             flex-direction: row;
             .comment-icon {
               color: #b6b2af;
-              margin-left: 0.625rem;
+              margin-left: 10px;
               display: flex;
             }
           }
@@ -268,14 +268,14 @@
           flex-direction: row;
           justify-content: flex-start;
           flex-wrap: wrap;
-          margin-top: 1.375rem;
+          margin-top: 22px;
           button {
-            height: 2rem;
-            font-size: 1rem;
-            padding-top: 0.313rem;
-            padding-bottom: 0.438rem;
-            margin-right: 1.438rem;
-            margin-bottom: 1.438rem;
+            height: 32px;
+            font-size: 16px;
+            padding-top: 5px;
+            padding-bottom: 7px;
+            margin-right: 23px;
+            margin-bottom: 23px;
           }
         }
       }
@@ -285,24 +285,24 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        margin: 0 2rem;
+        margin: 0 32px;
         background-color: rgb(255, 255, 255);
-        border-bottom-left-radius: 0.375rem;
-        border-bottom-right-radius: 0.375rem;
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
         .download-simulation {
-          margin-top: 2.813rem;
-          margin-bottom: 1.313rem;
+          margin-top: 45px;
+          margin-bottom: 21px;
         }
         .gesico-text {
           font-weight: 400;
-          font-size: 1rem;
+          font-size: 16px;
           color: rgb(49, 46, 43);
-          margin-bottom: 2.625rem;
+          margin-bottom: 42px;
         }
       }
 
       .start-new-query {
-        margin-top: 4.75rem;
+        margin-top: 76px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -314,26 +314,26 @@
       letter-spacing: 0;
       display: flex;
       flex-direction: column;
-      min-height: 10.5rem;
+      min-height: 168px;
       width: 70%;
       color: var(--grey80);
 
       .title {
         color: rgba(33, 100, 130, 1);
-        font-size: 1.5rem;
+        font-size: 24px;
         font-weight: 600;
         font-style: SemiBold;
-        line-height: 2rem;
-        margin-bottom: 0.438rem;
+        line-height: 32px;
+        margin-bottom: 7px;
       }
 
       .change-criteria {
         opacity: 1;
         color: rgba(49, 46, 43, 1);
-        font-size: 1rem;
+        font-size: 16px;
         font-weight: 400;
         font-style: Regular;
-        line-height: 1.5rem;
+        line-height: 24px;
       }
     }
 
@@ -341,13 +341,13 @@
       position: sticky;
       top: 0;
       width: 40%;
-      height: 33.75rem;
-      margin-right: 2rem;
-      border-radius: 0.5rem;
-      border: 0.063rem solid rgba(255, 255, 255, 1);
+      height: 540px;
+      margin-right: 32px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 1);
       box-shadow:
-        0rem 0rem 0rem 0.125rem rgba(255, 255, 255, 0.75) inset,
-        0rem 0rem 0rem 0.063rem rgba(0, 0, 0, 0.25) inset;
+        0 0 0 2px rgba(255, 255, 255, 0.75) inset,
+        0 0 0 1px rgba(0, 0, 0, 0.25) inset;
       &.no-pointer-events {
         pointer-events: none;
       }
