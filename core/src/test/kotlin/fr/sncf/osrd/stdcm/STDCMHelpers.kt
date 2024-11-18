@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMultimap
 import fr.sncf.osrd.DriverBehaviour
 import fr.sncf.osrd.api.FullInfra
 import fr.sncf.osrd.api.pathfinding.makeChunkPath
+import fr.sncf.osrd.envelope.Envelope
 import fr.sncf.osrd.envelope_sim_infra.EnvelopeTrainPath
 import fr.sncf.osrd.graph.GraphAdapter
 import fr.sncf.osrd.graph.Pathfinding
@@ -15,10 +16,11 @@ import fr.sncf.osrd.sim_infra.impl.ChunkPath
 import fr.sncf.osrd.standalone_sim.EnvelopeStopWrapper
 import fr.sncf.osrd.standalone_sim.StandaloneSim
 import fr.sncf.osrd.standalone_sim.result.ResultTrain.SpacingRequirement
-import fr.sncf.osrd.stdcm.graph.simulateBlock
+import fr.sncf.osrd.stdcm.graph.STDCMSimulations
 import fr.sncf.osrd.stdcm.infra_exploration.InfraExplorer
 import fr.sncf.osrd.stdcm.infra_exploration.initInfraExplorer
 import fr.sncf.osrd.stdcm.preprocessing.OccupancySegment
+import fr.sncf.osrd.train.RollingStock
 import fr.sncf.osrd.train.StandaloneTrainSchedule
 import fr.sncf.osrd.train.TestTrains
 import fr.sncf.osrd.train.TrainStop
@@ -118,6 +120,36 @@ fun getBlocksRunTime(infra: FullInfra, blocks: List<BlockId>): Double {
     }
     return time
 }
+
+/** Helper function to call `simulateBlock` without instantiating an `STDCMSimulations` */
+fun simulateBlock(
+    rawInfra: RawSignalingInfra,
+    infraExplorer: InfraExplorer,
+    initialSpeed: Double,
+    start: Offset<Block>,
+    rollingStock: RollingStock,
+    comfort: Comfort?,
+    timeStep: Double,
+    stopPosition: Offset<Block>?,
+    trainTag: String?
+): Envelope? {
+    val sim = STDCMSimulations()
+    val res =
+        sim.simulateBlock(
+            rawInfra,
+            infraExplorer,
+            initialSpeed,
+            start,
+            rollingStock,
+            comfort,
+            timeStep,
+            stopPosition,
+            trainTag
+        )
+    sim.logWarnings()
+    return res
+}
+
 /**
  * Checks that the result doesn't cross an occupied section, with a certain tolerance for binary
  * search inaccuracies
