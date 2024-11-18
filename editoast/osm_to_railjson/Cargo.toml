@@ -6,7 +6,7 @@ edition.workspace = true
 
 [dependencies]
 editoast_schemas.workspace = true
-geo-types = "0.7.13"
+geo-types = "0.7.14"
 geos.workspace = true
 osm4routing = "0.7.0"
 osmpbfreader = "0.16.1"
