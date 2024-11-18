@@ -39,7 +39,7 @@ impl ToTokens for RowDecl {
             })
             .unzip();
         tokens.extend(quote! {
-            #[derive(Queryable, QueryableByName, #(#additional_derives),*)]
+            #[derive(Queryable, #(#additional_derives),*)]
             #[diesel(table_name = #table)]
             #vis struct #ident {
                 #(#[diesel(column_name = #field_column)] #field_vis #field_name: #field_type),*

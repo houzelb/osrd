@@ -252,18 +252,19 @@ impl OperationalPointModel {
         infra_id: i64,
         uic: &[i64],
     ) -> crate::error::Result<Vec<Self>> {
-        use diesel::sql_query;
-        use diesel::sql_types::Array;
-        use diesel::sql_types::BigInt;
+        use diesel::dsl::sql;
+        use diesel::prelude::*;
+        use diesel::sql_types::*;
         use diesel_async::RunQueryDsl;
-        let query = {
-            "SELECT * FROM infra_object_operational_point
-                WHERE infra_id = $1 AND (data->'extensions'->'identifier'->'uic')::integer = ANY($2)"
-        }.to_string();
-        Ok(sql_query(query)
-            .bind::<BigInt, _>(infra_id)
-            .bind::<Array<BigInt>, _>(uic)
-            .load(conn.write().await.deref_mut())
+        use editoast_models::tables::infra_object_operational_point::dsl;
+
+        Ok(dsl::infra_object_operational_point
+            .filter(dsl::infra_id.eq(infra_id))
+            .filter(
+                sql::<Nullable<BigInt>>("(data->'extensions'->'identifier'->'uic')::int")
+                    .eq_any(uic),
+            )
+            .load(&mut conn.write().await)
             .await?
             .into_iter()
             .map(Self::from_row)
@@ -275,20 +276,18 @@ impl OperationalPointModel {
         infra_id: i64,
         trigrams: &[String],
     ) -> crate::error::Result<Vec<Self>> {
-        use diesel::sql_query;
-        use diesel::sql_types::Array;
-        use diesel::sql_types::BigInt;
-        use diesel::sql_types::Text;
+        use diesel::dsl::sql;
+        use diesel::prelude::*;
+        use diesel::sql_types::*;
         use diesel_async::RunQueryDsl;
-        let query = {
-            "SELECT * FROM infra_object_operational_point
-                WHERE infra_id = $1 AND (data->'extensions'->'sncf'->>'trigram')::text = ANY($2)"
-        }
-        .to_string();
-        Ok(sql_query(query)
-            .bind::<BigInt, _>(infra_id)
-            .bind::<Array<Text>, _>(trigrams)
-            .load(conn.write().await.deref_mut())
+        use editoast_models::tables::infra_object_operational_point::dsl;
+
+        Ok(dsl::infra_object_operational_point
+            .filter(dsl::infra_id.eq(infra_id))
+            .filter(
+                sql::<Nullable<Text>>("data->'extensions'->'sncf'->>'trigram'").eq_any(trigrams),
+            )
+            .load(&mut conn.write().await)
             .await?
             .into_iter()
             .map(Self::from_row)
