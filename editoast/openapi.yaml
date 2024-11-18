@@ -2630,14 +2630,6 @@ paths:
                       - success
                 - type: object
                   required:
-                  - status
-                  properties:
-                    status:
-                      type: string
-                      enum:
-                      - path_not_found
-                - type: object
-                  required:
                   - pathfinding_result
                   - conflicts
                   - status
@@ -4265,11 +4257,6 @@ components:
       - $ref: '#/components/schemas/EditoastRollingStockErrorKeyNotFound'
       - $ref: '#/components/schemas/EditoastRollingStockErrorLiveryMultipartError'
       - $ref: '#/components/schemas/EditoastRollingStockErrorNameAlreadyUsed'
-      - $ref: '#/components/schemas/EditoastSTDCMErrorInfraNotFound'
-      - $ref: '#/components/schemas/EditoastSTDCMErrorInvalidPathItems'
-      - $ref: '#/components/schemas/EditoastSTDCMErrorRollingStockNotFound'
-      - $ref: '#/components/schemas/EditoastSTDCMErrorTimetableNotFound'
-      - $ref: '#/components/schemas/EditoastSTDCMErrorTowedRollingStockNotFound'
       - $ref: '#/components/schemas/EditoastScenarioErrorInfraNotFound'
       - $ref: '#/components/schemas/EditoastScenarioErrorNotFound'
       - $ref: '#/components/schemas/EditoastScenarioErrorTimetableNotFound'
@@ -4277,6 +4264,11 @@ components:
       - $ref: '#/components/schemas/EditoastSearchApiErrorSearchEngineError'
       - $ref: '#/components/schemas/EditoastSpriteErrorsFileNotFound'
       - $ref: '#/components/schemas/EditoastSpriteErrorsUnknownSignalingSystem'
+      - $ref: '#/components/schemas/EditoastStdcmErrorInfraNotFound'
+      - $ref: '#/components/schemas/EditoastStdcmErrorInvalidPathItems'
+      - $ref: '#/components/schemas/EditoastStdcmErrorRollingStockNotFound'
+      - $ref: '#/components/schemas/EditoastStdcmErrorTimetableNotFound'
+      - $ref: '#/components/schemas/EditoastStdcmErrorTowedRollingStockNotFound'
       - $ref: '#/components/schemas/EditoastStudyErrorNotFound'
       - $ref: '#/components/schemas/EditoastStudyErrorStartDateAfterEndDate'
       - $ref: '#/components/schemas/EditoastTemporarySpeedLimitErrorNameAlreadyUsed'
@@ -5164,126 +5156,6 @@ components:
           type: string
           enum:
           - editoast:rollingstocks:NameAlreadyUsed
-    EditoastSTDCMErrorInfraNotFound:
-      type: object
-      required:
-      - type
-      - status
-      - message
-      properties:
-        context:
-          type: object
-          required:
-          - infra_id
-          properties:
-            infra_id:
-              type: integer
-        message:
-          type: string
-        status:
-          type: integer
-          enum:
-          - 400
-        type:
-          type: string
-          enum:
-          - editoast:stdcm_v2:InfraNotFound
-    EditoastSTDCMErrorInvalidPathItems:
-      type: object
-      required:
-      - type
-      - status
-      - message
-      properties:
-        context:
-          type: object
-          required:
-          - items
-          properties:
-            items:
-              type: array
-        message:
-          type: string
-        status:
-          type: integer
-          enum:
-          - 400
-        type:
-          type: string
-          enum:
-          - editoast:stdcm_v2:InvalidPathItems
-    EditoastSTDCMErrorRollingStockNotFound:
-      type: object
-      required:
-      - type
-      - status
-      - message
-      properties:
-        context:
-          type: object
-          required:
-          - rolling_stock_id
-          properties:
-            rolling_stock_id:
-              type: integer
-        message:
-          type: string
-        status:
-          type: integer
-          enum:
-          - 400
-        type:
-          type: string
-          enum:
-          - editoast:stdcm_v2:RollingStockNotFound
-    EditoastSTDCMErrorTimetableNotFound:
-      type: object
-      required:
-      - type
-      - status
-      - message
-      properties:
-        context:
-          type: object
-          required:
-          - timetable_id
-          properties:
-            timetable_id:
-              type: integer
-        message:
-          type: string
-        status:
-          type: integer
-          enum:
-          - 404
-        type:
-          type: string
-          enum:
-          - editoast:stdcm_v2:TimetableNotFound
-    EditoastSTDCMErrorTowedRollingStockNotFound:
-      type: object
-      required:
-      - type
-      - status
-      - message
-      properties:
-        context:
-          type: object
-          required:
-          - towed_rolling_stock_id
-          properties:
-            towed_rolling_stock_id:
-              type: integer
-        message:
-          type: string
-        status:
-          type: integer
-          enum:
-          - 400
-        type:
-          type: string
-          enum:
-          - editoast:stdcm_v2:TowedRollingStockNotFound
     EditoastScenarioErrorInfraNotFound:
       type: object
       required:
@@ -5447,6 +5319,126 @@ components:
           type: string
           enum:
           - editoast:sprites:UnknownSignalingSystem
+    EditoastStdcmErrorInfraNotFound:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+          required:
+          - infra_id
+          properties:
+            infra_id:
+              type: integer
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 400
+        type:
+          type: string
+          enum:
+          - editoast:stdcm_v2:InfraNotFound
+    EditoastStdcmErrorInvalidPathItems:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 400
+        type:
+          type: string
+          enum:
+          - editoast:stdcm_v2:InvalidPathItems
+    EditoastStdcmErrorRollingStockNotFound:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+          required:
+          - rolling_stock_id
+          properties:
+            rolling_stock_id:
+              type: integer
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 400
+        type:
+          type: string
+          enum:
+          - editoast:stdcm_v2:RollingStockNotFound
+    EditoastStdcmErrorTimetableNotFound:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+          required:
+          - timetable_id
+          properties:
+            timetable_id:
+              type: integer
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 404
+        type:
+          type: string
+          enum:
+          - editoast:stdcm_v2:TimetableNotFound
+    EditoastStdcmErrorTowedRollingStockNotFound:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+          required:
+          - towed_rolling_stock_id
+          properties:
+            towed_rolling_stock_id:
+              type: integer
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 400
+        type:
+          type: string
+          enum:
+          - editoast:stdcm_v2:TowedRollingStockNotFound
     EditoastStudyErrorNotFound:
       type: object
       required:
@@ -8226,6 +8218,108 @@ components:
             type: integer
             format: int64
             minimum: 0
+    Request:
+      type: object
+      description: An STDCM request
+      required:
+      - steps
+      - rolling_stock_id
+      - comfort
+      properties:
+        comfort:
+          $ref: '#/components/schemas/Comfort'
+        electrical_profile_set_id:
+          type: integer
+          format: int64
+          nullable: true
+        loading_gauge_type:
+          allOf:
+          - $ref: '#/components/schemas/LoadingGaugeType'
+          nullable: true
+        margin:
+          type: string
+          description: Can be a percentage `X%`, a time in minutes per 100 kilometer `Xmin/100km`
+          example:
+          - 5%
+          - 2min/100km
+          nullable: true
+        max_speed:
+          type: number
+          format: double
+          description: Maximum speed of the consist in km/h
+          nullable: true
+        maximum_departure_delay:
+          type: integer
+          format: int64
+          description: |-
+            By how long we can shift the departure time in milliseconds
+            Deprecated, first step data should be used instead
+          nullable: true
+          minimum: 0
+        maximum_run_time:
+          type: integer
+          format: int64
+          description: |-
+            Specifies how long the total run time can be in milliseconds
+            Deprecated, first step data should be used instead
+          nullable: true
+          minimum: 0
+        rolling_stock_id:
+          type: integer
+          format: int64
+        speed_limit_tags:
+          type: string
+          description: Train categories for speed limits
+          nullable: true
+        start_time:
+          type: string
+          format: date-time
+          description: Deprecated, first step arrival time should be used instead
+          nullable: true
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/PathfindingItem'
+        temporary_speed_limit_group_id:
+          type: integer
+          format: int64
+          nullable: true
+        time_gap_after:
+          type: integer
+          format: int64
+          description: |-
+            Margin after the train passage in milliseconds
+
+            Enforces that the path used by the train should be free and
+            available at least that many milliseconds after its passage.
+          minimum: 0
+        time_gap_before:
+          type: integer
+          format: int64
+          description: |-
+            Margin before the train passage in seconds
+
+            Enforces that the path used by the train should be free and
+            available at least that many milliseconds before its passage.
+          minimum: 0
+        total_length:
+          type: number
+          format: double
+          description: Total length of the consist in meters
+          nullable: true
+        total_mass:
+          type: number
+          format: double
+          description: Total mass of the consist in kg
+          nullable: true
+        towed_rolling_stock_id:
+          type: integer
+          format: int64
+          nullable: true
+        work_schedule_group_id:
+          type: integer
+          format: int64
+          nullable: true
     RjsPowerRestrictionRange:
       type: object
       description: A range along the train path where a power restriction is applied.
@@ -8757,108 +8851,6 @@ components:
             type: string
         zone:
           type: string
-    STDCMRequestPayload:
-      type: object
-      description: An STDCM request
-      required:
-      - steps
-      - rolling_stock_id
-      - comfort
-      properties:
-        comfort:
-          $ref: '#/components/schemas/Comfort'
-        electrical_profile_set_id:
-          type: integer
-          format: int64
-          nullable: true
-        loading_gauge_type:
-          allOf:
-          - $ref: '#/components/schemas/LoadingGaugeType'
-          nullable: true
-        margin:
-          type: string
-          description: Can be a percentage `X%`, a time in minutes per 100 kilometer `Xmin/100km`
-          example:
-          - 5%
-          - 2min/100km
-          nullable: true
-        max_speed:
-          type: number
-          format: double
-          description: Maximum speed of the consist in km/h
-          nullable: true
-        maximum_departure_delay:
-          type: integer
-          format: int64
-          description: |-
-            By how long we can shift the departure time in milliseconds
-            Deprecated, first step data should be used instead
-          nullable: true
-          minimum: 0
-        maximum_run_time:
-          type: integer
-          format: int64
-          description: |-
-            Specifies how long the total run time can be in milliseconds
-            Deprecated, first step data should be used instead
-          nullable: true
-          minimum: 0
-        rolling_stock_id:
-          type: integer
-          format: int64
-        speed_limit_tags:
-          type: string
-          description: Train categories for speed limits
-          nullable: true
-        start_time:
-          type: string
-          format: date-time
-          description: Deprecated, first step arrival time should be used instead
-          nullable: true
-        steps:
-          type: array
-          items:
-            $ref: '#/components/schemas/PathfindingItem'
-        temporary_speed_limit_group_id:
-          type: integer
-          format: int64
-          nullable: true
-        time_gap_after:
-          type: integer
-          format: int64
-          description: |-
-            Margin after the train passage in milliseconds
-
-            Enforces that the path used by the train should be free and
-            available at least that many milliseconds after its passage.
-          minimum: 0
-        time_gap_before:
-          type: integer
-          format: int64
-          description: |-
-            Margin before the train passage in seconds
-
-            Enforces that the path used by the train should be free and
-            available at least that many milliseconds before its passage.
-          minimum: 0
-        total_length:
-          type: number
-          format: double
-          description: Total length of the consist in meters
-          nullable: true
-        total_mass:
-          type: number
-          format: double
-          description: Total mass of the consist in kg
-          nullable: true
-        towed_rolling_stock_id:
-          type: integer
-          format: int64
-          nullable: true
-        work_schedule_group_id:
-          type: integer
-          format: int64
-          nullable: true
     Scenario:
       type: object
       required:

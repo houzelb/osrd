@@ -476,6 +476,21 @@ impl AsCoreRequest<Json<SimulationResponse>> for SimulationRequest {
     }
 }
 
+impl SimulationResponse {
+    pub fn simulation_run_time(&self) -> Option<u64> {
+        if let SimulationResponse::Success { provisional, .. } = self {
+            Some(
+                *provisional
+                    .times
+                    .last()
+                    .expect("core error: empty simulation result"),
+            )
+        } else {
+            None
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use editoast_schemas::rolling_stock::RollingResistance;
