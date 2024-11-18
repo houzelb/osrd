@@ -4,20 +4,20 @@
     align-items: center;
     width: 100%;
     .rolling-stock {
-      width: 3rem;
+      width: 48px;
       overflow: hidden;
-      padding-bottom: 0.25rem;
-        img {
-          height: 1rem;
-          object-fit: cover;
-          object-position: left;
-          transform: scaleX(-1);
-          mask-image: linear-gradient(90deg, black 80%, rgba(0, 0, 0, 0));
-          -webkit-mask-image: linear-gradient(90deg, black 80%, rgba(0, 0, 0, 0));
-        }
+      padding-bottom: 4px;
+      img {
+        height: 16px;
+        object-fit: cover;
+        object-position: left;
+        transform: scaleX(-1);
+        mask-image: linear-gradient(90deg, black 80%, rgba(0, 0, 0, 0));
+        -webkit-mask-image: linear-gradient(90deg, black 80%, rgba(0, 0, 0, 0));
+      }
     }
     img {
-      height: 1.5rem;
+      height: 24px;
     }
   }
 }
