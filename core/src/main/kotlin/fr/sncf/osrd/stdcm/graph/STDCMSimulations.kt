@@ -36,6 +36,9 @@ class STDCMSimulations {
     private var simulatedEnvelopes: HashMap<BlockSimulationParameters, SoftReference<Envelope>?> =
         HashMap()
 
+    // Used to log how many simulations failed (to log it once at the end of the processing)
+    private var nFailedSimulation = 0
+
     /**
      * Returns the corresponding envelope if the block's envelope has already been computed in
      * simulatedEnvelopes, otherwise computes the matching envelope and adds it to the STDCMGraph.
@@ -66,6 +69,67 @@ class STDCMSimulations {
         simulatedEnvelopes[blockParams] = SoftReference(simulatedEnvelope)
         return simulatedEnvelope
     }
+
+    /**
+     * Returns an envelope matching the given block. The envelope time starts when the train enters
+     * the block. stopPosition specifies the position at which the train should stop, may be null
+     * (no stop).
+     *
+     * Note: there are some approximations made here as we only "see" the tracks on the given
+     * blocks. We are missing slopes and speed limits from earlier in the path.
+     */
+    fun simulateBlock(
+        rawInfra: RawSignalingInfra,
+        infraExplorer: InfraExplorer,
+        initialSpeed: Double,
+        start: Offset<Block>,
+        rollingStock: RollingStock,
+        comfort: Comfort?,
+        timeStep: Double,
+        stopPosition: Offset<Block>?,
+        trainTag: String?
+    ): Envelope? {
+        if (stopPosition != null && stopPosition == Offset<Block>(0.meters))
+            return makeSinglePointEnvelope(0.0)
+        val blockLength = infraExplorer.getCurrentBlockLength()
+        if (start >= blockLength) return makeSinglePointEnvelope(initialSpeed)
+        var stops = doubleArrayOf()
+        var simLength = blockLength.distance - start.distance
+        if (stopPosition != null) {
+            stops = doubleArrayOf(stopPosition.distance.meters)
+            simLength = Distance.min(simLength, stopPosition.distance)
+        }
+        val path = infraExplorer.getCurrentEdgePathProperties(start, simLength)
+        val envelopePath = EnvelopeTrainPath.from(rawInfra, path)
+        val context = build(rollingStock, envelopePath, timeStep, comfort)
+        val mrsp = computeMRSP(path, rollingStock, false, trainTag)
+        return try {
+            val maxSpeedEnvelope = MaxSpeedEnvelope.from(context, stops, mrsp)
+            MaxEffortEnvelope.from(context, initialSpeed, maxSpeedEnvelope)
+        } catch (e: OSRDError) {
+            // The train can't reach its destination, for example because of high slopes
+            if (nFailedSimulation == 0) {
+                // We only log the first one (to get an actual error message but not spam any
+                // further)
+                logger.info(
+                    "First failure of an STDCM Simulation during the search (ignoring this possible path): ${e.message}"
+                )
+            }
+            nFailedSimulation++
+            null
+        }
+    }
+
+    /**
+     * Log any relevant warnings about what happened during the processing, to be called once at the
+     * end. Aggregates events into fewer log entries.
+     */
+    fun logWarnings() {
+        if (nFailedSimulation > 0)
+            logger.info(
+                "A total of $nFailedSimulation STDCM Simulations failed during the search (usually because of lack of traction)"
+            )
+    }
 }
 
 /** Create an EnvelopeSimContext instance from the blocks and extra parameters. */
@@ -81,48 +145,6 @@ fun makeSimContext(
     val path = makePathProps(rawInfra, blockInfra, blocks, offsetFirstBlock.cast())
     val envelopePath = EnvelopeTrainPath.from(rawInfra, path)
     return build(rollingStock, envelopePath, timeStep, comfort)
-}
-
-/**
- * Returns an envelope matching the given block. The envelope time starts when the train enters the
- * block. stopPosition specifies the position at which the train should stop, may be null (no stop).
- *
- * Note: there are some approximations made here as we only "see" the tracks on the given blocks. We
- * are missing slopes and speed limits from earlier in the path.
- */
-fun simulateBlock(
-    rawInfra: RawSignalingInfra,
-    infraExplorer: InfraExplorer,
-    initialSpeed: Double,
-    start: Offset<Block>,
-    rollingStock: RollingStock,
-    comfort: Comfort?,
-    timeStep: Double,
-    stopPosition: Offset<Block>?,
-    trainTag: String?
-): Envelope? {
-    if (stopPosition != null && stopPosition == Offset<Block>(0.meters))
-        return makeSinglePointEnvelope(0.0)
-    val blockLength = infraExplorer.getCurrentBlockLength()
-    if (start >= blockLength) return makeSinglePointEnvelope(initialSpeed)
-    var stops = doubleArrayOf()
-    var simLength = blockLength.distance - start.distance
-    if (stopPosition != null) {
-        stops = doubleArrayOf(stopPosition.distance.meters)
-        simLength = Distance.min(simLength, stopPosition.distance)
-    }
-    val path = infraExplorer.getCurrentEdgePathProperties(start, simLength)
-    val envelopePath = EnvelopeTrainPath.from(rawInfra, path)
-    val context = build(rollingStock, envelopePath, timeStep, comfort)
-    val mrsp = computeMRSP(path, rollingStock, false, trainTag)
-    return try {
-        val maxSpeedEnvelope = MaxSpeedEnvelope.from(context, stops, mrsp)
-        MaxEffortEnvelope.from(context, initialSpeed, maxSpeedEnvelope)
-    } catch (e: OSRDError) {
-        // The train can't reach its destination, for example because of high slopes
-        logger.info("STDCM Simulation failed (ignoring this possible path): ${e.message}")
-        null
-    }
 }
 
 /** Make an envelope with a single point of the given speed */

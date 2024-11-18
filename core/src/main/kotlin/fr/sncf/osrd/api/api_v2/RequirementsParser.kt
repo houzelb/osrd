@@ -139,18 +139,24 @@ private fun convertWorkSchedule(
     timeToAdd: TimeDelta = 0.seconds,
 ): Collection<ResultTrain.SpacingRequirement> {
     val res = mutableListOf<ResultTrain.SpacingRequirement>()
+
+    // Used to log invalid data (but only once per request)
+    var missingTracks = mutableSetOf<String>()
+    var tracksNotCoveredByRoutes = mutableSetOf<String>()
+
     for (range in workSchedule.trackRanges) {
-        val track = rawInfra.getTrackSectionFromName(range.trackSection) ?: continue
+        val track = rawInfra.getTrackSectionFromName(range.trackSection)
+        if (track == null) {
+            missingTracks.add(range.trackSection)
+            continue
+        }
         for (chunk in rawInfra.getTrackSectionChunks(track)) {
             val chunkStartOffset = rawInfra.getTrackChunkOffset(chunk)
             val chunkEndOffset = chunkStartOffset + rawInfra.getTrackChunkLength(chunk).distance
             if (chunkStartOffset > range.end || chunkEndOffset < range.begin) continue
             val zone = rawInfra.getTrackChunkZone(chunk)
             if (zone == null) {
-                requirementsParserLogger.info(
-                    "Skipping part of work schedule [${workSchedule.startTime}; ${workSchedule.endTime}] " +
-                        "because it is on a track not fully covered by routes: $track",
-                )
+                tracksNotCoveredByRoutes.add(range.trackSection)
                 continue
             }
             res.add(
@@ -162,6 +168,20 @@ private fun convertWorkSchedule(
                 )
             )
         }
+    }
+    if (missingTracks.isNotEmpty()) {
+        val msg =
+            "${missingTracks.size} track sections referenced in work schedules were not found on the infra: " +
+                missingTracks.take(3).joinToString(", ") +
+                (if (missingTracks.size > 3) ", ..." else "")
+        requirementsParserLogger.warn(msg)
+    }
+    if (tracksNotCoveredByRoutes.isNotEmpty()) {
+        val msg =
+            "${tracksNotCoveredByRoutes.size} track sections were not fully covered by routes (ignoring some work schedules): " +
+                tracksNotCoveredByRoutes.take(3).joinToString(", ") +
+                (if (tracksNotCoveredByRoutes.size > 3) ", ..." else "")
+        requirementsParserLogger.warn(msg)
     }
     return res
 }

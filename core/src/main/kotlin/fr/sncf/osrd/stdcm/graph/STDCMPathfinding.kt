@@ -116,6 +116,7 @@ class STDCMPathfinding(
         assert(stops.isNotEmpty())
         starts = getStartNodes(stops, listOf(constraints))
         val path = findPathImpl()
+        graph.stdcmSimulations.logWarnings()
         if (path == null) {
             logger.info("Failed to find a path")
             return null
