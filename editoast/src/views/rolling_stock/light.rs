@@ -107,7 +107,10 @@ struct LightRollingStockWithLiveriesCountList {
 async fn list(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
-    Query(page_settings): Query<PaginationQueryParam>,
+    page_settings: Result<
+        Query<PaginationQueryParam<1000>>,
+        axum::extract::rejection::QueryRejection,
+    >,
 ) -> Result<Json<LightRollingStockWithLiveriesCountList>> {
     let authorized = auth
         .check_roles([BuiltinRole::RollingStockCollectionRead].into())
@@ -116,8 +119,13 @@ async fn list(
     if !authorized {
         return Err(AuthorizationError::Unauthorized.into());
     }
+    let page_settings = match page_settings {
+        Ok(Query(page_settings)) => page_settings,
+        Err(query_rejection) => {
+            return Err(query_rejection.into());
+        }
+    };
     let settings = page_settings
-        .validate(1000)?
         .warn_page_size(100)
         .into_selection_settings()
         .order_by(|| RollingStockModel::ID.asc());
@@ -457,9 +465,10 @@ mod tests {
 
         let response: InternalError = app
             .fetch(request)
-            .assert_status(StatusCode::BAD_REQUEST)
+            .assert_status(StatusCode::INTERNAL_SERVER_ERROR)
             .json_into();
 
+        let response = dbg!(response);
         assert_eq!(response.error_type, "editoast:pagination:PageSizeTooBig");
         assert_eq!(response.context["provided_page_size"], 1010);
         assert_eq!(response.context["max_page_size"], 1000);

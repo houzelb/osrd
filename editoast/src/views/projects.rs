@@ -189,7 +189,7 @@ struct ProjectWithStudyCountList {
 async fn list(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
-    Query(pagination_params): Query<PaginationQueryParam>,
+    Query(pagination_params): Query<PaginationQueryParam<1000>>,
     Query(ordering_params): Query<OperationalStudiesOrderingParam>,
 ) -> Result<Json<ProjectWithStudyCountList>> {
     let authorized = auth
@@ -202,7 +202,6 @@ async fn list(
 
     let ordering = ordering_params.ordering;
     let settings = pagination_params
-        .validate(1000)?
         .warn_page_size(100)
         .into_selection_settings()
         .order_by(move || ordering.as_project_ordering());

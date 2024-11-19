@@ -484,7 +484,7 @@ async fn list(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
     Path((project_id, study_id)): Path<(i64, i64)>,
-    Query(pagination_params): Query<PaginationQueryParam>,
+    Query(pagination_params): Query<PaginationQueryParam<1000>>,
     Query(OperationalStudiesOrderingParam { ordering }): Query<OperationalStudiesOrderingParam>,
 ) -> Result<Json<ListScenariosResponse>> {
     let authorized = auth
@@ -500,7 +500,6 @@ async fn list(
     let _ = check_project_study(conn, project_id, study_id).await?;
 
     let settings = pagination_params
-        .validate(1000)?
         .warn_page_size(100)
         .into_selection_settings()
         .order_by(move || ordering.as_scenario_ordering())

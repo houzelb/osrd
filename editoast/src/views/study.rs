@@ -405,7 +405,7 @@ async fn list(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
     Path(project_id): Path<i64>,
-    Query(pagination_params): Query<PaginationQueryParam>,
+    Query(pagination_params): Query<PaginationQueryParam<1000>>,
     Query(ordering_params): Query<OperationalStudiesOrderingParam>,
 ) -> Result<Json<StudyListResponse>> {
     let authorized = auth
@@ -422,7 +422,6 @@ async fn list(
     }
 
     let settings = pagination_params
-        .validate(1000)?
         .warn_page_size(100)
         .into_selection_settings()
         .filter(move || Study::PROJECT_ID.eq(project_id))

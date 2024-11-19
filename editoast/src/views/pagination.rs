@@ -1,5 +1,6 @@
 use editoast_derive::EditoastError;
 use editoast_models::DbConnection;
+use serde::de::Error as _;
 use serde::Deserialize;
 use serde::Serialize;
 use thiserror::Error;
@@ -7,6 +8,7 @@ use tracing::warn;
 use utoipa::IntoParams;
 use utoipa::ToSchema;
 
+use crate::error::InternalError;
 use crate::error::Result;
 use crate::ListAndCount;
 use crate::Model;
@@ -139,7 +141,9 @@ impl<T> PaginatedList for T where T: ListAndCount + 'static {}
 
 #[derive(Debug, Clone, Copy, Deserialize, IntoParams)]
 #[into_params(parameter_in = Query)]
-pub struct PaginationQueryParam {
+// See https://yossarian.net/til/post/remote-self-derivation-with-serde-for-custom-invariants
+#[serde(remote = "Self")]
+pub struct PaginationQueryParam<const N: u64 = 100> {
     #[serde(default = "default_page")]
     #[param(minimum = 1, default = 1)]
     pub page: u64,
@@ -147,30 +151,48 @@ pub struct PaginationQueryParam {
     pub page_size: Option<u64>,
 }
 
+impl<'de, const N: u64> Deserialize<'de> for PaginationQueryParam<N> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let pagination_query_params = Self::deserialize(deserializer)?;
+        let (page, page_size) = pagination_query_params.unpack();
+        if page == 0 {
+            return Err(D::Error::custom(
+                InternalError::from(PaginationError::InvalidPageNumber { page }).to_string(),
+            ));
+        }
+        if page_size == 0 {
+            return Err(D::Error::custom(
+                InternalError::from(PaginationError::InvalidPageSize { page_size }).to_string(),
+            ));
+        }
+        if page_size > N {
+            return Err(D::Error::custom(
+                InternalError::from(PaginationError::PageSizeTooBig {
+                    provided_page_size: page_size,
+                    max_page_size: N,
+                })
+                .to_string(),
+            ));
+        }
+        Ok(pagination_query_params)
+    }
+}
+
 const fn default_page() -> u64 {
     1
 }
 
-impl PaginationQueryParam {
+impl<const N: u64> PaginationQueryParam<N> {
     /// Returns a pre-filled [SelectionSettings] from the pagination settings
     /// that can then be used to list or count models
     pub fn into_selection_settings<M: Model + 'static>(self) -> SelectionSettings<M> {
         self.into()
     }
 
-    pub fn validate(self, max_page_size: i64) -> Result<PaginationQueryParam> {
-        let (page, page_size) = self.unpack();
-        if page_size > max_page_size || page_size < 1 || page < 1 {
-            return Err(PaginationError::PageSizeTooBig {
-                provided_page_size: page_size,
-                max_page_size,
-            }
-            .into());
-        }
-        Ok(self)
-    }
-
-    pub fn warn_page_size(self, warn_page_size: i64) -> PaginationQueryParam {
+    pub fn warn_page_size(self, warn_page_size: u64) -> PaginationQueryParam<N> {
         let (_, page_size) = self.unpack();
         if page_size > warn_page_size {
             warn!(
@@ -181,14 +203,14 @@ impl PaginationQueryParam {
         self
     }
 
-    pub fn unpack(&self) -> (i64, i64) {
+    pub fn unpack(&self) -> (u64, u64) {
         let page_size = self.page_size.unwrap_or(DEFAULT_PAGE_SIZE);
-        (self.page as i64, page_size as i64)
+        (self.page, page_size)
     }
 }
 
-impl<M: Model + 'static> From<PaginationQueryParam> for SelectionSettings<M> {
-    fn from(PaginationQueryParam { page, page_size }: PaginationQueryParam) -> Self {
+impl<const N: u64, M: Model + 'static> From<PaginationQueryParam<N>> for SelectionSettings<M> {
+    fn from(PaginationQueryParam { page, page_size }: PaginationQueryParam<N>) -> Self {
         let page_size = page_size.unwrap_or(DEFAULT_PAGE_SIZE);
         SelectionSettings::from_pagination_settings(page, page_size)
     }
@@ -198,17 +220,17 @@ impl<M: Model + 'static> From<PaginationQueryParam> for SelectionSettings<M> {
 #[derive(Debug, Error, EditoastError)]
 #[editoast_error(base_id = "pagination")]
 pub enum PaginationError {
-    #[error("Invalid page size ({provided_page_size}), expected an integer 0 < page_size <= {max_page_size}")]
+    #[error("Invalid page size ({provided_page_size}), expected an integer such as page_size <= {max_page_size}")]
     #[editoast_error(status = 400)]
     PageSizeTooBig {
-        provided_page_size: i64,
-        max_page_size: i64,
+        provided_page_size: u64,
+        max_page_size: u64,
     },
     #[error("page number must be strictly positive, was {page}")]
-    #[editoast_error(status = 400)]
+    #[editoast_error(status = 500)]
     InvalidPageNumber { page: u64 },
     #[error("page size must be strictly positive, was {page_size}")]
-    #[editoast_error(status = 400)]
+    #[editoast_error(status = 500)]
     InvalidPageSize { page_size: u64 },
     #[error("no more information after page {page} when page size is {page_size} (total number of elements is {total_count})")]
     #[editoast_error(status = 404)]

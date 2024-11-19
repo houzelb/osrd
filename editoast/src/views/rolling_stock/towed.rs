@@ -175,7 +175,7 @@ struct TowedRollingStockCountList {
 async fn get_list(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
-    Query(page_settings): Query<PaginationQueryParam>,
+    Query(page_settings): Query<PaginationQueryParam<50>>,
 ) -> Result<Json<TowedRollingStockCountList>> {
     let authorized = auth
         .check_roles([BuiltinRole::RollingStockCollectionRead].into())
@@ -185,7 +185,6 @@ async fn get_list(
         return Err(AuthorizationError::Unauthorized.into());
     }
     let settings = page_settings
-        .validate(50)?
         .into_selection_settings()
         .order_by(|| TowedRollingStockModel::ID.asc());
     let (towed_rolling_stocks, stats) =

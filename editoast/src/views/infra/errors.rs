@@ -89,10 +89,7 @@ async fn list_errors(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let (page, page_size) = pagination_params
-        .validate(100)?
-        .warn_page_size(100)
-        .unpack();
+    let (page, page_size) = pagination_params.warn_page_size(100).unpack();
     let (page, page_size) = (page as u64, page_size as u64);
 
     let error_type = match error_type.map(|et| InfraErrorTypeLabel::from_str(&et).ok()) {

@@ -200,7 +200,7 @@ struct InfraListResponse {
 async fn list(
     app_state: State<AppState>,
     Extension(auth): AuthenticationExt,
-    pagination_params: Query<PaginationQueryParam>,
+    pagination_params: Query<PaginationQueryParam<1000>>,
 ) -> Result<Json<InfraListResponse>> {
     let authorized = auth
         .check_roles([BuiltinRole::InfraRead].into())
@@ -213,7 +213,6 @@ async fn list(
     let osrdyne_client = app_state.osrdyne_client.clone();
 
     let settings = pagination_params
-        .validate(1000)?
         .warn_page_size(100)
         .into_selection_settings();
 

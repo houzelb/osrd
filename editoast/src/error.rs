@@ -265,6 +265,28 @@ impl EditoastError for editoast_schemas::errors::GeometryError {
     }
 }
 
+impl EditoastError for axum::extract::rejection::QueryRejection {
+    fn get_status(&self) -> StatusCode {
+        StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn get_type(&self) -> &str {
+        "editoast:SerdeJsonError"
+    }
+
+    fn context(&self) -> HashMap<String, Value> {
+        [
+            ("body".to_string(), Value::String(self.body_text())),
+            (
+                "status".to_string(),
+                Value::String(self.status().to_string()),
+            ),
+        ]
+        .into_iter()
+        .collect()
+    }
+}
+
 // error definition : uses by the macro EditoastError to generate
 // the list of error and share it with the openAPI generator
 #[derive(Debug)]

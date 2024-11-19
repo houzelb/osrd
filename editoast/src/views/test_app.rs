@@ -259,6 +259,7 @@ fn trim_path(path: &str) -> String {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct TestResponse {
     inner: axum_test::TestResponse,
     log_payload: bool,
@@ -288,6 +289,7 @@ impl TestResponse {
         serde_json::from_slice::<serde_json::Value>(&bytes)
             .ok()
             .and_then(|json| serde_json::to_string_pretty(&json).ok())
+            .or_else(|| String::from_utf8(bytes.to_vec()).ok())
             .unwrap_or_else(|| "cannot render response body".to_string())
     }
 
@@ -325,14 +327,14 @@ impl TestResponse {
         fields(response_status = ?self.inner.status_code())
     )]
     pub fn json_into<T: DeserializeOwned>(self) -> T {
-        let body = self.bytes();
+        let body = self.clone().bytes();
         serde_json::from_slice(body.as_ref()).unwrap_or_else(|err| {
             tracing::error!(error = ?err, "Error deserializing test response into the desired type");
             let actual: serde_json::Value =
                 serde_json::from_slice(body.as_ref()).unwrap_or_else(|err| {
                     tracing::error!(
                         error = ?err,
-                        ?body,
+                        body = self.render_response_lossy(),
                         "Failed to deserialize test response body into JSON"
                     );
                     panic!("could not deserialize test response into JSON");
