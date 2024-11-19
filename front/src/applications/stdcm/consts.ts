@@ -19,14 +19,6 @@ export const COMPOSITION_CODES = [
   'ME140',
   'MV160',
   'MVGV',
-  'Marchandise',
-  'Marchandise - MA100',
-  'Marchandise - MA80',
-  'Marchandise - MA90',
-  'Messagerie - ME100',
-  'Messagerie - ME120',
-  'Messagerie - ME140',
-  'Messagerie - MVGV',
 ];
 
 export const DEFAULT_TOLERANCE = 1800; // 30min
