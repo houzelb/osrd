@@ -153,10 +153,7 @@
     "vite-tsconfig-paths": "^5.0.1",
     "vitest": "^2.0.0"
   },
-  "optionalDependencies": {
-    "@rollup/rollup-linux-arm64-gnu": "^4.23.0"
-  },
-  "resolutions": {
+  "overrides": {
     "react-error-overlay": "6.0.9",
     "@nivo/line": "^0.80.0",
     "@nivo/core": "^0.80.0",
@@ -173,7 +170,7 @@
     "test-coverage": "import-meta-env-prepare -x .env.example && vitest run --coverage",
     "generate-types": "exec scripts/generate-types.sh",
     "generate-licenses": "license-checker-rseidelsohn --json --production --direct --excludePackagesStartingWith '@types' --excludePrivatePackages --customPath src/common/ReleaseInformations/json/licenseCustomFormat.json > src/common/ReleaseInformations/json/licenses.json",
-    "e2e-tests": "yarn playwright test",
+    "e2e-tests": "playwright test",
     "i18n-api-errors": "tsx ./scripts/i18n-api-errors.ts",
     "i18n-checker": "tsx ./scripts/i18n-checker.ts"
   },

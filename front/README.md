@@ -3,16 +3,15 @@
 ## How to launch project for development purpose?
 
 - go inside `/front/` from OSRD main project
-- you'll need [`npm`](https://nodejs.org/en/download/package-manager) and
-  [`yarn`](https://classic.yarnpkg.com/lang/en/docs/install/)
-- exec `yarn` (hope you have a good connexion and a good cup of tea)
-- exec `yarn start` (perhaps you'll need `NODE_OPTIONS="--openssl-legacy-provider"` if your node
+- you'll need [`npm`](https://nodejs.org/en/download/package-manager)
+- exec `npm install` (hope you have a good connexion and a good cup of tea)
+- exec `npm start` (perhaps you'll need `NODE_OPTIONS="--openssl-legacy-provider"` if your node
   version is too new)
 - enjoy
 
 ## Commands
 
-### `yarn start`
+### `npm start`
 
 Runs the app in a local development environment.
 
@@ -21,36 +20,38 @@ well.
 
 See [Main Readme](../README.md) if you need more information to run the docker.
 
-### `yarn test`
+### `npm run test`
 
 Launches the test runner in the interactive watch mode.
 
-### `yarn build`
+### `npm run build`
 
 Builds the app for production to the `build` folder.
 
-### `yarn generate-licenses`
+### `npm run generate-licenses`
 
 Update licenses attributions in /src/common/ReleaseInformations/json/
 
-### `yarn e2e-tests`
+### `npm run e2e-tests`
 
 Launches end to end tests.
 
 It requires:
 
-- Install playwright dependencies `cd ./front/ && yarn playwright install --with-deps`
-- Backend containers to be up: `docker compose up --no-build --detach valkey postgres gateway core editoast`
+- Install playwright dependencies `cd ./front/ && npx playwright install --with-deps`
+- Backend containers to be up:
+  `docker compose up --no-build --detach valkey postgres gateway core editoast`
 - Running front with `docker compose up --build --detach front`
 
-Now you can run the test with `cd front/ && yarn e2e-tests`.
+Now you can run the test with `cd front/ && npm run e2e-tests`.
 
-If you are using a Linux distribution not supported by playwright (which only supports Windows, macOS and Ubuntu/Debian),
-you can instead start the tests inside a docker container using `osrd/scripts/run-front-playwright-container.sh`.
-You may pass the same options and arguments to this script as you would to `yarn e2e-tests` or `yarn playwright test`.
+If you are using a Linux distribution not supported by playwright (which only supports Windows,
+macOS and Ubuntu/Debian), you can instead start the tests inside a docker container using
+`osrd/scripts/run-front-playwright-container.sh`. You may pass the same options and arguments to
+this script as you would to `npm run e2e-tests` or `npx playwright test`.
 
-> [!CAUTION] If you try to run `yarn start` instead of running it through docker, you'll notice it
-> doesn't work because the gateway can't access your local port from inside a container. 2
+> [!CAUTION] If you try to run `npm run start` instead of running it through docker, you'll notice
+> it doesn't work because the gateway can't access your local port from inside a container. 2
 > solutions:
 >
 > - run all the components locally (you might keep Postgres and Valkey in containers)
@@ -63,9 +64,9 @@ these videos as artifacts.
 
 You may also want to explore the documentation of the test framework
 [Playwright](https://playwright.dev/). For example, try launching each test independently using
-`yarn playwright test --ui`, debug a test with `yarn playwright test --debug`, or launch a specified
-test of a specified test file with a specified browser once with for example
-`yarn playwright test 011-op-times-and-stops-tab.spec.ts -g "should correctly set and display times and stops tables" --project=firefox  --retries=0`.
+`npm run playwright test --ui`, debug a test with `npm run playwright test --debug`, or launch a
+specified test of a specified test file with a specified browser once with for example
+`npm run playwright test 011-op-times-and-stops-tab.spec.ts -g "should correctly set and display times and stops tables" --project=firefox  --retries=0`.
 
 ## Design rules
 
@@ -106,8 +107,8 @@ organized in folders.
 **The components propose the main JS/TS file and eventually another folder with same name containing
 some minor subcomponents linked to.**
 
-  - components/
-  - views/
+- components/
+- views/
 - [editor/](#infrastructure-editor-editor)
   - components/
 - [opendata/](#opendata-importation-opendata)
@@ -210,8 +211,8 @@ All common code (and shared components) supposed to be in `common/`.
 
 - ESLint is used as linter and prettier as formatter. Both are configured as devDependencies to
   enforce default eslint configuration eventually overidden by
-  [airbnb rules](https://airbnb.io/javascript/) translation. A few rules (see eslintrc) has
-  been disabled and will be re-enabled in the near future):
+  [airbnb rules](https://airbnb.io/javascript/) translation. A few rules (see eslintrc) has been
+  disabled and will be re-enabled in the near future):
   - 'no-named-as-default': 'off',
   - 'react/jsx-props-no-spreading': 0,
   - 'react/static-property-placement': 0,
@@ -225,7 +226,7 @@ All common code (and shared components) supposed to be in `common/`.
   [Prettier - Code Formatter Extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
   and follow instructions.
 
-You may also use `yarn lint-fix` to format/lint.
+You may also use `npm run lint-fix` to format/lint.
 
 ## Dependencies
 
@@ -252,12 +253,15 @@ You may also use `yarn lint-fix` to format/lint.
 - jsdocs
 
 ### Updating Dependencies
-When `package.json` changes (new packages or updated versions), developers may have issues running the app with Docker. New packages or versions might not be recognized by Docker.
+
+When `package.json` changes (new packages or updated versions), developers may have issues running
+the app with Docker. New packages or versions might not be recognized by Docker.
 
 To fix this, follow these steps:
 
-1. After pulling new changes, run `yarn install` to update local dependencies.
-2. If issues persist, delete `node_modules` and run `yarn install` again.
-3. Run `docker compose build --no-cache` to rebuild Docker images from scratch with new dependencies.
+1. After pulling new changes, run `npm install` to update local dependencies.
+2. If issues persist, delete `node_modules` and run `npm install` again.
+3. Run `docker compose build --no-cache` to rebuild Docker images from scratch with new
+   dependencies.
 
 This ensures developers can run the app with the latest dependencies using Docker.
