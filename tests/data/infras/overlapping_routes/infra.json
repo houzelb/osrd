@@ -1,5 +1,5 @@
 {
-    "version": "3.4.12",
+    "version": "3.4.13",
     "operational_points": [
         {
             "id": "op.a1",
@@ -9,6 +9,7 @@
                     "position": 0.0
                 }
             ],
+            "weight": null,
             "extensions": {
                 "sncf": {
                     "ci": 0,
@@ -31,6 +32,7 @@
                     "position": 1000.0
                 }
             ],
+            "weight": null,
             "extensions": {
                 "sncf": {
                     "ci": 0,
@@ -53,6 +55,7 @@
                     "position": 0.0
                 }
             ],
+            "weight": null,
             "extensions": {
                 "sncf": {
                     "ci": 0,
@@ -75,6 +78,7 @@
                     "position": 1000.0
                 }
             ],
+            "weight": null,
             "extensions": {
                 "sncf": {
                     "ci": 0,

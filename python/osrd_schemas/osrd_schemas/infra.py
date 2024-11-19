@@ -8,7 +8,7 @@ from pydantic.fields import FieldInfo
 
 ALL_OBJECT_TYPES = []
 
-RAILJSON_INFRA_VERSION_TYPE = Literal["3.4.12"]
+RAILJSON_INFRA_VERSION_TYPE = Literal["3.4.13"]
 RAILJSON_INFRA_VERSION = get_args(RAILJSON_INFRA_VERSION_TYPE)[0]
 
 # Traits
@@ -197,6 +197,7 @@ class OperationalPoint(BaseObjectTrait):
     """
 
     parts: List[OperationalPointPart]
+    weight: Optional[int] = Field(description="represents the significance of a PR", ge=0, default=None)
 
 
 class TrackEndpoint(BaseModel):

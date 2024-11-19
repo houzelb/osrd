@@ -25,6 +25,8 @@ pub struct OperationalPoint {
     #[serde(default)]
     #[schema(inline)]
     pub extensions: OperationalPointExtensions,
+    #[serde(default)]
+    pub weight: Option<u8>,
 }
 
 #[derive(Debug, Derivative, Clone, Deserialize, Serialize, ToSchema)]
