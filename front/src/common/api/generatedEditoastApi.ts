@@ -1992,6 +1992,7 @@ export type OperationalPoint = {
   };
   id: string;
   parts: OperationalPointPart[];
+  weight?: number | null;
 };
 export type Waypoint =
   | {

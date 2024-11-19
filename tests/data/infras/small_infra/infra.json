@@ -1,5 +1,5 @@
 {
-    "version": "3.4.12",
+    "version": "3.4.13",
     "operational_points": [
         {
             "id": "West_station",
@@ -17,6 +17,7 @@
                     "position": 500.0
                 }
             ],
+            "weight": null,
             "extensions": {
                 "sncf": {
                     "ci": 0,
@@ -39,6 +40,7 @@
                     "position": 500.0
                 }
             ],
+            "weight": null,
             "extensions": {
                 "sncf": {
                     "ci": 0,
@@ -73,6 +75,7 @@
                     "position": 450.0
                 }
             ],
+            "weight": null,
             "extensions": {
                 "sncf": {
                     "ci": 0,
@@ -99,6 +102,7 @@
                     "position": 14000.0
                 }
             ],
+            "weight": null,
             "extensions": {
                 "sncf": {
                     "ci": 0,
@@ -125,6 +129,7 @@
                     "position": 1025.0
                 }
             ],
+            "weight": null,
             "extensions": {
                 "sncf": {
                     "ci": 0,
@@ -147,6 +152,7 @@
                     "position": 4300.0
                 }
             ],
+            "weight": null,
             "extensions": {
                 "sncf": {
                     "ci": 0,
@@ -173,6 +179,7 @@
                     "position": 1500.0
                 }
             ],
+            "weight": null,
             "extensions": {
                 "sncf": {
                     "ci": 0,
@@ -195,6 +202,7 @@
                     "position": 4400.0
                 }
             ],
+            "weight": null,
             "extensions": {
                 "sncf": {
                     "ci": 0,

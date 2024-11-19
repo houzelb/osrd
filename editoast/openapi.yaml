@@ -7291,6 +7291,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/OperationalPointPart'
+        weight:
+          type: integer
+          format: int32
+          nullable: true
+          minimum: 0
       additionalProperties: false
     OperationalPointExtensions:
       type: object

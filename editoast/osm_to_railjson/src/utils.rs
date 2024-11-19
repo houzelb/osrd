@@ -476,6 +476,7 @@ pub fn operational_points(
                         identifier: identifier(&rel.tags),
                         sncf: None,
                     },
+                    weight: None,
                 })
             }
         })

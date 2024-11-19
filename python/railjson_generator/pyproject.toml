@@ -4,7 +4,7 @@ version = "0.4.8"
 
 [tool.poetry]
 name = "railjson_generator"
-version = "0.4.8"
+version = "0.4.9"
 description = ""
 authors = ["OSRD <contact@osrd.fr>"]
 

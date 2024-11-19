@@ -849,6 +849,20 @@
                     },
                     "title": "Parts",
                     "type": "array"
+                },
+                "weight": {
+                    "anyOf": [
+                        {
+                            "minimum": 0,
+                            "type": "integer"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "description": "represents the significance of a PR",
+                    "title": "Weight"
                 }
             },
             "required": [
@@ -2165,8 +2179,8 @@
             "type": "array"
         },
         "version": {
-            "const": "3.4.12",
-            "default": "3.4.12",
+            "const": "3.4.13",
+            "default": "3.4.13",
             "description": "Version of the schema",
             "title": "Version"
         }
