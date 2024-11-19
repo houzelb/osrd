@@ -217,7 +217,8 @@
       "InvalidUrl": "Url invalide '{{url}}'"
     },
     "work_schedule": {
-      "NameAlreadyUsed": "Un groupe de planches travaux avec le nom '{{name}}' existe déjà"
+      "NameAlreadyUsed": "Un groupe de planches travaux avec le nom '{{name}}' existe déjà",
+      "WorkScheduleGroupNotFound": "Le groupe de planche travaux avec l'id {{id}} n'existe pas"
     },
     "temporary_speed_limit": {
       "NameAlreadyUsed": "Un groupe de limites temporaires de vitesse avec le nom '{{name}} existe déjà"

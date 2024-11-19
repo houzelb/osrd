@@ -1,4 +1,5 @@
 use crate::models::prelude::*;
+use crate::models::work_schedules::WorkSchedule;
 use crate::models::Project;
 use crate::models::Scenario;
 use crate::models::Study;
@@ -56,6 +57,14 @@ impl Ordering {
             Ordering::CreationDateDesc => Scenario::CREATION_DATE.desc(),
             Ordering::LastModifiedAsc => Scenario::LAST_MODIFICATION.asc(),
             Ordering::LastModifiedDesc => Scenario::LAST_MODIFICATION.desc(),
+        }
+    }
+
+    pub fn as_work_schedule_ordering(&self) -> SortSetting<WorkSchedule> {
+        match *self {
+            Ordering::NameAsc => WorkSchedule::OBJ_ID.asc(),
+            Ordering::NameDesc => WorkSchedule::OBJ_ID.desc(),
+            _ => WorkSchedule::OBJ_ID.asc(),
         }
     }
 }

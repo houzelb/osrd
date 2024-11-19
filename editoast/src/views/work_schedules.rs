@@ -1,19 +1,4 @@
-use axum::extract::Json;
-use axum::extract::State;
-use axum::Extension;
-use chrono::DateTime;
-use chrono::Utc;
-use derivative::Derivative;
-use editoast_authz::BuiltinRole;
-use editoast_derive::EditoastError;
-use editoast_models::DbConnectionPoolV2;
-use serde::de::Error as SerdeError;
-use serde::Deserialize;
-use serde::Serialize;
-use std::result::Result as StdResult;
-use thiserror::Error;
-use utoipa::ToSchema;
-
+use super::pagination::PaginatedList;
 use crate::core::pathfinding::TrackRange as CoreTrackRange;
 use crate::error::InternalError;
 use crate::error::Result;
@@ -21,24 +6,62 @@ use crate::models::prelude::*;
 use crate::models::work_schedules::WorkSchedule;
 use crate::models::work_schedules::WorkScheduleGroup;
 use crate::models::work_schedules::WorkScheduleType;
+use crate::views::operational_studies::Ordering;
+use crate::views::pagination::PaginationQueryParam;
+use crate::views::pagination::PaginationStats;
 use crate::views::path::projection::Intersection;
 use crate::views::path::projection::PathProjection;
 use crate::views::AuthenticationExt;
 use crate::views::AuthorizationError;
-use crate::AppState;
-use editoast_schemas::infra::{Direction, TrackRange};
+use axum::extract::Json;
+use axum::extract::Path;
+use axum::extract::Query;
+use axum::extract::State;
+use axum::response::IntoResponse;
+use axum::Extension;
+use chrono::DateTime;
+use chrono::Utc;
+use derivative::Derivative;
+use editoast_authz::BuiltinRole;
+use editoast_derive::EditoastError;
+use editoast_models::DbConnectionPoolV2;
+use editoast_schemas::infra::Direction;
+use editoast_schemas::infra::TrackRange;
+use serde::de::Error as SerdeError;
+use serde::Deserialize;
+use serde::Serialize;
+use std::result::Result as StdResult;
+use thiserror::Error;
+use utoipa::IntoParams;
+use utoipa::ToSchema;
+use uuid::Uuid;
 
 crate::routes! {
     "/work_schedules" => {
         create,
         "/project_path" => project_path,
+        "/group" => {
+            create_group,
+            list_groups,
+            "/{id}" => {
+                delete_group,
+                get_group,
+                put_in_group,
+            },
+        },
     },
 }
 
 editoast_common::schemas! {
-    WorkScheduleCreateForm,
-    WorkScheduleCreateResponse,
+    WorkSchedule,
     WorkScheduleItemForm,
+    WorkScheduleType,
+}
+
+#[derive(IntoParams, Deserialize)]
+struct WorkScheduleGroupIdParam {
+    /// A work schedule group ID
+    id: i64,
 }
 
 #[derive(Debug, Error, EditoastError)]
@@ -47,6 +70,9 @@ enum WorkScheduleError {
     #[error("Name '{name}' already used")]
     #[editoast_error(status = 400)]
     NameAlreadyUsed { name: String },
+    #[error("Work schedule group '{id}' not found")]
+    #[editoast_error(status = 404)]
+    WorkScheduleGroupNotFound { id: i64 },
 }
 
 pub fn map_diesel_error(e: InternalError, name: impl AsRef<str>) -> InternalError {
@@ -136,49 +162,43 @@ struct WorkScheduleCreateResponse {
 #[utoipa::path(
     post, path = "",
     tag = "work_schedules",
-    request_body = WorkScheduleCreateForm,
+    request_body = inline(WorkScheduleCreateForm),
     responses(
-        (status = 201, body = WorkScheduleCreateResponse, description = "The id of the created work schedule group"),
+        (status = 201, body = inline(WorkScheduleCreateResponse), description = "The id of the created work schedule group"),
     )
 )]
 async fn create(
-    State(app_state): State<AppState>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
     Json(WorkScheduleCreateForm {
         work_schedule_group_name,
         work_schedules,
     }): Json<WorkScheduleCreateForm>,
 ) -> Result<Json<WorkScheduleCreateResponse>> {
-    let authorized = auth
-        .check_roles([BuiltinRole::WorkScheduleWrite].into())
-        .await
-        .map_err(AuthorizationError::AuthError)?;
-    if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
-    }
+    // Create the group (using the method for the create group endpoint)
+    let work_schedule_group = create_group(
+        State(db_pool.clone()),
+        Extension(auth),
+        Json(WorkScheduleGroupCreateForm {
+            work_schedule_group_name: Some(work_schedule_group_name),
+        }),
+    )
+    .await?;
 
-    let db_pool = app_state.db_pool_v2.clone();
     let conn = &mut db_pool.get().await?;
-
-    // Create the work_schedule_group
-    let work_schedule_group = WorkScheduleGroup::changeset()
-        .name(work_schedule_group_name.clone())
-        .creation_date(Utc::now())
-        .create(conn)
-        .await;
-    let work_schedule_group =
-        work_schedule_group.map_err(|e| map_diesel_error(e, work_schedule_group_name))?;
 
     // Create work schedules
     let work_schedules_changesets = work_schedules
         .into_iter()
-        .map(|work_schedule| work_schedule.into_work_schedule_changeset(work_schedule_group.id))
+        .map(|work_schedule| {
+            work_schedule.into_work_schedule_changeset(work_schedule_group.work_schedule_group_id)
+        })
         .collect::<Vec<_>>();
     let _work_schedules: Vec<_> =
         WorkSchedule::create_batch(conn, work_schedules_changesets).await?;
 
     Ok(Json(WorkScheduleCreateResponse {
-        work_schedule_group_id: work_schedule_group.id,
+        work_schedule_group_id: work_schedule_group.work_schedule_group_id,
     }))
 }
 
@@ -273,6 +293,227 @@ async fn project_path(
         })
         .collect();
     Ok(Json(projections))
+}
+
+#[derive(Serialize, Deserialize, ToSchema)]
+struct WorkScheduleGroupCreateForm {
+    work_schedule_group_name: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, ToSchema)]
+struct WorkScheduleGroupCreateResponse {
+    work_schedule_group_id: i64,
+}
+
+#[utoipa::path(
+    post, path = "",
+    tag = "work_schedules",
+    request_body = inline(WorkScheduleGroupCreateForm),
+    responses(
+        (status = 200, body = inline(WorkScheduleGroupCreateResponse), description = "The id of the created work schedule group"),
+    )
+)]
+async fn create_group(
+    State(db_pool): State<DbConnectionPoolV2>,
+    Extension(auth): AuthenticationExt,
+    Json(WorkScheduleGroupCreateForm {
+        work_schedule_group_name,
+    }): Json<WorkScheduleGroupCreateForm>,
+) -> Result<Json<WorkScheduleGroupCreateResponse>> {
+    let authorized = auth
+        .check_roles([BuiltinRole::WorkScheduleWrite].into())
+        .await
+        .map_err(AuthorizationError::AuthError)?;
+    if !authorized {
+        return Err(AuthorizationError::Unauthorized.into());
+    }
+
+    let conn = &mut db_pool.get().await?;
+    let group_name = work_schedule_group_name.unwrap_or(Uuid::new_v4().to_string());
+
+    // Create the work_schedule_group
+    let work_schedule_group = WorkScheduleGroup::changeset()
+        .name(group_name.clone())
+        .creation_date(Utc::now())
+        .create(conn)
+        .await;
+    let work_schedule_group = work_schedule_group.map_err(|e| map_diesel_error(e, group_name))?;
+    Ok(Json(WorkScheduleGroupCreateResponse {
+        work_schedule_group_id: work_schedule_group.id,
+    }))
+}
+
+#[utoipa::path(
+    delete, path = "",
+    tag = "work_schedules",
+    params(WorkScheduleGroupIdParam),
+    responses(
+        (status = 204, description = "The work schedule group has been deleted"),
+        (status = 404, description = "The work schedule group does not exist"),
+    )
+)]
+async fn delete_group(
+    State(db_pool): State<DbConnectionPoolV2>,
+    Extension(auth): AuthenticationExt,
+    Path(WorkScheduleGroupIdParam { id: group_id }): Path<WorkScheduleGroupIdParam>,
+) -> Result<impl IntoResponse> {
+    let authorized = auth
+        .check_roles([BuiltinRole::WorkScheduleWrite].into())
+        .await
+        .map_err(AuthorizationError::AuthError)?;
+    if !authorized {
+        return Err(AuthorizationError::Unauthorized.into());
+    }
+
+    let conn = &mut db_pool.get().await?;
+    WorkScheduleGroup::delete_static_or_fail(conn, group_id, || {
+        WorkScheduleError::WorkScheduleGroupNotFound { id: group_id }
+    })
+    .await?;
+
+    Ok(axum::http::StatusCode::NO_CONTENT)
+}
+
+#[utoipa::path(
+    get, path = "",
+    tag = "work_schedules",
+    responses(
+        (status = 201, body = Vec<i64>, description = "The existing work schedule group ids"),
+    )
+)]
+async fn list_groups(
+    State(db_pool): State<DbConnectionPoolV2>,
+    Extension(auth): AuthenticationExt,
+) -> Result<Json<Vec<i64>>> {
+    let authorized = auth
+        .check_roles([BuiltinRole::WorkScheduleRead].into())
+        .await
+        .map_err(AuthorizationError::AuthError)?;
+    if !authorized {
+        return Err(AuthorizationError::Unauthorized.into());
+    }
+
+    let conn = &mut db_pool.get().await?;
+
+    let selection_setting = SelectionSettings::new();
+    let work_schedule_group_ids = WorkScheduleGroup::list(conn, selection_setting)
+        .await?
+        .iter()
+        .map(|group| group.id)
+        .collect::<Vec<i64>>();
+
+    Ok(Json(work_schedule_group_ids))
+}
+
+#[utoipa::path(
+    put, path = "",
+    tag = "work_schedules",
+    request_body = Vec<WorkScheduleItemForm>,
+    params(WorkScheduleGroupIdParam),
+    responses(
+        (status = 200, description = "The work schedules have been created", body = Vec<WorkSchedule>),
+        (status = 404, description = "Work schedule group not found"),
+    )
+)]
+async fn put_in_group(
+    State(db_pool): State<DbConnectionPoolV2>,
+    Extension(auth): AuthenticationExt,
+    Path(WorkScheduleGroupIdParam { id: group_id }): Path<WorkScheduleGroupIdParam>,
+    Json(work_schedules): Json<Vec<WorkScheduleItemForm>>,
+) -> Result<Json<Vec<WorkSchedule>>> {
+    let authorized = auth
+        .check_roles([BuiltinRole::WorkScheduleWrite].into())
+        .await
+        .map_err(AuthorizationError::AuthError)?;
+    if !authorized {
+        return Err(AuthorizationError::Unauthorized.into());
+    }
+
+    let conn = &mut db_pool.get().await?;
+
+    conn.transaction(|conn| {
+        Box::pin(async move {
+            // Check that the group exists
+            WorkScheduleGroup::retrieve_or_fail(&mut conn.clone(), group_id, || {
+                WorkScheduleError::WorkScheduleGroupNotFound { id: group_id }
+            })
+            .await?;
+
+            // Create work schedules
+            let work_schedules_changesets = work_schedules
+                .into_iter()
+                .map(|work_schedule| work_schedule.into_work_schedule_changeset(group_id))
+                .collect::<Vec<_>>();
+            let work_schedules =
+                WorkSchedule::create_batch(&mut conn.clone(), work_schedules_changesets).await?;
+
+            Ok(Json(work_schedules))
+        })
+    })
+    .await
+}
+
+#[derive(Serialize, ToSchema)]
+#[cfg_attr(test, derive(Deserialize))]
+struct GroupContentResponse {
+    #[schema(value_type = Vec<WorkSchedule>)]
+    results: Vec<WorkSchedule>,
+    #[serde(flatten)]
+    stats: PaginationStats,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, utoipa::IntoParams)]
+#[into_params(parameter_in = Query)]
+pub struct WorkScheduleOrderingParam {
+    #[serde(default)]
+    pub ordering: Ordering,
+}
+
+#[utoipa::path(
+    get, path = "",
+    tag = "work_schedules",
+    params(PaginationQueryParam, WorkScheduleGroupIdParam, WorkScheduleOrderingParam),
+    responses(
+        (status = 200, description = "The work schedules in the group", body = inline(GroupContentResponse)),
+        (status = 404, description = "Work schedule group not found"),
+    )
+)]
+async fn get_group(
+    State(db_pool): State<DbConnectionPoolV2>,
+    Extension(auth): AuthenticationExt,
+    Path(WorkScheduleGroupIdParam { id: group_id }): Path<WorkScheduleGroupIdParam>,
+    Query(pagination_params): Query<PaginationQueryParam>,
+    Query(ordering_params): Query<WorkScheduleOrderingParam>,
+) -> Result<Json<GroupContentResponse>> {
+    let authorized = auth
+        .check_roles([BuiltinRole::WorkScheduleRead].into())
+        .await
+        .map_err(AuthorizationError::AuthError)?;
+    if !authorized {
+        return Err(AuthorizationError::Unauthorized.into());
+    }
+
+    let ordering = ordering_params.ordering;
+    let settings = pagination_params
+        .validate(100)?
+        .into_selection_settings()
+        .filter(move || WorkSchedule::WORK_SCHEDULE_GROUP_ID.eq(group_id))
+        .order_by(move || ordering.as_work_schedule_ordering());
+
+    let conn = &mut db_pool.get().await?;
+
+    // Check that the group exists
+    WorkScheduleGroup::retrieve_or_fail(conn, group_id, || {
+        WorkScheduleError::WorkScheduleGroupNotFound { id: group_id }
+    })
+    .await?;
+
+    let (work_schedules, stats) = WorkSchedule::list_paginated(conn, settings).await?;
+
+    Ok(Json(GroupContentResponse {
+        results: work_schedules,
+        stats,
+    }))
 }
 
 #[cfg(test)]
@@ -509,5 +750,49 @@ pub mod tests {
             .collect();
 
         assert_eq!(work_schedule_project_response, expected);
+    }
+
+    #[rstest]
+    async fn work_schedule_endpoints_workflow() {
+        let app = TestAppBuilder::default_app();
+
+        // Create a new group
+        let create_group_request = app.post("/work_schedules/group").json(&json!({}));
+        let group_creation_response = app
+            .fetch(create_group_request)
+            .assert_status(StatusCode::OK)
+            .json_into::<WorkScheduleGroupCreateResponse>();
+        let group_id = group_creation_response.work_schedule_group_id;
+        let work_schedule_url = format!("/work_schedules/group/{group_id}");
+
+        // Add a work schedule
+        let ref_obj_id = Uuid::new_v4().to_string();
+        let request = app.put(&work_schedule_url).json(&json!([{
+                "start_date_time": "2024-01-01T08:00:00Z",
+                "end_date_time": "2024-01-01T09:00:00Z",
+                "track_ranges": [],
+                "obj_id": ref_obj_id,
+                "work_schedule_type": "CATENARY"
+            }]
+        ));
+        app.fetch(request).assert_status(StatusCode::OK);
+
+        // Get the content of the group
+        let request = app.get(&work_schedule_url);
+        let response = app
+            .fetch(request)
+            .assert_status(StatusCode::OK)
+            .json_into::<GroupContentResponse>();
+        let work_schedules = response.results;
+        assert_eq!(1, work_schedules.len());
+        assert_eq!(ref_obj_id, work_schedules[0].obj_id);
+
+        // Delete it
+        let request = app.delete(&work_schedule_url);
+        app.fetch(request).assert_status(StatusCode::NO_CONTENT);
+
+        // Try to access it
+        let request = app.get(&work_schedule_url);
+        app.fetch(request).assert_status(StatusCode::NOT_FOUND);
     }
 }

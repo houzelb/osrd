@@ -911,11 +911,57 @@ const injectedRtkApi = api
         query: () => ({ url: `/version/core` }),
       }),
       postWorkSchedules: build.mutation<PostWorkSchedulesApiResponse, PostWorkSchedulesApiArg>({
+        query: (queryArg) => ({ url: `/work_schedules`, method: 'POST', body: queryArg.body }),
+        invalidatesTags: ['work_schedules'],
+      }),
+      getWorkSchedulesGroup: build.query<
+        GetWorkSchedulesGroupApiResponse,
+        GetWorkSchedulesGroupApiArg
+      >({
+        query: () => ({ url: `/work_schedules/group` }),
+        providesTags: ['work_schedules'],
+      }),
+      postWorkSchedulesGroup: build.mutation<
+        PostWorkSchedulesGroupApiResponse,
+        PostWorkSchedulesGroupApiArg
+      >({
         query: (queryArg) => ({
-          url: `/work_schedules`,
+          url: `/work_schedules/group`,
           method: 'POST',
-          body: queryArg.workScheduleCreateForm,
+          body: queryArg.body,
         }),
+        invalidatesTags: ['work_schedules'],
+      }),
+      getWorkSchedulesGroupById: build.query<
+        GetWorkSchedulesGroupByIdApiResponse,
+        GetWorkSchedulesGroupByIdApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/work_schedules/group/${queryArg.id}`,
+          params: {
+            page: queryArg.page,
+            page_size: queryArg.pageSize,
+            ordering: queryArg.ordering,
+          },
+        }),
+        providesTags: ['work_schedules'],
+      }),
+      putWorkSchedulesGroupById: build.mutation<
+        PutWorkSchedulesGroupByIdApiResponse,
+        PutWorkSchedulesGroupByIdApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/work_schedules/group/${queryArg.id}`,
+          method: 'PUT',
+          body: queryArg.body,
+        }),
+        invalidatesTags: ['work_schedules'],
+      }),
+      deleteWorkSchedulesGroupById: build.mutation<
+        DeleteWorkSchedulesGroupByIdApiResponse,
+        DeleteWorkSchedulesGroupByIdApiArg
+      >({
+        query: (queryArg) => ({ url: `/work_schedules/group/${queryArg.id}`, method: 'DELETE' }),
         invalidatesTags: ['work_schedules'],
       }),
       postWorkSchedulesProjectPath: build.query<
@@ -1686,9 +1732,49 @@ export type GetVersionApiArg = void;
 export type GetVersionCoreApiResponse = /** status 200 Return the core service version */ Version;
 export type GetVersionCoreApiArg = void;
 export type PostWorkSchedulesApiResponse =
-  /** status 201 The id of the created work schedule group */ WorkScheduleCreateResponse;
+  /** status 201 The id of the created work schedule group */ {
+    work_schedule_group_id: number;
+  };
 export type PostWorkSchedulesApiArg = {
-  workScheduleCreateForm: WorkScheduleCreateForm;
+  body: {
+    work_schedule_group_name: string;
+    work_schedules: WorkScheduleItemForm[];
+  };
+};
+export type GetWorkSchedulesGroupApiResponse =
+  /** status 201 The existing work schedule group ids */ number[];
+export type GetWorkSchedulesGroupApiArg = void;
+export type PostWorkSchedulesGroupApiResponse =
+  /** status 200 The id of the created work schedule group */ {
+    work_schedule_group_id: number;
+  };
+export type PostWorkSchedulesGroupApiArg = {
+  body: {
+    work_schedule_group_name?: string | null;
+  };
+};
+export type GetWorkSchedulesGroupByIdApiResponse =
+  /** status 200 The work schedules in the group */ PaginationStats & {
+    results: WorkSchedule[];
+  };
+export type GetWorkSchedulesGroupByIdApiArg = {
+  page?: number;
+  pageSize?: number | null;
+  /** A work schedule group ID */
+  id: number;
+  ordering?: Ordering;
+};
+export type PutWorkSchedulesGroupByIdApiResponse =
+  /** status 200 The work schedules have been created */ WorkSchedule[];
+export type PutWorkSchedulesGroupByIdApiArg = {
+  /** A work schedule group ID */
+  id: number;
+  body: WorkScheduleItemForm[];
+};
+export type DeleteWorkSchedulesGroupByIdApiResponse = unknown;
+export type DeleteWorkSchedulesGroupByIdApiArg = {
+  /** A work schedule group ID */
+  id: number;
 };
 export type PostWorkSchedulesProjectPathApiResponse =
   /** status 201 Returns a list of work schedules whose track ranges intersect the given path */ {
@@ -3389,9 +3475,6 @@ export type TrainScheduleForm = TrainScheduleBase & {
 export type Version = {
   git_describe: string | null;
 };
-export type WorkScheduleCreateResponse = {
-  work_schedule_group_id: number;
-};
 export type WorkScheduleItemForm = {
   end_date_time: string;
   obj_id: string;
@@ -3399,9 +3482,15 @@ export type WorkScheduleItemForm = {
   track_ranges: TrackRange[];
   work_schedule_type: 'CATENARY' | 'TRACK';
 };
-export type WorkScheduleCreateForm = {
-  work_schedule_group_name: string;
-  work_schedules: WorkScheduleItemForm[];
+export type WorkScheduleType = 'CATENARY' | 'TRACK';
+export type WorkSchedule = {
+  end_date_time: string;
+  id: number;
+  obj_id: string;
+  start_date_time: string;
+  track_ranges: TrackRange[];
+  work_schedule_group_id: number;
+  work_schedule_type: WorkScheduleType;
 };
 export type Intersection = {
   /** Distance of the end of the intersection relative to the beginning of the path */
