@@ -3,6 +3,7 @@ import 'dayjs/locale/fr';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import i18next from 'i18next';
 
 import type { ScheduleConstraint } from 'applications/stdcm/types';
 import type { IsoDateTimeString, IsoDurationString } from 'common/types';
@@ -254,3 +255,24 @@ export const formatLocaleDate = (date: Date) => date.toLocaleString().substring(
 
 export const isEqualDate = (searchDate: Date, startDate: Date) =>
   formatLocaleDate(searchDate) === formatLocaleDate(startDate);
+
+/**
+ * @param start timestamp or Date object
+ * @param end timestamp or Date object
+ * @returns string "Xj Yh Zmin"
+ */
+export const formatTimeDifference = (_start: number | Date, _end: number | Date): string => {
+  const start = dayjs(_start);
+  const end = dayjs(_end);
+
+  const diffInDays = end.diff(start, 'day');
+  const diffInHours = end.diff(start, 'hour') % 24;
+  const diffInMinutes = end.diff(start, 'minute') % 60;
+
+  const parts = [];
+  if (diffInDays > 0) parts.push(`${diffInDays}${i18next.t('common.units.day')}`);
+  if (diffInHours > 0) parts.push(`${diffInHours}${i18next.t('common.units.hour')}`);
+  if (diffInMinutes > 0) parts.push(`${diffInMinutes}${i18next.t('common.units.minute')}`);
+
+  return parts.join(' ');
+};

@@ -51,12 +51,12 @@
         overflow-x: hidden;
 
         .simulation-item {
-          width: 125px;
+          width: 160px;
           display: inline-block;
-          margin: 9px 64px 0 0;
+          margin-right: 32px;
           cursor: pointer;
 
-          .creation-date {
+          .simulation-metadata {
             color: rgba(182, 178, 175, 1);
             font-weight: 400;
             font-size: 14px;
@@ -65,6 +65,16 @@
             text-align: left;
             padding-top: 4px;
             padding-bottom: 11px;
+            display: flex;
+            flex-direction: column;
+
+            .creation-date {
+              margin-bottom: 4px;
+            }
+
+            .total-length-trip-duration {
+              margin-right: 10px;
+            }
           }
 
           .simulation-name {
@@ -75,14 +85,16 @@
             white-space: nowrap;
 
             .check-circle {
+              display: flex;
+              align-items: center;
+              margin-left: 8px;
               color: rgb(60, 202, 128);
-              padding-left: 8px;
             }
           }
 
           &.selected {
-            .creation-date {
-              color: rgb(121, 118, 113);
+            .simulation-metadata {
+              color: var(--grey50);
             }
 
             .simulation-name {
@@ -97,8 +109,9 @@
           }
 
           &.retained {
-            .simulation-name {
-              color: rgb(11, 114, 60);
+            .simulation-name,
+            .simulation-metadata {
+              color: var(--success60);
             }
           }
 

@@ -50,6 +50,12 @@
         "title": "Echec de l'enregistrement des modifications",
         "text": "Vos modifications n'ont pas été publiées"
       }
+    },
+    "units": {
+      "day": "j",
+      "hour": "h",
+      "km": "km",
+      "minute": "min"
     }
   },
   "Editor": {
