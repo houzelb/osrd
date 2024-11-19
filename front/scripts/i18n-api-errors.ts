@@ -1,6 +1,7 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import i18next from 'i18next';
 import { noop } from 'lodash';
+import type { OpenAPI } from 'openapi-types';
 
 // relative the project's root
 const openapi_path = '../editoast/openapi.yaml';
@@ -65,19 +66,21 @@ async function checkI18N(error: any): Promise<string[]> {
 
 async function run() {
   try {
-    const api = await SwaggerParser.validate(openapi_path);
+    const api: OpenAPI.Document = await SwaggerParser.validate(openapi_path);
+
+    if (!('openapi' in api)) throw new Error('Expected an OpenAPI schema');
 
     // Do some checks on the generic error
-    if (!api.components.schemas.EditoastError)
-      throw new Error(`"EditoastError" can't be found in "components > schemas"`);
-    if (!api.components.schemas.EditoastError.oneOf)
+    const editoastError = api?.components?.schemas?.EditoastError;
+    if (!editoastError) throw new Error(`"EditoastError" can't be found in "components > schemas"`);
+    if (!('oneOf' in editoastError) || !editoastError.oneOf)
       throw new Error(`Expected "EditoastError" to be a "oneOf" object`);
 
     // Check i18n for all errors
     const errors = (
       await Promise.all(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        api.components.schemas.EditoastError.oneOf.map((error: any) => checkI18N(error))
+        editoastError.oneOf.map((error: any) => checkI18N(error))
       )
     ).flat();
 
