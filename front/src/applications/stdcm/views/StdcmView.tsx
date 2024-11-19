@@ -47,8 +47,7 @@ const StdcmView = () => {
     useOsrdConfActions() as StdcmConfSliceActions;
 
   const selectedSimulation = simulationsList[selectedSimulationIndex];
-  const showResults =
-    !isPending && (showStatusBanner || simulationsList.length > 0 || hasConflicts);
+  const showResults = showStatusBanner || simulationsList.length > 0 || hasConflicts;
 
   const handleRetainSimulation = () => setRetainedSimulationIndex(selectedSimulationIndex);
 
