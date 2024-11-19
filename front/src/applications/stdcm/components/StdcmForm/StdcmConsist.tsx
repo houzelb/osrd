@@ -160,6 +160,7 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           min={0}
           value={totalMass ?? ''}
           onChange={onTotalMassChange}
+          disabled={disabled}
         />
         <Input
           id="length"
@@ -169,6 +170,7 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           min={0}
           value={totalLength ?? ''}
           onChange={onTotalLengthChange}
+          disabled={disabled}
         />
       </div>
       <div className="stdcm-consist__properties">
@@ -186,6 +188,7 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           min={0}
           value={maxSpeed ?? ''}
           onChange={onMaxSpeedChange}
+          disabled={disabled}
         />
       </div>
     </StdcmCard>
