@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next';
 
 import useHorizontalScroll from 'applications/stdcm/hooks/useHorizontalScroll';
 import type { StdcmSimulation } from 'applications/stdcm/types';
-import { hasConflicts } from 'applications/stdcm/utils/simulationOutputUtils';
-import { formatDateToString } from 'utils/date';
+import { hasConflicts, hasResults } from 'applications/stdcm/utils/simulationOutputUtils';
+import { formatDateToString, formatTimeDifference } from 'utils/date';
+import { mmToKm } from 'utils/physics';
 
 export const SIMULATION_ITEM_CLASSNAME = 'simulation-item';
 const ITEM_TO_SHOW_COUNT_ON_SCROLL = 3;
@@ -27,7 +28,7 @@ const StdcmSimulationNavigator = ({
   isCalculationFailed,
   onSelectSimulation,
 }: StdcmSimulationNavigatorProps) => {
-  const { t } = useTranslation('stdcm', { keyPrefix: 'simulation.results' });
+  const { t } = useTranslation();
 
   const { scrollableRef, showLeftBtn, showRightBtn, scrollLeft, scrollRight } = useHorizontalScroll(
     SIMULATION_ITEM_CLASSNAME,
@@ -53,40 +54,64 @@ const StdcmSimulationNavigator = ({
           </div>
         )}
         <div className="simulation-list" ref={scrollableRef}>
-          {simulationsList?.map(({ id, creationDate, outputs }, index) => (
-            <div
-              role="button"
-              tabIndex={0}
-              key={index}
-              className={cx(SIMULATION_ITEM_CLASSNAME, {
-                retained: retainedSimulationIndex === index,
-                selected: selectedSimulationIndex === index,
-                anyRetained: retainedSimulationIndex !== -1,
-              })}
-              onClick={() => onSelectSimulation(index)}
-            >
-              <div className="simulation-name">
-                <div>
-                  {outputs && !hasConflicts(outputs)
-                    ? t('simulationName.withOutputs', { id })
-                    : t('simulationName.withoutOutputs')}
-                </div>
-                {retainedSimulationIndex === index && (
-                  <span className="check-circle">
-                    <CheckCircle variant="fill" />
+          {simulationsList?.map(({ id, creationDate, outputs }, index) => {
+            let formatedTotalLength = '';
+            let formatedTripDuration = '';
+
+            if (hasResults(outputs)) {
+              const { results } = outputs;
+              const lastPointTime = results.simulation.final_output.times.at(-1)!;
+              const departureTimeInMs = new Date(results.departure_time).getTime();
+
+              formatedTotalLength = `${Math.round(mmToKm(results.path.length))} ${t('common.units.km', { ns: 'translation' })} `;
+              formatedTripDuration = formatTimeDifference(
+                departureTimeInMs,
+                lastPointTime + departureTimeInMs
+              );
+            }
+
+            return (
+              <div
+                role="button"
+                tabIndex={0}
+                key={index}
+                className={cx(SIMULATION_ITEM_CLASSNAME, {
+                  retained: retainedSimulationIndex === index,
+                  selected: selectedSimulationIndex === index,
+                  anyRetained: retainedSimulationIndex !== -1,
+                })}
+                onClick={() => onSelectSimulation(index)}
+              >
+                <div className="simulation-name">
+                  <span>
+                    {outputs && !hasConflicts(outputs)
+                      ? t('simulation.results.simulationName.withOutputs', {
+                          id,
+                          ns: 'stdcm',
+                        })
+                      : t('simulation.results.simulationName.withoutOutputs', {
+                          ns: 'stdcm',
+                        })}
                   </span>
+                  {retainedSimulationIndex === index && (
+                    <CheckCircle className="check-circle" variant="fill" />
+                  )}
+                </div>
+                <div className="simulation-metadata" key={id}>
+                  <span className="creation-date">
+                    {t('simulation.results.formatCreationDate', {
+                      ...formatDateToString(creationDate, true),
+                      ns: 'stdcm',
+                    })}
+                  </span>
+                  <span className="total-length-trip-duration">{`${formatedTotalLength}— ${formatedTripDuration}`}</span>
+                </div>
+                {selectedSimulationIndex === index && (
+                  <div className="selected-simulation-indicator" />
                 )}
               </div>
-              <div className="creation-date">
-                <span key={index}>
-                  {t('formatCreationDate', formatDateToString(creationDate, true))}
-                </span>
-              </div>
-              {selectedSimulationIndex === index && (
-                <div className="selected-simulation-indicator" />
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
         {showRightBtn && (
           <div
