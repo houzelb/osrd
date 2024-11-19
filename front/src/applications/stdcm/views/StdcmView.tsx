@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 import { isEqual, isNil } from 'lodash';
 
@@ -12,7 +12,6 @@ import { replaceElementAtIndex } from 'utils/array';
 import StdcmEmptyConfigError from '../components/StdcmEmptyConfigError';
 import StdcmConfig from '../components/StdcmForm/StdcmConfig';
 import StdcmHeader from '../components/StdcmHeader';
-import StdcmLoader from '../components/StdcmLoader';
 import StdcmResults from '../components/StdcmResults';
 import StdcmStatusBanner from '../components/StdcmStatusBanner';
 import useStdcmEnvironment, { NO_CONFIG_FOUND_MSG } from '../hooks/useStdcmEnv';
@@ -50,7 +49,6 @@ const StdcmView = () => {
   const selectedSimulation = simulationsList[selectedSimulationIndex];
   const showResults =
     !isPending && (showStatusBanner || simulationsList.length > 0 || hasConflicts);
-  const loaderRef = useRef<HTMLDivElement>(null);
 
   const handleRetainSimulation = () => setRetainedSimulationIndex(selectedSimulationIndex);
 
@@ -168,12 +166,6 @@ const StdcmView = () => {
     }
   }, [simulationsList]);
 
-  useEffect(() => {
-    if (isPending) {
-      loaderRef?.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [isPending]);
-
   // If we've got an error during the loading of the stdcm env which is not the "no config error" message,
   // we let the error boundary manage it
   if (error && error.message !== NO_CONFIG_FOUND_MSG) throw error;
@@ -192,9 +184,9 @@ const StdcmView = () => {
             showBtnToLaunchSimulation={showBtnToLaunchSimulation}
             retainedSimulationIndex={retainedSimulationIndex}
             launchStdcmRequest={launchStdcmRequest}
+            cancelStdcmRequest={cancelStdcmRequest}
           />
 
-          {isPending && <StdcmLoader cancelStdcmRequest={cancelStdcmRequest} ref={loaderRef} />}
           {showStatusBanner && <StdcmStatusBanner isFailed={isCalculationFailed} />}
 
           {showResults && (

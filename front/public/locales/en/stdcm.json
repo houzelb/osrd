@@ -26,7 +26,6 @@
   "indicateAnteriorPath": "Indicate anterior path",
   "indicatePosteriorPath": "Indicate posterior path",
   "leaveAt": "Leave at {{ time }}",
-  "loaderImageLegend": "Morning view of the locomotive shed at Le Bourget depot",
   "noConfigurationFound": {
     "title": "A configuration problem prevents you from performing a search",
     "text": "Please contact the maintenance team so they can get you back on track."
@@ -35,9 +34,9 @@
   "notificationTitle": "Phase 1: from D-7 to D-1 5pm, on the Perrigny-Miramas axis.",
   "pleaseWait": "Please wait…",
   "simulation": {
-    "averageRequestTime": "For your request, the time required is generally 90 seconds.",
     "calculatingSimulation": "Calculation in progress...",
     "getSimulation": "Get the simulation",
+    "infoMessage": "This simulation doesn't ensure the availability of the path.",
     "modifySearchCriteria": "You can modify your search criteria to find a solution.",
     "pendingSimulation": "Simulation in progress",
     "results": {
@@ -67,8 +66,8 @@
       "startNewQuery": "Start a new query",
       "status": {
         "completed": "Calculation completed",
-        "errorMessage": "We are sorry that we could not process your request. The STDCM team has been notified and will be aware of the situation soon.",
-        "failed": "Calculation failed"
+        "errorMessage": "We are sorry that we could not process your request. The LMR team has been notified and will be aware of the situation as soon as possible.",
+        "failed": "A technical problem occurred"
       },
       "upgrade": {
         "arrivalIncompatible": "Arrival time incompatible",
@@ -79,7 +78,7 @@
         "unqualifiedDriver": "Unqualified driver"
       }
     },
-    "stopCalculation": "Stop calculation"
+    "stopCalculation": "Stop"
   },
   "spaceTimeGraphic": "Space-Time graph",
   "speedSpaceChart": "Speed Space Chart",

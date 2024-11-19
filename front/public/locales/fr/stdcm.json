@@ -26,7 +26,6 @@
   "indicateAnteriorPath": "Indiquer le sillon antérieur",
   "indicatePosteriorPath": "Indiquer le sillon postérieur",
   "leaveAt": "Partir à {{ time }}",
-  "loaderImageLegend": "Vue matinale du relais de locomotives du dépôt du Bourget",
   "noConfigurationFound": {
     "title": "Un problème de configuration vous empêche de faire une recherche",
     "text": "Veuillez contacter l'équipe de maintenance pour qu'elle puisse vous remettre sur les rails."
@@ -35,9 +34,9 @@
   "notificationTitle": "Phase 1 : de J-7 à J-1 17h, sur l’axe Perrigny—Miramas.",
   "pleaseWait": "Veuillez patientez…",
   "simulation": {
-    "averageRequestTime": "Pour votre demande, le temps nécessaire est généralement de 90 secondes.",
     "calculatingSimulation": "Calcul en cours...",
     "getSimulation": "Obtenir la simulation",
+    "infoMessage": "Cette simulation n'offre pas la garantie de disponibilité du sillon.",
     "modifySearchCriteria": "Vous pouvez modifier vos critères de recherche pour trouver une solution.",
     "pendingSimulation": "simulation en cours",
     "results": {
@@ -67,8 +66,8 @@
       "startNewQuery": "Démarrez une nouvelle requête",
       "status": {
         "completed": "Calcul terminé",
-        "errorMessage": "Nous sommes désolé de ne pas avoir pu traiter votre demande. L’équipe STDCM a été notifiée et prendra connaissance de la situation prochainement.",
-        "failed": "Le calcul n'a pas abouti"
+        "errorMessage": "Nous sommes désolés de ne pas avoir pu traiter votre demande. L’équipe LMR a été notifiée et prendra connaissance de la situation dès que possible.",
+        "failed": "Un problème technique est survenu"
       },
       "upgrade": {
         "arrivalIncompatible": "Heure arrivée incompatible",
@@ -79,7 +78,7 @@
         "unqualifiedDriver": "Conducteur non habilité"
       }
     },
-    "stopCalculation": "Arrêter le calcul"
+    "stopCalculation": "Arrêter"
   },
   "spaceTimeGraphic": "Graphique Espace-Temps",
   "speedSpaceChart": "Graphique Espace Vitesse",

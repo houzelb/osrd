@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '@osrd-project/ui-core';
 import { ArrowDown, ArrowUp } from '@osrd-project/ui-icons';
@@ -24,6 +24,7 @@ import StdcmSimulationParams from '../StdcmSimulationParams';
 import StdcmVias from './StdcmVias';
 import { ArrivalTimeTypes, StdcmConfigErrorTypes } from '../../types';
 import checkStdcmConfigErrors from '../../utils/checkStdcmConfigErrors';
+import StdcmLoader from '../StdcmLoader';
 import StdcmWarningBox from '../StdcmWarningBox';
 
 /**
@@ -36,6 +37,7 @@ type StdcmConfigProps = {
   launchStdcmRequest: () => Promise<void>;
   retainedSimulationIndex: number;
   showBtnToLaunchSimulation: boolean;
+  cancelStdcmRequest: () => void;
 };
 
 const StdcmConfig = ({
@@ -44,8 +46,10 @@ const StdcmConfig = ({
   launchStdcmRequest,
   retainedSimulationIndex,
   showBtnToLaunchSimulation,
+  cancelStdcmRequest,
 }: StdcmConfigProps) => {
   const { t } = useTranslation('stdcm');
+  const launchButtonRef = useRef<HTMLDivElement>(null);
 
   const { infra } = useInfraStatus();
   const dispatch = useAppDispatch();
@@ -72,6 +76,7 @@ const StdcmConfig = ({
   const scenarioID = useSelector(getScenarioID);
 
   const pathfinding = useStaticPathfinding(infra);
+  const formRef = useRef<HTMLDivElement>(null);
 
   const [formErrors, setFormErrors] = useState<StdcmConfigErrors>();
 
@@ -156,7 +161,7 @@ const StdcmConfig = ({
               <StdcmConsist disabled={disabled} />
             </div>
             <div className="stdcm__separator" />
-            <div className="stdcm-simulation-itinerary">
+            <div ref={formRef} className="stdcm-simulation-itinerary">
               <StdcmOrigin disabled={disabled} />
               <StdcmVias disabled={disabled} />
               <StdcmDestination disabled={disabled} />
@@ -168,18 +173,22 @@ const StdcmConfig = ({
                 className="posterior-linked-path"
                 linkedOp={{ extremityType: 'origin', id: destination.id }}
               />
+
               <div
                 className={cx('stdcm-launch-request', {
                   'wizz-effect': pathfinding?.status !== 'success' || formErrors,
                 })}
+                ref={launchButtonRef}
               >
-                {showBtnToLaunchSimulation && (
-                  <Button
-                    data-testid="launch-simulation-button"
-                    label={t('simulation.getSimulation')}
-                    onClick={startSimulation}
-                  />
-                )}
+                <Button
+                  data-testid="launch-simulation-button"
+                  className={cx({
+                    'fade-out': !showBtnToLaunchSimulation,
+                  })}
+                  label={t('simulation.getSimulation')}
+                  onClick={startSimulation}
+                  isDisabled={disabled || !showBtnToLaunchSimulation}
+                />
                 {formErrors && (
                   <StdcmWarningBox
                     errorInfos={formErrors}
@@ -188,6 +197,14 @@ const StdcmConfig = ({
                   />
                 )}
               </div>
+
+              {isPending && (
+                <StdcmLoader
+                  cancelStdcmRequest={cancelStdcmRequest}
+                  launchButtonRef={launchButtonRef}
+                  formRef={formRef}
+                />
+              )}
             </div>
           </div>
         </div>

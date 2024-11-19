@@ -1,42 +1,105 @@
-import { forwardRef } from 'react';
+import { useEffect, useRef, useState, type RefObject } from 'react';
 
 import { Button } from '@osrd-project/ui-core';
+import cx from 'classnames';
 import { useTranslation } from 'react-i18next';
 
-import stdcmLoaderImg from 'assets/pictures/views/stdcm_loader.jpg';
+import type { LoaderStatus } from '../types';
+
+const LOADER_HEIGHT = 176;
+const LOADER_OFFSET = 32;
 
 type StdcmLoaderProps = {
   cancelStdcmRequest: () => void;
+  launchButtonRef: RefObject<HTMLDivElement>;
+  formRef: RefObject<HTMLDivElement>;
 };
 
-const StdcmLoader = forwardRef(
-  ({ cancelStdcmRequest }: StdcmLoaderProps, ref: React.Ref<HTMLDivElement>) => {
-    const { t } = useTranslation('stdcm');
-    return (
-      <div className="stdcm-loader-background">
-        <div
-          ref={ref}
-          className="stdcm-loader d-flex flex-column justify-content-center align-items-center"
-        >
-          <div className="stdcm-loader__wrapper">
-            <h1>{t('simulation.calculatingSimulation')}</h1>
-            <p>{t('simulation.averageRequestTime')}</p>
-          </div>
-          <div className="stdcm-loader__cancel-btn">
-            <Button
-              data-testid="cancel-simulation-button"
-              variant="Cancel"
-              label={t('simulation.stopCalculation')}
-              size="small"
-              onClick={cancelStdcmRequest}
-            />
-          </div>
-          <img src={stdcmLoaderImg} alt={t('simulation.pendingSimulation')} />
-          <p className="stdcm-loader__img-signature">{t('loaderImageLegend')}</p>
+const StdcmLoader = ({ cancelStdcmRequest, launchButtonRef, formRef }: StdcmLoaderProps) => {
+  const { t } = useTranslation('stdcm');
+  const loaderRef = useRef<HTMLDivElement>(null);
+
+  const { top } = launchButtonRef.current!.getBoundingClientRect();
+  const windowHeight = window.innerHeight;
+
+  const [loaderStatus, setLoaderStatus] = useState<LoaderStatus>({
+    status: windowHeight - top - 32 > LOADER_HEIGHT ? 'loader-absolute' : 'loader-fixed-bottom',
+    firstLaunch: true,
+  });
+
+  useEffect(() => {
+    // Depending on the scroll, change the position of the loader between fixed, sticky or absolute
+    const handleScroll = () => {
+      if (!loaderRef.current || !launchButtonRef.current || !formRef.current) return;
+
+      const { scrollY, innerHeight } = window;
+
+      const isLoaderFitting =
+        innerHeight - launchButtonRef.current.getBoundingClientRect().top >
+        LOADER_HEIGHT + LOADER_OFFSET;
+
+      // Loader doesn't fit between the bottom of the form and bottom of the viewport
+      if (!isLoaderFitting) {
+        setLoaderStatus({
+          firstLaunch: false,
+          status: 'loader-fixed-bottom',
+        });
+        return;
+      }
+
+      const currentFormHeight = formRef.current.clientHeight;
+      const topFormPosition = formRef.current.getBoundingClientRect().top;
+      const launchButtonHeight = launchButtonRef.current.clientHeight;
+      const shouldLoaderStickTop =
+        scrollY >
+        currentFormHeight + scrollY + topFormPosition - launchButtonHeight - LOADER_OFFSET;
+
+      // Loader reaches the top of the screen minus its top offset
+      if (shouldLoaderStickTop) {
+        setLoaderStatus({
+          firstLaunch: false,
+          status: 'loader-fixed-top',
+        });
+        return;
+      }
+
+      setLoaderStatus({
+        firstLaunch: false,
+        status: 'loader-absolute',
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={loaderRef}
+      className={cx('stdcm-loader', `${loaderStatus.status}`, {
+        'with-fade-in-animation':
+          loaderStatus.status === 'loader-absolute' && loaderStatus.firstLaunch,
+        'with-slide-animation':
+          loaderStatus.status === 'loader-fixed-bottom' && loaderStatus.firstLaunch,
+      })}
+    >
+      <div className="stdcm-loader__wrapper">
+        <h2>{t('simulation.calculatingSimulation')}</h2>
+        <div className="stdcm-loader__cancel-btn">
+          <Button
+            data-testid="cancel-simulation-button"
+            variant="Cancel"
+            label={t('simulation.stopCalculation')}
+            size="small"
+            onClick={cancelStdcmRequest}
+          />
         </div>
       </div>
-    );
-  }
-);
+      <p className="stdcm-loader__info-message">{t('simulation.infoMessage')}</p>
+    </div>
+  );
+};
 
 export default StdcmLoader;

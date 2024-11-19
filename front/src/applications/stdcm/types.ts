@@ -200,3 +200,8 @@ export type StdcmLinkedPathResult = {
 };
 
 export type ExtremityPathStepType = 'origin' | 'destination';
+
+export type LoaderStatus = {
+  status: 'loader-fixed-bottom' | 'loader-fixed-top' | 'loader-absolute';
+  firstLaunch: boolean;
+};
