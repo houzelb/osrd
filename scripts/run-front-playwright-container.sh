@@ -11,7 +11,7 @@ if ! command -v jq &> /dev/null; then
   exit 1
 fi
 cd front
-VERSION=$(yarn list --pattern playwright --json | jq -r '.data.trees[].name | split("@")[-1]' | sort -u)
+VERSION=$(npm list --package-lock-only --pattern playwright --json | jq -r '.dependencies["@playwright/test"].version' | sort -u)
 if [ "$(echo "$VERSION" | wc -l)" -ne 1 ]; then
   echo "Error: Zero or multiple playwright versions found: $VERSION" >&2
   exit 1
@@ -40,4 +40,4 @@ docker run -it --rm \
     -v "$PWD/front/playwright-report:/app/front/playwright-report" \
     -v "$PWD/front/test-results:/app/front/test-results" \
     -u "$(stat -c %u:%g .)" \
-    osrd-playwright:latest yarn playwright test "${args[@]}"
+    osrd-playwright:latest npx playwright test "${args[@]}"
