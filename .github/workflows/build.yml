@@ -484,7 +484,7 @@ jobs:
           -v $PWD/gateway:/gateway
           -v $PWD/front/src/common/api:/app/src/common/api
           ${{ fromJSON(needs.build.outputs.stable_tags).front-build }}
-          yarn generate-types
+          npm run generate-types
 
       - name: Check for unexpected changes
         run: |
@@ -704,7 +704,7 @@ jobs:
         run: |
           docker run --name=front-i18n-api-error --net=host -v $PWD/output/openapi.yaml:/editoast/openapi.yaml \
               ${{ fromJSON(needs.build.outputs.stable_tags).front-build }} \
-              yarn i18n-api-errors
+              npm run i18n-api-errors
           exit $(docker wait front-i18n-api-error)
 
   check_gateway:
@@ -859,7 +859,7 @@ jobs:
         run: |
           docker run --name=front-format --net=host \
             ${{ fromJSON(needs.build.outputs.stable_tags).front-build }} \
-            yarn prettier . --check
+            npx prettier . --check
 
           exit $(docker wait front-format)
 
@@ -867,14 +867,14 @@ jobs:
         run: |
           docker run --name=front-i18n-checker --net=host \
             ${{ fromJSON(needs.build.outputs.stable_tags).front-build }} \
-            yarn i18n-checker
+            npm run i18n-checker
           exit $(docker wait front-i18n-checker)
 
       - name: Execute tests within container
         run: |
           docker run --name=front-test --net=host -v $PWD/output:/app/tests/unit \
             ${{ fromJSON(needs.build.outputs.stable_tags).front-build }} \
-            yarn test-coverage
+            npm run test-coverage
 
           exit $(docker wait front-test)
 
@@ -1058,7 +1058,7 @@ jobs:
       - name: Detect Playwright version
         id: detect_playwright_version
         run: |
-          PLAYWRIGHT_VERSION=$(cd front && yarn list --pattern playwright --json | jq -r '.data.trees[].name | split("@")[-1]' | sort -u)
+          PLAYWRIGHT_VERSION=$(cd front && npm list --package-lock-only --pattern playwright --json | jq -r '.dependencies["@playwright/test"].version' | sort -u)
           if [ "$(echo "$PLAYWRIGHT_VERSION" | wc -l)" -ne 1 ]; then
               echo "Error: Zero or multiple playwright versions found: $PLAYWRIGHT_VERSION" >&2
               exit 1
@@ -1098,7 +1098,7 @@ jobs:
             -e CI=true \
             --ipc=host \
             -v "$PWD/front/test-results:/app/front/test-results" \
-            osrd-playwright:latest yarn playwright test
+            osrd-playwright:latest npx playwright test
           exit $(docker wait playwright-test)
 
       - uses: actions/upload-artifact@v4
