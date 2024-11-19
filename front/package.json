@@ -67,6 +67,7 @@
     "json-schema": "^0.4.0",
     "lodash": "^4.17.21",
     "maplibre-gl": "^4.0.0",
+    "openapi-types": "^12.1.3",
     "openapi-typescript-codegen": "^0.27.0",
     "party-js": "^2.2.0",
     "prop-types": "^15.8.1",
