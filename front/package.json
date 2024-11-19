@@ -160,7 +160,7 @@
     "react-error-overlay": "6.0.9",
     "@nivo/line": "^0.80.0",
     "@nivo/core": "^0.80.0",
-    "oazapfts": "anisometropie/oazapfts#master"
+    "oazapfts": "osrd-project/oazapfts#master"
   },
   "scripts": {
     "compile": "tsc -b",
