@@ -89,9 +89,11 @@ fn init_tracing(mode: EditoastMode, telemetry_config: &client::TelemetryConfig) 
     let telemetry_layer = match telemetry_config.telemetry_kind {
         client::TelemetryKind::None => None,
         client::TelemetryKind::Opentelemetry => {
-            let exporter = opentelemetry_otlp::new_exporter()
-                .tonic()
-                .with_endpoint(telemetry_config.telemetry_endpoint.as_str());
+            let exporter = opentelemetry_otlp::SpanExporter::builder()
+                .with_tonic()
+                .with_endpoint(telemetry_config.telemetry_endpoint.as_str())
+                .build()
+                .expect("failed to build a span exporter");
             let resource = Resource::new(vec![KeyValue::new(
                 opentelemetry_semantic_conventions::resource::SERVICE_NAME,
                 telemetry_config.service_name.clone(),
@@ -105,12 +107,10 @@ fn init_tracing(mode: EditoastMode, telemetry_config: &client::TelemetryConfig) 
                 ],
             ));
             let trace_config = opentelemetry_sdk::trace::Config::default().with_resource(resource);
-            let otlp_tracer = opentelemetry_otlp::new_pipeline()
-                .tracing()
-                .with_exporter(exporter)
-                .with_trace_config(trace_config)
-                .install_batch(opentelemetry_sdk::runtime::Tokio)
-                .expect("Failed to initialize Opentelemetry tracer")
+            let otlp_tracer = opentelemetry_sdk::trace::TracerProvider::builder()
+                .with_batch_exporter(exporter, opentelemetry_sdk::runtime::Tokio)
+                .with_config(trace_config)
+                .build()
                 .tracer("osrd-editoast");
             let layer = tracing_opentelemetry::OpenTelemetryLayer::new(otlp_tracer);
             opentelemetry::global::set_text_map_propagator(TraceContextPropagator::new());
