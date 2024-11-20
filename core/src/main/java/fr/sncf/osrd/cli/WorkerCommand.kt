@@ -38,7 +38,7 @@ class WorkerCommand : CliCommand {
         names = ["--editoast-authorization"],
         description = "The HTTP Authorization header sent to editoast"
     )
-    private var editoastAuthorization: String = "x-osrd-core"
+    private var editoastAuthorization: String = "x-osrd-skip-authz"
 
     val WORKER_ID: String?
     val WORKER_ID_USE_HOSTNAME: Boolean
