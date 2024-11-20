@@ -1,5 +1,14 @@
 import { useRef, useState, useContext, useEffect, useCallback } from 'react';
 
+import {
+  CompassCardinalV2,
+  CompassNeedleV2,
+  Info,
+  Search,
+  Sliders,
+  ZoomIn,
+  ZoomOut,
+} from '@osrd-project/ui-icons';
 import cx from 'classnames';
 import type { MapRef } from 'react-map-gl/maplibre';
 
@@ -10,12 +19,6 @@ import type { CommonToolState } from 'applications/editor/tools/types';
 import type { PartialOrReducer, Tool } from 'applications/editor/types';
 import { ModalContext } from 'common/BootstrapSNCF/ModalSNCF/ModalProvider';
 import ButtonMapInfras from 'common/Map/Buttons/ButtonMapInfras';
-import ButtonMapKey from 'common/Map/Buttons/ButtonMapKey';
-import ButtonMapSearch from 'common/Map/Buttons/ButtonMapSearch';
-import ButtonMapSettings from 'common/Map/Buttons/ButtonMapSettings';
-import ButtonResetViewport from 'common/Map/Buttons/ButtonResetViewport';
-import ButtonZoomIn from 'common/Map/Buttons/ButtonZoomIn';
-import ButtonZoomOut from 'common/Map/Buttons/ButtonZoomOut';
 import MapKey from 'common/Map/MapKey';
 import MapSearch from 'common/Map/Search/MapSearch';
 import MapSettings from 'common/Map/Settings/MapSettings';
@@ -25,6 +28,7 @@ import { useAppDispatch } from 'store';
 import useOutsideClick from 'utils/hooks/useOutsideClick';
 
 import ButtonMapInfraErrors from './ButtonMapInfraErrors';
+import MapButton from './MapButton';
 
 type MapButtonsProps = {
   map?: MapRef;
@@ -40,6 +44,7 @@ type MapButtonsProps = {
     activeTool: Tool<CommonToolState>;
   };
   viewPort: Viewport;
+  isNewButtons?: boolean;
 };
 
 const ZOOM_DEFAULT = 5;
@@ -55,12 +60,18 @@ export default function MapButtons({
   bearing,
   editorProps,
   viewPort: viewportProps,
+  isNewButtons = false,
 }: MapButtonsProps) {
   const dispatch = useAppDispatch();
   const { isOpen, openModal } = useContext(ModalContext);
 
   const [openedPopover, setOpenedPopover] = useState<string | undefined>(undefined);
   const [viewport, setViewport] = useState(viewportProps);
+
+  const rotationStyle = {
+    transform: `translate(-40%, 0) rotate(${-bearing}deg)`,
+    transformOrigin: 'center',
+  };
 
   const toggleMapModal = useCallback((keyModal: string) => {
     setOpenedPopover((prevOpenedPopover) =>
@@ -146,18 +157,60 @@ export default function MapButtons({
   return (
     <div ref={mapButtonsRef}>
       <div
-        className={cx('btn-map-container', {
+        className={cx(isNewButtons ? 'new-btn-map-container' : 'btn-map-container', {
           editor: !!editorProps,
         })}
       >
-        <ButtonZoomIn zoomIn={zoomIn} />
-        <ButtonZoomOut zoomOut={zoomOut} />
-        <ButtonResetViewport updateLocalViewport={resetPitchBearing} bearing={bearing} />
-        <ButtonMapSearch toggleMapSearch={() => toggleMapModal('SEARCH')} />
-        <ButtonMapSettings toggleMapSettings={openMapSettingsModal} />
+        <MapButton
+          onClick={zoomIn}
+          isNewButton={isNewButtons}
+          icon={<ZoomIn />}
+          tooltipKey="common.zoom-in"
+        />
+        <MapButton
+          onClick={zoomOut}
+          isNewButton={isNewButtons}
+          icon={<ZoomOut />}
+          tooltipKey="common.zoom-out"
+        />
+        <MapButton
+          onClick={resetPitchBearing}
+          isNewButton={isNewButtons}
+          icon={
+            <>
+              <span className="compass-needle" style={rotationStyle}>
+                <CompassNeedleV2 />
+              </span>
+              <span className="compass-cardinal">
+                <CompassCardinalV2 />
+              </span>
+            </>
+          }
+          tooltipKey="common.reset-north"
+          extraClasses={isNewButtons ? 'new-btn-map-resetviewport' : 'btn-map-resetviewport'}
+        />
+        <MapButton
+          onClick={() => toggleMapModal('SEARCH')}
+          isNewButton={isNewButtons}
+          icon={<Search />}
+          tooltipKey="common.search"
+        />
+        <MapButton
+          onClick={openMapSettingsModal}
+          isNewButton={isNewButtons}
+          icon={<Sliders />}
+          tooltipKey="Editor.nav.toggle-layers"
+        />
+        {withMapKeyButton && (
+          <MapButton
+            onClick={() => toggleMapModal('KEY')}
+            isNewButton={isNewButtons}
+            icon={<Info />}
+            tooltipKey="common.help-legend"
+          />
+        )}
         {withInfraButton && <ButtonMapInfras isInEditor={!!editorProps} />}
         {editorProps && <ButtonMapInfraErrors editorState={editorProps.editorState} />}
-        {withMapKeyButton && <ButtonMapKey toggleMapKey={() => toggleMapModal('KEY')} />}
       </div>
       {openedPopover === MAP_POPOVERS.SEARCH && (
         <MapSearch map={map} closeMapSearchPopUp={() => setOpenedPopover(undefined)} />

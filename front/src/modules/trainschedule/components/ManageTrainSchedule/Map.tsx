@@ -234,6 +234,7 @@ const Map = ({
           bearing={mapViewport.bearing}
           withMapKeyButton
           viewPort={mapViewport}
+          isNewButtons
         />
       )}
       <ReactMapGL

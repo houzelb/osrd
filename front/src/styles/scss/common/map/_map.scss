@@ -18,6 +18,56 @@
   }
 }
 
+.new-btn-map-container {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 0;
+  padding: 12px;
+
+  .new-btn-map {
+    color: var(--black100);
+    width: 40px;
+    height: 40px;
+    padding: 12px;
+    border-radius: 6px;
+    outline: 3px solid rgba(152, 192, 245, 0.25);
+    box-shadow: 0 0 0 1px var(--primary40) inset;
+    background-color: rgba(255, 255, 255, 1);
+    margin-block: 4px;
+
+    &:hover {
+      outline-color: var(--primary30);
+      box-shadow: 0 0 0 1px var(--primary80) inset;
+    }
+    &:focus {
+      outline: 3px solid var(--primary30);
+      box-shadow: 0 0 0 1px var(--primary80) inset;
+    }
+    &:active {
+      outline: 2px solid var(--primary30);
+      box-shadow: 0 0 0 1px var(--primary80) inset;
+    }
+
+    span {
+      display: flex;
+      margin: auto;
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  .new-btn-map-resetviewport {
+    .compass-needle,
+    .compass-cardinal {
+      position: absolute;
+      top: 16px;
+      left: 18px;
+      transform: translate(-40%, 0);
+    }
+  }
+}
+
 /* Map Settings */
 .map-modal {
   position: absolute;
