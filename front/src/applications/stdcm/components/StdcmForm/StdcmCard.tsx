@@ -27,7 +27,7 @@ const StdcmCard = ({
           'align-items-center'
         )}
       >
-        <span>{name}</span>
+        <span className="stdcm-consist-title">{name}</span>
         {title}
       </div>
     )}
