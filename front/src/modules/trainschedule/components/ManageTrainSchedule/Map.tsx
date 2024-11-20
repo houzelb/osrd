@@ -51,6 +51,7 @@ import { getMap, getTerrain3DExaggeration } from 'reducers/map/selectors';
 import { useAppDispatch } from 'store';
 import { getMapMouseEventNearestFeature } from 'utils/mapHelper';
 
+import OPERATIONAL_POINT_LAYERS from './consts';
 import ItineraryLayer from './ManageTrainScheduleMap/ItineraryLayer';
 import ItineraryMarkers, {
   type MarkerInformation,
@@ -111,6 +112,7 @@ const Map = ({
 
   const [mapIsLoaded, setMapIsLoaded] = useState(false);
 
+  const [hoveredOperationalPointId, setHoveredOperationalPointId] = useState<string>();
   const [snappedPoint, setSnappedPoint] = useState<Feature<Point> | undefined>();
   const { urlLat = '', urlLon = '', urlZoom = '', urlBearing = '', urlPitch = '' } = useParams();
   const dispatch = useAppDispatch();
@@ -146,16 +148,18 @@ const Map = ({
 
   const onFeatureClick = (e: MapLayerMouseEvent) => {
     if (preventPointSelection) return;
-    const result = getMapMouseEventNearestFeature(e, { layersId: ['chartis/tracks-geo/main'] });
-    if (
-      result &&
-      result.feature.properties &&
-      result.feature.properties.id &&
-      result.feature.geometry.type === 'LineString'
-    ) {
+
+    const result = getMapMouseEventNearestFeature(e, {
+      layersId: [
+        'chartis/tracks-geo/main',
+        ...(layersSettings.operationalpoints ? OPERATIONAL_POINT_LAYERS : []),
+      ],
+    });
+    if (result && result.feature.properties && result.feature.properties.id) {
       setFeatureInfoClick({
         feature: result.feature,
         coordinates: result.nearest,
+        isOperationalPoint: result.feature.sourceLayer === 'operational_points',
       });
     } else {
       setFeatureInfoClick(undefined);
@@ -165,13 +169,22 @@ const Map = ({
 
   const onMoveGetFeature = (e: MapLayerMouseEvent) => {
     if (preventPointSelection) return;
-    const result = getMapMouseEventNearestFeature(e, { layersId: ['chartis/tracks-geo/main'] });
+    const result = getMapMouseEventNearestFeature(e, {
+      layersId: [
+        'chartis/tracks-geo/main',
+        ...(layersSettings.operationalpoints ? OPERATIONAL_POINT_LAYERS : []),
+      ],
+    });
     if (
       result &&
       result.feature.properties &&
       result.feature.properties.id &&
-      result.feature.geometry.type === 'LineString'
+      (result.feature.geometry.type === 'LineString' || result.feature.geometry.type === 'Point')
     ) {
+      if (result.feature.geometry.type === 'Point') {
+        setHoveredOperationalPointId(result.feature.properties.id);
+      }
+
       setSnappedPoint({
         type: 'Feature',
         geometry: {
@@ -183,6 +196,7 @@ const Map = ({
         },
       });
     } else {
+      setHoveredOperationalPointId(undefined);
       setSnappedPoint(undefined);
     }
   };
@@ -337,6 +351,7 @@ const Map = ({
                 colors={colors[mapStyle]}
                 layerOrder={LAYER_GROUPS_ORDER[LAYERS.OPERATIONAL_POINTS.GROUP]}
                 infraID={infraID}
+                operationnalPointId={hoveredOperationalPointId}
               />
             )}
 

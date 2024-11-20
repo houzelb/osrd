@@ -188,6 +188,7 @@ const NewMap = ({
       setFeatureInfoClick({
         feature: result.feature,
         coordinates: result.nearest,
+        isOperationalPoint: false,
       });
     } else {
       setFeatureInfoClick(undefined);
