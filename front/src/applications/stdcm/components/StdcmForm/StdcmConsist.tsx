@@ -27,7 +27,7 @@ const ConsistCardTitle = ({
   if (!rollingStock) return null;
 
   return (
-    <div className="stdcm-consist-img w-75 d-flex justify-content-end align-self-end">
+    <div className="stdcm-consist-img">
       <RollingStock2Img rollingStock={rollingStock} />
     </div>
   );
