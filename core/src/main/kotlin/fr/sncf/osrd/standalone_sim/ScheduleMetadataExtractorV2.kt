@@ -105,24 +105,68 @@ fun runScheduleMetadataExtractor(
     val closedSignalStops = pathStops.filter { it.receptionSignal.isStopOnClosedSignal }
 
     val signalSightings = mutableListOf<SignalSighting>()
-    for ((i, pathSignal) in pathSignals.withIndex()) {
+    var indexClosedSignalStop = 0
+
+    var closedSignalStopOffset =
+        getStopTravelledPathOffset(closedSignalStops, indexClosedSignalStop, pathOffsetBuilder)
+    for ((indexPathSignal, pathSignal) in pathSignals.withIndex()) {
         val physicalSignal = loadedSignalInfra.getPhysicalSignal(pathSignal.signal)
-        var sightOffset =
+        var signalCriticalOffset =
             Offset.max(
                 Offset.zero(),
                 pathSignal.pathOffset - rawInfra.getSignalSightDistance(physicalSignal)
             )
-        if (i > 0) {
-            val previousSignalOffset = pathSignals[i - 1].pathOffset
-            sightOffset = Offset.max(sightOffset, previousSignalOffset)
+        if (indexPathSignal > 0) {
+            val previousSignalOffset = pathSignals[indexPathSignal - 1].pathOffset
+            signalCriticalOffset = Offset.max(signalCriticalOffset, previousSignalOffset)
         }
+        var signalCriticalTime =
+            envelopeWithStops.interpolateArrivalAt(signalCriticalOffset.distance.meters)
+
+        // advance to the first stop after sightOffset
+        while (closedSignalStopOffset != null && closedSignalStopOffset <= signalCriticalOffset) {
+            closedSignalStopOffset =
+                getStopTravelledPathOffset(
+                    closedSignalStops,
+                    indexClosedSignalStop++,
+                    pathOffsetBuilder
+                )
+        }
+        // if stop is before signal
+        if (closedSignalStopOffset != null && closedSignalStopOffset <= pathSignal.pathOffset) {
+            // advance to the last stop before signal
+            var nextStopOffset =
+                getStopTravelledPathOffset(
+                    closedSignalStops,
+                    indexClosedSignalStop + 1,
+                    pathOffsetBuilder
+                )
+            while (nextStopOffset != null && nextStopOffset <= pathSignal.pathOffset) {
+                closedSignalStopOffset = nextStopOffset
+                indexClosedSignalStop++
+                nextStopOffset =
+                    getStopTravelledPathOffset(
+                        closedSignalStops,
+                        indexClosedSignalStop + 1,
+                        pathOffsetBuilder
+                    )
+            }
+
+            val stopDepartureTime =
+                envelopeWithStops.interpolateDepartureFrom(closedSignalStopOffset.distance.meters)
+            if (signalCriticalTime < stopDepartureTime - CLOSED_SIGNAL_RESERVATION_MARGIN) {
+                signalCriticalOffset = closedSignalStopOffset!!
+                signalCriticalTime = stopDepartureTime - CLOSED_SIGNAL_RESERVATION_MARGIN
+            }
+        }
+
         signalSightings.add(
             SignalSighting(
                 rawInfra.getPhysicalSignalName(
                     loadedSignalInfra.getPhysicalSignal(pathSignal.signal)
                 )!!,
-                envelopeWithStops.interpolateArrivalAt(sightOffset.distance.meters).seconds,
-                sightOffset,
+                maxOf(signalCriticalTime.seconds, Duration.ZERO),
+                signalCriticalOffset,
                 "VL" // TODO: find out the real state
             )
         )
@@ -204,6 +248,15 @@ fun runScheduleMetadataExtractor(
             )
         }
     )
+}
+
+fun getStopTravelledPathOffset(
+    pathStops: List<PathStop>,
+    indexStop: Int,
+    pathOffsetBuilder: PathOffsetBuilder
+): Offset<TravelledPath>? {
+    val stop = pathStops.getOrNull(indexStop) ?: return null
+    return pathOffsetBuilder.toTravelledPath(stop.pathOffset)
 }
 
 fun makeSimpleReportTrain(
