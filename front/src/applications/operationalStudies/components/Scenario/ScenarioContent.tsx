@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { ChevronRight } from '@osrd-project/ui-icons';
 import cx from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { GiElectric } from 'react-icons/gi';
 
 import handleOperation from 'applications/operationalStudies/components/MacroEditor/ngeToOsrd';
 import importTimetableToNGE from 'applications/operationalStudies/components/MacroEditor/osrdToNge';
@@ -15,7 +14,6 @@ import useScenarioData from 'applications/operationalStudies/hooks/useScenarioDa
 import ImportTrainSchedule from 'applications/operationalStudies/views/ImportTrainSchedule';
 import ManageTrainSchedule from 'applications/operationalStudies/views/ManageTrainSchedule';
 import SimulationResults from 'applications/operationalStudies/views/SimulationResults';
-import infraLogo from 'assets/pictures/components/tracks.svg';
 import type {
   InfraWithState,
   ScenarioResponse,
@@ -52,7 +50,6 @@ const ScenarioContent = ({
   const [collapsedTimetable, setCollapsedTimetable] = useState(false);
   const [trainIdToEdit, setTrainIdToEdit] = useState<number>();
   const [isMacro, setIsMacro] = useState(false);
-
   const {
     selectedTrainId,
     trainScheduleSummaries,
@@ -67,9 +64,11 @@ const ScenarioContent = ({
   const toggleMicroMacroButton = useCallback(
     (isMacroMode: boolean) => {
       setIsMacro(isMacroMode);
-      setCollapsedTimetable(isMacroMode);
+      if (!isMacroMode && collapsedTimetable) {
+        setCollapsedTimetable(false);
+      }
     },
-    [setIsMacro, setCollapsedTimetable]
+    [setIsMacro, setCollapsedTimetable, collapsedTimetable]
   );
 
   const [ngeDto, setNgeDto] = useState<NetzgrafikDto>();
@@ -134,8 +133,10 @@ const ScenarioContent = ({
                 infraReloadCount={reloadCount}
                 collapseTimetable={() => setCollapsedTimetable(true)}
               />
+
               <MicroMacroSwitch isMacro={isMacro} setIsMacro={toggleMicroMacroButton} />
-              {!isMacro && infra && (
+
+              {infra && (
                 <>
                   {displayTrainScheduleManagement !== MANAGE_TRAIN_SCHEDULE_TYPES.none && (
                     <TimetableManageTrainSchedule
@@ -165,6 +166,17 @@ const ScenarioContent = ({
           </div>
 
           <div className={collapsedTimetable ? 'col-12' : 'col-hdp-9 col-xl-8 col-lg-7 col-md-6'}>
+            {collapsedTimetable && (
+              <button
+                data-testid="timetable-collapse-button"
+                className="timetable-collapse-button"
+                type="button"
+                aria-label={t('toggleTimetable')}
+                onClick={() => setCollapsedTimetable(false)}
+              >
+                <ChevronRight />
+              </button>
+            )}
             {!isInfraLoaded &&
               !isMacro &&
               displayTrainScheduleManagement !== MANAGE_TRAIN_SCHEDULE_TYPES.add &&
@@ -186,37 +198,8 @@ const ScenarioContent = ({
               </div>
             )}
             <div className="scenario-results">
-              {collapsedTimetable && (
-                <>
-                  <div className="scenario-timetable-collapsed">
-                    <button
-                      data-testid="timetable-collapse-button"
-                      className="timetable-collapse-button"
-                      type="button"
-                      aria-label={t('toggleTimetable')}
-                      onClick={() => setCollapsedTimetable(false)}
-                    >
-                      <ChevronRight />
-                    </button>
-                    <div className="lead ml-2">{scenario.name}</div>
-                    <div className="d-flex align-items-center ml-auto">
-                      <img src={infraLogo} alt="Infra logo" className="infra-logo mr-2" />
-                      {scenario.infra_name}
-                    </div>
-                    <div className="d-flex align-items-center ml-4">
-                      <span className="mr-1">
-                        <GiElectric />
-                      </span>
-                      {scenario.electrical_profile_set_id
-                        ? scenario.electrical_profile_set_id
-                        : t('noElectricalProfileSet')}
-                    </div>
-                  </div>
-                  <MicroMacroSwitch isMacro={isMacro} setIsMacro={toggleMicroMacroButton} />
-                </>
-              )}
               {isMacro ? (
-                <div className={cx(collapsedTimetable ? 'macro-container' : 'h-100')}>
+                <div className={cx(collapsedTimetable ? 'macro-container' : 'h-100 p-1')}>
                   <NGE dto={ngeDto} onOperation={handleNGEOperation} />
                 </div>
               ) : (
