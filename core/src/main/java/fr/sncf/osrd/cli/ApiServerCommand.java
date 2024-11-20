@@ -42,7 +42,7 @@ public final class ApiServerCommand implements CliCommand {
     @Parameter(
             names = {"--editoast-authorization"},
             description = "The HTTP Authorization header sent to editoast")
-    private String editoastAuthorization = "x-osrd-core";
+    private String editoastAuthorization = "x-osrd-skip-authz";
 
     @Parameter(
             names = {"-j", "--threads"},

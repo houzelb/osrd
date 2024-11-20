@@ -149,8 +149,8 @@ pub enum Authentication {
     Unauthenticated,
     /// The issuer of the request provided the 'x-remote-user-identity' header.
     Authenticated(Authorizer<PgAuthDriver<BuiltinRole>>),
-    /// The requests comes from a Core instance. All requests are considered safe.
-    Core,
+    /// The requests comes from a trusted service (like core). All requests are considered safe.
+    SkipAuthorization,
 }
 
 impl Authentication {
@@ -162,7 +162,7 @@ impl Authentication {
     ) -> Result<bool, <PgAuthDriver<BuiltinRole> as editoast_authz::authorizer::StorageDriver>::Error>
     {
         match self {
-            Authentication::Core => Ok(true),
+            Authentication::SkipAuthorization => Ok(true),
             Authentication::Unauthenticated => Ok(false),
             Authentication::Authenticated(authorizer) => {
                 authorizer.check_roles(required_roles).await
@@ -176,7 +176,7 @@ impl Authentication {
     pub fn authorizer(self) -> Result<Authorizer<PgAuthDriver<BuiltinRole>>, AuthorizationError> {
         match self {
             Authentication::Authenticated(authorizer) => Ok(authorizer),
-            Authentication::Unauthenticated | Authentication::Core => {
+            Authentication::Unauthenticated | Authentication::SkipAuthorization => {
                 Err(AuthorizationError::Unauthenticated)
             }
         }
@@ -196,8 +196,8 @@ async fn authenticate(
         )));
     }
     let Some(identity) = headers.get("x-remote-user-identity") else {
-        if headers.contains_key("x-osrd-core") {
-            return Ok(Authentication::Core);
+        if headers.contains_key("x-osrd-skip-authz") {
+            return Ok(Authentication::SkipAuthorization);
         }
         return Ok(Authentication::Unauthenticated);
     };
