@@ -374,12 +374,13 @@ fun routingRequirements(
             rawInfra.getSignalSightDistance(rawInfra.getPhysicalSignal(signal))
 
         // find the location at which establishing the route becomes necessary
-        val criticalPos = limitingBlockOffset + limitingSignalOffsetInBlock - signalSightDistance
-        var criticalTime = envelope.interpolateArrivalAtClamp(criticalPos.distance.meters)
+        val routeCriticalPos =
+            limitingBlockOffset + limitingSignalOffsetInBlock - signalSightDistance
+        var routeCriticalTime = envelope.interpolateArrivalAtClamp(routeCriticalPos.distance.meters)
 
-        // check if an arrival on stop signal is scheduled between the critical position and the
-        // entry signal of the route (both position and time, as there is a time margin)
-        // in this case, just move the critical position to just after the stop
+        // check if an arrival on stop signal is scheduled between the route critical position and
+        // the entry signal of the route (both position and time, as there is a time margin) in this
+        // case, just move the route critical position to the stop
         val entrySignalOffset =
             blockOffsets[routeStartBlockIndex] +
                 blockInfra.getSignalsPositions(firstRouteBlock).first().distance
@@ -389,14 +390,14 @@ fun routingRequirements(
                 // stop duration is included in interpolateDepartureFromClamp()
                 val stopDepartureTime =
                     envelope.interpolateDepartureFromClamp(stopTravelledOffset.distance.meters)
-                if (criticalTime < stopDepartureTime - CLOSED_SIGNAL_RESERVATION_MARGIN) {
-                    criticalTime = stopDepartureTime - CLOSED_SIGNAL_RESERVATION_MARGIN
+                if (routeCriticalTime < stopDepartureTime - CLOSED_SIGNAL_RESERVATION_MARGIN) {
+                    routeCriticalTime = stopDepartureTime - CLOSED_SIGNAL_RESERVATION_MARGIN
                 }
                 break
             }
         }
 
-        return maxOf(criticalTime, 0.0)
+        return maxOf(routeCriticalTime, 0.0)
     }
 
     val res = mutableListOf<RoutingRequirement>()
@@ -417,7 +418,7 @@ fun routingRequirements(
             // the distance to the end of the zone from the start of the train path
             val travelPathOffset = pathOffsetBuilder.toTravelledPath(routePathOffset)
             // the point in the train path at which the zone is released
-            val criticalPos = travelPathOffset + rollingStock.length.meters
+            val exitCriticalPos = travelPathOffset + rollingStock.length.meters
             // if the zones are never occupied by the train, no requirement is emitted
             // Note: the train is considered starting from a "portal", so "growing" from its start
             // offset
@@ -425,8 +426,9 @@ fun routingRequirements(
                 assert(routeIndex == 0)
                 continue
             }
-            val criticalTime = envelope.interpolateDepartureFromClamp(criticalPos.distance.meters)
-            zoneRequirements.add(routingZoneRequirement(rawInfra, zonePath, criticalTime))
+            val exitCriticalTime =
+                envelope.interpolateDepartureFromClamp(exitCriticalPos.distance.meters)
+            zoneRequirements.add(routingZoneRequirement(rawInfra, zonePath, exitCriticalTime))
         }
         res.add(
             RoutingRequirement(
