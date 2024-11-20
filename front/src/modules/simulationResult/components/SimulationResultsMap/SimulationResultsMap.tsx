@@ -204,6 +204,7 @@ const SimulationResultMap = ({
         bearing={mapViewport.bearing}
         withMapKeyButton
         viewPort={mapViewport}
+        isNewButtons
       />
       <ReactMapGL
         {...mapViewport}
