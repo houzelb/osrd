@@ -8,12 +8,23 @@ const getStepLocation = (step: PathItemLocation): PathItemLocation => {
     return { track: step.track, offset: mToMm(step.offset) };
   }
   if ('operational_point' in step) {
-    return { operational_point: step.operational_point };
+    return { operational_point: step.operational_point, track_reference: step.track_reference };
   }
   if ('trigram' in step) {
-    return { trigram: step.trigram, secondary_code: step.secondary_code };
+    return {
+      trigram: step.trigram,
+      secondary_code: step.secondary_code,
+      track_reference: step.track_reference,
+    };
   }
-  return { uic: step.uic, secondary_code: step.secondary_code };
+  if (step.uic === -1) {
+    throw new Error('Invalid UIC');
+  }
+  return {
+    uic: step.uic,
+    secondary_code: step.secondary_code,
+    track_reference: step.track_reference,
+  };
 };
 
 export default getStepLocation;

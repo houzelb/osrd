@@ -56,4 +56,10 @@
       padding: 4px 8px;
     }
   }
+  select {
+    background-color: var(--white);
+  }
+  select:focus {
+    background-color: var(--white);
+  }
 }

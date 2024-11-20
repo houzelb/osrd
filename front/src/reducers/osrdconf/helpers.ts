@@ -13,26 +13,36 @@ import type { PathStep } from './types';
 
 export const insertViaFromMap = (
   pathSteps: OperationalStudiesConfState['pathSteps'],
+  // newVia comes from a map click either on a track section or an operational point
   newVia: PathStep,
   pathProperties: ManageTrainSchedulePathProperties
 ): OperationalStudiesConfState['pathSteps'] => {
   // If one of these is missing, via is not valid (it hasn't been added via click on map) and we return the same array
-  if (!('track' in newVia) || !newVia.coordinates) return pathSteps;
+  if (!newVia.coordinates) return pathSteps;
 
   const origin = pathSteps[0];
   const destination = last(pathSteps);
+
   const newStep = {
-    track: newVia.track,
-    offset: newVia.offset,
     id: newVia.id,
     coordinates: newVia.coordinates,
+    ...('track' in newVia
+      ? {
+          track: newVia.track,
+          offset: newVia.offset,
+        }
+      : {
+          ...newVia,
+          track_reference: newVia.track_reference,
+        }),
   };
 
   let newViaIndex = -1;
-  // If origin and destination have already been selected and there is at least a via,
-  // we project the new via on the current path and add it at the most relevant index
+
   if (origin && destination && pathSteps.length > 2) {
-    const newViaPoint = point(newVia.coordinates);
+    // If origin and destination have already been selected and there is at least a via,
+    // we project the new via on the current path and add it at the most relevant index
+    const newViaPoint = point(newStep.coordinates);
     const positionOnPath = calculateDistanceAlongTrack(
       feature(pathProperties.geometry, { length: pathProperties.length }),
       newViaPoint.geometry,

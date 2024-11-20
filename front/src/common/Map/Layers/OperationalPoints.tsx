@@ -10,9 +10,15 @@ interface Props {
   colors: Theme;
   layerOrder: number;
   infraID: number | undefined;
+  operationnalPointId?: string;
 }
 
-export default function OperationalPoints({ colors, layerOrder, infraID }: Props) {
+export default function OperationalPoints({
+  colors,
+  layerOrder,
+  infraID,
+  operationnalPointId,
+}: Props) {
   const point: LayerProps = {
     type: 'circle',
     'source-layer': 'operational_points',
@@ -42,7 +48,12 @@ export default function OperationalPoints({ colors, layerOrder, infraID }: Props
           ['concat', ' ', ['get', 'extensions_sncf_ch']],
         ],
       ],
-      'text-font': ['Roboto Condensed'],
+      'text-font': [
+        'case',
+        ['==', ['get', 'id'], operationnalPointId || ''],
+        ['literal', ['Roboto Bold']],
+        ['literal', ['Roboto Condensed']],
+      ],
       'text-size': 12,
       'text-anchor': 'left',
       'text-justify': 'left',
@@ -100,7 +111,12 @@ export default function OperationalPoints({ colors, layerOrder, infraID }: Props
           ['get', 'extensions_sncf_ch'],
         ],
       ],
-      'text-font': ['Roboto Condensed'],
+      'text-font': [
+        'case',
+        ['==', ['get', 'id'], operationnalPointId || ''],
+        ['literal', ['Roboto Bold']],
+        ['literal', ['Roboto Condensed']],
+      ],
       'text-size': 11,
       'text-anchor': 'left',
       'text-allow-overlap': false,
