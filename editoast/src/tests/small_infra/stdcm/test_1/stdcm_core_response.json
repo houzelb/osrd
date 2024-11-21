@@ -155,7 +155,7 @@
                         "time_tail_free": 42.075
                     }
                 },
-                "signal_sightings": [
+                "signal_critical_positions": [
                     {
                         "offset": 0.0,
                         "signal": "SA1",

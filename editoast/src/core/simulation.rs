@@ -26,7 +26,7 @@ use std::hash::Hash;
 editoast_common::schemas! {
     CompleteReportTrain,
     RoutingRequirement,
-    SignalSighting,
+    SignalCriticalPosition,
     SpacingRequirement,
     RoutingZoneRequirement,
     ZoneUpdate,
@@ -306,14 +306,16 @@ pub struct ReportTrain {
 pub struct CompleteReportTrain {
     #[serde(flatten)]
     pub report_train: ReportTrain,
-    pub signal_sightings: Vec<SignalSighting>,
+    pub signal_critical_positions: Vec<SignalCriticalPosition>,
     pub zone_updates: Vec<ZoneUpdate>,
     pub spacing_requirements: Vec<SpacingRequirement>,
     pub routing_requirements: Vec<RoutingRequirement>,
 }
 
 #[derive(Debug, Clone, PartialEq, Hash, Serialize, Deserialize, ToSchema)]
-pub struct SignalSighting {
+/// First position (space and time) along the path where given signal must
+/// be free (sighting time or closed-signal stop ending)
+pub struct SignalCriticalPosition {
     pub signal: String,
     /// Time in ms
     pub time: u64,

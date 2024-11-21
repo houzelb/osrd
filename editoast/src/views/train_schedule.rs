@@ -29,7 +29,7 @@ use crate::core::pathfinding::PathfindingResultSuccess;
 use crate::core::simulation::CompleteReportTrain;
 use crate::core::simulation::PhysicsConsistParameters;
 use crate::core::simulation::ReportTrain;
-use crate::core::simulation::SignalSighting;
+use crate::core::simulation::SignalCriticalPosition;
 use crate::core::simulation::SimulationMargins;
 use crate::core::simulation::SimulationPath;
 use crate::core::simulation::SimulationPowerRestrictionItem;
@@ -961,7 +961,7 @@ mod tests {
                     "speeds": [],
                     "energy_consumption": 0.0,
                     "path_item_times": [0, 1000, 2000, 3000],
-                    "signal_sightings": [],
+                    "signal_critical_positions": [],
                     "zone_updates": [],
                     "spacing_requirements": [],
                     "routing_requirements": []
