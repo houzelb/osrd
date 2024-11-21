@@ -24,12 +24,14 @@ type AddTrainScheduleButtonProps = {
   infraState?: InfraState;
   setIsWorking: (isWorking: boolean) => void;
   upsertTrainSchedules: (trainSchedules: TrainScheduleResult[]) => void;
+  dtoImport: () => void;
 };
 
 const AddTrainScheduleButton = ({
   infraState,
   setIsWorking,
   upsertTrainSchedules,
+  dtoImport,
 }: AddTrainScheduleButtonProps) => {
   const [postTrainSchedule] =
     osrdEditoastApi.endpoints.postTimetableByIdTrainSchedule.useMutation();
@@ -83,6 +85,7 @@ const AddTrainScheduleButton = ({
           })
         );
         setIsWorking(false);
+        dtoImport();
         upsertTrainSchedules(newTrainSchedules);
       } catch (e) {
         setIsWorking(false);

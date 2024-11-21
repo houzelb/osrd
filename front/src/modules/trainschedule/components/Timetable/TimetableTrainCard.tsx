@@ -34,6 +34,7 @@ type TimetableTrainCardProps = {
   setTrainIdToEdit: (trainIdToEdit?: number) => void;
   removeTrains: (trainIds: number[]) => void;
   projectionPathIsUsed: boolean;
+  dtoImport: () => void;
 };
 
 const formatFullDate = (d: Date) => dayjs(d).format('D/MM/YYYY HH:mm:ss');
@@ -50,6 +51,7 @@ const TimetableTrainCard = ({
   setTrainIdToEdit,
   removeTrains,
   projectionPathIsUsed,
+  dtoImport,
 }: TimetableTrainCardProps) => {
   const { t } = useTranslation(['operationalStudies/scenario']);
   const dispatch = useAppDispatch();
@@ -81,6 +83,7 @@ const TimetableTrainCard = ({
       .unwrap()
       .then(() => {
         removeTrains([train.id]);
+        dtoImport();
         dispatch(
           setSuccess({
             title: t('timetable.trainDeleted', { name: train.trainName }),
@@ -125,6 +128,7 @@ const TimetableTrainCard = ({
           body: [newTrain],
         }).unwrap();
         upsertTrainSchedules([trainScheduleResult]);
+        dtoImport();
         dispatch(
           setSuccess({
             title: t('timetable.trainAdded'),

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import { ChevronRight } from '@osrd-project/ui-icons';
 import cx from 'classnames';
@@ -24,7 +24,6 @@ import ScenarioLoaderMessage from 'modules/scenario/components/ScenarioLoaderMes
 import TimetableManageTrainSchedule from 'modules/trainschedule/components/ManageTrainSchedule/TimetableManageTrainSchedule';
 import Timetable from 'modules/trainschedule/components/Timetable/Timetable';
 import { useAppDispatch } from 'store';
-import { concatMap, mapBy } from 'utils/types';
 
 import ScenarioDescription from './ScenarioDescription';
 
@@ -61,6 +60,13 @@ const ScenarioContent = ({
     removeTrains,
   } = useScenarioData(scenario, timetable, infra);
 
+  const [ngeDto, setNgeDto] = useState<NetzgrafikDto>();
+
+  const dtoImport = async () => {
+    const dto = await importTimetableToNGE(scenario.infra_id, scenario.timetable_id, dispatch);
+    setNgeDto(dto);
+  };
+
   const toggleMicroMacroButton = useCallback(
     (isMacroMode: boolean) => {
       setIsMacro(isMacroMode);
@@ -68,40 +74,16 @@ const ScenarioContent = ({
         setCollapsedTimetable(false);
       }
     },
-    [setIsMacro, setCollapsedTimetable, collapsedTimetable]
+    [setIsMacro, collapsedTimetable]
   );
-
-  const [ngeDto, setNgeDto] = useState<NetzgrafikDto>();
-  const [ngeUpsertedTrainSchedules, setNgeUpsertedTrainSchedules] = useState<
-    Map<number, TrainScheduleResult>
-  >(new Map());
-  const [ngeDeletedTrainIds, setNgeDeletedTrainIds] = useState<number[]>([]);
-
-  useEffect(() => {
-    if (!isMacro || (isMacro && ngeDto)) {
-      return;
-    }
-
-    const doImport = async () => {
-      const dto = await importTimetableToNGE(scenario.infra_id, scenario.timetable_id, dispatch);
-      setNgeDto(dto);
-    };
-    doImport();
-  }, [scenario, isMacro]);
 
   useEffect(() => {
     if (isMacro) {
-      return;
+      dtoImport();
     }
-
-    if (ngeDto) {
-      setNgeDto(undefined);
-    }
-    upsertTrainSchedules(Array.from(ngeUpsertedTrainSchedules.values()));
-    removeTrains(ngeDeletedTrainIds);
   }, [isMacro]);
 
-  const handleNGEOperation = (event: NGEEvent, netzgrafikDto: NetzgrafikDto) =>
+  const handleNGEOperation = (event: NGEEvent, netzgrafikDto: NetzgrafikDto) => {
     handleOperation({
       event,
       dispatch,
@@ -109,14 +91,13 @@ const ScenarioContent = ({
       timeTableId: scenario.timetable_id,
       netzgrafikDto,
       addUpsertedTrainSchedules: (upsertedTrainSchedules: TrainScheduleResult[]) => {
-        setNgeUpsertedTrainSchedules((prev) =>
-          concatMap(prev, mapBy(upsertedTrainSchedules, 'id'))
-        );
+        upsertTrainSchedules(upsertedTrainSchedules);
       },
       addDeletedTrainIds: (trainIds: number[]) => {
-        setNgeDeletedTrainIds((prev) => [...prev, ...trainIds]);
+        removeTrains(trainIds);
       },
     });
+  };
 
   return (
     <main className="mastcontainer mastcontainer-no-mastnav">
@@ -146,6 +127,7 @@ const ScenarioContent = ({
                       trainIdToEdit={trainIdToEdit}
                       setTrainIdToEdit={setTrainIdToEdit}
                       infraState={infra.state}
+                      dtoImport={dtoImport}
                     />
                   )}
                   <Timetable
@@ -159,6 +141,7 @@ const ScenarioContent = ({
                     trainIdToEdit={trainIdToEdit}
                     trainSchedules={trainSchedules}
                     trainSchedulesWithDetails={trainScheduleSummaries}
+                    dtoImport={dtoImport}
                   />
                 </>
               )}
