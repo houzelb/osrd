@@ -7989,7 +7989,7 @@ oas-validator@^5.0.8:
 
 oazapfts@^4.8.0, oazapfts@osrd-project/oazapfts#master:
   version "0.0.0-development"
-  resolved "https://codeload.github.com/osrd-project/oazapfts/tar.gz/3cdfac73c2615b923ba1cde9027ea096bc56ac54"
+  resolved "https://codeload.github.com/osrd-project/oazapfts/tar.gz/ce86de04f9590074ce701fd2bb4e902bbd7ae565"
   dependencies:
     "@apidevtools/swagger-parser" "^10.1.0"
     lodash "^4.17.21"
