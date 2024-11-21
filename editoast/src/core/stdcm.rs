@@ -20,7 +20,7 @@ use crate::core::AsCoreRequest;
 use crate::core::Json;
 
 #[derive(Debug, Serialize)]
-pub struct STDCMRequest {
+pub struct Request {
     /// Infrastructure id
     pub infra: i64,
     /// Infrastructure expected version
@@ -28,7 +28,7 @@ pub struct STDCMRequest {
 
     // Pathfinding inputs
     /// List of waypoints. Each waypoint is a list of track offset.
-    pub path_items: Vec<STDCMPathItem>,
+    pub path_items: Vec<PathItem>,
     /// The loading gauge of the rolling stock
     pub rolling_stock_loading_gauge: LoadingGaugeType,
     /// List of supported signaling systems
@@ -62,18 +62,18 @@ pub struct STDCMRequest {
 }
 
 #[derive(Debug, Serialize)]
-pub struct STDCMPathItem {
+pub struct PathItem {
     /// The track offsets of the path item
     pub locations: Vec<TrackOffset>,
     /// Stop duration in milliseconds. None if the train does not stop at this path item.
     pub stop_duration: Option<u64>,
     /// If specified, describes when the train may arrive at the location
-    pub step_timing_data: Option<STDCMStepTimingData>,
+    pub step_timing_data: Option<StepTimingData>,
 }
 
 /// Contains the data of a step timing, when it is specified
 #[derive(Debug, Serialize)]
-pub struct STDCMStepTimingData {
+pub struct StepTimingData {
     /// Time the train should arrive at this point
     pub arrival_time: DateTime<Utc>,
     /// Tolerance for the arrival time, when it arrives before the expected time, in ms
@@ -131,7 +131,7 @@ pub enum Response {
     },
 }
 
-impl AsCoreRequest<Json<Response>> for STDCMRequest {
+impl AsCoreRequest<Json<Response>> for Request {
     const METHOD: reqwest::Method = reqwest::Method::POST;
     const URL_PATH: &'static str = "/v2/stdcm";
 

@@ -13,8 +13,6 @@ use serde::Serialize;
 use utoipa::ToSchema;
 
 use crate::core::pathfinding::PathfindingInputError;
-use crate::core::stdcm::STDCMPathItem;
-use crate::core::stdcm::STDCMStepTimingData;
 use crate::error::Result;
 use crate::models::temporary_speed_limits::TemporarySpeedLimit;
 use crate::models::towed_rolling_stock::TowedRollingStockModel;
@@ -224,7 +222,7 @@ impl Request {
         &self,
         conn: &mut DbConnection,
         infra_id: i64,
-    ) -> Result<Vec<STDCMPathItem>> {
+    ) -> Result<Vec<crate::core::stdcm::PathItem>> {
         let locations: Vec<_> = self.steps.iter().map(|item| &item.location).collect();
 
         let path_item_cache = PathItemCache::load(conn, infra_id, &locations).await?;
@@ -240,11 +238,11 @@ impl Request {
         Ok(track_offsets
             .iter()
             .zip(&self.steps)
-            .map(|(track_offset, path_item)| STDCMPathItem {
+            .map(|(track_offset, path_item)| crate::core::stdcm::PathItem {
                 stop_duration: path_item.duration,
                 locations: track_offset.to_vec(),
                 step_timing_data: path_item.timing_data.as_ref().map(|timing_data| {
-                    STDCMStepTimingData {
+                    crate::core::stdcm::StepTimingData {
                         arrival_time: timing_data.arrival_time,
                         arrival_time_tolerance_before: timing_data.arrival_time_tolerance_before,
                         arrival_time_tolerance_after: timing_data.arrival_time_tolerance_after,
