@@ -1,19 +1,7 @@
 import cx from 'classnames';
 
+import type { ImportStation } from 'applications/operationalStudies/types';
 import { formatUicToCi } from 'utils/strings';
-
-export interface ImportStation {
-  trigram?: string;
-  name?: string;
-  yardname?: string;
-  town?: string;
-  department?: string;
-  region?: string;
-  uic?: number;
-  linename?: string;
-  pk?: string;
-  linecode?: string;
-}
 
 type Props = {
   station: ImportStation;
