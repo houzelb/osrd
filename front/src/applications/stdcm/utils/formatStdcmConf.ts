@@ -127,8 +127,8 @@ export const checkStdcmConf = (
       setFailure({
         name: t('operationalStudies/manageTrainSchedule:errorMessages.trainScheduleTitle'),
         message: t('operationalStudies/manageTrainSchedule:errorMessages.originTimeOutsideWindow', {
-          low: dateTimeFormatting(searchDatetimeWindow.begin, false, false),
-          high: dateTimeFormatting(searchDatetimeWindow.end, false, false),
+          low: dateTimeFormatting(searchDatetimeWindow.begin, false),
+          high: dateTimeFormatting(searchDatetimeWindow.end, false),
         }),
       })
     );

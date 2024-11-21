@@ -48,11 +48,7 @@ export function formatIsoDate(date: Date) {
   return date.toISOString().substring(0, 10);
 }
 
-export function dateTimeFormatting(
-  date: Date,
-  withoutTime: boolean = false,
-  isUTC: boolean = true
-) {
+export function dateTimeFormatting(date: Date, withoutTime: boolean = false) {
   let locale;
   switch (i18n.language) {
     case 'fr':
@@ -61,10 +57,8 @@ export function dateTimeFormatting(
     default:
       locale = 'en';
   }
-  // Force interpreting the date in UTC
-  const dateToUTC = dayjs(date).utc(isUTC);
   const dateFormat = withoutTime ? 'D MMM YYYY' : 'D MMM YYYY HH:mm';
-  return dateToUTC.locale(locale).tz(userTimeZone).format(dateFormat).replace(/\./gi, '');
+  return dayjs(date).locale(locale).tz(userTimeZone).format(dateFormat).replace(/\./gi, '');
 }
 
 /**
