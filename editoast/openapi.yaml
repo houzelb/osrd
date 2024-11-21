@@ -7375,6 +7375,47 @@ components:
           maxLength: 255
           minLength: 1
       additionalProperties: false
+    OperationalPointReference:
+      allOf:
+      - oneOf:
+        - type: object
+          required:
+          - operational_point
+          properties:
+            operational_point:
+              type: string
+              maxLength: 255
+              minLength: 1
+        - type: object
+          required:
+          - trigram
+          properties:
+            secondary_code:
+              type: string
+              description: An optional secondary code to identify a more specific location
+              nullable: true
+            trigram:
+              type: string
+              minLength: 1
+        - type: object
+          required:
+          - uic
+          properties:
+            secondary_code:
+              type: string
+              description: An optional secondary code to identify a more specific location
+              nullable: true
+            uic:
+              type: integer
+              format: int32
+              description: The [UIC](https://en.wikipedia.org/wiki/List_of_UIC_country_codes) code of an operational point
+              minimum: 0
+      - type: object
+        properties:
+          track_reference:
+            allOf:
+            - $ref: '#/components/schemas/TrackReference'
+            nullable: true
     Ordering:
       type: string
       enum:
@@ -7536,38 +7577,7 @@ components:
     PathItemLocation:
       oneOf:
       - $ref: '#/components/schemas/TrackOffset'
-      - type: object
-        required:
-        - operational_point
-        properties:
-          operational_point:
-            type: string
-            maxLength: 255
-            minLength: 1
-      - type: object
-        required:
-        - trigram
-        properties:
-          secondary_code:
-            type: string
-            description: An optional secondary code to identify a more specific location
-            nullable: true
-          trigram:
-            type: string
-            minLength: 1
-      - type: object
-        required:
-        - uic
-        properties:
-          secondary_code:
-            type: string
-            description: An optional secondary code to identify a more specific location
-            nullable: true
-          uic:
-            type: integer
-            format: int32
-            description: The [UIC](https://en.wikipedia.org/wiki/List_of_UIC_country_codes) code of an operational point
-            minimum: 0
+      - $ref: '#/components/schemas/OperationalPointReference'
       description: The location of a path waypoint
     PathProperties:
       type: object
@@ -10790,6 +10800,23 @@ components:
           type: string
           maxLength: 255
           minLength: 1
+    TrackReference:
+      oneOf:
+      - type: object
+        required:
+        - track_id
+        properties:
+          track_id:
+            type: string
+            maxLength: 255
+            minLength: 1
+      - type: object
+        required:
+        - track_name
+        properties:
+          track_name:
+            type: string
+            minLength: 1
     TrackSection:
       type: object
       required:

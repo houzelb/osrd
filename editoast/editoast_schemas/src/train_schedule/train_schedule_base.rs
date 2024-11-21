@@ -162,6 +162,8 @@ mod tests {
     use serde_json::from_str;
     use serde_json::to_string;
 
+    use crate::train_schedule::path_item::OperationalPointIdentifier::OperationalPointId;
+    use crate::train_schedule::path_item::OperationalPointReference;
     use crate::train_schedule::schedule_item::ReceptionSignal;
     use crate::train_schedule::Margins;
     use crate::train_schedule::PathItemLocation;
@@ -180,9 +182,12 @@ mod tests {
     /// Test deserialize an invalid train schedule
     #[test]
     fn deserialize_duplicate_path_id_train_schedule() {
-        let location = PathItemLocation::OperationalPointId {
-            operational_point: "op".into(),
-        };
+        let location = PathItemLocation::OperationalPointReference(OperationalPointReference {
+            reference: OperationalPointId {
+                operational_point: "op".into(),
+            },
+            track_reference: None,
+        });
         let path_item = PathItem {
             id: "a".into(),
             location,
@@ -235,9 +240,12 @@ mod tests {
     /// Test deserialize an invalid train schedule
     #[test]
     fn deserialize_duplicate_schedule_points_train_schedule() {
-        let location = PathItemLocation::OperationalPointId {
-            operational_point: "op".into(),
-        };
+        let location = PathItemLocation::OperationalPointReference(OperationalPointReference {
+            reference: OperationalPointId {
+                operational_point: "op".into(),
+            },
+            track_reference: None,
+        });
         let path_item = PathItem {
             id: "a".into(),
             location,
@@ -270,9 +278,12 @@ mod tests {
     /// Test deserialize an invalid train schedule
     #[test]
     fn deserialize_arrival_time_first_waypoint_schedule_train_schedule() {
-        let location = PathItemLocation::OperationalPointId {
-            operational_point: "op".into(),
-        };
+        let location = PathItemLocation::OperationalPointReference(OperationalPointReference {
+            reference: OperationalPointId {
+                operational_point: "op".into(),
+            },
+            track_reference: None,
+        });
         let path_item = PathItem {
             id: "a".into(),
             location,

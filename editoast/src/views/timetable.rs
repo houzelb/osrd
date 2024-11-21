@@ -235,7 +235,6 @@ async fn train_schedule(
         timetable_id,
     })
     .await?;
-
     let changesets: Vec<TrainScheduleChangeset> = train_schedules
         .into_iter()
         .map(|ts| TrainScheduleForm {
