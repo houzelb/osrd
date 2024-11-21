@@ -32,6 +32,7 @@ body:
     attributes:
       label: How can we reproduce it (as minimally and precisely as possible)?
       placeholder: |
+        💡 When trains are involved, providing train-schedule export can help a lot to reproduce quickly and precisely.
         1. Go to '...'
         2. Click on '....'
         3. Scroll down to '....'
