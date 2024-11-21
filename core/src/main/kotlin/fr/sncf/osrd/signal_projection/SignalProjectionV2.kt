@@ -1,7 +1,7 @@
 package fr.sncf.osrd.signal_projection
 
 import fr.sncf.osrd.api.FullInfra
-import fr.sncf.osrd.api.api_v2.SignalSighting
+import fr.sncf.osrd.api.api_v2.SignalCriticalPosition
 import fr.sncf.osrd.api.api_v2.ZoneUpdate
 import fr.sncf.osrd.api.api_v2.project_signals.SignalUpdate
 import fr.sncf.osrd.conflicts.TravelledPath
@@ -11,9 +11,15 @@ import fr.sncf.osrd.signaling.SignalingSimulator
 import fr.sncf.osrd.signaling.ZoneStatus
 import fr.sncf.osrd.sim_infra.api.*
 import fr.sncf.osrd.sim_infra.impl.ChunkPath
-import fr.sncf.osrd.standalone_sim.*
+import fr.sncf.osrd.standalone_sim.PathOffsetBuilder
+import fr.sncf.osrd.standalone_sim.PathSignal
+import fr.sncf.osrd.standalone_sim.pathSignalsInRange
+import fr.sncf.osrd.standalone_sim.trainPathBlockOffset
 import fr.sncf.osrd.utils.indexing.StaticIdxList
-import fr.sncf.osrd.utils.units.*
+import fr.sncf.osrd.utils.units.Duration
+import fr.sncf.osrd.utils.units.Length
+import fr.sncf.osrd.utils.units.TimeDelta
+import fr.sncf.osrd.utils.units.meters
 import java.awt.Color
 
 data class SignalAspectChangeEventV2(val newAspect: String, val time: TimeDelta)
@@ -23,7 +29,7 @@ fun projectSignals(
     chunkPath: ChunkPath,
     blockPath: StaticIdxList<Block>,
     routePath: StaticIdxList<Route>,
-    signalSightings: Collection<SignalSighting>,
+    signalCriticalPositions: Collection<SignalCriticalPosition>,
     zoneUpdates: Collection<ZoneUpdate>,
     simulationEndTime: TimeDelta
 ): List<SignalUpdate> {
@@ -98,7 +104,7 @@ fun projectSignals(
             loadedSignalInfra,
             sigSystemManager,
             rawInfra,
-            signalSightings,
+            signalCriticalPositions,
             Length(chunkPath.endOffset - chunkPath.beginOffset),
             simulationEndTime
         )
@@ -186,7 +192,7 @@ private fun signalUpdates(
     loadedSignalInfra: LoadedSignalInfra,
     sigSystemManager: SigSystemManager,
     rawInfra: RawInfra,
-    signalSightings: Collection<SignalSighting>,
+    signalCriticalPositions: Collection<SignalCriticalPosition>,
     travelledPathLength: Length<TravelledPath>,
     simulationEndTime: TimeDelta,
 ): MutableList<SignalUpdate> {
@@ -221,7 +227,7 @@ private fun signalUpdates(
         }
     }
 
-    val signalSightingMap = signalSightings.associateBy { it.signal }
+    val signalCriticalPositionMap = signalCriticalPositions.associateBy { it.signal }
 
     val nextSignal = mutableMapOf<LogicalSignalId, PathSignal>()
     for (i in 0 until signalsOnPath.size - 1) nextSignal[signalsOnPath[i].signal] =
@@ -240,14 +246,17 @@ private fun signalUpdates(
 
         if (events.isEmpty()) continue
 
-        // Compute the "green" section
-        // It happens before the first event
+        // Compute the "green" section (free block):
+        // * only seen signals (especially when train path is different from the projection path)
+        // * starting at the moment they must be green (sighting time or closed-signal stop ending)
+        // * ending at the first event
         if (
-            events.first().time != Duration.ZERO && signalSightingMap.contains(physicalSignalName)
+            events.first().time != Duration.ZERO &&
+                signalCriticalPositionMap.contains(physicalSignalName)
         ) {
             val event = events.first()
             val timeEnd = event.time
-            val timeStart = signalSightingMap[physicalSignalName]!!.time
+            val timeStart = signalCriticalPositionMap[physicalSignalName]!!.time
             if (timeEnd > timeStart) {
                 signalUpdates.add(
                     SignalUpdate(

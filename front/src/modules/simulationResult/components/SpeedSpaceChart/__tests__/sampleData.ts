@@ -38,7 +38,7 @@ export const simulation: SimulationResponseSuccess = {
         ],
       },
     ],
-    signal_sightings: [
+    signal_critical_positions: [
       {
         signal: 'signal',
         state: 'state',

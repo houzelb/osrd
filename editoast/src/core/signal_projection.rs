@@ -4,7 +4,7 @@ use serde::Serialize;
 use std::collections::HashMap;
 use utoipa::ToSchema;
 
-use crate::core::simulation::SignalSighting;
+use crate::core::simulation::SignalCriticalPosition;
 use crate::core::simulation::ZoneUpdate;
 use crate::core::{AsCoreRequest, Json};
 
@@ -22,7 +22,7 @@ pub struct SignalUpdatesRequest<'a> {
     pub routes: &'a Vec<Identifier>,
     /// Path description as block ids
     pub blocks: &'a Vec<Identifier>,
-    /// List of signal sightings and zone updates for each train
+    /// List of signal critical positions and zone updates for each train
     pub train_simulations: HashMap<i64, TrainSimulation<'a>>,
 }
 
@@ -51,7 +51,7 @@ pub struct SignalUpdate {
 
 #[derive(Debug, Serialize)]
 pub struct TrainSimulation<'a> {
-    pub signal_sightings: &'a Vec<SignalSighting>,
+    pub signal_critical_positions: &'a Vec<SignalCriticalPosition>,
     pub zone_updates: &'a Vec<ZoneUpdate>,
     pub simulation_end_time: u64,
 }

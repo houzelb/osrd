@@ -45,7 +45,8 @@ class CompleteReportTrain(
     speeds: List<Double>,
     @Json(name = "energy_consumption") energyConsumption: Double,
     @Json(name = "path_item_times") pathItemTimes: List<TimeDelta>,
-    @Json(name = "signal_sightings") val signalSightings: List<SignalSighting>,
+    @Json(name = "signal_critical_positions")
+    val signalCriticalPositions: List<SignalCriticalPosition>,
     @Json(name = "zone_updates") val zoneUpdates: List<ZoneUpdate>,
     @Json(name = "spacing_requirements") val spacingRequirements: List<SpacingRequirement>,
     @Json(name = "routing_requirements") val routingRequirements: List<RoutingRequirement>

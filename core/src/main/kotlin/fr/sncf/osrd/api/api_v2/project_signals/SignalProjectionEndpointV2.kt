@@ -41,7 +41,7 @@ class SignalProjectionEndpointV2(private val infraManager: InfraManager) : Take 
                         chunkPath,
                         blockPath,
                         routePath,
-                        trainSimulation.signalSightings,
+                        trainSimulation.signalCriticalPositions,
                         trainSimulation.zoneUpdates,
                         trainSimulation.simulationEndTime
                     )

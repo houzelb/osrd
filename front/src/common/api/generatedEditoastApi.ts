@@ -3093,7 +3093,7 @@ export type RoutingRequirement = {
   route: string;
   zones: RoutingZoneRequirement[];
 };
-export type SignalSighting = {
+export type SignalCriticalPosition = {
   /** Position in mm */
   position: number;
   signal: string;
@@ -3133,7 +3133,7 @@ export type SimulationResponse =
       };
       final_output: ReportTrain & {
         routing_requirements: RoutingRequirement[];
-        signal_sightings: SignalSighting[];
+        signal_critical_positions: SignalCriticalPosition[];
         spacing_requirements: SpacingRequirement[];
         zone_updates: ZoneUpdate[];
       };

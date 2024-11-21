@@ -658,7 +658,7 @@ mod tests {
                     energy_consumption: 0.0,
                     path_item_times: vec![0, 10],
                 },
-                signal_sightings: vec![],
+                signal_critical_positions: vec![],
                 zone_updates: vec![],
                 spacing_requirements: vec![],
                 routing_requirements: vec![],

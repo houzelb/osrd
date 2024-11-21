@@ -104,7 +104,7 @@ fun runScheduleMetadataExtractor(
         }
     val closedSignalStops = pathStops.filter { it.receptionSignal.isStopOnClosedSignal }
 
-    val signalSightings = mutableListOf<SignalSighting>()
+    val signalCriticalPositions = mutableListOf<SignalCriticalPosition>()
     var indexClosedSignalStop = 0
 
     var closedSignalStopOffset =
@@ -160,8 +160,8 @@ fun runScheduleMetadataExtractor(
             }
         }
 
-        signalSightings.add(
-            SignalSighting(
+        signalCriticalPositions.add(
+            SignalCriticalPosition(
                 rawInfra.getPhysicalSignalName(
                     loadedSignalInfra.getPhysicalSignal(pathSignal.signal)
                 )!!,
@@ -227,7 +227,7 @@ fun runScheduleMetadataExtractor(
         reportTrain.speeds,
         reportTrain.energyConsumption,
         reportTrain.pathItemTimes,
-        signalSightings,
+        signalCriticalPositions,
         zoneUpdates,
         spacingRequirements.requirements.map {
             SpacingRequirement(it.zone, it.beginTime.seconds, it.endTime.seconds)

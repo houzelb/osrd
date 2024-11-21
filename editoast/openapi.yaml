@@ -3306,7 +3306,7 @@ components:
       - $ref: '#/components/schemas/ReportTrain'
       - type: object
         required:
-        - signal_sightings
+        - signal_critical_positions
         - zone_updates
         - spacing_requirements
         - routing_requirements
@@ -3315,10 +3315,10 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/RoutingRequirement'
-          signal_sightings:
+          signal_critical_positions:
             type: array
             items:
-              $ref: '#/components/schemas/SignalSighting'
+              $ref: '#/components/schemas/SignalCriticalPosition'
           spacing_requirements:
             type: array
             items:
@@ -9504,8 +9504,11 @@ components:
           maxLength: 255
           minLength: 1
       additionalProperties: false
-    SignalSighting:
+    SignalCriticalPosition:
       type: object
+      description: |-
+        First position (space and time) along the path where given signal must
+        be free (sighting time or closed-signal stop ending)
       required:
       - signal
       - time
@@ -9586,7 +9589,7 @@ components:
             - $ref: '#/components/schemas/ReportTrain'
             - type: object
               required:
-              - signal_sightings
+              - signal_critical_positions
               - zone_updates
               - spacing_requirements
               - routing_requirements
@@ -9595,10 +9598,10 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/RoutingRequirement'
-                signal_sightings:
+                signal_critical_positions:
                   type: array
                   items:
-                    $ref: '#/components/schemas/SignalSighting'
+                    $ref: '#/components/schemas/SignalCriticalPosition'
                 spacing_requirements:
                   type: array
                   items:
