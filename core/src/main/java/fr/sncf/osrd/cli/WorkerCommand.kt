@@ -175,6 +175,7 @@ class WorkerCommand : CliCommand {
             val channel = connection.createChannel()
             val callback =
                 fun(message: Delivery) {
+                    val startTimeMS = System.currentTimeMillis()
                     reportActivity(activityChannel, "request-received")
 
                     val replyTo = message.properties.replyTo
@@ -281,7 +282,12 @@ class WorkerCommand : CliCommand {
                     }
 
                     channel.basicAck(message.envelope.deliveryTag, false)
-                    logger.info("request for path {} processed", path)
+                    val executionTimeMS = System.currentTimeMillis() - startTimeMS
+                    logger.info(
+                        "request for path {} processed in {}s",
+                        path,
+                        executionTimeMS / 1_000.0
+                    )
                 }
             channel.basicConsume(
                 WORKER_REQUESTS_QUEUE,
