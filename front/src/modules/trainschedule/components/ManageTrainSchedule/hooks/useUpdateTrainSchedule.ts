@@ -19,6 +19,7 @@ const useUpdateTrainSchedule = (
   setDisplayTrainScheduleManagement: (type: string) => void,
   upsertTrainSchedules: (trainSchedules: TrainScheduleResult[]) => void,
   setTrainIdToEdit: (trainIdToEdit?: number) => void,
+  dtoImport: () => void,
   trainIdToEdit?: number
 ) => {
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
@@ -50,8 +51,8 @@ const useUpdateTrainSchedule = (
           id: trainIdToEdit,
           trainScheduleForm: trainSchedule,
         }).unwrap();
-
         upsertTrainSchedules([trainScheduleResult]);
+        dtoImport();
         dispatch(
           setSuccess({
             title: t('trainUpdated'),

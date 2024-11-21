@@ -18,6 +18,7 @@ type TimetableManageTrainScheduleProps = {
   upsertTrainSchedules: (trainSchedules: TrainScheduleResult[]) => void;
   infraState?: InfraState;
   setTrainIdToEdit: (trainIdToEdit?: number) => void;
+  dtoImport: () => void;
 };
 
 const TimetableManageTrainSchedule = ({
@@ -27,6 +28,7 @@ const TimetableManageTrainSchedule = ({
   infraState,
   trainIdToEdit,
   setTrainIdToEdit,
+  dtoImport,
 }: TimetableManageTrainScheduleProps) => {
   const { t } = useTranslation('operationalStudies/manageTrainSchedule');
   const [isWorking, setIsWorking] = useState(false);
@@ -41,9 +43,9 @@ const TimetableManageTrainSchedule = ({
     setDisplayTrainScheduleManagement,
     upsertTrainSchedules,
     setTrainIdToEdit,
+    dtoImport,
     trainIdToEdit
   );
-
   return (
     <div className="scenario-timetable-managetrainschedule">
       <div className="scenario-timetable-managetrainschedule-header">
@@ -77,6 +79,7 @@ const TimetableManageTrainSchedule = ({
                 infraState={infraState}
                 setIsWorking={setIsWorking}
                 upsertTrainSchedules={upsertTrainSchedules}
+                dtoImport={dtoImport}
               />
             )}
             <TrainAddingSettings />

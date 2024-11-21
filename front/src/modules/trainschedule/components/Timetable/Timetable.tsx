@@ -28,6 +28,7 @@ type TimetableProps = {
   trainIdToEdit?: number;
   trainSchedules?: TrainScheduleResult[];
   trainSchedulesWithDetails: TrainScheduleWithDetails[];
+  dtoImport: () => void;
 };
 
 const formatDepartureDate = (d: Date) => dayjs(d).locale(i18n.language).format('dddd D MMMM YYYY');
@@ -43,6 +44,7 @@ const Timetable = ({
   trainIdToEdit,
   trainSchedules = [],
   trainSchedulesWithDetails,
+  dtoImport,
 }: TimetableProps) => {
   const { t } = useTranslation(['operationalStudies/scenario', 'common/itemTypes']);
 
@@ -160,6 +162,7 @@ const Timetable = ({
               projectionPathIsUsed={
                 infraState === 'CACHED' && trainIdUsedForProjection === train.id
               }
+              dtoImport={dtoImport}
             />
           </div>
         ))}
