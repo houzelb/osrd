@@ -431,7 +431,10 @@ fn path_input_hash(infra: i64, infra_version: &String, path_input: &PathfindingI
 pub mod tests {
     use axum::http::StatusCode;
     use editoast_models::DbConnectionPoolV2;
+    use editoast_schemas::train_schedule::OperationalPointIdentifier;
+    use editoast_schemas::train_schedule::OperationalPointReference;
     use editoast_schemas::train_schedule::PathItemLocation;
+    use editoast_schemas::train_schedule::TrackReference;
     use pretty_assertions::assert_eq;
     use rstest::rstest;
     use serde_json::json;
@@ -475,10 +478,64 @@ pub mod tests {
                 PathfindingInputError::InvalidPathItems {
                     items: vec![InvalidPathItem {
                         index: 1,
-                        path_item: PathItemLocation::OperationalPointDescription {
-                            trigram: "NO_TRIGRAM".into(),
-                            secondary_code: None
-                        }
+                        path_item: PathItemLocation::OperationalPointReference(
+                            OperationalPointReference {
+                                reference:
+                                    OperationalPointIdentifier::OperationalPointDescription {
+                                        trigram: "NO_TRIGRAM".into(),
+                                        secondary_code: None
+                                    },
+                                track_reference: None,
+                            }
+                        )
+                    }]
+                }
+            ))
+        );
+    }
+
+    #[rstest]
+    async fn pathfinding_with_invalid_path_items_due_to_track_reference() {
+        let app = TestAppBuilder::default_app();
+        let db_pool = app.db_pool();
+        let small_infra = create_small_infra(&mut db_pool.get_ok()).await;
+
+        let request = app
+            .post(format!("/infra/{}/pathfinding/blocks", small_infra.id).as_str())
+            .json(&json!({
+                "path_items":[
+                    {"uic":3,"secondary_code":"BV", "track_reference": {"track_name": "V2"}},
+                    {"uic":8 ,"secondary_code":"BV", "track_reference": {"track_name": "V245"}},
+                ],
+                "rolling_stock_is_thermal":true,
+                "rolling_stock_loading_gauge":"G1",
+                "rolling_stock_supported_electrifications":[],
+                "rolling_stock_supported_signaling_systems":["BAL","BAPR"],
+                "rolling_stock_maximum_speed":22.00,
+                "rolling_stock_length":26.00
+            }));
+
+        let pathfinding_result: PathfindingResult =
+            app.fetch(request).assert_status(StatusCode::OK).json_into();
+        assert_eq!(
+            pathfinding_result,
+            PathfindingResult::Failure(PathfindingFailure::PathfindingInputError(
+                PathfindingInputError::InvalidPathItems {
+                    items: vec![InvalidPathItem {
+                        index: 1,
+                        path_item: PathItemLocation::OperationalPointReference(
+                            OperationalPointReference {
+                                reference:
+                                    OperationalPointIdentifier::OperationalPointUic {
+                                        uic: 8,
+                                        secondary_code: Some("BV".into())
+                                    },
+                                track_reference: 
+                                    Some(TrackReference::Name {
+                                        track_name: "V245".into()
+                                    }),
+                            }
+                        )
                     }]
                 }
             ))

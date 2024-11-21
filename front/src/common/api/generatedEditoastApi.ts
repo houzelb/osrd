@@ -2421,8 +2421,14 @@ export type TrackOffset = {
   offset: number;
   track: string;
 };
-export type PathItemLocation =
-  | TrackOffset
+export type TrackReference =
+  | {
+      track_id: string;
+    }
+  | {
+      track_name: string;
+    };
+export type OperationalPointReference = (
   | {
       operational_point: string;
     }
@@ -2436,7 +2442,11 @@ export type PathItemLocation =
       secondary_code?: string | null;
       /** The [UIC](https://en.wikipedia.org/wiki/List_of_UIC_country_codes) code of an operational point */
       uic: number;
-    };
+    }
+) & {
+  track_reference?: TrackReference | null;
+};
+export type PathItemLocation = TrackOffset | OperationalPointReference;
 export type PathfindingInputError =
   | {
       error_type: 'invalid_path_items';

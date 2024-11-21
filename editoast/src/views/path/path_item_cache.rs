@@ -4,10 +4,14 @@ use crate::error::Result;
 use crate::models::TrackSectionModel;
 use crate::RetrieveBatchUnchecked;
 use editoast_schemas::infra::TrackOffset;
+use editoast_schemas::primitives::NonBlankString;
+use editoast_schemas::train_schedule::OperationalPointReference;
+use editoast_schemas::train_schedule::TrackReference;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
 use editoast_models::DbConnection;
+use editoast_schemas::train_schedule::OperationalPointIdentifier;
 use editoast_schemas::train_schedule::PathItemLocation;
 
 use crate::models::OperationalPointModel;
@@ -23,6 +27,7 @@ pub struct PathItemCache {
     trigram_to_ops: HashMap<String, Vec<OperationalPointModel>>,
     ids_to_ops: HashMap<String, OperationalPointModel>,
     existing_track_ids: HashSet<String>,
+    track_ids_to_name: HashMap<String, NonBlankString>,
 }
 
 impl PathItemCache {
@@ -50,18 +55,30 @@ impl PathItemCache {
             .flat_map(|op| &op.parts)
             .map(|part| (infra_id, part.track.0.clone()))
             .chain(tracks);
-        let existing_track_ids =
-            TrackSectionModel::retrieve_batch_unchecked::<_, Vec<_>>(conn, tracks)
-                .await?
-                .into_iter()
-                .map(|track| track.obj_id)
-                .collect();
+        let track_sections =
+            TrackSectionModel::retrieve_batch_unchecked::<_, Vec<_>>(conn, tracks.clone()).await?;
+        let existing_track_ids = track_sections
+            .clone()
+            .into_iter()
+            .map(|track| track.obj_id)
+            .collect();
+        let track_ids_to_name = track_sections
+            .into_iter()
+            .filter_map(|track| {
+                track
+                    .extensions
+                    .sncf
+                    .as_ref()
+                    .map(|extension| (track.obj_id.clone(), extension.track_name.clone()))
+            })
+            .collect();
 
         Ok(PathItemCache {
             uic_to_ops,
             trigram_to_ops,
             ids_to_ops,
             existing_track_ids,
+            track_ids_to_name,
         })
     }
 
@@ -97,22 +114,39 @@ impl PathItemCache {
                 PathItemLocation::TrackOffset(track_offset) => {
                     vec![track_offset.clone()]
                 }
-                PathItemLocation::OperationalPointId { operational_point } => {
-                    match self.get_from_id(&operational_point.0) {
-                        Some(op) => op.track_offset(),
-                        None => {
+                PathItemLocation::OperationalPointReference(OperationalPointReference {
+                    reference: OperationalPointIdentifier::OperationalPointId { operational_point },
+                    track_reference,
+                }) => match self.get_from_id(&operational_point.0) {
+                    Some(op) => {
+                        let track_offsets = op.track_offset();
+                        let track_offsets =
+                            self.track_reference_filter(track_offsets, track_reference);
+                        if track_offsets.is_empty() {
                             invalid_path_items.push(InvalidPathItem {
                                 index,
                                 path_item: path_item.clone(),
                             });
                             continue;
-                        }
+                        };
+                        track_offsets
                     }
-                }
-                PathItemLocation::OperationalPointDescription {
-                    trigram,
-                    secondary_code,
-                } => {
+                    None => {
+                        invalid_path_items.push(InvalidPathItem {
+                            index,
+                            path_item: path_item.clone(),
+                        });
+                        continue;
+                    }
+                },
+                PathItemLocation::OperationalPointReference(OperationalPointReference {
+                    reference:
+                        OperationalPointIdentifier::OperationalPointDescription {
+                            trigram,
+                            secondary_code,
+                        },
+                    track_reference,
+                }) => {
                     let ops = self
                         .get_from_trigram(&trigram.0)
                         .cloned()
@@ -125,12 +159,25 @@ impl PathItemCache {
                         });
                         continue;
                     }
-                    track_offsets_from_ops(&ops)
+                    let track_offsets = track_offsets_from_ops(&ops);
+                    let track_offsets = self.track_reference_filter(track_offsets, track_reference);
+                    if track_offsets.is_empty() {
+                        invalid_path_items.push(InvalidPathItem {
+                            index,
+                            path_item: path_item.clone(),
+                        });
+                        continue;
+                    };
+                    track_offsets
                 }
-                PathItemLocation::OperationalPointUic {
-                    uic,
-                    secondary_code,
-                } => {
+                PathItemLocation::OperationalPointReference(OperationalPointReference {
+                    reference:
+                        OperationalPointIdentifier::OperationalPointUic {
+                            uic,
+                            secondary_code,
+                        },
+                    track_reference,
+                }) => {
                     let ops = self
                         .get_from_uic(i64::from(*uic))
                         .cloned()
@@ -143,7 +190,16 @@ impl PathItemCache {
                         });
                         continue;
                     }
-                    track_offsets_from_ops(&ops)
+                    let track_offsets = track_offsets_from_ops(&ops);
+                    let track_offsets = self.track_reference_filter(track_offsets, track_reference);
+                    if track_offsets.is_empty() {
+                        invalid_path_items.push(InvalidPathItem {
+                            index,
+                            path_item: path_item.clone(),
+                        });
+                        continue;
+                    };
+                    track_offsets
                 }
             };
 
@@ -173,6 +229,31 @@ impl PathItemCache {
 
         Ok(result)
     }
+
+    /// Filter operational points parts by a track label or a track id
+    /// If neither a track label or id is provided, the original list is returned
+    fn track_reference_filter(
+        &self,
+        track_offsets: Vec<TrackOffset>,
+        track_reference: &Option<TrackReference>,
+    ) -> Vec<TrackOffset> {
+        match track_reference {
+            Some(TrackReference::Id { track_id }) => track_offsets
+                .into_iter()
+                .filter(|track_offset| &track_offset.track == track_id)
+                .collect(),
+            Some(TrackReference::Name { track_name }) => track_offsets
+                .into_iter()
+                .filter(|track_offset| {
+                    self.track_ids_to_name
+                        .get::<String>(&track_offset.track)
+                        .unwrap()
+                        == track_name
+                })
+                .collect(),
+            None => track_offsets,
+        }
+    }
 }
 
 /// Collect the ids of the operational points from the path items
@@ -183,15 +264,25 @@ fn collect_path_item_ids(path_items: &[&PathItemLocation]) -> (Vec<String>, Vec<
 
     for item in path_items {
         match item {
-            PathItemLocation::OperationalPointDescription { trigram, .. } => {
+            PathItemLocation::OperationalPointReference(OperationalPointReference {
+                reference: OperationalPointIdentifier::OperationalPointDescription { trigram, .. },
+                ..
+            }) => {
                 trigrams.push(trigram.clone().0);
             }
-            PathItemLocation::OperationalPointUic { uic, .. } => {
+            PathItemLocation::OperationalPointReference(OperationalPointReference {
+                reference: OperationalPointIdentifier::OperationalPointUic { uic, .. },
+                ..
+            }) => {
                 ops_uic.push(i64::from(*uic));
             }
-            PathItemLocation::OperationalPointId {
-                operational_point, ..
-            } => {
+            PathItemLocation::OperationalPointReference(OperationalPointReference {
+                reference:
+                    OperationalPointIdentifier::OperationalPointId {
+                        operational_point, ..
+                    },
+                ..
+            }) => {
                 ops_id.push(operational_point.clone().0);
             }
             _ => {}

@@ -7,8 +7,11 @@ pub use schedule_item::ReceptionSignal;
 pub use schedule_item::ScheduleItem;
 
 mod path_item;
+pub use path_item::OperationalPointIdentifier;
+pub use path_item::OperationalPointReference;
 pub use path_item::PathItem;
 pub use path_item::PathItemLocation;
+pub use path_item::TrackReference;
 
 mod train_schedule_options;
 pub use train_schedule_options::TrainScheduleOptions;

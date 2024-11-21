@@ -9,6 +9,8 @@ use crate::infra::TrackOffset;
 editoast_common::schemas! {
     PathItem,
     PathItemLocation,
+    OperationalPointReference,
+    TrackReference,
 }
 
 /// A location on the path of a train
@@ -32,6 +34,34 @@ pub struct PathItem {
 #[serde(untagged, deny_unknown_fields)]
 pub enum PathItemLocation {
     TrackOffset(#[schema(inline)] TrackOffset),
+    OperationalPointReference(#[schema(inline)] OperationalPointReference),
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema, Hash)]
+pub struct OperationalPointReference {
+    #[serde(flatten)]
+    #[schema(inline)]
+    pub reference: OperationalPointIdentifier,
+    #[serde(default)]
+    pub track_reference: Option<TrackReference>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema, Hash)]
+#[serde(untagged, deny_unknown_fields)]
+pub enum TrackReference {
+    Id {
+        #[schema(inline)]
+        track_id: Identifier,
+    },
+    Name {
+        #[schema(inline)]
+        track_name: NonBlankString,
+    },
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema, Hash)]
+#[serde(untagged, deny_unknown_fields)]
+pub enum OperationalPointIdentifier {
     OperationalPointId {
         /// The object id of an operational point
         #[schema(inline)]
