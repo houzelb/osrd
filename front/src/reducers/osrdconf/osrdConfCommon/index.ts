@@ -46,6 +46,7 @@ export const defaultCommonConf: OsrdConfState = {
   featureInfoClick: { displayPopup: false },
   // Corresponds to origin and destination not defined
   pathSteps: [null, null],
+  pathStepsCompletedWithPFResult: false,
   rollingStockComfort: 'STANDARD' as const,
   startTime: new Date().toISOString(),
 };
@@ -75,7 +76,11 @@ interface CommonConfReducers<S extends OsrdConfState> extends InfraStateReducers
   ['updateFeatureInfoClick']: CaseReducer<S, PayloadAction<S['featureInfoClick']>>;
   ['updatePathSteps']: CaseReducer<
     S,
-    PayloadAction<{ pathSteps: S['pathSteps']; resetPowerRestrictions?: boolean }>
+    PayloadAction<{
+      pathSteps: S['pathSteps'];
+      resetPowerRestrictions?: boolean;
+      completedWithPFResult?: boolean;
+    }>
   >;
   ['deleteItinerary']: CaseReducer<S>;
   ['clearVias']: CaseReducer<S>;
@@ -165,6 +170,7 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
         }
         return pathStep;
       });
+      state.pathStepsCompletedWithPFResult = false;
     },
     updateGridMarginBefore(state: Draft<S>, action: PayloadAction<S['gridMarginBefore']>) {
       state.gridMarginBefore = action.payload;
@@ -178,23 +184,31 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
     },
     updatePathSteps(
       state: Draft<S>,
-      action: PayloadAction<{ pathSteps: S['pathSteps']; resetPowerRestrictions?: boolean }>
+      action: PayloadAction<{
+        pathSteps: S['pathSteps'];
+        resetPowerRestrictions?: boolean;
+        completedWithPFResult?: boolean;
+      }>
     ) {
       state.pathSteps = action.payload.pathSteps;
+      state.pathStepsCompletedWithPFResult = action.payload.completedWithPFResult || false;
       if (action.payload.resetPowerRestrictions) {
         state.powerRestriction = [];
       }
     },
     deleteItinerary(state: Draft<S>) {
       state.pathSteps = [null, null];
+      state.pathStepsCompletedWithPFResult = false;
     },
     clearVias(state: Draft<S>) {
       state.pathSteps = [state.pathSteps[0], state.pathSteps[state.pathSteps.length - 1]];
+      state.pathStepsCompletedWithPFResult = false;
     },
     // Use this action in the via list, not the suggested op list
     deleteVia(state: Draft<S>, action: PayloadAction<number>) {
       // Index takes count of the origin in the array
       state.pathSteps = removeElementAtIndex(state.pathSteps, action.payload + 1);
+      state.pathStepsCompletedWithPFResult = false;
     },
     // Use this action only to via added by click on map
     addVia(
@@ -209,10 +223,12 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
         action.payload.newVia,
         action.payload.pathProperties
       );
+      state.pathStepsCompletedWithPFResult = false;
     },
     moveVia: {
       reducer: (state: Draft<S>, action: PayloadAction<S['pathSteps']>) => {
         state.pathSteps = action.payload;
+        state.pathStepsCompletedWithPFResult = false;
       },
       prepare: (vias: S['pathSteps'], from: number, to: number) => {
         const newVias = Array.from(vias);
@@ -227,11 +243,13 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
     // from the suggested via modal
     upsertViaFromSuggestedOP(state: Draft<S>, action: PayloadAction<SuggestedOP>) {
       upsertPathStep(state.pathSteps, action.payload);
+      state.pathStepsCompletedWithPFResult = false;
     },
     upsertSeveralViasFromSuggestedOP(state: Draft<S>, action: PayloadAction<SuggestedOP[]>) {
       action.payload.forEach((suggestedOp) => {
         upsertPathStep(state.pathSteps, suggestedOp);
       });
+      state.pathStepsCompletedWithPFResult = false;
     },
     updateRollingStockComfort(state: Draft<S>, action: PayloadAction<S['rollingStockComfort']>) {
       state.rollingStockComfort = action.payload;
@@ -249,6 +267,7 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
           }
         : null;
       state.pathSteps = updateOriginPathStep(state.pathSteps, newPoint, true);
+      state.pathStepsCompletedWithPFResult = false;
     },
     updateDestination(state: Draft<S>, action: PayloadAction<ArrayElement<S['pathSteps']>>) {
       const prevDestinationArrivalType = state.pathSteps.at(-1)?.arrivalType;
@@ -260,6 +279,7 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
           }
         : null;
       state.pathSteps = updateDestinationPathStep(state.pathSteps, newPoint, true);
+      state.pathStepsCompletedWithPFResult = false;
     },
   };
 }

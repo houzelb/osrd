@@ -207,6 +207,7 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
     const state = store.getState()[slice.name];
     expect(state.pathSteps[1]?.stopFor).toEqual('PT60S');
     expect(state.pathSteps[1]?.stopType).toEqual('serviceStop');
+    expect(state.pathStepsCompletedWithPFResult).toEqual(false);
   });
 
   it('should handle updateFeatureInfoClick', () => {
@@ -237,6 +238,7 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
     defaultStore.dispatch(slice.actions.updatePathSteps({ pathSteps }));
     const state = defaultStore.getState()[slice.name];
     expect(state.pathSteps).toEqual(pathSteps);
+    expect(state.pathStepsCompletedWithPFResult).toEqual(false);
   });
 
   it('should handle updateOrigin', () => {
@@ -247,6 +249,7 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
     defaultStore.dispatch(slice.actions.updateOrigin(newOrigin));
     const state = defaultStore.getState()[slice.name];
     expect(state.pathSteps[0]).toEqual(newOrigin);
+    expect(state.pathStepsCompletedWithPFResult).toEqual(false);
   });
 
   it('should handle updateDestination', () => {
@@ -255,6 +258,7 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
     defaultStore.dispatch(slice.actions.updateDestination(newDestination));
     const state = defaultStore.getState()[slice.name];
     expect(last(state.pathSteps)).toEqual(newDestination);
+    expect(state.pathStepsCompletedWithPFResult).toEqual(false);
   });
 
   it('should handle deleteItinerary', () => {
@@ -265,6 +269,7 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
     store.dispatch(slice.actions.deleteItinerary());
     const state = store.getState()[slice.name];
     expect(state.pathSteps).toEqual([null, null]);
+    expect(state.pathStepsCompletedWithPFResult).toEqual(false);
   });
 
   it('should handle clearVias', () => {
@@ -275,6 +280,7 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
     store.dispatch(slice.actions.clearVias());
     const state = store.getState()[slice.name];
     expect(state.pathSteps).toEqual([pathSteps[0], last(pathSteps)]);
+    expect(state.pathStepsCompletedWithPFResult).toEqual(false);
   });
 
   it('should handle deleteVia', () => {
@@ -285,6 +291,7 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
     store.dispatch(slice.actions.deleteVia(0));
     const state = store.getState()[slice.name];
     expect(state.pathSteps).toEqual(removeElementAtIndex(pathSteps, 1));
+    expect(state.pathStepsCompletedWithPFResult).toEqual(false);
   });
 
   describe('should handle addVia', () => {
@@ -305,6 +312,7 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
       store.dispatch(slice.actions.addVia({ newVia: paris, pathProperties }));
       const state = store.getState()[slice.name];
       expect(state.pathSteps).toStrictEqual([null, parisNoPosition, strasbourg]);
+      expect(state.pathStepsCompletedWithPFResult).toEqual(false);
     });
 
     it('should handle insertion for a route with no existing via and no destination', () => {
@@ -372,6 +380,7 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
     store.dispatch(slice.actions.moveVia(pathSteps, 0, 2));
     const state = store.getState()[slice.name];
     expect(state.pathSteps).toStrictEqual([brest, lemans, paris, rennes, strasbourg]);
+    expect(state.pathStepsCompletedWithPFResult).toEqual(false);
   });
 
   describe('should handle upsertViaFromSuggestedOP', () => {
@@ -442,6 +451,7 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
       store.dispatch(slice.actions.upsertViaFromSuggestedOP(newVia));
       const state = store.getState()[slice.name];
       expect(state.pathSteps).toEqual([brest, rennes, updatedVia, paris, strasbourg]);
+      expect(state.pathStepsCompletedWithPFResult).toEqual(false);
     });
   });
 

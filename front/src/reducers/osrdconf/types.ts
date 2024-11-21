@@ -39,6 +39,7 @@ export interface OsrdConfState extends InfraState {
   gridMarginAfter?: number;
   featureInfoClick: { displayPopup: boolean; feature?: Feature; coordinates?: number[] };
   pathSteps: (PathStep | null)[];
+  pathStepsCompletedWithPFResult: boolean;
   rollingStockComfort: Comfort;
   // Format ISO 8601
   startTime: string;

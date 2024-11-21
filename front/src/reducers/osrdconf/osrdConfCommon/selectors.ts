@@ -49,6 +49,7 @@ const buildCommonConfSelectors = <ConfState extends OsrdConfState>(
     getPowerRestriction: makeOsrdConfSelector('powerRestriction'),
     getFeatureInfoClick: makeOsrdConfSelector('featureInfoClick'),
     getPathSteps,
+    getPathStepsCompletedWithPFResult: makeOsrdConfSelector('pathStepsCompletedWithPFResult'),
     getOrigin: (state: RootState) => {
       const pathSteps = getPathSteps(state);
       return pathSteps[0];

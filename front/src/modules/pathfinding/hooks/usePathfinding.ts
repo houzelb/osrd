@@ -28,6 +28,7 @@ import type { PathStep } from 'reducers/osrdconf/types';
 import { useAppDispatch } from 'store';
 import { isEmptyArray } from 'utils/array';
 import { castErrorToFailure } from 'utils/error';
+import { usePrevious } from 'utils/hooks/state';
 
 import useInfraStatus from './useInfraStatus';
 
@@ -150,16 +151,27 @@ export const usePathfinding = (
 ) => {
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
   const dispatch = useAppDispatch();
-  const { getInfraID, getOrigin, getDestination, getVias, getPathSteps, getPowerRestriction } =
-    useOsrdConfSelectors();
+  const {
+    getInfraID,
+    getOrigin,
+    getDestination,
+    getVias,
+    getPathSteps,
+    getPowerRestriction,
+    getPathStepsCompletedWithPFResult,
+  } = useOsrdConfSelectors();
   const infraId = useSelector(getInfraID, isEqual);
   const origin = useSelector(getOrigin, isEqual);
   const destination = useSelector(getDestination, isEqual);
   const vias = useSelector(getVias(), isEqual);
   const pathSteps = useSelector(getPathSteps);
+  const pathStepsCompletedWithPF = useSelector(getPathStepsCompletedWithPFResult);
   const powerRestrictions = useSelector(getPowerRestriction);
   const { infra, reloadCount, setIsInfraError } = useInfraStatus();
   const { rollingStock } = useStoreDataForRollingStockSelector();
+
+  const previousOrigin = usePrevious(origin);
+  const previousDestination = usePrevious(destination);
 
   const initializerArgs = {
     origin,
@@ -196,6 +208,11 @@ export const usePathfinding = (
   };
 
   useEffect(() => {
+    // ignore update made automatically to vias from pathfinding result
+    // we want only the changes asked manually by user
+    if (pathStepsCompletedWithPF) {
+      return;
+    }
     if (isPathfindingInitialized) {
       pathfindingDispatch({
         type: 'VIAS_CHANGED',
@@ -209,6 +226,12 @@ export const usePathfinding = (
   }, [vias]);
 
   useEffect(() => {
+    if (
+      (previousOrigin !== origin || previousDestination !== destination) &&
+      pathStepsCompletedWithPF
+    ) {
+      return;
+    }
     if (isPathfindingInitialized) {
       pathfindingDispatch({
         type: 'PATHFINDING_PARAM_CHANGED',
@@ -339,7 +362,11 @@ export const usePathfinding = (
                 );
               }
               dispatch(
-                updatePathSteps({ pathSteps: updatedPathSteps, resetPowerRestrictions: true })
+                updatePathSteps({
+                  pathSteps: updatedPathSteps,
+                  resetPowerRestrictions: true,
+                  completedWithPFResult: true,
+                })
               );
 
               const allWaypoints = upsertPathStepsInOPs(
