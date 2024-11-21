@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import nextId from 'react-id-generator';
 
 import type {
+  ImportStation,
   ImportedTrainSchedule,
   TrainScheduleImportConfig,
   Step,
@@ -15,7 +16,7 @@ import { getGraouTrainSchedules } from 'common/api/graouApi';
 import { type TrainScheduleBase } from 'common/api/osrdEditoastApi';
 import InputSNCF from 'common/BootstrapSNCF/InputSNCF';
 import { ModalContext } from 'common/BootstrapSNCF/ModalSNCF/ModalProvider';
-import StationCard, { type ImportStation } from 'common/StationCard';
+import StationCard from 'common/StationCard';
 import UploadFileModal from 'common/uploadFileModal';
 import StationSelector from 'modules/trainschedule/components/ImportTrainSchedule/ImportTrainScheduleStationSelector';
 import { setFailure } from 'reducers/main';
@@ -154,7 +155,7 @@ const ImportTrainScheduleConfig = ({
         date,
         startTime,
         endTime,
-      } as TrainScheduleImportConfig);
+      });
     }
   }
   // EXTRACT-CI-CH-CODE

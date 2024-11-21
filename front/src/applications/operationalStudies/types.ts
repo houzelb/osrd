@@ -40,9 +40,22 @@ export type ImportedTrainSchedule = {
   transilienName?: string;
 };
 
+export type ImportStation = {
+  trigram?: string;
+  name?: string;
+  yardname?: string;
+  town?: string;
+  department?: string;
+  region?: string;
+  uic?: number;
+  linename?: string;
+  pk?: string;
+  linecode?: string;
+};
+
 export type TrainScheduleImportConfig = {
-  from: string;
-  to: string;
+  from: ImportStation;
+  to: ImportStation;
   date: string;
   startTime: string;
   endTime: string;

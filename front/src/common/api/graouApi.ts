@@ -1,5 +1,7 @@
-import type { TrainScheduleImportConfig } from 'applications/operationalStudies/types';
-import type { ImportStation } from 'common/StationCard';
+import type {
+  ImportStation,
+  TrainScheduleImportConfig,
+} from 'applications/operationalStudies/types';
 
 export const GRAOU_URL = 'https://graou.info';
 

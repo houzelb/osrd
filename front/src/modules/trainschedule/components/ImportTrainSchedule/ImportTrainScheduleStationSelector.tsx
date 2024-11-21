@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import nextId from 'react-id-generator';
 
+import type { ImportStation } from 'applications/operationalStudies/types';
 import { searchGraouStations } from 'common/api/graouApi';
 import InputSNCF from 'common/BootstrapSNCF/InputSNCF';
 import { Loader } from 'common/Loaders';
-import StationCard, { type ImportStation } from 'common/StationCard';
+import StationCard from 'common/StationCard';
 import { useDebounce } from 'utils/helpers';
 
 interface ImportTrainScheduleStationSelectorProps {
