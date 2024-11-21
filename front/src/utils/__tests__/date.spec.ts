@@ -5,7 +5,6 @@ import {
   isoDateToMs,
   formatToIsoDate,
   serializeDateTimeWithoutYear,
-  parseDateTime,
   extractDateAndTimefromISO,
   isArrivalDateInSearchTimeWindow,
   formatLocaleDateToIsoDate,
@@ -51,26 +50,6 @@ describe('formatToIsoDate', () => {
     const msDate = 1714156215000;
     const isoDate = formatToIsoDate(msDate);
     expect(isoDate).toEqual('2024-04-26T18:30:15Z'); // Ends by Z because CI seems to be in UTC timezone
-  });
-});
-
-describe('parseDateTime', () => {
-  it('should parse a valid date-time string', () => {
-    const input = '18/07/2024 03:16:30';
-    const result = parseDateTime(input);
-    expect(result).toBeInstanceOf(Date);
-  });
-
-  it('should parse a valid date-time string with a single-digit day', () => {
-    const input = '1/07/2024 03:16:30';
-    const result = parseDateTime(input);
-    expect(result).toBeInstanceOf(Date);
-  });
-
-  it('should return null for an invalid date-time string', () => {
-    const input = 'invalid date';
-    const result = parseDateTime(input);
-    expect(result).toBeNull();
   });
 });
 

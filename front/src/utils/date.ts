@@ -180,17 +180,6 @@ export function substractDurationToIsoDate(
 }
 
 /**
- * Parses a date string in 'DD/MM/YYYY HH:mm:ss' format to a Date object.
- * @param {string} dateTime - The date-time string to be parsed.
- * @returns {Date | null} The parsed Date object, or null if the input is invalid.
- */
-export function parseDateTime(dateTime: string): Date | null {
-  const date = dayjs(dateTime, ['DD/MM/YYYY HH:mm:ss', 'D/MM/YYYY HH:mm:ss']);
-  if (!date.isValid()) return null;
-  return date.toDate();
-}
-
-/**
  * Serializes a Date object to a string format 'DD/MM HH:mm:ss' without the year.
  * @param {Date} date - The Date object to be serialized.
  * @returns {string} The formatted date-time string without the year.
