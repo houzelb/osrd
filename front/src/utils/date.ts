@@ -18,17 +18,6 @@ const userTimeZone = dayjs.tz.guess(); // Format : 'Europe/Paris'
 
 /**
  * @param dateTimeString date string in ISO format
- * @returns string "HH:MM:SS"
- */
-function extractHHMMSS(dateTimeString?: string) {
-  if (!dateTimeString) {
-    return '';
-  }
-  return dateTimeString.substring(11, 19);
-}
-
-/**
- * @param dateTimeString date string in ISO format
  * @returns string "HH:MM"
  */
 export function extractHHMM(dateTimeString?: string) {
@@ -40,7 +29,7 @@ export function extractHHMM(dateTimeString?: string) {
 
 export function timestampToHHMMSS(timestamp: number) {
   const date = new Date(timestamp * 1000);
-  return extractHHMMSS(date.toISOString());
+  return dayjs(date).format('HH:mm:ss');
 }
 
 export function formatIsoDate(date: Date) {
