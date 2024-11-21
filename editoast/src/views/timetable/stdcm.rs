@@ -33,7 +33,6 @@ use crate::core::pathfinding::InvalidPathItem;
 use crate::core::pathfinding::PathfindingResultSuccess;
 use crate::core::simulation::PhysicsConsistParameters;
 use crate::core::simulation::{RoutingRequirement, SimulationResponse, SpacingRequirement};
-use crate::core::stdcm::STDCMRequest;
 use crate::core::AsCoreRequest;
 use crate::core::CoreClient;
 use crate::error::Result;
@@ -210,7 +209,7 @@ async fn stdcm(
     let work_schedules = stdcm_request.get_work_schedules(conn).await?;
 
     // 5. Build STDCM request
-    let stdcm_request = STDCMRequest {
+    let stdcm_request = crate::core::stdcm::Request {
         infra: infra.id,
         expected_version: infra.version.clone(),
         rolling_stock_loading_gauge: rolling_stock.loading_gauge,
