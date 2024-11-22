@@ -3,14 +3,17 @@ import type {
   PathfindingInputError,
   PathfindingNotFound,
   SimulationSummaryResult,
+  TrainScheduleResult,
 } from 'common/api/osrdEditoastApi';
 
 export type ValidityFilter = 'both' | 'valid' | 'invalid';
 
 export type ScheduledPointsHonoredFilter = 'both' | 'honored' | 'notHonored';
 
-export type TrainScheduleWithDetails = {
-  id: number;
+export type TrainScheduleWithDetails = Omit<
+  TrainScheduleResult,
+  'train_name' | 'rolling_stock_name' | 'timetable_id'
+> & {
   trainName: string;
   startTime: Date;
   arrivalTime: Date | null;

@@ -16,16 +16,13 @@ import {
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import { formatSuggestedOperationalPoints, upsertPathStepsInOPs } from 'modules/pathfinding/utils';
 import { getSupportedElectrification, isThermal } from 'modules/rollingStock/helpers/electric';
-import { adjustConfWithTrainToModify } from 'modules/trainschedule/components/ManageTrainSchedule/helpers/adjustConfWithTrainToModify';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
+import computeBasePathSteps from 'modules/trainschedule/helpers/computeBasePathSteps';
 import { setFailure } from 'reducers/main';
-import type { OperationalStudiesConfSliceActions } from 'reducers/osrdconf/operationalStudiesConf';
 import type { PathStep } from 'reducers/osrdconf/types';
 import { useAppDispatch } from 'store';
 import { castErrorToFailure } from 'utils/error';
 import { getPointCoordinates } from 'utils/geometry';
-import { mmToM } from 'utils/physics';
-import { ISO8601Duration2sec } from 'utils/timeManipulation';
 
 import type { ManageTrainSchedulePathProperties } from '../types';
 
@@ -33,48 +30,6 @@ type ItineraryForTrainUpdate = {
   pathSteps: (PathStep | null)[];
   pathProperties: ManageTrainSchedulePathProperties;
 };
-
-/**
- * create pathSteps in the case pathfinding fails or the train is imported from NGE
- */
-const computeBasePathSteps = (trainSchedule: TrainScheduleResult) =>
-  trainSchedule.path.map((step) => {
-    const correspondingSchedule = trainSchedule.schedule?.find(
-      (schedule) => schedule.at === step.id
-    );
-
-    const {
-      arrival,
-      stop_for: stopFor,
-      locked,
-      reception_signal: receptionSignal,
-    } = correspondingSchedule || {};
-
-    const stepWithoutSecondaryCode = omit(step, ['secondary_code']);
-
-    if ('track' in stepWithoutSecondaryCode) {
-      stepWithoutSecondaryCode.offset = mmToM(stepWithoutSecondaryCode.offset!);
-    }
-
-    let name;
-    if ('trigram' in step) {
-      name = step.trigram + (step.secondary_code ? `/${step.secondary_code}` : '');
-    } else if ('uic' in step) {
-      name = step.uic.toString();
-    } else if ('operational_point' in step) {
-      name = step.operational_point;
-    }
-
-    return {
-      ...stepWithoutSecondaryCode,
-      ch: 'secondary_code' in step ? step.secondary_code : undefined,
-      name,
-      arrival, // ISODurationString
-      stopFor: stopFor ? ISO8601Duration2sec(stopFor).toString() : stopFor,
-      locked,
-      receptionSignal,
-    } as PathStep;
-  });
 
 export function updatePathStepsFromOperationalPoints(
   pathSteps: PathStep[],
@@ -122,11 +77,12 @@ const useSetupItineraryForTrainUpdate = (
   setPathProperties: (pathProperties: ManageTrainSchedulePathProperties) => void,
   trainIdToEdit: number
 ) => {
-  const { getInfraID, getUsingElectricalProfiles } = useOsrdConfSelectors();
+  const { getInfraID } = useOsrdConfSelectors();
   const infraId = useSelector(getInfraID);
-  const usingElectricalProfiles = useSelector(getUsingElectricalProfiles);
   const dispatch = useAppDispatch();
-  const osrdActions = useOsrdConfActions() as OperationalStudiesConfSliceActions;
+
+  const { updatePathSteps } = useOsrdConfActions();
+
   const [getTrainScheduleById] = osrdEditoastApi.endpoints.getTrainScheduleById.useLazyQuery({});
   const [getRollingStockByName] =
     osrdEditoastApi.endpoints.getRollingStockNameByRollingStockName.useLazyQuery();
@@ -237,7 +193,6 @@ const useSetupItineraryForTrainUpdate = (
       const trainSchedule = await getTrainScheduleById({ id: trainIdToEdit }).unwrap();
 
       let rollingStock: RollingStockWithLiveries | null = null;
-      let pathSteps: (PathStep | null)[] | undefined;
 
       if (trainSchedule.rolling_stock_name) {
         try {
@@ -245,7 +200,11 @@ const useSetupItineraryForTrainUpdate = (
             rollingStockName: trainSchedule.rolling_stock_name,
           }).unwrap();
           const itinerary = await computeItineraryForTrainUpdate(trainSchedule, rollingStock);
-          pathSteps = itinerary?.pathSteps;
+          const pathSteps = itinerary?.pathSteps;
+
+          if (pathSteps) {
+            dispatch(updatePathSteps({ pathSteps }));
+          }
 
           if (itinerary?.pathProperties) {
             setPathProperties(itinerary.pathProperties);
@@ -254,15 +213,6 @@ const useSetupItineraryForTrainUpdate = (
           dispatch(setFailure(castErrorToFailure(e)));
         }
       }
-
-      adjustConfWithTrainToModify(
-        trainSchedule,
-        pathSteps || computeBasePathSteps(trainSchedule),
-        rollingStock?.id,
-        dispatch,
-        usingElectricalProfiles,
-        osrdActions
-      );
     };
 
     setupItineraryForTrainUpdate();

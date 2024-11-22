@@ -11,9 +11,11 @@ import { GiPathDistance } from 'react-icons/gi';
 import { MANAGE_TRAIN_SCHEDULE_TYPES } from 'applications/operationalStudies/consts';
 import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import type { TrainScheduleBase, TrainScheduleResult } from 'common/api/osrdEditoastApi';
+import { useOsrdConfActions } from 'common/osrdContext';
 import RollingStock2Img from 'modules/rollingStock/components/RollingStock2Img';
 import trainNameWithNum from 'modules/trainschedule/components/ManageTrainSchedule/helpers/trainNameHelper';
 import { setFailure, setSuccess } from 'reducers/main';
+import type { OperationalStudiesConfSliceActions } from 'reducers/osrdconf/operationalStudiesConf';
 import { updateTrainIdUsedForProjection, updateSelectedTrainId } from 'reducers/simulationResults';
 import { useAppDispatch } from 'store';
 import { formatToIsoDate, isoDateToMs } from 'utils/date';
@@ -51,6 +53,8 @@ const TimetableTrainCard = ({
 }: TimetableTrainCardProps) => {
   const { t } = useTranslation(['operationalStudies/scenario']);
   const dispatch = useAppDispatch();
+  const { selectTrainToEdit } = useOsrdConfActions() as OperationalStudiesConfSliceActions;
+
   const [postTrainSchedule] =
     osrdEditoastApi.endpoints.postTimetableByIdTrainSchedule.useMutation();
   const [getTrainSchedule] = osrdEditoastApi.endpoints.postTrainSchedule.useLazyQuery();
@@ -61,6 +65,7 @@ const TimetableTrainCard = ({
   };
 
   const editTrainSchedule = () => {
+    dispatch(selectTrainToEdit(train));
     setTrainIdToEdit(train.id);
     setDisplayTrainScheduleManagement(MANAGE_TRAIN_SCHEDULE_TYPES.edit);
   };
