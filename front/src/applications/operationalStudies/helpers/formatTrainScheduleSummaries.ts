@@ -59,7 +59,7 @@ const formatTrainScheduleSummaries = (
           };
 
     return {
-      id: trainSchedule.id,
+      ...trainSchedule,
       trainName: trainSchedule.train_name,
       startTime,
       stopsCount:

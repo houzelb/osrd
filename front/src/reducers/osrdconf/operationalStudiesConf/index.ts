@@ -1,7 +1,11 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, type Draft, type PayloadAction } from '@reduxjs/toolkit';
 
+import type { TrainScheduleWithDetails } from 'modules/trainschedule/components/Timetable/types';
+import computeBasePathSteps from 'modules/trainschedule/helpers/computeBasePathSteps';
 import { defaultCommonConf, buildCommonConfReducers } from 'reducers/osrdconf/osrdConfCommon';
 import type { OsrdConfState } from 'reducers/osrdconf/types';
+import { convertIsoUtcToLocalTime } from 'utils/date';
+import { msToKmh } from 'utils/physics';
 
 import { builPowerRestrictionReducer } from './powerRestrictionReducer';
 
@@ -13,6 +17,33 @@ export const operationalStudiesConfSlice = createSlice({
   reducers: {
     ...buildCommonConfReducers<OperationalStudiesConfState>(),
     ...builPowerRestrictionReducer<OperationalStudiesConfState>(),
+    selectTrainToEdit(
+      state: Draft<OperationalStudiesConfState>,
+      action: PayloadAction<TrainScheduleWithDetails>
+    ) {
+      const {
+        rollingStock,
+        trainName,
+        initial_speed,
+        start_time,
+        options,
+        speedLimitTag,
+        labels,
+        power_restrictions,
+      } = action.payload;
+
+      state.rollingStockID = rollingStock?.id;
+      state.pathSteps = computeBasePathSteps(action.payload);
+      state.startTime = convertIsoUtcToLocalTime(start_time);
+
+      state.name = trainName;
+      state.initialSpeed = initial_speed ? Math.floor(msToKmh(initial_speed) * 10) / 10 : 0;
+
+      state.usingElectricalProfiles = options?.use_electrical_profiles ?? true;
+      state.labels = labels;
+      state.speedLimitByTag = speedLimitTag || undefined;
+      state.powerRestriction = power_restrictions || [];
+    },
   },
 });
 
