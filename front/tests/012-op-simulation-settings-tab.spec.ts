@@ -30,9 +30,6 @@ test.describe('Simulation Settings Tab Verification', () => {
   // Set viewport to avoid scrolling issues and ensure elements are attached to the DOM
   test.use({ viewport: { width: 1920, height: 1080 } });
 
-  // TODO: Remove the skip when bug #9344 is fixed
-  test.skip(({ browserName }) => browserName === 'webkit', 'Skip this test on Safari');
-
   const expectedCellDataElectricalProfileON: StationData[] = readJsonFile(
     './tests/assets/operationStudies/simulationSettings/electricalProfiles/electricalProfileON.json'
   );
@@ -64,6 +61,7 @@ test.describe('Simulation Settings Tab Verification', () => {
   let infra: Infra;
   let OSRDLanguage: string;
   type TranslationKeys = keyof typeof enTranslations;
+  let stabilityTimeout: number;
 
   // Define CellData interface for table cell data
   interface CellData {
@@ -85,7 +83,8 @@ test.describe('Simulation Settings Tab Verification', () => {
 
   test.beforeEach(
     'Navigate to Times and Stops tab with rolling stock and route set',
-    async ({ page }) => {
+    async ({ page, browserName }) => {
+      stabilityTimeout = browserName === 'webkit' ? 2000 : 500;
       const [operationalStudiesPage, routePage, rollingStockPage, homePage] = [
         new OperationalStudiesPage(page),
         new RoutePage(page),
@@ -165,9 +164,9 @@ test.describe('Simulation Settings Tab Verification', () => {
     // Add the train schedule and verify output results
     await operationalStudiesPage.addTrainSchedule();
     await operationalStudiesPage.returnSimulationResult();
-    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
     await opTimetablePage.getTrainArrivalTime('11:53');
     await opTimetablePage.clickOnScenarioCollapseButton();
+    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataElectricalProfileON, OSRDLanguage);
     await opTimetablePage.clickOnTimetableCollapseButton();
@@ -176,11 +175,10 @@ test.describe('Simulation Settings Tab Verification', () => {
     await operationalStudiesPage.clickOnSimulationSettingsTab();
     await opSimulationSettingsPage.deactivateElectricalProfile();
     await opTimetablePage.clickOnEditTrainSchedule();
-    // TODO: Remove the reload when bug #8854 (UI not updating after modification) is fixed
-    await page.reload({ timeout: 30000, waitUntil: 'networkidle' });
-    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
+    await page.waitForTimeout(stabilityTimeout); // Waiting for the timetable to update due to a slight latency
     await opTimetablePage.getTrainArrivalTime('11:52');
     await opTimetablePage.clickOnScenarioCollapseButton();
+    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
     await opOutputTablePage.getOutputTableData(expectedCellDataElectricalProfileOFF, OSRDLanguage);
   });
   test('Activate composition code', async ({ page }) => {
@@ -220,9 +218,9 @@ test.describe('Simulation Settings Tab Verification', () => {
     // Add the train schedule and verify output results
     await operationalStudiesPage.addTrainSchedule();
     await operationalStudiesPage.returnSimulationResult();
-    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
     await opTimetablePage.getTrainArrivalTime('12:03');
     await opTimetablePage.clickOnScenarioCollapseButton();
+    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataCodeCompoON, OSRDLanguage);
     await opTimetablePage.clickOnTimetableCollapseButton();
@@ -231,11 +229,10 @@ test.describe('Simulation Settings Tab Verification', () => {
     await operationalStudiesPage.clickOnSimulationSettingsTab();
     await opSimulationSettingsPage.selectCodeCompoOption('__PLACEHOLDER__');
     await opTimetablePage.clickOnEditTrainSchedule();
-    // TODO: Remove the reload when bug #8854 (UI not updating after modification) is fixed
-    await page.reload({ timeout: 30000, waitUntil: 'networkidle' });
-    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
+    await page.waitForTimeout(stabilityTimeout);
     await opTimetablePage.getTrainArrivalTime('11:52');
     await opTimetablePage.clickOnScenarioCollapseButton();
+    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
     await opOutputTablePage.getOutputTableData(expectedCellDataCodeCompoOFF, OSRDLanguage);
   });
   test('Activate linear and mareco margin', async ({ page }) => {
@@ -284,9 +281,9 @@ test.describe('Simulation Settings Tab Verification', () => {
     // Add the train schedule and verify output results
     await operationalStudiesPage.addTrainSchedule();
     await operationalStudiesPage.returnSimulationResult();
-    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
     await opTimetablePage.getTrainArrivalTime('11:54');
     await opTimetablePage.clickOnScenarioCollapseButton();
+    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataLinearMargin, OSRDLanguage);
     await opTimetablePage.clickOnTimetableCollapseButton();
@@ -295,11 +292,10 @@ test.describe('Simulation Settings Tab Verification', () => {
     await operationalStudiesPage.clickOnSimulationSettingsTab();
     await opSimulationSettingsPage.activateMarecoMargin();
     await opTimetablePage.clickOnEditTrainSchedule();
-    // TODO: Remove the reload when bug #8854 (UI not updating after modification) is fixed
-    await page.reload({ timeout: 30000, waitUntil: 'networkidle' });
-    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
+    await page.waitForTimeout(stabilityTimeout);
     await opTimetablePage.getTrainArrivalTime('11:54');
     await opTimetablePage.clickOnScenarioCollapseButton();
+    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
     await opOutputTablePage.getOutputTableData(expectedCellDataMarecoMargin, OSRDLanguage);
   });
   test('Add all the simulation settings', async ({ page }) => {
@@ -349,9 +345,9 @@ test.describe('Simulation Settings Tab Verification', () => {
     // Add the train schedule and verify output results
     await operationalStudiesPage.addTrainSchedule();
     await operationalStudiesPage.returnSimulationResult();
-    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
     await opTimetablePage.getTrainArrivalTime('12:06');
     await opTimetablePage.clickOnScenarioCollapseButton();
+    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataForAllSettings, OSRDLanguage);
   });

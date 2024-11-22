@@ -493,6 +493,7 @@ class STDCMPage {
 
   async downloadSimulation(browserName: string) {
     // Wait for the download event
+    await this.page.waitForTimeout(500);
     const downloadPromise = this.page.waitForEvent('download', { timeout: 120000 });
     await this.downloadSimulationButton.click({ force: true });
     const download = await downloadPromise.catch(() => {
