@@ -100,4 +100,4 @@ updates:
     open-pull-requests-limit: 100
     labels:
       - "dependencies"
-      - "area:actions"
+      - "area:ci"
