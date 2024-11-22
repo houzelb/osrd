@@ -8,7 +8,7 @@ export const getTimesInfoFromDate = (date?: Date) =>
         date,
         arrivalDate: dateToDDMMYYYY(date), // ISO date part
         arrivalTime: dateToHHMMSS(date, { withoutSeconds: true }),
-        arrivalTimehours: date.getHours(),
+        arrivalTimeHours: date.getHours(),
         arrivalTimeMinutes: date.getMinutes(),
       }
     : undefined;
