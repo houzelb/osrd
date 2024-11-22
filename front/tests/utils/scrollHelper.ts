@@ -20,6 +20,7 @@ const scrollContainer = async (
   { stepSize = 300, timeout = 20, scrollOffsetThreshold = 200 }: ScrollOptions = {}
 ): Promise<void> => {
   // Locate the scrollable container on the page
+  await page.waitForSelector(containerSelector, { state: 'visible' });
   const container = await page.evaluateHandle(
     (selector: string) => document.querySelector(selector),
     containerSelector
