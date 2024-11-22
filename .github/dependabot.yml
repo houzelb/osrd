@@ -91,6 +91,11 @@ updates:
     labels:
       - "dependencies"
       - "area:core"
+    groups:
+      kotlin:
+        patterns:
+          - "kotlin"
+          - "ksp"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
