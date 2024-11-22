@@ -166,7 +166,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await operationalStudiesPage.returnSimulationResult();
     await opTimetablePage.getTrainArrivalTime('11:53');
     await opTimetablePage.clickOnScenarioCollapseButton();
-    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
+    await opOutputTablePage.verifyTimesStopsDataSheetVisibility();
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataElectricalProfileON, OSRDLanguage);
     await opTimetablePage.clickOnTimetableCollapseButton();
@@ -178,7 +178,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await page.waitForTimeout(stabilityTimeout); // Waiting for the timetable to update due to a slight latency
     await opTimetablePage.getTrainArrivalTime('11:52');
     await opTimetablePage.clickOnScenarioCollapseButton();
-    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
+    await opOutputTablePage.verifyTimesStopsDataSheetVisibility();
     await opOutputTablePage.getOutputTableData(expectedCellDataElectricalProfileOFF, OSRDLanguage);
   });
   test('Activate composition code', async ({ page }) => {
@@ -220,7 +220,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await operationalStudiesPage.returnSimulationResult();
     await opTimetablePage.getTrainArrivalTime('12:03');
     await opTimetablePage.clickOnScenarioCollapseButton();
-    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
+    await opOutputTablePage.verifyTimesStopsDataSheetVisibility();
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataCodeCompoON, OSRDLanguage);
     await opTimetablePage.clickOnTimetableCollapseButton();
@@ -232,7 +232,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await page.waitForTimeout(stabilityTimeout);
     await opTimetablePage.getTrainArrivalTime('11:52');
     await opTimetablePage.clickOnScenarioCollapseButton();
-    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
+    await opOutputTablePage.verifyTimesStopsDataSheetVisibility();
     await opOutputTablePage.getOutputTableData(expectedCellDataCodeCompoOFF, OSRDLanguage);
   });
   test('Activate linear and mareco margin', async ({ page }) => {
@@ -283,7 +283,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await operationalStudiesPage.returnSimulationResult();
     await opTimetablePage.getTrainArrivalTime('11:54');
     await opTimetablePage.clickOnScenarioCollapseButton();
-    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
+    await opOutputTablePage.verifyTimesStopsDataSheetVisibility();
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataLinearMargin, OSRDLanguage);
     await opTimetablePage.clickOnTimetableCollapseButton();
@@ -295,7 +295,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await page.waitForTimeout(stabilityTimeout);
     await opTimetablePage.getTrainArrivalTime('11:54');
     await opTimetablePage.clickOnScenarioCollapseButton();
-    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
+    await opOutputTablePage.verifyTimesStopsDataSheetVisibility();
     await opOutputTablePage.getOutputTableData(expectedCellDataMarecoMargin, OSRDLanguage);
   });
   test('Add all the simulation settings', async ({ page }) => {
@@ -347,7 +347,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await operationalStudiesPage.returnSimulationResult();
     await opTimetablePage.getTrainArrivalTime('12:06');
     await opTimetablePage.clickOnScenarioCollapseButton();
-    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
+    await opOutputTablePage.verifyTimesStopsDataSheetVisibility();
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataForAllSettings, OSRDLanguage);
   });

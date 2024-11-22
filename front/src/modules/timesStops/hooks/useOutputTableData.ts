@@ -18,7 +18,7 @@ import { ARRIVAL_TIME_ACCEPTABLE_ERROR_MS } from '../consts';
 import { computeInputDatetimes } from '../helpers/arrivalTime';
 import computeMargins, { getTheoreticalMargins } from '../helpers/computeMargins';
 import { formatSchedule } from '../helpers/scheduleData';
-import { type ScheduleEntry, type TimeStopsRow } from '../types';
+import { type ScheduleEntry, type TimesStopsRow } from '../types';
 
 const useOutputTableData = (
   { final_output: simulatedTrain }: SimulationResponseSuccess,
@@ -26,11 +26,11 @@ const useOutputTableData = (
   operationalPoints?: PathPropertiesFormatted['operationalPoints'],
   selectedTrainSchedule?: TrainScheduleResult,
   path?: PathfindingResultSuccess
-): TimeStopsRow[] => {
+): TimesStopsRow[] => {
   const { t } = useTranslation('timesStops');
   const { getTrackSectionsByIds } = useScenarioContext();
 
-  const [rows, setRows] = useState<TimeStopsRow[]>([]);
+  const [rows, setRows] = useState<TimesStopsRow[]>([]);
 
   const scheduleByAt: Record<string, ScheduleEntry> = keyBy(selectedTrainSchedule?.schedule, 'at');
   const theoreticalMargins = selectedTrainSchedule && getTheoreticalMargins(selectedTrainSchedule);

@@ -9,7 +9,7 @@ export type TimeExtraDays = {
   dayDisplayed?: boolean;
 };
 
-export type TimeStopsRow = {
+export type TimesStopsRow = {
   opId: string;
   name?: string;
   ch?: string;
@@ -33,7 +33,7 @@ export type TimeStopsRow = {
   isMarginValid?: boolean;
 };
 
-export type TimesStopsInputRow = Omit<SuggestedOP, 'arrival' | 'departure'> & TimeStopsRow;
+export type TimesStopsInputRow = Omit<SuggestedOP, 'arrival' | 'departure'> & TimesStopsRow;
 
 export enum TableType {
   Input = 'Input',
