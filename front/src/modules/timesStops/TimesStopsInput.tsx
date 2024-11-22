@@ -64,7 +64,7 @@ type TimesStopsInputProps = {
 const TimesStopsInput = ({ allWaypoints, startTime, pathSteps }: TimesStopsInputProps) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation('timesStops');
-  const { updatePathSteps, upsertSeveralViasFromSuggestedOP } = useOsrdConfActions();
+  const { deleteVia, upsertSeveralViasFromSuggestedOP } = useOsrdConfActions();
 
   const [rows, setRows] = useState<TimesStopsInputRow[]>([]);
 
@@ -88,19 +88,7 @@ const TimesStopsInput = ({ allWaypoints, startTime, pathSteps }: TimesStopsInput
 
     if (index === -1) return;
 
-    const updatedPathSteps = pathSteps.map((step, i) => {
-      if (i === index) {
-        return {
-          ...step,
-          stopFor: undefined,
-          theoreticalMargin: undefined,
-          arrival: undefined,
-          receptionSignal: undefined,
-        };
-      }
-      return step;
-    });
-    dispatch(updatePathSteps({ pathSteps: updatedPathSteps }));
+    dispatch(deleteVia(index - 1));
   };
 
   const onChange = useCallback(
