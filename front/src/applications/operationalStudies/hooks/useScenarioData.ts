@@ -163,27 +163,43 @@ const useScenarioData = (
     });
   }, []);
 
-  return {
-    selectedTrainId,
-    trainScheduleSummaries,
-    trainSchedules,
-    projectionData:
-      trainScheduleUsedForProjection && projectionPath
-        ? {
-            trainSchedule: trainScheduleUsedForProjection,
-            ...projectionPath,
-            projectedTrains,
-            projectionLoaderData: {
-              allTrainsProjected,
-              totalTrains: timetable.train_ids.length,
-            },
-          }
-        : undefined,
-    simulationResults,
-    conflicts,
-    removeTrains,
-    upsertTrainSchedules,
-  };
+  return useMemo(
+    () => ({
+      selectedTrainId,
+      trainScheduleSummaries,
+      trainSchedules,
+      projectionData:
+        trainScheduleUsedForProjection && projectionPath
+          ? {
+              trainSchedule: trainScheduleUsedForProjection,
+              ...projectionPath,
+              projectedTrains,
+              projectionLoaderData: {
+                allTrainsProjected,
+                totalTrains: timetable.train_ids.length,
+              },
+            }
+          : undefined,
+      simulationResults,
+      conflicts,
+      removeTrains,
+      upsertTrainSchedules,
+    }),
+    [
+      selectedTrainId,
+      trainScheduleSummaries,
+      trainSchedules,
+      trainScheduleUsedForProjection,
+      projectionPath,
+      projectedTrains,
+      allTrainsProjected,
+      timetable.train_ids.length,
+      simulationResults,
+      conflicts,
+      removeTrains,
+      upsertTrainSchedules,
+    ]
+  );
 };
 
 export default useScenarioData;

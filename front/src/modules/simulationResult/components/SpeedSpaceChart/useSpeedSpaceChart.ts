@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type {
   LayerData,
@@ -94,19 +94,23 @@ const useSpeedSpaceChart = (
     }
   }, [simulation, trainScheduleResult, rollingStock, departureTime]);
 
-  return trainScheduleResult &&
-    rollingStock &&
-    simulation?.status === 'success' &&
-    formattedPathProperties &&
-    departureTime
-    ? {
-        rollingStock,
-        formattedPowerRestrictions,
-        simulation,
-        formattedPathProperties,
-        departureTime,
-      }
-    : null;
+  return useMemo(
+    () =>
+      trainScheduleResult &&
+      rollingStock &&
+      simulation?.status === 'success' &&
+      formattedPathProperties &&
+      departureTime
+        ? {
+            rollingStock,
+            formattedPowerRestrictions,
+            simulation,
+            formattedPathProperties,
+            departureTime,
+          }
+        : null,
+    [rollingStock, formattedPowerRestrictions, simulation, formattedPathProperties, departureTime]
+  );
 };
 
 export default useSpeedSpaceChart;

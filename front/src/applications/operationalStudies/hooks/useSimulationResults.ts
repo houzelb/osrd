@@ -6,6 +6,7 @@ import useSpeedSpaceChart from 'modules/simulationResult/components/SpeedSpaceCh
 import { getSelectedTrainId } from 'reducers/simulationResults/selectors';
 
 import type { SimulationResultsData } from '../types';
+import { useMemo } from 'react';
 
 /**
  * Prepare data to be used in simulation results
@@ -50,15 +51,18 @@ const useSimulationResults = (): SimulationResultsData => {
       selectedTrainPowerRestrictions: [],
     };
 
-  return {
-    selectedTrainSchedule,
-    selectedTrainRollingStock: speedSpaceChart?.rollingStock,
-    selectedTrainPowerRestrictions: speedSpaceChart?.formattedPowerRestrictions || [],
-    trainSimulation: speedSpaceChart?.simulation,
-    pathProperties: speedSpaceChart?.formattedPathProperties,
-    pathLength: path?.length,
-    path,
-  };
+  return useMemo(
+    () => ({
+      selectedTrainSchedule,
+      selectedTrainRollingStock: speedSpaceChart?.rollingStock,
+      selectedTrainPowerRestrictions: speedSpaceChart?.formattedPowerRestrictions || [],
+      trainSimulation: speedSpaceChart?.simulation,
+      pathProperties: speedSpaceChart?.formattedPathProperties,
+      pathLength: path?.length,
+      path,
+    }),
+    [selectedTrainSchedule, speedSpaceChart, path]
+  );
 };
 
 export default useSimulationResults;
