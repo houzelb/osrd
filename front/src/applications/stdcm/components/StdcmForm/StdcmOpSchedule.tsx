@@ -26,7 +26,7 @@ type StdcmOpScheduleProps = {
     date: Date;
     arrivalDate: string;
     arrivalTime: string;
-    arrivalTimehours: number;
+    arrivalTimeHours: number;
     arrivalTimeMinutes: number;
   };
   opToleranceValues: {
@@ -70,7 +70,7 @@ const StdcmOpSchedule = ({
             ? opTimingData.date
             : defaultDate(searchDatetimeWindow?.begin),
         arrivalTime: opTimingData?.arrivalTime,
-        arrivalTimeHours: opTimingData?.arrivalTimehours,
+        arrivalTimeHours: opTimingData?.arrivalTimeHours,
         arrivalTimeMinutes: opTimingData?.arrivalTimeMinutes,
         arrivalToleranceValues: {
           minusTolerance: opToleranceValues.arrivalToleranceBefore,
