@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { useSelector } from 'react-redux';
 
 import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
@@ -6,7 +8,6 @@ import useSpeedSpaceChart from 'modules/simulationResult/components/SpeedSpaceCh
 import { getSelectedTrainId } from 'reducers/simulationResults/selectors';
 
 import type { SimulationResultsData } from '../types';
-import { useMemo } from 'react';
 
 /**
  * Prepare data to be used in simulation results
