@@ -725,4 +725,16 @@ class PathPropertiesTests {
         }
         return LineString.make(latitudes.toDoubleArray(), longitudes.toDoubleArray())
     }
+
+    @Test
+    fun testG1RollingStockLoadingGaugeCompatibility() {
+        // G1 train is compatible with any track gauge except GLOTT (not sure so default to not
+        // compatible) and FR3.3/GB/G2 that is not a track gauge
+        for (trackGauge in
+            RJSLoadingGaugeType.entries.minus(
+                listOf(RJSLoadingGaugeType.GLOTT, RJSLoadingGaugeType.FR3_3_GB_G2)
+            )) {
+            assert(trackGauge.compatibleGaugeTypes.contains(RJSLoadingGaugeType.G1))
+        }
+    }
 }
