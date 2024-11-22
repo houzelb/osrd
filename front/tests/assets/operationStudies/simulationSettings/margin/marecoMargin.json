@@ -8,9 +8,9 @@
     "signalReceptionClosed": false,
     "margin": {
       "theoretical": "10 %",
-      "theoreticalS": "0 s",
-      "actual": "0 s",
-      "difference": "0 s"
+      "theoreticalS": "104 s",
+      "actual": "105 s",
+      "difference": "1 s"
     },
     "calculatedArrival": "11:22:40",
     "calculatedDeparture": ""
@@ -24,9 +24,9 @@
     "signalReceptionClosed": false,
     "margin": {
       "theoretical": "",
-      "theoreticalS": "104 s",
-      "actual": "105 s",
-      "difference": "1 s"
+      "theoreticalS": "",
+      "actual": "",
+      "difference": ""
     },
     "calculatedArrival": "11:32:33",
     "calculatedDeparture": ""
@@ -39,10 +39,10 @@
     "stopTime": "124",
     "signalReceptionClosed": false,
     "margin": {
-      "theoretical": "",
-      "theoreticalS": "165 s",
-      "actual": "167 s",
-      "difference": "1 s"
+      "theoretical": "10 %",
+      "theoreticalS": "62 s",
+      "actual": "62 s",
+      "difference": "0 s"
     },
     "calculatedArrival": "11:41:40",
     "calculatedDeparture": "11:43:44"

@@ -90,7 +90,8 @@ class OperationalStudiesOutputTablePage extends OperationalStudiesTimetablePage 
           .locator('input.dsg-checkbox')
           .isChecked(),
         OperationalStudiesOutputTablePage.getCellValue(
-          cells.nth(headerIndexMap[translations.theoreticalMargin])
+          cells.nth(headerIndexMap[translations.theoreticalMargin]),
+          false
         ),
         OperationalStudiesOutputTablePage.getCellValue(
           cells.nth(headerIndexMap[translations.theoreticalMarginSeconds])

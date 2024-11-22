@@ -21,6 +21,7 @@ export type TimeStopsRow = {
   onStopSignal?: boolean;
   shortSlipDistance?: boolean;
   theoreticalMargin?: string; // value asked by user
+  isTheoreticalMarginBoundary?: boolean; // tells whether the theoreticalMargin value was inputted for this line or if it is repeated from a previous line
 
   theoreticalMarginSeconds?: string;
   calculatedMargin?: string;
@@ -39,3 +40,8 @@ export enum TableType {
 }
 
 export type ScheduleEntry = ArrayElement<TrainScheduleResult['schedule']>;
+
+export type TheoreticalMarginsRecord = Record<
+  string,
+  { theoreticalMargin: string; isBoundary: boolean }
+>;
