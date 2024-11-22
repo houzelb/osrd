@@ -10,7 +10,7 @@ import { NO_BREAK_SPACE } from 'utils/strings';
 
 import useOutputTableData from './hooks/useOutputTableData';
 import TimesStops from './TimesStops';
-import { TableType, type TimeStopsRow } from './types';
+import { TableType, type TimesStopsRow } from './types';
 
 type TimesStopsOutputProps = {
   simulatedTrain: SimulationResponseSuccess;
@@ -41,7 +41,7 @@ const TimesStopsOutput = ({
       rows={enrichedOperationalPoints}
       tableType={TableType.Output}
       cellClassName={({ rowData: rowData_, columnId }) => {
-        const rowData = rowData_ as TimeStopsRow;
+        const rowData = rowData_ as TimesStopsRow;
         const arrivalScheduleNotRespected = rowData.arrival?.time
           ? rowData.calculatedArrival !== rowData.arrival.time
           : false;

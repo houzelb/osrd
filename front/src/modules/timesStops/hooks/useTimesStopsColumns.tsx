@@ -11,7 +11,7 @@ import { marginRegExValidation } from '../consts';
 import { disabledTextColumn } from '../helpers/utils';
 import ReadOnlyTime from '../ReadOnlyTime';
 import TimeInput from '../TimeInput';
-import { TableType, type TimeExtraDays, type TimeStopsRow } from '../types';
+import { TableType, type TimeExtraDays, type TimesStopsRow } from '../types';
 
 const timeColumn = (isOutputTable: boolean) =>
   ({
@@ -33,7 +33,7 @@ function headerWithTitleTagIfShortened(shortenedHeader: string, fullHeader: stri
   return <span title={fullHeader}> {shortenedHeader} </span>;
 }
 
-export const useTimeStopsColumns = <T extends TimeStopsRow>(
+export const useTimesStopsColumns = <T extends TimesStopsRow>(
   tableType: TableType,
   allWaypoints: T[] = []
 ) => {

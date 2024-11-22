@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next';
 
 import { Loader } from 'common/Loaders/Loader';
 
-import { useTimeStopsColumns } from './hooks/useTimeStopsColumns';
-import { type TableType, type TimeStopsRow } from './types';
+import { useTimesStopsColumns } from './hooks/useTimesStopsColumns';
+import { type TableType, type TimesStopsRow } from './types';
 
-type TimesStopsProps<T extends TimeStopsRow> = {
+type TimesStopsProps<T extends TimesStopsRow> = {
   rows: T[];
   tableType: TableType;
   cellClassName?: DataSheetGridProps['cellClassName'];
@@ -18,7 +18,7 @@ type TimesStopsProps<T extends TimeStopsRow> = {
   dataIsLoading: boolean;
 };
 
-const TimesStops = <T extends TimeStopsRow>({
+const TimesStops = <T extends TimesStopsRow>({
   rows,
   tableType,
   cellClassName,
@@ -29,7 +29,7 @@ const TimesStops = <T extends TimeStopsRow>({
 }: TimesStopsProps<T>) => {
   const { t } = useTranslation('timesStops');
 
-  const columns = useTimeStopsColumns(tableType, rows);
+  const columns = useTimesStopsColumns(tableType, rows);
 
   if (dataIsLoading) {
     return (

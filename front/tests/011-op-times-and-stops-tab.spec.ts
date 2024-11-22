@@ -173,7 +173,7 @@ test.describe('Times and Stops Tab Verification', () => {
     // Add train schedule, verify results and output table data
     await operationalStudiesPage.addTrainSchedule();
     await operationalStudiesPage.returnSimulationResult();
-    await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
+    await opOutputTablePage.verifyTimesStopsDataSheetVisibility();
 
     // Scroll and extract output table data for verification
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');

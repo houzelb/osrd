@@ -143,10 +143,10 @@ class OperationalStudiesOutputTablePage extends OperationalStudiesTimetablePage 
   }
 
   // Wait for the Times and Stops simulation data sheet to be fully loaded with a specified timeout (default: 60 seconds)
-  async verifyTimeStopsDataSheetVisibility(timeout = 60 * 1000): Promise<void> {
-    await this.timeStopsDataSheet.waitFor({ state: 'visible', timeout });
+  async verifyTimesStopsDataSheetVisibility(timeout = 60 * 1000): Promise<void> {
+    await this.timesStopsDataSheet.waitFor({ state: 'visible', timeout });
     await this.page.waitForTimeout(100); // Short delay for stabilization
-    await this.timeStopsDataSheet.scrollIntoViewIfNeeded({ timeout });
+    await this.timesStopsDataSheet.scrollIntoViewIfNeeded({ timeout });
   }
 }
 
