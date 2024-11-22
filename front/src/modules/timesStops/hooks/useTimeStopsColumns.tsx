@@ -158,7 +158,7 @@ export const useTimeStopsColumns = <T extends TimeStopsRow>(
             continuousUpdates: false,
             placeholder: !isOutputTable ? t('theoreticalMarginPlaceholder') : '',
             formatBlurredInput: (value) => {
-              if (!value || value === '0%') return '';
+              if (!value) return '';
               if (!isOutputTable && !marginRegExValidation.test(value)) {
                 return `${value}${t('theoreticalMarginPlaceholder')}`;
               }
@@ -168,7 +168,10 @@ export const useTimeStopsColumns = <T extends TimeStopsRow>(
           })
         ),
         cellClassName: ({ rowData }) =>
-          cx({ invalidCell: !isOutputTable && !rowData.isMarginValid }),
+          cx({
+            invalidCell: !isOutputTable && !rowData.isMarginValid,
+            repeatedValue: rowData.isTheoreticalMarginBoundary === false, // the class should be added on false but not undefined
+          }),
         title: t('theoreticalMargin'),
         headerClassName: 'padded-header',
         minWidth: 100,

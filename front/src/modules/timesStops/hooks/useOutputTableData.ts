@@ -15,7 +15,7 @@ import { calculateTimeDifferenceInSeconds } from 'utils/timeManipulation';
 
 import { ARRIVAL_TIME_ACCEPTABLE_ERROR_MS } from '../consts';
 import { computeInputDatetimes } from '../helpers/arrivalTime';
-import computeMargins from '../helpers/computeMargins';
+import computeMargins, { getTheoreticalMargins } from '../helpers/computeMargins';
 import { formatSchedule } from '../helpers/scheduleData';
 import { type ScheduleEntry, type TimeStopsRow } from '../types';
 
@@ -29,6 +29,8 @@ const useOutputTableData = (
   const { t } = useTranslation('timesStops');
 
   const scheduleByAt: Record<string, ScheduleEntry> = keyBy(selectedTrainSchedule?.schedule, 'at');
+  const theoreticalMargins = selectedTrainSchedule && getTheoreticalMargins(selectedTrainSchedule);
+
   const startDatetime = selectedTrainSchedule
     ? new Date(selectedTrainSchedule.start_time)
     : undefined;
@@ -48,8 +50,19 @@ const useOutputTableData = (
         computedArrival,
         schedule
       );
-      const { theoreticalMargin, theoreticalMarginSeconds, calculatedMargin, diffMargins } =
-        computeMargins(selectedTrainSchedule, index, pathItemTimes);
+      const {
+        theoreticalMargin,
+        isTheoreticalMarginBoundary,
+        theoreticalMarginSeconds,
+        calculatedMargin,
+        diffMargins,
+      } = computeMargins(
+        theoreticalMargins,
+        selectedTrainSchedule,
+        scheduleByAt,
+        index,
+        pathItemTimes
+      );
 
       const { theoreticalArrival, arrival, departure, refDate } = computeInputDatetimes(
         startDatetime,
@@ -78,6 +91,7 @@ const useOutputTableData = (
         onStopSignal,
         shortSlipDistance,
         theoreticalMargin,
+        isTheoreticalMarginBoundary,
 
         theoreticalMarginSeconds,
         calculatedMargin,

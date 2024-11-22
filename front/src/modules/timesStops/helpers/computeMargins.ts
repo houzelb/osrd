@@ -3,39 +3,48 @@ import type { TrainScheduleWithDetails } from 'modules/trainschedule/components/
 import { ms2sec } from 'utils/timeManipulation';
 
 import { formatDigitsAndUnit } from './utils';
+import type { ScheduleEntry, TheoreticalMarginsRecord } from '../types';
 
-function getTheoreticalMargin(selectedTrainSchedule: TrainScheduleResult, pathStepId: string) {
-  if (selectedTrainSchedule.path.length === 0) {
+/** Extracts the theoretical margin for each path step in the train schedule,
+ * and marks whether margins are repeated or correspond to a boundary between margin values */
+export function getTheoreticalMargins(selectedTrainSchedule: TrainScheduleResult) {
+  const { margins } = selectedTrainSchedule;
+  if (!margins) {
     return undefined;
   }
-  // pathStep is starting point => we take the first margin
-  if (selectedTrainSchedule.path[0].id === pathStepId) {
-    return selectedTrainSchedule.margins?.values[0];
-  }
-  const theoreticalMarginBoundaryIndex = selectedTrainSchedule.margins?.boundaries?.findIndex(
-    (id) => id === pathStepId
-  );
-  if (
-    theoreticalMarginBoundaryIndex === undefined ||
-    theoreticalMarginBoundaryIndex < 0 ||
-    theoreticalMarginBoundaryIndex > selectedTrainSchedule.margins!.values.length - 2
-  ) {
-    return undefined;
-  }
-
-  return selectedTrainSchedule.margins!.values[theoreticalMarginBoundaryIndex + 1];
+  const theoreticalMargins: TheoreticalMarginsRecord = {};
+  let marginIndex = 0;
+  selectedTrainSchedule.path.forEach((step, index) => {
+    let isBoundary = index === 0;
+    if (step.id === selectedTrainSchedule.margins?.boundaries[marginIndex]) {
+      marginIndex += 1;
+      isBoundary = true;
+    }
+    theoreticalMargins[step.id] = {
+      theoreticalMargin: margins.values[marginIndex],
+      isBoundary,
+    };
+  });
+  return theoreticalMargins;
 }
 
+/** Compute all margins to display for a given train schedule path step */
 function computeMargins(
+  theoreticalMargins: TheoreticalMarginsRecord | undefined,
   selectedTrainSchedule: TrainScheduleResult,
+  scheduleByAt: Record<string, ScheduleEntry>,
   pathStepIndex: number,
   pathItemTimes: NonNullable<TrainScheduleWithDetails['pathItemTimes']> // in ms
 ) {
   const { path, margins } = selectedTrainSchedule;
+  const pathStepId = path[pathStepIndex].id;
+  const schedule = scheduleByAt[pathStepId];
+  const stepTheoreticalMarginInfo = theoreticalMargins?.[pathStepId];
   if (
     !margins ||
-    (margins.values.length === 1 && margins.values[0] === '0%') ||
-    pathStepIndex === selectedTrainSchedule.path.length - 1
+    pathStepIndex === selectedTrainSchedule.path.length - 1 ||
+    !stepTheoreticalMarginInfo ||
+    !(schedule || stepTheoreticalMarginInfo.isBoundary)
   ) {
     return {
       theoreticalMargin: undefined,
@@ -45,14 +54,17 @@ function computeMargins(
     };
   }
 
-  const pathStepId = path[pathStepIndex].id;
-  const theoreticalMargin = getTheoreticalMargin(selectedTrainSchedule, pathStepId);
+  const { theoreticalMargin, isBoundary } = stepTheoreticalMarginInfo;
 
-  // find the previous pathStep where margin was defined
-  let prevIndex = 0;
-  for (let index = 1; index < pathStepIndex; index += 1) {
-    if (margins.boundaries.includes(path[index].id)) {
-      prevIndex = index;
+  // find the next pathStep where constraints are defined
+  let nextIndex = path.length - 1;
+
+  for (let index = pathStepIndex + 1; index < path.length; index += 1) {
+    const curStepId = path[index].id;
+    const curStepSchedule = scheduleByAt[curStepId];
+    if (theoreticalMargins[curStepId]?.isBoundary || curStepSchedule) {
+      nextIndex = index;
+      break;
     }
   }
 
@@ -61,19 +73,20 @@ function computeMargins(
   // provisional = margins
   // final = margins + requested arrival times
   const { base, provisional, final } = pathItemTimes;
-  const baseDuration = ms2sec(base[pathStepIndex + 1] - base[prevIndex]);
-  const provisionalDuration = ms2sec(provisional[pathStepIndex + 1] - provisional[prevIndex]);
-  const finalDuration = ms2sec(final[pathStepIndex + 1] - final[prevIndex]);
+  const baseDuration = ms2sec(base[nextIndex] - base[pathStepIndex]);
+  const provisionalDuration = ms2sec(provisional[nextIndex] - provisional[pathStepIndex]);
+  const finalDuration = ms2sec(final[nextIndex] - final[pathStepIndex]);
 
   // how much longer it took (s) with the margin than without
-  const provisionalLostTime = provisionalDuration - baseDuration;
-  const finalLostTime = finalDuration - baseDuration;
+  const provisionalLostTime = Math.round(provisionalDuration - baseDuration);
+  const finalLostTime = Math.round(finalDuration - baseDuration);
 
   return {
     theoreticalMargin: formatDigitsAndUnit(theoreticalMargin),
-    theoreticalMarginSeconds: `${Math.round(provisionalLostTime)} s`,
-    calculatedMargin: `${Math.round(finalLostTime)} s`,
-    diffMargins: `${Math.round(finalLostTime - provisionalLostTime)} s`,
+    isTheoreticalMarginBoundary: isBoundary,
+    theoreticalMarginSeconds: `${provisionalLostTime} s`,
+    calculatedMargin: `${finalLostTime} s`,
+    diffMargins: `${finalLostTime - provisionalLostTime} s`,
   };
 }
 

@@ -114,7 +114,7 @@ const getDigits = (unit: string | undefined) =>
   unit === MarginUnit.second || unit === MarginUnit.percent ? 0 : 1;
 
 export function formatDigitsAndUnit(fullValue: string | number | undefined, unit?: string) {
-  if (fullValue === undefined || fullValue === '0%') {
+  if (fullValue === undefined) {
     return '';
   }
   if (typeof fullValue === 'number') {
