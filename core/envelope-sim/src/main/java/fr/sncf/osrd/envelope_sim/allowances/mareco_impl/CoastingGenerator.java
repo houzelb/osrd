@@ -67,8 +67,11 @@ public final class CoastingGenerator {
 
         assert constrainedBuilder.getLastPos() < endPos;
 
-        if (!reachedLowLimit && constrainedBuilder.getLastPos() != envelope.getBeginPos())
+        if (!reachedLowLimit) {
             return backwardPartBuilder.build();
+            // We only need to recompute a coasting going forward if the low speed limit has been reached,
+            // as we'd need to add accelerations in places where we've clipped the speed
+        }
 
         var resultCoast = coastFromBeginning(
                 envelope, context, constrainedBuilder.getLastPos(), constrainedBuilder.getLastSpeed());
