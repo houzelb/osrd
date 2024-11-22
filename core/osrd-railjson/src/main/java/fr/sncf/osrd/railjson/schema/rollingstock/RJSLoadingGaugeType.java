@@ -27,7 +27,7 @@ public enum RJSLoadingGaugeType {
             case GB1 -> Sets.union(Set.of(GB1), GB.getCompatibleGaugeTypes());
             case GC -> Sets.union(Set.of(GC), GB1.getCompatibleGaugeTypes());
             case G2 -> Sets.union(Set.of(G2, FR3_3_GB_G2), G1.getCompatibleGaugeTypes());
-            case FR3_3 -> Set.of(FR3_3, FR3_3_GB_G2);
+            case FR3_3 -> Sets.union(Set.of(FR3_3, FR3_3_GB_G2), G1.getCompatibleGaugeTypes());
             case GLOTT -> Set.of(GLOTT);
             default -> null;
         };
