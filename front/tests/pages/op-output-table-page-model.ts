@@ -15,12 +15,11 @@ class OperationalStudiesOutputTablePage extends OperationalStudiesTimetablePage 
     this.columnHeaders = page.locator(
       '.dsg-cell.dsg-cell-header:not(.dsg-cell-gutter) .dsg-cell-header-container'
     );
-    this.tableRows = page.locator('.time-stop-outputs .time-stops-datasheet .dsg-row');
+    this.tableRows = page.locator('.time-stops-datasheet .dsg-row');
   }
 
   // Retrieve the cell value based on the locator type
   static async getCellValue(cell: Locator, isInput: boolean = true): Promise<string> {
-    await cell.waitFor({ state: 'visible', timeout: 30 * 1000 });
     return isInput
       ? (await cell.locator('input').getAttribute('value'))?.trim() || ''
       : (await cell.textContent())?.trim() || '';
@@ -28,7 +27,6 @@ class OperationalStudiesOutputTablePage extends OperationalStudiesTimetablePage 
 
   // Extract the column index for each header name
   async getHeaderIndexMap(): Promise<Record<string, number>> {
-    await this.columnHeaders.first().waitFor({ state: 'visible', timeout: 30 * 1000 });
     const headers = await this.columnHeaders.allTextContents();
     const headerMap: Record<string, number> = {};
     headers.forEach((header, index) => {
@@ -67,48 +65,46 @@ class OperationalStudiesOutputTablePage extends OperationalStudiesTimetablePage 
         calculatedArrival,
         calculatedDeparture,
       ] = await Promise.all([
-        await OperationalStudiesOutputTablePage.getCellValue(
+        OperationalStudiesOutputTablePage.getCellValue(
           cells.nth(headerIndexMap[translations.name]),
           false
         ),
-        await OperationalStudiesOutputTablePage.getCellValue(
-          cells.nth(headerIndexMap[translations.ch])
-        ),
-        await OperationalStudiesOutputTablePage.getCellValue(
+        OperationalStudiesOutputTablePage.getCellValue(cells.nth(headerIndexMap[translations.ch])),
+        OperationalStudiesOutputTablePage.getCellValue(
           cells.nth(headerIndexMap[translations.arrivalTime]),
           false
         ),
-        await OperationalStudiesOutputTablePage.getCellValue(
+        OperationalStudiesOutputTablePage.getCellValue(
           cells.nth(headerIndexMap[translations.departureTime]),
           false
         ),
-        await OperationalStudiesOutputTablePage.getCellValue(
+        OperationalStudiesOutputTablePage.getCellValue(
           cells.nth(headerIndexMap[translations.stopTime])
         ),
-        await cells
+        cells
           .nth(headerIndexMap[translations.receptionOnClosedSignal])
           .locator('input.dsg-checkbox')
           .isChecked(),
-        await cells
+        cells
           .nth(headerIndexMap[translations.shortSlipDistance])
           .locator('input.dsg-checkbox')
           .isChecked(),
-        await OperationalStudiesOutputTablePage.getCellValue(
+        OperationalStudiesOutputTablePage.getCellValue(
           cells.nth(headerIndexMap[translations.theoreticalMargin])
         ),
-        await OperationalStudiesOutputTablePage.getCellValue(
+        OperationalStudiesOutputTablePage.getCellValue(
           cells.nth(headerIndexMap[translations.theoreticalMarginSeconds])
         ),
-        await OperationalStudiesOutputTablePage.getCellValue(
+        OperationalStudiesOutputTablePage.getCellValue(
           cells.nth(headerIndexMap[translations.realMargin])
         ),
-        await OperationalStudiesOutputTablePage.getCellValue(
+        OperationalStudiesOutputTablePage.getCellValue(
           cells.nth(headerIndexMap[translations.diffMargins])
         ),
-        await OperationalStudiesOutputTablePage.getCellValue(
+        OperationalStudiesOutputTablePage.getCellValue(
           cells.nth(headerIndexMap[translations.calculatedArrivalTime])
         ),
-        await OperationalStudiesOutputTablePage.getCellValue(
+        OperationalStudiesOutputTablePage.getCellValue(
           cells.nth(headerIndexMap[translations.calculatedDepartureTime])
         ),
       ]);
@@ -141,8 +137,8 @@ class OperationalStudiesOutputTablePage extends OperationalStudiesTimetablePage 
 
   // Wait for the Times and Stops simulation data sheet to be fully loaded with a specified timeout (default: 60 seconds)
   async verifyTimeStopsDataSheetVisibility(timeout = 60 * 1000): Promise<void> {
-    await this.timeStopsDataSheet.waitFor({ state: 'attached', timeout });
-    await expect(this.timeStopsDataSheet).toBeVisible({ timeout });
+    await this.timeStopsDataSheet.waitFor({ state: 'visible', timeout });
+    await this.page.waitForTimeout(100); // Short delay for stabilization
     await this.timeStopsDataSheet.scrollIntoViewIfNeeded({ timeout });
   }
 }
