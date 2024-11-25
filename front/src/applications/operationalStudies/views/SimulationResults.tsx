@@ -4,7 +4,6 @@ import { ChevronLeft, ChevronRight } from '@osrd-project/ui-icons';
 import cx from 'classnames';
 import { useTranslation } from 'react-i18next';
 
-import type { SimulationResultsData } from 'applications/operationalStudies/types';
 import type { Conflict } from 'common/api/osrdEditoastApi';
 import SimulationWarpedMap from 'common/Map/WarpedMap/SimulationWarpedMap';
 import ResizableSection from 'common/ResizableSection';
@@ -21,9 +20,12 @@ import { useFormattedOperationalPoints } from 'modules/simulationResult/hooks/us
 import SimulationResultExport from 'modules/simulationResult/SimulationResultExport/SimulationResultsExport';
 import type { ProjectionData } from 'modules/simulationResult/types';
 import TimesStopsOutput from 'modules/timesStops/TimesStopsOutput';
+import type { TrainScheduleWithDetails } from 'modules/trainschedule/components/Timetable/types';
 import { updateViewport, type Viewport } from 'reducers/map';
 import { useAppDispatch } from 'store';
 import { getPointCoordinates } from 'utils/geometry';
+
+import useSimulationResults from '../hooks/useSimulationResults';
 
 const SPEED_SPACE_CHART_HEIGHT = 521.5;
 const HANDLE_TAB_RESIZE_HEIGHT = 20;
@@ -33,8 +35,8 @@ type SimulationResultsProps = {
   scenarioData: { name: string; infraName: string };
   collapsedTimetable: boolean;
   infraId?: number;
-  simulationResults: SimulationResultsData;
   projectionData?: ProjectionData;
+  selectedTrainSummary?: TrainScheduleWithDetails;
   conflicts?: Conflict[];
 };
 
@@ -42,20 +44,21 @@ const SimulationResults = ({
   scenarioData,
   collapsedTimetable,
   infraId,
-  simulationResults: {
-    selectedTrainSchedule,
-    selectedTrainRollingStock,
-    selectedTrainPowerRestrictions,
-    selectedTrainSummary,
-    trainSimulation,
-    pathProperties,
-    path,
-  },
   projectionData,
+  selectedTrainSummary,
   conflicts = [],
 }: SimulationResultsProps) => {
   const { t } = useTranslation('simulation');
   const dispatch = useAppDispatch();
+
+  const {
+    selectedTrainSchedule,
+    selectedTrainRollingStock,
+    selectedTrainPowerRestrictions,
+    trainSimulation,
+    pathProperties,
+    path,
+  } = useSimulationResults();
 
   const [extViewport, setExtViewport] = useState<Viewport>();
   const [showWarpedMap, setShowWarpedMap] = useState(false);

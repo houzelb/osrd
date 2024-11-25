@@ -52,10 +52,10 @@ const ScenarioContent = ({
   const [isMacro, setIsMacro] = useState(false);
   const {
     selectedTrainId,
+    selectedTrainSummary,
     trainScheduleSummaries,
     trainSchedules,
     projectionData,
-    simulationResults,
     conflicts,
     upsertTrainSchedules,
     removeTrains,
@@ -209,9 +209,9 @@ const ScenarioContent = ({
                     scenarioData={{ name: scenario.name, infraName: scenario.infra_name }}
                     collapsedTimetable={collapsedTimetable}
                     projectionData={projectionData}
-                    simulationResults={simulationResults}
                     infraId={infra.id}
                     conflicts={conflicts}
+                    selectedTrainSummary={selectedTrainSummary}
                   />
                 )
               )}
