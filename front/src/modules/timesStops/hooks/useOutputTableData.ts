@@ -21,7 +21,7 @@ import { formatSchedule } from '../helpers/scheduleData';
 import { type ScheduleEntry, type TimesStopsRow } from '../types';
 
 const useOutputTableData = (
-  { final_output: simulatedTrain }: SimulationResponseSuccess,
+  simulatedTrain?: SimulationResponseSuccess['final_output'],
   trainSummary?: TrainScheduleWithDetails,
   operationalPoints?: PathPropertiesFormatted['operationalPoints'],
   selectedTrainSchedule?: TrainScheduleResult,
@@ -109,7 +109,7 @@ const useOutputTableData = (
 
   useEffect(() => {
     const formatRows = async () => {
-      if (!operationalPoints || !startDatetime) {
+      if (!operationalPoints || !startDatetime || !simulatedTrain) {
         setRows([]);
         return;
       }
