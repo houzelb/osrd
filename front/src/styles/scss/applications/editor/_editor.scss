@@ -7,7 +7,7 @@
   $white: var(--white);
   $gray: var(--coolgray5);
 
-  padding-top: 3.75rem; // Header height
+  padding-top: 60px; // Header height
 
   .layout {
     width: 100%;
@@ -53,19 +53,19 @@
   .actions-box,
   .infra-locked,
   .panel-box {
-    padding: 1rem;
+    padding: 16px;
 
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
 
     & > * {
-      margin-bottom: 0.5rem;
+      margin-bottom: 8px;
     }
 
     .separator {
       border-bottom: 2px solid $gray;
-      margin: 0 5px 0.5rem;
+      margin: 0 5px 8px;
     }
   }
 
@@ -107,7 +107,7 @@
   }
 
   .panel-container {
-    width: 32.25rem;
+    width: 516px;
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
@@ -117,17 +117,17 @@
     position: absolute;
     right: 0;
     top: 0;
-    padding: 1rem;
+    padding: 16px;
 
     display: flex;
     flex-direction: column;
 
     & > * {
-      margin-bottom: 0.5rem;
+      margin-bottom: 8px;
     }
 
     & > .separator {
-      margin-bottom: 1rem;
+      margin-bottom: 16px;
     }
   }
 
@@ -135,8 +135,8 @@
     position: absolute;
     bottom: 4em;
     right: 0;
-    padding: 1rem;
-    gap: 1rem;
+    padding: 16px;
+    gap: 16px;
 
     display: flex;
   }
@@ -202,7 +202,7 @@
 
 .editor-infra-errors-list {
   .error-count {
-    height: 1.5rem;
+    height: 24px;
   }
   #errors-list-container {
     height: 60vh;
