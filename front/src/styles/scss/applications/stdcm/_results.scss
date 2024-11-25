@@ -7,7 +7,7 @@
     position: relative;
     color: rgb(0, 0, 0);
     font-weight: 600;
-    font-size: 18px;
+    font-size: 1.125rem;
     line-height: 24px;
     margin-bottom: 36px;
 
@@ -59,7 +59,7 @@
           .simulation-metadata {
             color: rgba(182, 178, 175, 1);
             font-weight: 400;
-            font-size: 14px;
+            font-size: 0.875rem;
             line-height: 20px;
             letter-spacing: 0;
             text-align: left;
@@ -164,7 +164,7 @@
 
           th {
             height: 32px;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 400;
             text-transform: capitalize;
             color: rgb(121, 118, 113);
@@ -183,7 +183,7 @@
           }
           td {
             height: 32px;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 400;
             color: rgb(49, 46, 43);
             line-height: 20px;
@@ -199,14 +199,14 @@
             padding-right: 36px;
           }
           .stop {
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 600;
             color: rgb(0, 0, 0);
             line-height: 20px;
             width: 75px;
           }
           .stop-with-duration {
-            font-size: 14px;
+            font-size: 0.875rem;
             color: rgb(255, 255, 255);
             background-color: rgb(33, 100, 130);
             border-radius: 10px;
@@ -265,7 +265,7 @@
           margin-left: 8px;
           .title {
             font-weight: 600;
-            font-size: 18px;
+            font-size: 1.125rem;
             padding-top: 25px;
             display: flex;
             flex-direction: row;
@@ -284,7 +284,7 @@
           margin-top: 22px;
           button {
             height: 32px;
-            font-size: 16px;
+            font-size: 1rem;
             padding-top: 5px;
             padding-bottom: 7px;
             margin-right: 23px;
@@ -308,7 +308,7 @@
         }
         .gesico-text {
           font-weight: 400;
-          font-size: 16px;
+          font-size: 1rem;
           color: rgb(49, 46, 43);
           margin-bottom: 42px;
         }
@@ -333,7 +333,7 @@
 
       .title {
         color: rgba(33, 100, 130, 1);
-        font-size: 24px;
+        font-size: 1.5rem;
         font-weight: 600;
         font-style: SemiBold;
         line-height: 32px;
@@ -343,7 +343,7 @@
       .change-criteria {
         opacity: 1;
         color: rgba(49, 46, 43, 1);
-        font-size: 16px;
+        font-size: 1rem;
         font-weight: 400;
         font-style: Regular;
         line-height: 24px;
