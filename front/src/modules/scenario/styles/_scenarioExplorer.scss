@@ -1,11 +1,11 @@
 .scenario-explorator-card {
   border-radius: 4px;
   background-color: var(--white);
-  height: 7.75rem;
-  padding: 0.5rem;
+  height: 124px;
+  padding: 8px;
   transition: 0.4s;
   cursor: pointer;
-  margin-bottom: 0.5rem;
+  margin-bottom: 8px;
   .scenario-explorator-card-noscenario {
     display: flex;
     align-items: center;
@@ -16,13 +16,13 @@
     font-size: 1.5rem;
   }
   .scenario-explorator-card-head {
-    height: 6.75rem;
+    height: 108px;
     .scenario-explorator-card-head-img {
       position: absolute;
       overflow: hidden;
       border-radius: 4px;
       height: inherit;
-      width: 6rem;
+      width: 96px;
       img {
         display: flex;
         align-items: center;
@@ -34,25 +34,25 @@
       }
     }
     .scenario-explorator-card-head-content {
-      margin-left: 6.5rem;
+      margin-left: 104px;
       font-weight: 500;
       height: 100%;
       .scenario-explorator-card-head-content-item {
         display: flex;
         align-items: center;
-        margin-bottom: 0.25rem;
+        margin-bottom: 4px;
         height: 22%;
         img {
           border-radius: 4px 0 0 4px;
           background-color: var(--coolgray3);
-          padding: 0.25rem;
+          padding: 4px;
           height: 100%;
         }
         div {
           display: flex;
           align-items: center;
           height: 100%;
-          padding: 0 0.25rem 0 0.5rem;
+          padding: 0 4px 0 8px;
           width: 100%;
           color: var(--white);
           border-radius: 0 4px 4px 0;
@@ -68,7 +68,7 @@
           background-color: var(--coolgray3);
           color: var(--secondary);
           height: 100%;
-          width: 6.5rem;
+          width: 104px;
         }
         .scenario-explorator-card-head-project {
           border-radius: 0 4px 4px 0;
@@ -90,8 +90,8 @@
           .scenario-explorator-card-head-scenario-traincount {
             display: flex;
             align-items: center;
-            gap: 0.25rem;
-            padding: 0 0.25rem;
+            gap: 4px;
+            padding: 0 4px;
           }
         }
         .scenario-explorator-card-head-infra {
@@ -112,10 +112,10 @@
   .scenario-explorator-modal-title {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 16px;
     width: 100%;
     img {
-      height: 2rem;
+      height: 32px;
     }
   }
   .scenario-explorator-modal-part {
@@ -127,11 +127,11 @@
       align-items: center;
       justify-content: space-between;
       position: relative;
-      padding: 0.5rem;
+      padding: 8px;
       background-color: var(--coolgray3);
       border-radius: 4px 4px 0 0;
       img {
-        height: 1.25rem;
+        height: 20px;
       }
       h2 {
         flex-grow: 1;
@@ -145,12 +145,12 @@
       .scenario-explorator-modal-part-title-count {
         font-size: 0.7rem;
         font-weight: bold;
-        width: 1.5rem;
+        width: 24px;
         text-align: center;
         background-color: var(--coolgray1);
         border-radius: 4px;
-        line-height: 1.5rem;
-        padding: 0 0.25rem;
+        line-height: 24px;
+        padding: 0 4px;
       }
     }
     &.projects {
@@ -172,7 +172,7 @@
       position: absolute;
       display: flex;
       align-items: center;
-      right: -3.5rem;
+      right: -56px;
       top: 0;
       height: 100%;
       font-size: 6rem;
@@ -182,28 +182,28 @@
       position: relative;
       width: 100%;
       height: 20vh;
-      padding: 0.5rem 0 0;
+      padding: 8px 0 0;
       overflow: auto;
       .minicard {
         display: flex;
         align-items: center;
         font-size: 0.8rem;
-        padding: 0.25rem;
-        height: 2rem;
+        padding: 4px;
+        height: 32px;
         background-color: var(--white);
-        line-height: 0.8rem;
+        line-height: 12.8px;
         border-radius: 0 4px 4px 0;
         transition: 0.2s;
-        margin: 0 0.5rem 0.5rem;
+        margin: 0 8px 8px;
         border: 2px solid var(--white);
         border-left: none;
         .minicard-img {
           position: absolute;
           overflow: hidden;
           border-radius: 4px 0 0 4px;
-          height: 2rem;
-          width: 2rem;
-          left: 0.5rem;
+          height: 32px;
+          width: 32px;
+          left: 8px;
           img {
             display: flex;
             align-items: center;
@@ -226,8 +226,8 @@
           border-left: 2px solid var(--white);
         }
         &.with-image {
-          margin: 0 0 0.5rem 2.5rem;
-          width: calc(100% - 3rem);
+          margin: 0 0 8px 40px;
+          width: calc(100% - 48px);
         }
         &.selected {
           cursor: not-allowed;

@@ -1,10 +1,10 @@
 .project-card {
   position: relative;
   border-radius: 4px;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
   transition: 0.4s;
   border: 1px solid var(--coolgray3);
-  height: 21rem;
+  height: 336px;
   cursor: pointer;
   &:hover,
   &:focus,
@@ -45,7 +45,7 @@
       color: var(--coolgray7);
     }
     .legend {
-      margin-top: 1rem;
+      margin-top: 16px;
       font-size: 1.5rem;
     }
   }
@@ -55,12 +55,12 @@
     z-index: 2;
     color: var(--purple);
     font-size: 2rem;
-    top: -1.6rem;
-    left: -0.8rem;
+    top: -25.6px;
+    left: -12.8px;
   }
   .project-card-img {
     position: relative;
-    height: 10rem;
+    height: 160px;
     overflow: hidden;
     border-radius: 4px 4px 0 0;
     img {
@@ -94,7 +94,7 @@
       bottom: 0;
       left: 0;
       z-index: 1;
-      padding: 0 0.5rem 0.5rem;
+      padding: 0 8px 8px;
     }
   }
   .project-card-studies {
@@ -103,11 +103,11 @@
     justify-content: space-between;
     font-style: italic;
     background-color: var(--coolgray3);
-    padding: 0.25rem 0.5rem;
+    padding: 4px 8px;
     text-align: right;
     font-size: 0.7rem;
     color: var(--coolgray11);
-    height: 1.5rem;
+    height: 24px;
     div {
       white-space: nowrap;
       svg {
@@ -119,15 +119,15 @@
     color: var(--purple);
     font-weight: 500;
     font-size: 0.9rem;
-    padding: 0 0.5rem;
-    margin: 0.5rem 0 0.25rem;
+    padding: 0 8px;
+    margin: 8px 0 4px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .project-card-description {
-    padding: 0 0.5rem;
-    height: 3.9rem;
+    padding: 0 8px;
+    height: 62.4px;
     overflow: auto;
     font-size: 0.8rem;
     white-space: break-spaces;
@@ -139,10 +139,10 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.25rem;
-    margin-top: 0.5rem;
-    padding: 0.25rem 0.5rem;
-    height: 2.7rem;
+    gap: 4px;
+    margin-top: 8px;
+    padding: 4px 8px;
+    height: 43.2px;
     overflow: auto;
     font-weight: 500;
     font-size: 0.8rem;
@@ -150,7 +150,7 @@
       color: var(--white);
       background-color: var(--purple);
       border-radius: 4px;
-      padding: 0 0.25rem;
+      padding: 0 4px;
       transition: 0.2s;
       max-width: 30%;
       overflow: hidden;

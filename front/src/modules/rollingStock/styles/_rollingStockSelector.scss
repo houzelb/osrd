@@ -9,9 +9,9 @@
       flex-grow: 1;
       background-color: var(--coolgray1);
       border-radius: 4px;
-      padding: 0.25rem 0.5rem;
+      padding: 4px 8px;
       position: relative;
-      min-height: 1.5rem;
+      min-height: 24px;
       .rollingstock-info-series {
         position: relative;
         font-weight: bold;
@@ -25,12 +25,12 @@
           color: #a1006b;
         }
         font-weight: bold;
-        margin-left: 0.25rem;
+        margin-left: 4px;
         font-size: 0.7rem;
       }
       .rollingstock-info-subseries {
         position: relative;
-        margin-left: 0.25rem;
+        margin-left: 4px;
         text-transform: uppercase;
         vertical-align: text-bottom;
         font-size: 0.7rem;
@@ -40,7 +40,7 @@
   .rollingstock-container-img {
     overflow: hidden;
     .rollingstock-img {
-      height: 2rem;
+      height: 32px;
       white-space: nowrap;
       transform: scale(
         0.4
@@ -50,22 +50,22 @@
         display: inline-block;
         position: relative;
         vertical-align: baseline;
-        max-height: 4rem;
+        max-height: 64px;
       }
     }
   }
   .rollingstock-minicard-end {
     display: flex;
     justify-content: space-between;
-    margin-top: 0.5rem;
-    gap: 0.5rem;
+    margin-top: 8px;
+    gap: 8px;
     .rollingstock-info-comfort {
       display: flex;
       align-items: center;
       background-color: var(--coolgray1);
-      height: 1.5rem;
+      height: 24px;
       margin-left: auto;
-      padding: 0rem 0.5rem;
+      padding: 0 8px;
       border-radius: 4px;
     }
     .comfort-AC,
@@ -75,12 +75,12 @@
     .rollingstock-info-end {
       display: flex;
       align-items: center;
-      height: 1.5rem;
+      height: 24px;
       position: relative;
       border: 1px solid var(--coolgray3);
       color: var(--coolgray9);
       border-radius: 4px;
-      padding: 0 0.5rem;
+      padding: 0 8px;
       font-size: 0.8rem;
     }
   }
@@ -102,13 +102,13 @@
     overflow: auto;
     flex-grow: 1;
     .loader {
-      margin-top: 1rem;
+      margin-top: 16px;
       transform: none;
     }
     .rollingstock-empty {
       display: flex;
       position: relative;
-      margin-top: 2rem;
+      margin-top: 32px;
       flex-direction: column;
       align-items: center;
       width: 100%;
@@ -119,7 +119,7 @@
       }
       img {
         position: absolute;
-        width: 7rem;
+        width: 112px;
         filter: blur(2px);
         opacity: 0.2;
       }
