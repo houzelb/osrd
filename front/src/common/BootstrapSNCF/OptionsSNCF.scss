@@ -1,18 +1,18 @@
 .options-control {
-  border-radius: 0.4375rem !important;
+  border-radius: 7px !important;
   .options-item {
-    border-radius: 0.4375rem;
+    border-radius: 7px;
     .options-btn {
-      border-radius: 0.4375rem;
+      border-radius: 7px;
     }
   }
   &.sm {
-    padding: 0.2rem;
+    padding: 3.2px;
     .options-btn {
-      border-radius: 0.4375rem;
-      padding: 0.3rem 0.5rem 0.2rem;
+      border-radius: 7px;
+      padding: 4.8px 8px 3.2px;
       font-size: 0.8rem;
-      height: 1.625rem;
+      height: 26px;
     }
   }
 }

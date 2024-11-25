@@ -25,15 +25,15 @@
     &.via {
       display: flex;
       align-items: center;
-      margin-bottom: 0rem;
-      padding: 0 0 0 0.65rem;
-      margin: 0 0.9rem 0 0.75rem;
+      margin-bottom: 0;
+      padding: 0 0 0 10.4px;
+      margin: 0 14.4px 0 12px;
       border-right: 1px solid #30338375;
       .ring {
         position: relative;
         display: block;
-        height: 1rem;
-        width: 1rem;
+        height: 16px;
+        width: 16px;
         border-radius: 50%;
         background-color: var(--white);
         border: 2px dotted var(--cyan);
@@ -59,7 +59,7 @@
         }
       }
       .stoptime {
-        padding: 0rem 0.5rem;
+        padding: 0 8px;
         font-size: 0.8rem;
         font-weight: 500;
         border-radius: 4px;
@@ -70,7 +70,7 @@
         }
       }
       .form-control {
-        width: 7rem;
+        width: 112px;
       }
       &:hover,
       &:focus-within {
@@ -102,9 +102,9 @@
   .content {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 8px;
     justify-content: center;
-    padding: 0.5rem;
+    padding: 8px;
     font-size: 0.9rem;
     font-weight: 500;
     background-color: var(--white);
@@ -112,10 +112,10 @@
     border: 2px solid var(--white);
     color: var(--white);
     img {
-      height: 1rem;
+      height: 16px;
     }
     .lead {
-      line-height: 1rem;
+      line-height: 16px;
     }
 
     &.pathfinding-none {
@@ -166,7 +166,7 @@
     .pathfinding-in-progress-card {
       width: 80%;
       border-radius: 4px;
-      padding: 1rem 1rem;
+      padding: 16px 16px;
       background: var(--white);
 
       display: flex;
@@ -181,7 +181,7 @@
         justify-content: center;
 
         .pathfinding-in-progress-title {
-          margin: 0 1rem;
+          margin: 0 16px;
         }
       }
     }
