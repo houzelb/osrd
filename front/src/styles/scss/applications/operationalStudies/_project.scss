@@ -4,7 +4,7 @@
     border: none;
     color: var(--secondary);
     transition: 0.2s;
-    padding: 0.25rem 0.5rem;
+    padding: 4px 8px;
     border-radius: 4px;
     &.on {
       color: white;
@@ -21,7 +21,7 @@
 
   .multiselect-delete {
     border: none;
-    padding: 0.25rem 0.5rem;
+    padding: 4px 8px;
     border-radius: 4px;
     border-color: transparent;
     background-color: rgba(var(--red-rgb), 0.75);
@@ -34,9 +34,9 @@
     .project-details-title {
       display: flex;
       position: relative;
-      gap: 1rem;
-      margin-bottom: 0.5rem;
-      min-height: 15rem;
+      gap: 16px;
+      margin-bottom: 8px;
+      min-height: 240px;
       .project-details-title-img {
         position: absolute;
         overflow: hidden;
@@ -54,7 +54,7 @@
         }
         @media screen and (max-width: 768px) {
           position: relative;
-          height: 10rem;
+          height: 160px;
         }
       }
       .project-details-title-content {
@@ -71,14 +71,14 @@
             border: none;
             color: var(--purple);
             transition: 0.2s;
-            padding: 0.25rem 1rem;
+            padding: 4px 16px;
             font-size: 1.5rem;
             border-radius: 4px;
             .project-details-title-modify-button-text {
               transition: opacity 0.2s;
               opacity: 0;
               font-size: 1.25rem;
-              margin-right: 1rem;
+              margin-right: 16px;
             }
             &:hover {
               background-color: var(--purple);
@@ -94,13 +94,13 @@
           font-size: 0.8rem;
           text-transform: uppercase;
           border-bottom: 1px solid var(--coolgray5);
-          padding-bottom: 0.15rem;
-          margin-bottom: 0.25rem;
+          padding-bottom: 2.4px;
+          margin-bottom: 4px;
         }
         .project-details-title-description {
           overflow: auto;
           max-height: 20vh;
-          margin-bottom: 1rem;
+          margin-bottom: 16px;
           font-size: 1.25rem;
           white-space: break-spaces;
         }
@@ -113,9 +113,9 @@
     .project-details-financials {
       display: flex;
       align-items: center;
-      margin-bottom: 0.5rem;
+      margin-bottom: 8px;
       border-radius: 4px;
-      padding: 0.5rem;
+      padding: 8px;
       background-color: var(--purple);
       color: var(--white);
       .project-details-financials-infos {
@@ -128,26 +128,26 @@
         }
         flex-grow: 1;
         overflow: auto;
-        margin-right: 0.5rem;
+        margin-right: 8px;
       }
       .project-details-financials-amount {
         display: flex;
         align-items: center;
-        line-height: 2rem;
+        line-height: 32px;
         font-size: 1.5rem;
         font-weight: bold;
         background-color: var(--coolgray1);
         color: var(--purple);
         border-radius: 4px;
-        padding: 0.25rem 0.5rem;
+        padding: 4px 8px;
         .project-details-financials-amount-text {
-          line-height: 1rem;
+          line-height: 16px;
           text-align: right;
-          width: 4rem;
+          width: 64px;
           font-size: 0.8rem;
           font-weight: 500;
           text-transform: uppercase;
-          margin-right: 0.5rem;
+          margin-right: 8px;
           white-space: wrap;
         }
       }
@@ -156,13 +156,13 @@
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: 0.25rem;
+      gap: 4px;
       .project-details-tags-tag {
         font-size: 0.9rem;
         color: var(--white);
         background-color: var(--purple);
         border-radius: 4px;
-        padding: 0 0.25rem;
+        padding: 0 4px;
         transition: 0.2s;
       }
     }
@@ -172,18 +172,18 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1rem;
-    padding: 1rem 0.5rem 1rem 0.5rem;
-    margin-top: 2rem;
+    gap: 16px;
+    padding: 16px 8px 16px 8px;
+    margin-top: 32px;
   }
 
   .studies-list {
     overflow: auto;
     max-height: 50vh;
-    margin-left: -0.5rem;
-    margin-right: -0.5rem;
-    padding-top: 1rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    margin-left: -8px;
+    margin-right: -8px;
+    padding-top: 16px;
+    padding-left: 8px;
+    padding-right: 8px;
   }
 }

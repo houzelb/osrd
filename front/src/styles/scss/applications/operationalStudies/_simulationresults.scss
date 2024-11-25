@@ -89,12 +89,12 @@
   .map-pathfinding-marker {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 4px;
     position: absolute;
     font-weight: 500;
     border-radius: 4px;
-    line-height: 0.7rem;
-    padding: 0.15rem 0.25rem;
+    line-height: 11.2px;
+    padding: 2.4px 4px;
     font-size: 0.7rem;
     white-space: nowrap;
     &.via-number {
@@ -104,7 +104,7 @@
     }
     &.stdcm-via {
       align-self: flex-start;
-      padding-top: 0.5rem;
+      padding-top: 8px;
       color: black;
     }
   }

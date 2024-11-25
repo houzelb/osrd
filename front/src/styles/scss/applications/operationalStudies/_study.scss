@@ -1,19 +1,19 @@
 .study-view {
   .study-details {
     width: 100%;
-    margin-bottom: 1rem;
-    min-height: 15rem;
+    margin-bottom: 16px;
+    min-height: 240px;
     .study-details-dates {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      gap: 0.25rem;
-      margin-bottom: 0.5rem;
+      gap: 4px;
+      margin-bottom: 8px;
       .study-details-dates-date {
         text-align: center;
         flex-grow: 1;
-        padding: 0 0.5rem;
-        margin-bottom: 0.25rem;
+        padding: 0 8px;
+        margin-bottom: 4px;
         text-transform: uppercase;
         font-weight: 500;
         color: var(--secondary);
@@ -23,7 +23,7 @@
           font-size: 0.7rem;
           font-weight: normal;
           text-align: right;
-          margin-right: 0.5rem;
+          margin-right: 8px;
         }
         .study-details-dates-date-value {
           align-items: center;
@@ -43,7 +43,7 @@
           border-color: var(--orange);
         }
       }
-      height: calc(100% - 1rem);
+      height: calc(100% - 16px);
     }
     .study-details-name {
       display: flex;
@@ -58,14 +58,14 @@
         border: none;
         color: var(--primary);
         transition: 0.2s;
-        padding: 0.25rem 1rem;
+        padding: 4px 16px;
         font-size: 1.5rem;
         border-radius: 4px;
         .study-details-modify-button-text {
           transition: opacity 0.2s;
           opacity: 0;
           font-size: 1.25rem;
-          margin-right: 1rem;
+          margin-right: 16px;
         }
         &:hover {
           background-color: var(--primary);
@@ -82,12 +82,12 @@
       font-weight: 500;
     }
     .study-details-description {
-      margin-bottom: 0.5rem;
+      margin-bottom: 8px;
       white-space: break-spaces;
       overflow: auto;
     }
     .study-details-state {
-      padding: 5rem 0 1rem;
+      padding: 80px 0 16px;
       overflow: auto;
       white-space: nowrap;
       .study-details-state-step {
@@ -95,15 +95,15 @@
         position: relative;
         cursor: pointer;
         &:not(:first-child) {
-          margin-left: 3rem;
+          margin-left: 48px;
           &::before {
             position: absolute;
-            top: 0.6rem;
-            right: 1.5rem;
+            top: 9.6px;
+            right: 24px;
             display: inline-block;
             content: ' ';
-            width: 3rem;
-            height: 0.3rem;
+            width: 48px;
+            height: 4.8px;
             background-color: var(--coolgray3);
           }
         }
@@ -114,18 +114,18 @@
           font-weight: bold;
           background-color: var(--coolgray3);
           color: var(--secondary);
-          border-radius: 1rem;
-          width: 1.5rem;
-          height: 1.5rem;
+          border-radius: 16px;
+          width: 24px;
+          height: 24px;
           transition: 0.2s;
         }
         .study-details-state-step-label {
           position: absolute;
           white-space: normal;
           text-align: left;
-          width: 8rem;
-          top: -1.25rem;
-          left: 0.5rem;
+          width: 128px;
+          top: -20px;
+          left: 8px;
           font-size: 0.8rem;
           transform: rotate(-30deg);
           transform-origin: left;
@@ -162,13 +162,13 @@
       display: flex;
       align-items: center;
       background-color: var(--primary);
-      padding: 0.5rem;
+      padding: 8px;
       border-radius: 4px;
       .study-details-financials-infos {
         display: flex;
-        gap: 1rem;
+        gap: 16px;
         overflow: auto;
-        margin-right: 0.5rem;
+        margin-right: 8px;
         .study-details-financials-infos-item {
           text-transform: uppercase;
           font-weight: 500;
@@ -188,17 +188,17 @@
         margin-left: auto;
         font-size: 1.25rem;
         font-weight: bold;
-        line-height: 1rem;
+        line-height: 16px;
         background-color: var(--white);
         color: var(--primary);
         border-radius: 4px;
-        padding: 0.5rem;
+        padding: 8px;
         .study-details-financials-amount-text {
           font-size: 0.7rem;
           font-weight: 500;
           text-transform: uppercase;
-          margin-right: 0.5rem;
-          padding: 0.25rem 0 0;
+          margin-right: 8px;
+          padding: 4px 0 0;
         }
       }
     }
@@ -210,15 +210,15 @@
         display: flex;
         align-items: center;
         flex-wrap: wrap;
-        gap: 0.25rem;
-        padding: 0.25rem 0;
+        gap: 4px;
+        padding: 4px 0;
         overflow: auto;
         .study-details-tags-tag {
           font-size: 0.9rem;
           color: var(--white);
           background-color: var(--primary);
           border-radius: 4px;
-          padding: 0 0.25rem;
+          padding: 0 4px;
         }
       }
     }
@@ -229,7 +229,7 @@
     border: none;
     color: var(--secondary);
     transition: 0.2s;
-    padding: 0.25rem 0.5rem;
+    padding: 4px 8px;
     border-radius: 4px;
     &.on {
       color: white;
@@ -246,7 +246,7 @@
 
   .multiselect-delete {
     border: none;
-    padding: 0.25rem 0.5rem;
+    padding: 4px 8px;
     border-radius: 4px;
     border-color: transparent;
     background-color: rgba(var(--red-rgb), 0.75);
@@ -260,18 +260,18 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1rem;
-    padding: 1rem 0.5rem 1rem 0.5rem;
-    margin-top: 2rem;
+    gap: 16px;
+    padding: 16px 8px 16px 8px;
+    margin-top: 32px;
   }
 
   .scenarios-list {
     overflow: auto;
     max-height: 50vh;
-    margin-left: -0.5rem;
-    margin-right: -0.5rem;
-    padding-top: 1rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    margin-left: -8px;
+    margin-right: -8px;
+    padding-top: 16px;
+    padding-left: 8px;
+    padding-right: 8px;
   }
 }
