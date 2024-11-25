@@ -22,7 +22,6 @@ import { mapBy } from 'utils/types';
 import useAutoUpdateProjection from './useAutoUpdateProjection';
 import useLazyLoadTrains from './useLazyLoadTrains';
 import usePathProjection from './usePathProjection';
-import useSimulationResults from './useSimulationResults';
 
 const useScenarioData = (
   scenario: ScenarioResponse,
@@ -44,8 +43,6 @@ const useScenarioData = (
     });
 
   const projectionPath = usePathProjection(infra);
-
-  const simulationResults = useSimulationResults();
 
   const {
     trainScheduleSummariesById,
@@ -165,6 +162,9 @@ const useScenarioData = (
 
   return {
     selectedTrainId,
+    selectedTrainSummary: selectedTrainId
+      ? trainScheduleSummariesById.get(selectedTrainId)
+      : undefined,
     trainScheduleSummaries,
     trainSchedules,
     projectionData:
@@ -179,12 +179,6 @@ const useScenarioData = (
             },
           }
         : undefined,
-    simulationResults: {
-      ...simulationResults,
-      selectedTrainSummary: selectedTrainId
-        ? trainScheduleSummariesById.get(selectedTrainId)
-        : undefined,
-    },
     conflicts,
     removeTrains,
     upsertTrainSchedules,
