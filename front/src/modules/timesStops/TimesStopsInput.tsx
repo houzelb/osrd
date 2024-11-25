@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useScenarioContext } from 'applications/operationalStudies/hooks/useScenarioContext';
 import { useOsrdConfActions } from 'common/osrdContext';
-import { isVia, matchPathStepAndOp } from 'modules/pathfinding/utils';
+import { isVia, matchPathStepAndOp, getUniqueOperationalPoints } from 'modules/pathfinding/utils';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import type { OperationalStudiesConfSliceActions } from 'reducers/osrdconf/operationalStudiesConf';
 import type { PathStep } from 'reducers/osrdconf/types';
@@ -139,8 +139,19 @@ const TimesStopsInput = ({
           ...op,
           trackName: trackSections[op.track]?.extensions?.sncf?.track_name,
         }));
-        const formatedRows = formatSuggestedViasToRowVias(
+
+        const mergedWaypoints = getUniqueOperationalPoints(
           suggestedOPsWithTrackNames,
+          (waypoint) => `${waypoint.ci}-${waypoint.ch}`,
+          (previousWaypoint, nextWaypoint) => {
+            if (previousWaypoint.trackName !== nextWaypoint.trackName) {
+              previousWaypoint.trackName = `${previousWaypoint.trackName}/${nextWaypoint.trackName}`;
+            }
+          }
+        );
+
+        const formatedRows = formatSuggestedViasToRowVias(
+          mergedWaypoints,
           pathSteps || [],
           t,
           startTime,

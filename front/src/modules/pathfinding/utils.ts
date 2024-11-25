@@ -183,3 +183,29 @@ export const isStation = (chCode: string): boolean =>
   chCode === 'BV' || chCode === '00' || chCode === '';
 
 export const isPathStepInvalid = (step: PathStep | null): boolean => step?.isInvalid || false;
+
+/**
+ * Ensure that the array doesn't have any duplicated operational points by merging the duplicates.
+ * They usually can be differentiated by the track name.
+ * @param operationalPoints the list of operational points
+ * @param getDuplicatedOP a function that returns a key base on some op properties
+ * @param mergeOP a function checking that previous and next op differ by one property and merge this property into the previous op
+ * @returns the updated list with unique operational points
+ */
+export function getUniqueOperationalPoints<T>(
+  operationalPoints: T[],
+  extractKeyFromOp: (operationalPoint: T) => string,
+  mergeOP: (previousOperationalPoint: T, nextOperationalPoint: T) => void
+): T[] {
+  return Object.values(
+    operationalPoints.reduce<Record<string, T>>((uniqueOperationalPoints, operationalPoint) => {
+      const key = extractKeyFromOp(operationalPoint);
+      if (uniqueOperationalPoints[key]) {
+        mergeOP(uniqueOperationalPoints[key], operationalPoint);
+      } else {
+        uniqueOperationalPoints[key] = { ...operationalPoint };
+      }
+      return uniqueOperationalPoints;
+    }, {})
+  );
+}
