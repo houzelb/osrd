@@ -11,6 +11,10 @@
   --dsg-header-text-color: var(--grey50);
   --dsg-header-active-text-color: var(--black100);
 
+  .invalidCell {
+    color: red !important;
+  }
+
   .padded-header > * {
     padding-inline: 8px 16px;
   }
@@ -19,8 +23,16 @@
     color: var(--grey50);
   }
 
-  .invalidCell {
-    color: red !important;
+  .self-center {
+    align-self: center;
+  }
+
+  .small-unit-container {
+    display: inline-block;
+    font-size: 0.5rem;
+    line-height: 8px;
+    text-align: left;
+    vertical-align: -10%;
   }
 
   .repeatedValue {
