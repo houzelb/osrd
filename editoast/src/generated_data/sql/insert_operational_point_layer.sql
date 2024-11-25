@@ -21,16 +21,18 @@ collect AS (
                 1.
             )
         ) AS geo,
-        ops.kp AS kp
+        ops.kp AS kp,
+        ops.track_id AS track_section
     FROM ops
         INNER JOIN infra_object_track_section AS tracks ON tracks.obj_id = ops.track_id
         AND tracks.infra_id = $1
         INNER JOIN infra_layer_track_section AS tracks_layer ON tracks.obj_id = tracks_layer.obj_id
         AND tracks.infra_id = tracks_layer.infra_id
 )
-INSERT INTO infra_layer_operational_point (obj_id, infra_id, geographic, kp)
+INSERT INTO infra_layer_operational_point (obj_id, infra_id, geographic, kp, track_section)
 SELECT op_id,
     $1,
     geo,
-    kp
+    kp,
+    track_section
 FROM collect

@@ -117,28 +117,21 @@ impl PathItemCache {
                 PathItemLocation::OperationalPointReference(OperationalPointReference {
                     reference: OperationalPointIdentifier::OperationalPointId { operational_point },
                     track_reference,
-                }) => match self.get_from_id(&operational_point.0) {
-                    Some(op) => {
-                        let track_offsets = op.track_offset();
-                        let track_offsets =
-                            self.track_reference_filter(track_offsets, track_reference);
-                        if track_offsets.is_empty() {
-                            invalid_path_items.push(InvalidPathItem {
-                                index,
-                                path_item: path_item.clone(),
-                            });
-                            continue;
-                        };
-                        track_offsets
+                }) => {
+                    let mut track_offsets = vec![];
+                    if let Some(op) = self.get_from_id(&operational_point.0) {
+                        track_offsets = op.track_offset();
+                        track_offsets = self.track_reference_filter(track_offsets, track_reference);
                     }
-                    None => {
+                    if track_offsets.is_empty() {
                         invalid_path_items.push(InvalidPathItem {
                             index,
                             path_item: path_item.clone(),
                         });
                         continue;
                     }
-                },
+                    track_offsets
+                }
                 PathItemLocation::OperationalPointReference(OperationalPointReference {
                     reference:
                         OperationalPointIdentifier::OperationalPointDescription {
@@ -152,13 +145,6 @@ impl PathItemCache {
                         .cloned()
                         .unwrap_or_default();
                     let ops = secondary_code_filter(secondary_code, ops);
-                    if ops.is_empty() {
-                        invalid_path_items.push(InvalidPathItem {
-                            index,
-                            path_item: path_item.clone(),
-                        });
-                        continue;
-                    }
                     let track_offsets = track_offsets_from_ops(&ops);
                     let track_offsets = self.track_reference_filter(track_offsets, track_reference);
                     if track_offsets.is_empty() {
@@ -183,13 +169,6 @@ impl PathItemCache {
                         .cloned()
                         .unwrap_or_default();
                     let ops = secondary_code_filter(secondary_code, ops);
-                    if ops.is_empty() {
-                        invalid_path_items.push(InvalidPathItem {
-                            index,
-                            path_item: path_item.clone(),
-                        });
-                        continue;
-                    }
                     let track_offsets = track_offsets_from_ops(&ops);
                     let track_offsets = self.track_reference_filter(track_offsets, track_reference);
                     if track_offsets.is_empty() {

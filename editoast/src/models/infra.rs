@@ -148,11 +148,19 @@ impl Infra {
 
                 if let Some(layer_table) = get_geometry_layer_table(&object) {
                     let layer_table = layer_table.to_string();
-                    let sql = if object != ObjectType::Signal {
-                        format!("INSERT INTO {layer_table}(obj_id,geographic,infra_id) SELECT obj_id,geographic,$1 FROM {layer_table} WHERE infra_id=$2")
-                    } else {
-                        format!("INSERT INTO {layer_table}(obj_id,geographic,infra_id, angle_geo, signaling_system, sprite)
+                    let sql = match object {
+                        ObjectType::Signal => {
+                            format!("INSERT INTO {layer_table}(obj_id,geographic,infra_id, angle_geo, signaling_system, sprite)
                                     SELECT obj_id,geographic,$1,angle_geo, signaling_system, sprite FROM {layer_table} WHERE infra_id = $2")
+                                }
+                        ,
+                        ObjectType::OperationalPoint => {
+                            format!("INSERT INTO {layer_table}(obj_id,geographic,infra_id, kp, track_section)
+                                    SELECT obj_id,geographic,$1,kp, track_section FROM {layer_table} WHERE infra_id = $2")
+                                }
+                        _ => {
+                            format!("INSERT INTO {layer_table}(obj_id,geographic,infra_id) SELECT obj_id,geographic,$1 FROM {layer_table} WHERE infra_id=$2")
+                        }
                     };
 
                     sql_query(sql)
