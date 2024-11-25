@@ -505,7 +505,7 @@ pub mod tests {
             .json(&json!({
                 "path_items":[
                     {"uic":3,"secondary_code":"BV", "track_reference": {"track_name": "V2"}},
-                    {"uic":8 ,"secondary_code":"BV", "track_reference": {"track_name": "V245"}},
+                    {"uic":8 ,"secondary_code":"BV", "track_reference": {"track_name": "V_INVALID"}},
                 ],
                 "rolling_stock_is_thermal":true,
                 "rolling_stock_loading_gauge":"G1",
@@ -525,15 +525,13 @@ pub mod tests {
                         index: 1,
                         path_item: PathItemLocation::OperationalPointReference(
                             OperationalPointReference {
-                                reference:
-                                    OperationalPointIdentifier::OperationalPointUic {
-                                        uic: 8,
-                                        secondary_code: Some("BV".into())
-                                    },
-                                track_reference: 
-                                    Some(TrackReference::Name {
-                                        track_name: "V245".into()
-                                    }),
+                                reference: OperationalPointIdentifier::OperationalPointUic {
+                                    uic: 8,
+                                    secondary_code: Some("BV".into())
+                                },
+                                track_reference: Some(TrackReference::Name {
+                                    track_name: "V_INVALID".into()
+                                }),
                             }
                         )
                     }]
