@@ -1,5 +1,5 @@
 .rollingstock-editor {
-  padding-top: 5rem;
+  padding-top: 80px;
   max-height: 100vh;
 
   &-list {
@@ -7,7 +7,7 @@
     overflow-y: scroll;
 
     .rollingstock-body-container-img {
-      min-height: 2.4rem;
+      min-height: 38.4px;
     }
 
     &-cards {
@@ -35,25 +35,25 @@
 
     > .rollingstock-card-header {
       @media screen and (min-width: 1140px) {
-        height: 3rem;
+        height: 48px;
 
         .rollingstock-title {
-          height: 3rem;
+          height: 48px;
 
           .rollingstock-info {
-            height: 3rem;
+            height: 48px;
 
             .rollingstock-info-begin {
-              height: 3rem;
+              height: 48px;
 
               .rollingstock-info-series {
-                height: 2.3rem;
+                height: 36.8px;
                 font-weight: bold;
                 font-size: 1.5rem;
               }
 
               .rollingstock-info-unit {
-                margin-left: 0.5rem;
+                margin-left: 8px;
 
                 &.UM2,
                 &.UM3 {
@@ -63,13 +63,13 @@
 
               .rollingstock-info-subseries {
                 font-size: 1rem;
-                margin-left: 0.5rem;
+                margin-left: 8px;
               }
             }
 
             .rollingstock-info-middle {
               font-size: 1rem;
-              line-height: 1rem;
+              line-height: 16px;
             }
 
             .rollingstock-info-end {
@@ -81,14 +81,14 @@
     }
 
     .rollingstock-card-body {
-      height: 18rem;
+      height: 288px;
     }
 
     .form-control {
       height: auto;
 
       .rs-form-buttons {
-        margin-top: 1rem;
+        margin-top: 16px;
       }
     }
 
@@ -103,8 +103,8 @@
           @media screen and (min-width: 1140px) {
             font-size: medium;
             font-weight: 500;
-            height: 2rem;
-            padding: 0.5rem;
+            height: 32px;
+            padding: 8px;
           }
         }
       }
@@ -115,22 +115,22 @@
 
       .tab-content {
         background-color: var(--white);
-        border-radius: 0.5rem;
+        border-radius: 8px;
       }
 
       .tab-pane {
-        padding-top: 1rem;
+        padding-top: 16px;
       }
 
       .tabs {
-        margin-bottom: 1rem;
+        margin-bottom: 16px;
       }
 
       overflow-y: auto;
       width: 100%;
 
       @media screen and (min-width: 767px) {
-        padding-right: 1.5rem;
+        padding-right: 24px;
         width: 50%;
         position: fixed;
         right: 0;
@@ -144,8 +144,8 @@
   }
 
   &borders {
-    border: 0.2rem solid #d7d7d7;
-    border-radius: 0.5rem;
+    border: 3.2px solid #d7d7d7;
+    border-radius: 8px;
   }
 
   &-buttons {
@@ -176,7 +176,7 @@
 
   &-left-container {
     width: 94%;
-    padding-right: 1.5rem;
+    padding-right: 24px;
 
     @media screen and (min-width: 767px) {
       width: 45%;
@@ -221,13 +221,13 @@
   &-select {
     > label {
       margin-bottom: 0;
-      margin-right: 0.5rem;
+      margin-right: 8px;
     }
   }
 
   @media screen and (min-width: 1140px) {
     .loading-gauge-label {
-      margin: 0.5rem;
+      margin: 8px;
     }
   }
 
@@ -254,13 +254,13 @@
   }
 
   .defaultImageRSEditor img {
-    max-height: 2rem;
+    max-height: 32px;
   }
 
   .rollingstock-editor-spreadsheet {
     width: 40%;
     height: auto;
-    border-radius: 0.3rem;
+    border-radius: 4.8px;
 
     .dsg-cell-header {
       color: var(--blue);
@@ -275,10 +275,10 @@
     .rollingstock-card-body {
       width: 60%;
       border: none;
-      height: 20.75rem;
+      height: 332px;
 
       .rollingstock-curves {
-        height: 20.75rem;
+        height: 332px;
       }
     }
   }
@@ -288,13 +288,13 @@
       flex-direction: column-reverse;
 
       .rollingstock-card-body {
-        margin-bottom: 1rem;
+        margin-bottom: 16px;
         width: 100%;
       }
     }
 
     .rollingstock-editor-spreadsheet {
-      padding-right: 1rem;
+      padding-right: 16px;
       height: 100%;
       width: 100%;
     }
@@ -303,12 +303,12 @@
   .rollingstock-editor-effort-speed-curves {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    row-gap: 1.5rem;
-    column-gap: 2.1rem;
+    row-gap: 24px;
+    column-gap: 33.6px;
     padding-top: 0;
-    padding-left: 1rem;
-    padding-right: 2rem;
-    padding-bottom: 1rem;
+    padding-left: 16px;
+    padding-right: 32px;
+    padding-bottom: 16px;
   }
 
   .selector-container {
@@ -326,14 +326,14 @@
 
     &:nth-child(4) {
       .selector-itemslist {
-        border-radius: 0.3rem;
+        border-radius: 4.8px;
       }
     }
   }
 
   .warning-message {
     border: 2px solid var(--yellow);
-    border-radius: 0.3rem;
+    border-radius: 4.8px;
 
     .warning-icon {
       color: var(--yellow);
