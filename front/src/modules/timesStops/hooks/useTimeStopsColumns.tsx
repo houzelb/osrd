@@ -5,6 +5,8 @@ import { keyColumn, type Column, checkboxColumn, createTextColumn } from 'react-
 import type { CellComponent } from 'react-datasheet-grid/dist/types';
 import { useTranslation } from 'react-i18next';
 
+import { NO_BREAK_SPACE } from 'utils/strings';
+
 import { marginRegExValidation } from '../consts';
 import { disabledTextColumn } from '../helpers/utils';
 import ReadOnlyTime from '../ReadOnlyTime';
@@ -167,6 +169,27 @@ export const useTimeStopsColumns = <T extends TimeStopsRow>(
             alignRight: true,
           })
         ),
+        ...(isOutputTable && {
+          component: ({ rowData }) => {
+            if (!rowData.theoreticalMargin) return null;
+            const [digits, unit] = rowData.theoreticalMargin.split(NO_BREAK_SPACE);
+            return (
+              <span className="dsg-input dsg-input-align-right self-center text-nowrap">
+                {digits}
+                {NO_BREAK_SPACE}
+                {unit === 'min/100km' ? (
+                  <span className="small-unit-container">
+                    <span>min/</span>
+                    <br />
+                    <span>100km</span>
+                  </span>
+                ) : (
+                  unit
+                )}
+              </span>
+            );
+          },
+        }),
         cellClassName: ({ rowData }) =>
           cx({
             invalidCell: !isOutputTable && !rowData.isMarginValid,
@@ -174,8 +197,7 @@ export const useTimeStopsColumns = <T extends TimeStopsRow>(
           }),
         title: t('theoreticalMargin'),
         headerClassName: 'padded-header',
-        minWidth: 100,
-        maxWidth: 130,
+        ...fixedWidth(isOutputTable ? 75 : 110),
         disabled: ({ rowIndex }) => isOutputTable || rowIndex === allWaypoints.length - 1,
       },
       ...extraOutputColumns,
