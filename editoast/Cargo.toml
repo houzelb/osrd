@@ -90,7 +90,7 @@ axum = { version = "0.7.9", default-features = false, features = [
   "multipart",
   "tracing",
 ] }
-axum-extra = { version = "0.9.4", default-features = false, features = [
+axum-extra = { version = "0.9.6", default-features = false, features = [
   "typed-header",
 ] }
 axum-test = { version = "16.4.0", default-features = false }
