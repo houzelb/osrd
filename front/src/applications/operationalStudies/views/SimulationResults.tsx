@@ -116,10 +116,6 @@ const SimulationResults = ({
     }
   }, [extViewport]);
 
-  if (!trainSimulation) return null;
-
-  if (trainSimulation.status !== 'success') return null;
-
   return (
     <div className="simulation-results">
       {/* SIMULATION : STICKY BAR */}
@@ -150,7 +146,7 @@ const SimulationResults = ({
           className="simulation-warped-map d-flex flex-row align-items-stretch mb-2"
           style={{ height: manchetteWithSpaceTimeChartHeight }}
         >
-          {projectionData && projectionData.projectedTrains.length > 0 && pathProperties && (
+          {projectionData && projectionData.projectedTrains.length > 0 && (
             <>
               <button
                 type="button"

@@ -13,7 +13,7 @@ import TimesStops from './TimesStops';
 import { TableType, type TimesStopsRow } from './types';
 
 type TimesStopsOutputProps = {
-  simulatedTrain: SimulationResponseSuccess;
+  simulatedTrain?: SimulationResponseSuccess;
   trainSummary?: TrainScheduleWithDetails;
   operationalPoints?: PathPropertiesFormatted['operationalPoints'];
   selectedTrainSchedule?: TrainScheduleResult;
@@ -30,7 +30,7 @@ const TimesStopsOutput = ({
   dataIsLoading,
 }: TimesStopsOutputProps) => {
   const enrichedOperationalPoints = useOutputTableData(
-    simulatedTrain,
+    simulatedTrain?.final_output,
     trainSummary,
     operationalPoints,
     selectedTrainSchedule,
