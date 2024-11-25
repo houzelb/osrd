@@ -4,7 +4,7 @@
   width: 100%;
   cursor: pointer;
   border-radius: 4px;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 
   &.solid {
     opacity: 1 !important;
@@ -32,7 +32,7 @@
   }
 
   .rollingstock-body-container-img {
-    padding: 0 0.5rem;
+    padding: 0 8px;
     border-left: 2px solid var(--coolgray3);
     border-right: 2px solid var(--coolgray3);
     &.opened-rollingstock-card-body {
@@ -44,9 +44,9 @@
       overflow: hidden;
       img {
         max-width: 100%;
-        height: 2rem;
+        height: 32px;
         display: inline-block;
-        padding-top: 0.75rem;
+        padding-top: 12px;
         position: relative;
         vertical-align: baseline;
       }
@@ -59,7 +59,7 @@
     border-right: 2px solid var(--coolgray3);
     border-bottom: 2px solid var(--coolgray3);
     .rollingstock-footer-specs {
-      padding: 0.5rem 0.5rem 0.25rem;
+      padding: 8px 8px 4px;
       svg {
         vertical-align: text-top;
         font-size: 0.9rem;
@@ -74,8 +74,8 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      height: 2.75rem;
-      padding: 0 0.5rem;
+      height: 44px;
+      padding: 0 8px;
       border-radius: 0 0 4px 4px;
       color: var(--light);
       background-color: var(--coolgray3);
@@ -84,7 +84,7 @@
         align-items: center;
         span {
           display: flex;
-          padding: 0 0.25rem 0.1rem 0;
+          padding: 0 4px 1.6px 0;
         }
       }
     }
@@ -94,7 +94,7 @@
 .rollingstock-card-header {
   border-radius: 4px 4px 0 0;
   background-color: var(--coolgray3);
-  padding: 0.15rem 0.5rem;
+  padding: 2.4px 8px;
   overflow: hidden;
   border-top: 2px solid var(--coolgray3);
   border-left: 2px solid var(--coolgray3);
@@ -102,19 +102,19 @@
   cursor: pointer;
   .rollingstock-title {
     white-space: nowrap;
-    height: 1.5rem;
+    height: 24px;
     overflow: hidden;
     .rollingstock-info {
       display: flex;
       align-items: center;
-      height: 1.5rem;
+      height: 24px;
       justify-content: space-between;
       .rollingstock-info-begin {
-        height: 1.5rem;
+        height: 24px;
         display: flex;
         align-items: center;
         .rollingstock-info-series {
-          height: 1.5rem;
+          height: 24px;
           font-weight: bold;
         }
         .rollingstock-info-unit {
@@ -125,11 +125,11 @@
             color: #a1006b;
           }
           font-weight: bold;
-          margin-left: 0.25rem;
+          margin-left: 4px;
           font-size: 0.7rem;
         }
         .rollingstock-info-subseries {
-          margin-left: 0.25rem;
+          margin-left: 4px;
           text-transform: uppercase;
           font-size: 0.7rem;
         }
@@ -142,7 +142,7 @@
         text-transform: uppercase;
         color: #303383;
         font-size: 0.6rem;
-        line-height: 0.6rem;
+        line-height: 9.6px;
       }
       .rollingstock-info-end {
         display: flex;
@@ -156,7 +156,7 @@
 
 .rollingstock-card-body {
   position: relative;
-  padding: 0 0.5rem;
+  padding: 0 8px;
   border-left: 2px solid var(--coolgray3);
   border-right: 2px solid var(--coolgray3);
   font-size: 0.8rem;
@@ -164,13 +164,13 @@
   .rollingstock-detail-container-img {
     position: absolute;
     z-index: 0;
-    width: calc(100% - 5rem);
+    width: calc(100% - 80px);
     overflow: hidden;
-    bottom: 2.6rem;
-    left: 3.5rem;
+    bottom: 41.6px;
+    left: 56px;
     opacity: 0.35;
-    padding-top: 1rem; // Need padding...because
-    padding-bottom: 1rem;
+    padding-top: 16px; // Need padding...because
+    padding-bottom: 16px;
     .rollingstock-detail-img {
       display: flex;
       align-items: baseline;
@@ -181,7 +181,7 @@
       ); // Have to scale whole <img> because electric trains with pantograph have taller pictures
       transform-origin: left;
       img {
-        max-height: 4rem;
+        max-height: 64px;
         display: inline-block;
         position: relative;
         vertical-align: baseline;
@@ -190,6 +190,6 @@
   }
   .loader {
     margin: 0;
-    padding: 2rem 0;
+    padding: 32px 0;
   }
 }

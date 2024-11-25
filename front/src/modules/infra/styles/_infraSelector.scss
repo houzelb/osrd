@@ -1,6 +1,6 @@
 .infra-loader-absolute {
   display: block;
-  height: calc(100% - 3.5rem);
+  height: calc(100% - 56px);
   width: 100%;
   left: 0;
   top: 0;
@@ -10,7 +10,7 @@
 }
 
 .infra-input-filter {
-  margin-bottom: 0.5rem;
+  margin-bottom: 8px;
 }
 
 .infraselector-button {
@@ -19,7 +19,7 @@
   .infra-lock {
     display: flex;
     align-items: center;
-    margin-right: 0.5rem;
+    margin-right: 8px;
     text-transform: uppercase;
   }
 }
@@ -31,7 +31,7 @@
   margin: 0;
   border: none;
   font-size: 0.9rem;
-  line-height: 2.2rem;
+  line-height: 35.2px;
   font-weight: 400;
   text-transform: uppercase;
   background: none;
@@ -57,7 +57,7 @@
     padding: 0;
     transition: 0.2s;
     width: 100%;
-    margin-bottom: 0.5rem;
+    margin-bottom: 8px;
     border-radius: 4px;
     text-align: left;
     font-weight: 100;
@@ -68,7 +68,7 @@
       text-transform: uppercase;
       small {
         font-size: 0.6rem;
-        margin-right: 0.25rem;
+        margin-right: 4px;
       }
     }
     &.unlocked {
@@ -108,11 +108,11 @@
       }
     }
     .infraslist-item-choice-main {
-      padding: 0 0.25rem;
+      padding: 0 4px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 2rem;
+      height: 32px;
       span {
         display: flex;
       }
@@ -121,10 +121,10 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.25rem 0.25rem 0;
+      padding: 4px 4px 0;
       font-size: 0.6rem;
-      height: 1rem;
-      line-height: 1.25rem;
+      height: 16px;
+      line-height: 20px;
       font-weight: 500;
     }
   }
@@ -133,9 +133,9 @@
   .infraslist-item-edition {
     display: flex;
     align-items: center;
-    height: 3.5rem;
+    height: 56px;
     position: relative;
-    margin-bottom: 0.5rem;
+    margin-bottom: 8px;
     &.disabled {
       opacity: 0.25;
     }
@@ -150,13 +150,13 @@
         align-items: center;
         flex-grow: 1;
         overflow: hidden;
-        padding-left: 0.5rem;
+        padding-left: 8px;
       }
       .infraslist-item-delete-button-container {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 8rem;
+        width: 128px;
       }
       .infraslist-item-edition-delete-buttons {
         display: flex;
@@ -204,12 +204,12 @@
         border-radius: 4px 0 0 4px;
       }
       .infraslist-item-edition-main {
-        padding: 0 0.25rem;
+        padding: 0 4px;
         display: flex;
         align-items: center;
         font-size: 0.9rem;
-        height: 2rem;
-        line-height: 1rem;
+        height: 32px;
+        line-height: 16px;
         input {
           background: none;
         }
@@ -220,11 +220,11 @@
           display: flex;
           align-items: center;
           color: var(--coolgray7);
-          padding: 0 0.25rem 0 0.25rem;
+          padding: 0 4px 0 4px;
           text-transform: uppercase;
           small {
             font-size: 0.6rem;
-            margin-right: 0.25rem;
+            margin-right: 4px;
           }
         }
       }
@@ -233,17 +233,17 @@
         align-items: center;
         background-color: var(--coolgray3);
         justify-content: space-between;
-        padding: 0.25rem 0.25rem 0;
+        padding: 4px 4px 0;
         font-size: 0.6rem;
-        height: 1rem;
-        line-height: 1.25rem;
+        height: 16px;
+        line-height: 20px;
         font-weight: 500;
       }
     }
     .infraslist-item-actionsbar {
       display: flex;
       justify-content: around;
-      width: 8rem;
+      width: 128px;
     }
     .infraslist-item-action {
       display: flex;
@@ -253,16 +253,16 @@
       background-color: var(--coolgray1);
       flex-grow: 1;
       border: none;
-      height: 3.25rem;
+      height: 52px;
       transition:
         background-color 0.4s,
         color 0.4s;
-      width: 2rem;
+      width: 32px;
       .spinner-border {
         color: var(--coolgray7);
         width: 1em;
         height: 1em;
-        border-width: 0.15rem;
+        border-width: 2.4px;
       }
       &:last-child {
         border-radius: 0 4px 4px 0;
@@ -274,7 +274,7 @@
         background-color: var(--coolgray3);
       }
       &.waiting {
-        width: 8rem;
+        width: 128px;
       }
       &.unlock {
         color: var(--green);
@@ -284,14 +284,14 @@
         }
       }
       &.cancel {
-        width: 4rem;
+        width: 64px;
         &:hover {
           background-color: var(--coolgray11);
           color: var(--white);
         }
       }
       &.check {
-        width: 4rem;
+        width: 64px;
         color: var(--green);
         &:hover {
           background-color: var(--green);
@@ -308,7 +308,7 @@
       &.delete {
         margin-left: 0;
         margin-right: 0;
-        width: 4rem;
+        width: 64px;
         color: var(--red);
         &:first-child {
           border-radius: 4px 0 0 4px;
@@ -330,12 +330,12 @@
 }
 
 .infra-add {
-  padding: 0.5rem;
+  padding: 8px;
   border: 2px solid var(--green);
   border-radius: 4px;
   .infra-add-error {
-    height: 1rem;
-    margin: 0.5rem 0;
+    height: 16px;
+    margin: 8px 0;
     text-align: center;
     color: var(--red);
   }
@@ -343,7 +343,7 @@
     display: flex;
     align-items: center;
     color: var(--coolgray9);
-    padding: 0.5rem;
+    padding: 8px;
     border: 2px dashed var(--coolgray3);
     border-radius: 4px;
     width: 100%;

@@ -1,5 +1,5 @@
 .study-edition-modal {
-  max-height: calc(100vh - 3.5rem);
+  max-height: calc(100vh - 56px);
   display: flex;
   flex-direction: column;
   .modal-body {
@@ -8,14 +8,14 @@
   .study-edition-modal-title {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 16px;
     width: 100%;
     img {
-      height: 2rem;
+      height: 32px;
     }
   }
   .study-edition-modal-description {
-    margin-bottom: 1rem;
+    margin-bottom: 16px;
     textarea {
       min-height: auto;
     }
