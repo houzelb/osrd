@@ -108,7 +108,7 @@ $ease-in-quint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
     top: 18px;
     left: 0;
     width: 100%;
-    font-size: 12px;
+    font-size: 0.75rem;
   }
 
   &-mark-text {
@@ -305,7 +305,7 @@ $ease-in-quint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
     height: 24px;
     padding: 6px 2px;
     color: $tooltip-color;
-    font-size: 12px;
+    font-size: 0.75rem;
     line-height: 1;
     text-align: center;
     text-decoration: none;

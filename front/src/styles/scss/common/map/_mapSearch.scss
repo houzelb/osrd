@@ -7,7 +7,7 @@
     display: flex;
     overflow-y: auto;
     overflow-x: hidden;
-    padding-right: 0.5rem;
+    padding-right: 8px;
     width: 100%;
     flex-direction: column;
 
@@ -15,25 +15,25 @@
       all: unset;
       display: flex;
       align-items: center;
-      padding: 0 0.25rem;
+      padding: 0 4px;
       border-radius: var(--border-radius);
       cursor: pointer;
-      line-height: 1.25rem;
+      line-height: 20px;
 
       .trigram {
         color: var(--coolgray9);
         font-family: monospace;
         font-size: 0.8rem;
-        width: 2rem;
+        width: 32px;
         flex-grow: 0;
         flex-shrink: 0;
       }
       .name {
-        padding: 0.25rem 0 0 0.5rem;
+        padding: 4px 0 0 8px;
         flex-grow: 1;
         flex-shrink: 1;
         .ch {
-          margin-left: 0.25rem;
+          margin-left: 4px;
           font-size: 0.9rem;
         }
       }
@@ -65,11 +65,11 @@
       td {
         cursor: pointer;
         vertical-align: middle;
-        padding: 0.25rem;
+        padding: 4px;
       }
       font-size: 0.9rem;
       img {
-        height: 2rem;
+        height: 32px;
       }
       &:hover {
         background-color: #d7d7d7;
@@ -88,7 +88,7 @@
   .map-search-marker-title {
     font-weight: bold;
     border-radius: 4px;
-    padding: 0 0.5rem;
+    padding: 0 8px;
   }
   .map-search-marker-subtitle {
     font-size: 0.9rem;

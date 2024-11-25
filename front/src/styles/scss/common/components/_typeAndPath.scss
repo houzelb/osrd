@@ -1,13 +1,13 @@
 .type-and-path {
   position: relative;
   background-color: var(--white);
-  padding: 0.5rem;
+  padding: 8px;
   border-radius: var(--border-radius);
   .help {
     position: relative;
     display: flex;
     align-items: center;
-    height: 5rem;
+    height: 80px;
     max-width: 21vw;
     overflow: auto;
     font-size: 0.9rem;
@@ -17,18 +17,18 @@
   .op-tooltips {
     position: absolute;
     z-index: 1;
-    bottom: 2.9rem;
+    bottom: 46.4px;
     .op {
       position: absolute;
       font-weight: 500;
       border: 1px dashed var(--cyan);
       background-color: var(--white);
       color: var(--cyan);
-      padding: 0 0.25rem;
+      padding: 0 4px;
       transform: rotate(-40deg);
       transform-origin: left;
       border-radius: var(--border-radius);
-      max-width: 7rem;
+      max-width: 112px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -36,7 +36,7 @@
       &.wrong {
         position: absolute;
         border-radius: 0;
-        top: -0.5rem;
+        top: -8px;
         transform: unset;
         padding: 0;
         border: none;
@@ -66,7 +66,7 @@
     color: unset;
     background-color: var(--coolgray1);
     border-radius: var(--border-radius);
-    padding: 0 0.5rem;
+    padding: 0 8px;
     &::placeholder {
       text-transform: none;
       font-size: 0.9rem;
@@ -75,17 +75,17 @@
 }
 
 .results-container {
-  max-height: 5rem;
-  max-width: 45rem;
+  max-height: 80px;
+  max-width: 720px;
   position: relative;
-  line-height: 1.5rem;
+  line-height: 24px;
   overflow: hidden;
   border-radius: var(--border-radius);
   .station-results {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 8px;
     background-color: white;
     overflow: hidden;
     .station {
@@ -127,9 +127,9 @@
     position: absolute;
     bottom: 25%;
     left: var(--cursor-position);
-    border-left: 1.2rem solid transparent;
-    border-right: 1.2rem solid transparent;
-    border-bottom: 1.5rem solid white;
+    border-left: 19.2px solid transparent;
+    border-right: 19.2px solid transparent;
+    border-bottom: 24px solid white;
     z-index: 4;
   }
 }

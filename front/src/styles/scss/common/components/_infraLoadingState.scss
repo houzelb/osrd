@@ -2,7 +2,7 @@
   font-size: 0.75rem;
   display: flex;
   align-items: center;
-  margin-bottom: 0.0625rem;
+  margin-bottom: 1px;
 
   &.cached {
     color: var(--success30);
@@ -37,7 +37,7 @@
 
   .steps {
     font-weight: 500;
-    margin-left: 0.25rem;
-    margin-top: 0.1rem;
+    margin-left: 4px;
+    margin-top: 1.6px;
   }
 }
