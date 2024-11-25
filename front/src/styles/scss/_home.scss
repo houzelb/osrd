@@ -3,14 +3,14 @@
   padding-bottom: 0 !important;
 }
 .cardscontainer {
-  margin: 2rem;
+  margin: 32px;
   .card {
     display: flex;
     align-items: center;
     cursor: pointer;
     transition: 0.2s ease-in-out;
     img {
-      padding: 1rem;
+      padding: 16px;
       width: 50%;
     }
 
@@ -33,33 +33,33 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem 0 0;
+  padding: 16px 0 0;
   h1 {
-    padding-top: 2rem;
+    padding-top: 32px;
     font-size: 3rem;
     color: var(--coolgray9);
   }
   img {
-    width: 8rem;
+    width: 128px;
   }
   @media screen and (max-width: 1024px) {
     h1 {
       font-size: 1.5rem;
     }
     img {
-      width: 4rem;
+      width: 64px;
     }
   }
 }
 
 .modal-header .close {
-  padding-top: 1.8rem !important;
+  padding-top: 28.8px !important;
 }
 
 .language-choice-btn {
   display: flex !important;
-  padding: 0.5rem 1rem !important;
-  gap: 1rem;
+  padding: 8px 16px !important;
+  gap: 16px;
   svg {
     height: 24px;
   }
