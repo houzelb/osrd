@@ -11,17 +11,17 @@
     z-index: 10;
     top: 0;
     left: 0;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
+    padding: 8px;
+    margin-bottom: 8px;
     overflow: hidden;
     input {
-      padding: 0.125rem 0.5rem;
+      padding: 2px 8px;
     }
     .train-detail {
-      min-width: 4.5rem;
-      max-height: 2rem;
-      padding: 0.1rem;
-      line-height: 0.8rem;
+      min-width: 72px;
+      max-height: 32px;
+      padding: 1.6px;
+      line-height: 12.8px;
     }
     .rounded,
     .form-control,
@@ -34,13 +34,13 @@
       border-radius: 4px !important;
     }
     &.with-collapsed-timetable {
-      top: 3rem;
+      top: 48px;
     }
   }
 
   .osrd-simulation-container {
     position: relative;
-    padding: 1rem;
+    padding: 16px;
     border-radius: 4px;
 
     &.speedspacechart-container {
@@ -65,7 +65,7 @@
 
   .driver-train-schedule {
     background-color: white;
-    padding: 1rem;
+    padding: 16px;
     border-radius: 4px;
     margin-inline: 38px 30px;
   }
@@ -83,7 +83,7 @@
   /* MAP */
   .train-speed-label {
     text-shadow: 0 0 3px #fff;
-    padding-bottom: 1.5rem;
+    padding-bottom: 24px;
   }
 
   .map-pathfinding-marker {
