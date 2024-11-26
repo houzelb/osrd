@@ -1363,7 +1363,7 @@ dependencies = [
  "sha1",
  "strum",
  "tempfile",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
  "tokio",
  "tokio-util",
  "tower 0.5.1",
@@ -1385,7 +1385,7 @@ dependencies = [
  "pretty_assertions",
  "serde",
  "strum",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
  "tokio",
  "toml_edit",
  "tracing",
@@ -1399,7 +1399,7 @@ dependencies = [
  "rangemap",
  "serde",
  "serde_json",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
  "utoipa",
 ]
 
@@ -1430,7 +1430,7 @@ dependencies = [
  "opentelemetry-semantic-conventions",
  "postgis_diesel",
  "postgres-openssl",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
  "tokio",
  "tokio-postgres",
  "tracing",
@@ -1444,7 +1444,7 @@ dependencies = [
  "itertools 0.13.0",
  "reqwest",
  "serde",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
  "tokio",
  "tracing",
  "url",
@@ -1465,7 +1465,7 @@ dependencies = [
  "serde",
  "serde_json",
  "strum",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
  "utoipa",
  "uuid",
 ]
@@ -1478,7 +1478,7 @@ dependencies = [
  "serde",
  "serde_json",
  "strum",
- "thiserror 1.0.69",
+ "thiserror 2.0.3",
  "utoipa",
 ]
 
@@ -4549,7 +4549,7 @@ checksum = "f077553d607adc1caf65430528a576c757a71ed73944b66ebb58ef2bbd243568"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.87",
+ "syn 2.0.89",
 ]
 
 [[package]]
