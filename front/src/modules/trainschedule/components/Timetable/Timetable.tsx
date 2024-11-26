@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 
 import cx from 'classnames';
 import dayjs from 'dayjs';
-import { compact } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
@@ -13,7 +12,6 @@ import ConflictsList from 'modules/conflict/components/ConflictsList';
 import { updateSelectedTrainId } from 'reducers/simulationResults';
 import { getTrainIdUsedForProjection } from 'reducers/simulationResults/selectors';
 import { useAppDispatch } from 'store';
-import { distributedIntervalsFromArrayOfValues } from 'utils/numbers';
 
 import TimetableToolbar from './TimetableToolbar';
 import TimetableTrainCard from './TimetableTrainCard';
@@ -56,16 +54,6 @@ const Timetable = ({
   const [showTrainDetails, setShowTrainDetails] = useState(false);
   const trainIdUsedForProjection = useSelector(getTrainIdUsedForProjection);
   const dispatch = useAppDispatch();
-
-  const trainsDurationsIntervals = useMemo(
-    () =>
-      displayedTrainSchedules.length > 0
-        ? distributedIntervalsFromArrayOfValues(
-            compact(displayedTrainSchedules.map((train) => train.duration))
-          )
-        : [],
-    [displayedTrainSchedules]
-  );
 
   const toggleShowTrainDetails = () => {
     setShowTrainDetails(!showTrainDetails);
@@ -152,30 +140,29 @@ const Timetable = ({
           trainSchedules={trainSchedules}
           isInSelection={selectedTrainIds.length > 0}
         />
-        {trainsDurationsIntervals &&
-          displayedTrainSchedules.map((train: TrainScheduleWithDetails, index) => (
-            <div key={`timetable-train-card-${train.id}-${train.trainName}`}>
-              {showDepartureDates[index] && (
-                <div className="scenario-timetable-departure-date">
-                  {currentDepartureDates[index]}
-                </div>
-              )}
-              <TimetableTrainCard
-                isInSelection={selectedTrainIds.includes(train.id)}
-                handleSelectTrain={handleSelectTrain}
-                train={train}
-                isSelected={infraState === 'CACHED' && selectedTrainId === train.id}
-                isModified={train.id === trainIdToEdit}
-                setDisplayTrainScheduleManagement={setDisplayTrainScheduleManagement}
-                upsertTrainSchedules={upsertTrainSchedules}
-                setTrainIdToEdit={setTrainIdToEdit}
-                removeTrains={removeAndUnselectTrains}
-                projectionPathIsUsed={
-                  infraState === 'CACHED' && trainIdUsedForProjection === train.id
-                }
-              />
-            </div>
-          ))}
+        {displayedTrainSchedules.map((train: TrainScheduleWithDetails, index) => (
+          <div key={`timetable-train-card-${train.id}-${train.trainName}`}>
+            {showDepartureDates[index] && (
+              <div className="scenario-timetable-departure-date">
+                {currentDepartureDates[index]}
+              </div>
+            )}
+            <TimetableTrainCard
+              isInSelection={selectedTrainIds.includes(train.id)}
+              handleSelectTrain={handleSelectTrain}
+              train={train}
+              isSelected={infraState === 'CACHED' && selectedTrainId === train.id}
+              isModified={train.id === trainIdToEdit}
+              setDisplayTrainScheduleManagement={setDisplayTrainScheduleManagement}
+              upsertTrainSchedules={upsertTrainSchedules}
+              setTrainIdToEdit={setTrainIdToEdit}
+              removeTrains={removeAndUnselectTrains}
+              projectionPathIsUsed={
+                infraState === 'CACHED' && trainIdUsedForProjection === train.id
+              }
+            />
+          </div>
+        ))}
         <div
           className={cx('bottom-timetables-trains', {
             'empty-list': trainSchedulesWithDetails.length === 0,
