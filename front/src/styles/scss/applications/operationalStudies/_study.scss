@@ -261,17 +261,14 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 16px;
-    padding: 16px 8px 16px 8px;
+    padding: 16px 8px;
     margin-top: 32px;
   }
 
   .scenarios-list {
     overflow: auto;
     max-height: 50vh;
-    margin-left: -8px;
-    margin-right: -8px;
-    padding-top: 16px;
-    padding-left: 8px;
-    padding-right: 8px;
+    margin-inline: -8px;
+    padding: 16px 8px 0;
   }
 }
