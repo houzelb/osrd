@@ -1,5 +1,9 @@
 {
   "editScenario": "Edit scenario",
+  "description": {
+    "electricalProfileWithName": "Electrical profiles : {{name}} | ID{{id}}",
+    "electricalProfileWithId": "Electrical profiles : ID{{id}}"
+  },
   "displayTrainsWithDetails": "Mask/unmask trains detail",
   "electricalProfileSet": "Electrical profiles set",
   "errorMessages": {
