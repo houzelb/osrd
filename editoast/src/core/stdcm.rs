@@ -19,7 +19,11 @@ use super::simulation::SimulationResponse;
 use crate::core::AsCoreRequest;
 use crate::core::Json;
 
-#[derive(Debug, Serialize)]
+editoast_common::schemas! {
+    Response,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Request {
     /// Infrastructure id
     pub infra: i64,
@@ -61,7 +65,7 @@ pub struct Request {
     pub temporary_speed_limits: Vec<TemporarySpeedLimit>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PathItem {
     /// The track offsets of the path item
     pub locations: Vec<TrackOffset>,
@@ -72,7 +76,7 @@ pub struct PathItem {
 }
 
 /// Contains the data of a step timing, when it is specified
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StepTimingData {
     /// Time the train should arrive at this point
     pub arrival_time: DateTime<Utc>,
@@ -83,7 +87,7 @@ pub struct StepTimingData {
 }
 
 /// Lighter description of a work schedule, with only the relevant information for core
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkSchedule {
     /// Start time as a time delta from the stdcm start time in ms
     pub start_time: u64,
@@ -94,7 +98,7 @@ pub struct WorkSchedule {
 }
 
 /// Lighter description of a work schedule with only the relevant information for core
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TemporarySpeedLimit {
     /// Speed limitation in m/s
     pub speed_limit: f64,
@@ -114,7 +118,7 @@ pub struct UndirectedTrackRange {
     pub end: u64,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, ToSchema)]
 #[serde(tag = "status", rename_all = "snake_case")]
 // We accepted the difference of memory size taken by variants
 // Since there is only on success and others are error cases

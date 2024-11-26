@@ -8621,6 +8621,45 @@ components:
           type: integer
           format: int64
           nullable: true
+    Response:
+      oneOf:
+      - type: object
+        required:
+        - simulation
+        - path
+        - departure_time
+        - status
+        properties:
+          departure_time:
+            type: string
+            format: date-time
+          path:
+            $ref: '#/components/schemas/PathfindingResultSuccess'
+          simulation:
+            $ref: '#/components/schemas/SimulationResponse'
+          status:
+            type: string
+            enum:
+            - success
+      - type: object
+        required:
+        - status
+        properties:
+          status:
+            type: string
+            enum:
+            - path_not_found
+      - type: object
+        required:
+        - error
+        - status
+        properties:
+          error:
+            $ref: '#/components/schemas/SimulationResponse'
+          status:
+            type: string
+            enum:
+            - preprocessing_simulation_error
     RjsPowerRestrictionRange:
       type: object
       description: A range along the train path where a power restriction is applied.
@@ -10232,6 +10271,31 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RangeAllowance'
+    StdcmLog:
+      type: object
+      required:
+      - id
+      - trace_id
+      - request
+      - response
+      - created
+      properties:
+        created:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          format: int64
+        request:
+          $ref: '#/components/schemas/Request'
+        response:
+          $ref: '#/components/schemas/Response'
+        trace_id:
+          type: string
+        user_id:
+          type: integer
+          format: int64
+          nullable: true
     StdcmSearchEnvironment:
       type: object
       required:

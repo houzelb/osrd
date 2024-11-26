@@ -36,6 +36,7 @@ editoast_common::schemas! {
     simulation::schemas(),
     pathfinding::schemas(),
     conflict_detection::schemas(),
+    stdcm::schemas(),
 }
 
 #[derive(Debug, Clone)]

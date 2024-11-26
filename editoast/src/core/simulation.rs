@@ -33,7 +33,7 @@ editoast_common::schemas! {
     SimulationResponse,
 }
 
-#[derive(Debug, Serialize, Derivative)]
+#[derive(Debug, Clone, Serialize, Deserialize, Derivative)]
 #[derivative(Hash)]
 pub struct PhysicsConsist {
     pub effort_curves: EffortCurves,
