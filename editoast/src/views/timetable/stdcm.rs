@@ -17,6 +17,7 @@ use editoast_schemas::train_schedule::Margins;
 use editoast_schemas::train_schedule::ReceptionSignal;
 use editoast_schemas::train_schedule::ScheduleItem;
 use failure_handler::SimulationFailureHandler;
+use opentelemetry::trace::TraceContextExt;
 use request::convert_steps;
 use request::Request;
 use serde::Deserialize;
@@ -24,6 +25,8 @@ use serde::Serialize;
 use std::collections::HashMap;
 use std::sync::Arc;
 use thiserror::Error;
+use tracing::Instrument;
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 use utoipa::IntoParams;
 use utoipa::ToSchema;
 
@@ -36,6 +39,8 @@ use crate::core::simulation::{RoutingRequirement, SimulationResponse, SpacingReq
 use crate::core::AsCoreRequest;
 use crate::core::CoreClient;
 use crate::error::Result;
+use crate::models::prelude::*;
+use crate::models::stdcm_log::StdcmLog;
 use crate::models::timetable::TimetableWithTrains;
 use crate::models::train_schedule::TrainSchedule;
 use crate::models::Infra;
@@ -46,8 +51,6 @@ use crate::views::train_schedule::train_simulation_batch;
 use crate::views::AuthenticationExt;
 use crate::views::AuthorizationError;
 use crate::AppState;
-use crate::Retrieve;
-use crate::RetrieveBatch;
 use crate::ValkeyClient;
 
 editoast_common::schemas! {
@@ -135,7 +138,7 @@ async fn stdcm(
     }
 
     let db_pool = app_state.db_pool_v2.clone();
-    let conn = &mut db_pool.get().await?;
+    let mut conn = db_pool.get().await?;
 
     let valkey_client = app_state.valkey.clone();
     let core_client = app_state.core_client.clone();
@@ -143,19 +146,21 @@ async fn stdcm(
     let infra_id = query.infra;
 
     // 1. Retrieve Timetable / Infra / Trains / Simulation / Rolling Stock
-    let timetable_trains = TimetableWithTrains::retrieve_or_fail(conn, timetable_id, || {
+    let timetable_trains = TimetableWithTrains::retrieve_or_fail(&mut conn, timetable_id, || {
         StdcmError::TimetableNotFound { timetable_id }
     })
     .await?;
 
-    let infra =
-        Infra::retrieve_or_fail(conn, infra_id, || StdcmError::InfraNotFound { infra_id }).await?;
+    let infra = Infra::retrieve_or_fail(&mut conn, infra_id, || StdcmError::InfraNotFound {
+        infra_id,
+    })
+    .await?;
 
     let (train_schedules, _): (Vec<_>, _) =
-        TrainSchedule::retrieve_batch(conn, timetable_trains.train_ids.clone()).await?;
+        TrainSchedule::retrieve_batch(&mut conn, timetable_trains.train_ids.clone()).await?;
 
     let rolling_stock =
-        RollingStockModel::retrieve_or_fail(conn, stdcm_request.rolling_stock_id, || {
+        RollingStockModel::retrieve_or_fail(&mut conn, stdcm_request.rolling_stock_id, || {
             StdcmError::RollingStockNotFound {
                 rolling_stock_id: stdcm_request.rolling_stock_id,
             }
@@ -186,7 +191,7 @@ async fn stdcm(
 
     // 3. Get scheduled train requirements
     let simulations: Vec<_> = train_simulation_batch(
-        conn,
+        &mut conn,
         valkey_client.clone(),
         core_client.clone(),
         &train_schedules,
@@ -206,7 +211,7 @@ async fn stdcm(
     );
 
     // 4. Retrieve work schedules
-    let work_schedules = stdcm_request.get_work_schedules(conn).await?;
+    let work_schedules = stdcm_request.get_work_schedules(&mut conn).await?;
 
     // 5. Build STDCM request
     let stdcm_request = crate::core::stdcm::Request {
@@ -221,17 +226,19 @@ async fn stdcm(
             total_length: stdcm_request.total_length,
             total_mass: stdcm_request.total_mass,
             towed_rolling_stock: stdcm_request
-                .get_towed_rolling_stock(conn)
+                .get_towed_rolling_stock(&mut conn)
                 .await?
                 .map(From::from),
             traction_engine: rolling_stock.into(),
         }
         .into(),
         temporary_speed_limits: stdcm_request
-            .get_temporary_speed_limits(conn, simulation_run_time)
+            .get_temporary_speed_limits(&mut conn, simulation_run_time)
             .await?,
         comfort: stdcm_request.comfort,
-        path_items: stdcm_request.get_stdcm_path_items(conn, infra_id).await?,
+        path_items: stdcm_request
+            .get_stdcm_path_items(&mut conn, infra_id)
+            .await?,
         start_time: earliest_departure_time,
         trains_requirements,
         maximum_departure_delay: stdcm_request.get_maximum_departure_delay(simulation_run_time),
@@ -251,7 +258,42 @@ async fn stdcm(
 
     let stdcm_response = stdcm_request.fetch(core_client.as_ref()).await?;
 
-    // 6. Handle STDCM Core Response
+    // 6. Check if the current tracing level is debug or greater, and if so, log STDCM request and response
+    if tracing::level_filters::LevelFilter::current() >= tracing::Level::DEBUG {
+        let user_id = auth.authorizer().map_or_else(
+            |e| {
+                tracing::error!("Authorization failed: {e}. Unable to retrieve user ID.");
+                None
+            },
+            |auth| Some(auth.user_id()),
+        );
+        let stdcm_response_for_spawn = stdcm_response.clone();
+        let trace_id = tracing::Span::current()
+            .context()
+            .span()
+            .span_context()
+            .trace_id();
+        let stdcm_log_changeset = StdcmLog::changeset()
+            .trace_id(trace_id.to_string())
+            .request(stdcm_request)
+            .response(stdcm_response_for_spawn)
+            .user_id(user_id);
+        let _ = tokio::spawn(
+            // We just don't await the creation of the log entry since we want
+            // the endpoint to return as soon as possible, and because failing
+            // to persist a log entry is not a very important error here.
+            async move {
+                let _ = stdcm_log_changeset
+                    .create(&mut conn)
+                    .await
+                    .map_err(|e| tracing::error!("Failed during log operation: {e}"));
+            }
+            .in_current_span(),
+        )
+        .await;
+    }
+
+    // 7. Handle STDCM Core Response
     match stdcm_response {
         crate::core::stdcm::Response::Success {
             simulation,

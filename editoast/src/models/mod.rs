@@ -6,6 +6,7 @@ pub mod fixtures;
 pub mod infra;
 pub mod infra_objects;
 pub mod layers;
+pub mod stdcm_log;
 // We allow unused until models is moved to a separate crate
 pub mod auth;
 pub mod pagination;
@@ -41,6 +42,7 @@ editoast_common::schemas! {
     infra::schemas(),
     projects::schemas(),
     rolling_stock_model::schemas(),
+    stdcm_log::schemas(),
 }
 
 #[cfg(test)]
