@@ -28,6 +28,8 @@ export default function RenderItinerary({
     'line-color': '#158DCF',
   };
 
+  const markerOffset: [number, number] = [0, 8];
+
   if (!pathItemsCoordinates || pathItemsCoordinates.length < 2) {
     return null;
   }
@@ -38,18 +40,34 @@ export default function RenderItinerary({
 
   return (
     <Source type="geojson" data={geojsonPath}>
-      <Marker longitude={originLongitude} latitude={originLatitude} anchor="bottom">
+      <Marker
+        longitude={originLongitude}
+        latitude={originLatitude}
+        anchor="bottom"
+        offset={markerOffset}
+      >
         <img src={originIcon} alt="origin" />
       </Marker>
       {vias.map(([longitude, latitude], index) => (
-        <Marker key={`via-${index}`} longitude={longitude} latitude={latitude} anchor="bottom">
+        <Marker
+          key={`via-${index}`}
+          longitude={longitude}
+          latitude={latitude}
+          anchor="bottom"
+          offset={markerOffset}
+        >
           <img src={viaIcon} alt={`via ${index + 1}`} />
           <span className={cx('map-pathfinding-marker', 'via-number', 'stdcm-via')}>
             {index + 1}
           </span>
         </Marker>
       ))}
-      <Marker longitude={destinationLongitude} latitude={destinationLatitude} anchor="bottom">
+      <Marker
+        longitude={destinationLongitude}
+        latitude={destinationLatitude}
+        anchor="bottom"
+        offset={markerOffset}
+      >
         <img src={destinationIcon} alt="destination" />
       </Marker>
       <OrderedLayer
