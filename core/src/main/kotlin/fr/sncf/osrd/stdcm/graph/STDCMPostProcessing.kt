@@ -119,7 +119,7 @@ class STDCMPostProcessing(private val graph: STDCMGraph) {
         stopAtEnd: Boolean,
     ): Envelope {
         val context = build(rollingStock, physicsPath, timeStep, comfort)
-        val mrsp = computeMRSP(trainPath, rollingStock, false, trainTag)
+        val mrsp = computeMRSP(trainPath, rollingStock, true, trainTag)
         val stopPositions = stops.map { it.position }.toMutableList()
         if (stopAtEnd) stopPositions.add(physicsPath.length)
         val maxSpeedEnvelope = MaxSpeedEnvelope.from(context, stopPositions.toDoubleArray(), mrsp)
