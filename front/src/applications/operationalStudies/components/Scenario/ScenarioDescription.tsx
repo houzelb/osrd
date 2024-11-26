@@ -1,9 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Blocked, ChevronLeft, Pencil, X } from '@osrd-project/ui-icons';
 import { useTranslation } from 'react-i18next';
 
-import type { InfraWithState, ScenarioResponse } from 'common/api/osrdEditoastApi';
+import {
+  osrdEditoastApi,
+  type InfraWithState,
+  type ScenarioResponse,
+} from 'common/api/osrdEditoastApi';
 import { useModal } from 'common/BootstrapSNCF/ModalSNCF';
 import AddAndEditScenarioModal from 'modules/scenario/components/AddOrEditScenarioModal';
 import useOutsideClick from 'utils/hooks/useOutsideClick';
@@ -29,6 +33,15 @@ const ScenarioDescription = ({
   const expandedDescriptionRef = useRef<HTMLDivElement | null>(null);
   const collapsedDescriptionRef = useRef<HTMLDivElement | null>(null);
   const [isTooLongDescription, setIsTooLongDescription] = useState<boolean>(false);
+
+  const { data: electricalProfileSets } =
+    osrdEditoastApi.endpoints.getElectricalProfileSet.useQuery();
+
+  const electricalProfileSet = useMemo(
+    () =>
+      electricalProfileSets?.find((profile) => profile.id === scenario.electrical_profile_set_id),
+    [electricalProfileSets]
+  );
 
   const toggleDescription = () => {
     setIsOpenedDescription(!isOpenedDescription);
@@ -114,9 +127,20 @@ const ScenarioDescription = ({
         </button>
       </div>
       <div className="scenario-details-electrical-profile-set">
-        {scenario.electrical_profile_set_id
-          ? scenario.electrical_profile_set_id
-          : t('noElectricalProfileSet')}
+        {scenario.electrical_profile_set_id ? (
+          <span>
+            {electricalProfileSet?.name
+              ? t('description.electricalProfileWithName', {
+                  name: electricalProfileSet.name,
+                  id: scenario.electrical_profile_set_id,
+                })
+              : t('description.electricalProfileWithId', {
+                  id: scenario.electrical_profile_set_id,
+                })}
+          </span>
+        ) : (
+          t('noElectricalProfileSet')
+        )}
       </div>
 
       <div className="scenario-details-infra-name">
