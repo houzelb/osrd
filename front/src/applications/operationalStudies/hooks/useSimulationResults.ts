@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { useSelector } from 'react-redux';
 
 import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
@@ -50,15 +52,18 @@ const useSimulationResults = (): SimulationResultsData => {
       selectedTrainPowerRestrictions: [],
     };
 
-  return {
-    selectedTrainSchedule,
-    selectedTrainRollingStock: speedSpaceChart?.rollingStock,
-    selectedTrainPowerRestrictions: speedSpaceChart?.formattedPowerRestrictions || [],
-    trainSimulation: speedSpaceChart?.simulation,
-    pathProperties: speedSpaceChart?.formattedPathProperties,
-    pathLength: path?.length,
-    path,
-  };
+  return useMemo(
+    () => ({
+      selectedTrainSchedule,
+      selectedTrainRollingStock: speedSpaceChart?.rollingStock,
+      selectedTrainPowerRestrictions: speedSpaceChart?.formattedPowerRestrictions || [],
+      trainSimulation: speedSpaceChart?.simulation,
+      pathProperties: speedSpaceChart?.formattedPathProperties,
+      pathLength: path?.length,
+      path,
+    }),
+    [selectedTrainSchedule, speedSpaceChart, path]
+  );
 };
 
 export default useSimulationResults;

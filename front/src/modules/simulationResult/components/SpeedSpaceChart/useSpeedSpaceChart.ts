@@ -1,12 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
-import type {
-  LayerData,
-  PowerRestrictionValues,
-} from '@osrd-project/ui-speedspacechart/dist/types/chartTypes';
 import { useTranslation } from 'react-i18next';
 
-import type { PathPropertiesFormatted } from 'applications/operationalStudies/types';
 import { preparePathPropertiesData } from 'applications/operationalStudies/utils';
 import {
   osrdEditoastApi,
@@ -31,10 +26,6 @@ const useSpeedSpaceChart = (
   const { t } = useTranslation('simulation');
   const infraId = useInfraID();
 
-  const [formattedPathProperties, setFormattedPathProperties] = useState<PathPropertiesFormatted>();
-  const [formattedPowerRestrictions, setFormattedPowerRestrictions] =
-    useState<LayerData<PowerRestrictionValues>[]>();
-
   const rollingStockName = trainScheduleResult?.rolling_stock_name;
   const { data: rollingStock } =
     osrdEditoastApi.endpoints.getRollingStockNameByRollingStockName.useQuery(
@@ -53,8 +44,8 @@ const useSpeedSpaceChart = (
   ]);
 
   // retrieve and format pathfinding properties
-  useEffect(() => {
-    const getPathProperties = async () => {
+  const formattedPathProperties = useMemo(() => {
+    try {
       if (
         infraId &&
         trainScheduleResult &&
@@ -63,28 +54,36 @@ const useSpeedSpaceChart = (
         simulation?.status === 'success' &&
         pathProperties
       ) {
-        const formattedPathProps = preparePathPropertiesData(
+        return preparePathPropertiesData(
           simulation.electrical_profiles,
           pathProperties,
           pathfindingResult,
           trainScheduleResult.path,
           t
         );
-
-        setFormattedPathProperties(formattedPathProps);
-
-        // Format power restrictions
-        const powerRestrictions = formatPowerRestrictionRangesWithHandled({
-          selectedTrainSchedule: trainScheduleResult,
-          selectedTrainRollingStock: rollingStock,
-          pathfindingResult,
-          pathProperties: formattedPathProps,
-        });
-        setFormattedPowerRestrictions(powerRestrictions);
       }
-    };
+      return undefined;
+    } catch (err) {
+      return undefined;
+    }
+  }, [pathProperties, infraId, rollingStock]);
 
-    getPathProperties();
+  const formattedPowerRestrictions = useMemo(() => {
+    if (
+      infraId &&
+      trainScheduleResult &&
+      rollingStock &&
+      pathfindingResult &&
+      formattedPathProperties
+    ) {
+      return formatPowerRestrictionRangesWithHandled({
+        selectedTrainSchedule: trainScheduleResult,
+        selectedTrainRollingStock: rollingStock,
+        pathfindingResult,
+        pathProperties: formattedPathProperties,
+      });
+    }
+    return undefined;
   }, [pathProperties, infraId, rollingStock]);
 
   // setup chart synchronizer
@@ -94,19 +93,23 @@ const useSpeedSpaceChart = (
     }
   }, [simulation, trainScheduleResult, rollingStock, departureTime]);
 
-  return trainScheduleResult &&
-    rollingStock &&
-    simulation?.status === 'success' &&
-    formattedPathProperties &&
-    departureTime
-    ? {
-        rollingStock,
-        formattedPowerRestrictions,
-        simulation,
-        formattedPathProperties,
-        departureTime,
-      }
-    : null;
+  return useMemo(
+    () =>
+      trainScheduleResult &&
+      rollingStock &&
+      simulation?.status === 'success' &&
+      formattedPathProperties &&
+      departureTime
+        ? {
+            rollingStock,
+            formattedPowerRestrictions,
+            simulation,
+            formattedPathProperties,
+            departureTime,
+          }
+        : null,
+    [rollingStock, formattedPowerRestrictions, simulation, formattedPathProperties, departureTime]
+  );
 };
 
 export default useSpeedSpaceChart;
