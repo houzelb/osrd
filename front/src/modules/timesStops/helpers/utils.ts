@@ -193,6 +193,10 @@ export function updateRowTimesAndMargin(
       newRowData.theoreticalMargin = '0%';
     }
   }
+  // Remove second unit in stopFor if inputted by mistake
+  if (newRowData.stopFor && /^[0-9]+ *s$/i.test(newRowData.stopFor)) {
+    newRowData.stopFor = newRowData.stopFor.replace(/ *s$/i, '');
+  }
   return newRowData;
 }
 
