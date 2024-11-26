@@ -103,26 +103,21 @@ const TimesStopsInput = ({ allWaypoints, startTime, pathSteps }: TimesStopsInput
       if (!updatedRows[operation.fromRowIndex].isMarginValid) {
         newRows[operation.fromRowIndex].isMarginValid = false;
         setRows(newRows);
-      } else if (
-        !rows[operation.fromRowIndex].isMarginValid &&
-        updatedRows[operation.fromRowIndex].isMarginValid
-      ) {
-        newRows[operation.fromRowIndex].isMarginValid = true;
-        setRows(newRows);
-      } else {
-        const newVias = updatedRows
-          .filter(
-            (row, index) =>
-              !isEqual(normalizeNullablesInRow(row), normalizeNullablesInRow(rows[index]))
-          )
-          .map(({ shortSlipDistance, onStopSignal, arrival, departure, ...row }) => ({
-            ...row,
-            arrival: durationSinceStartTime(startTime, arrival),
-            departure: durationSinceStartTime(startTime, departure),
-            receptionSignal: onStopSignalToReceptionSignal(onStopSignal, shortSlipDistance),
-          }));
-        dispatch(upsertSeveralViasFromSuggestedOP(newVias));
+        return;
       }
+
+      const newVias = updatedRows
+        .filter(
+          (row, index) =>
+            !isEqual(normalizeNullablesInRow(row), normalizeNullablesInRow(rows[index]))
+        )
+        .map(({ shortSlipDistance, onStopSignal, arrival, departure, ...row }) => ({
+          ...row,
+          arrival: durationSinceStartTime(startTime, arrival),
+          departure: durationSinceStartTime(startTime, departure),
+          receptionSignal: onStopSignalToReceptionSignal(onStopSignal, shortSlipDistance),
+        }));
+      dispatch(upsertSeveralViasFromSuggestedOP(newVias));
     },
     [rows, startTime]
   );
