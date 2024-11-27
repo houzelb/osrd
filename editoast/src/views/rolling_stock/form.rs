@@ -2,7 +2,6 @@ use std::collections::HashMap;
 
 use editoast_schemas::rolling_stock::EffortCurves;
 use editoast_schemas::rolling_stock::EnergySource;
-use editoast_schemas::rolling_stock::Gamma;
 use editoast_schemas::rolling_stock::LoadingGaugeType;
 use editoast_schemas::rolling_stock::RollingResistance;
 use editoast_schemas::rolling_stock::RollingStockMetadata;
@@ -31,7 +30,7 @@ pub struct RollingStockForm {
     pub startup_time: f64,
     pub startup_acceleration: f64,
     pub comfort_acceleration: f64,
-    pub gamma: Gamma,
+    pub const_gamma: f64,
     pub inertia_coefficient: f64,
     pub mass: f64,
     pub rolling_resistance: RollingResistance,
@@ -67,7 +66,7 @@ impl From<RollingStockForm> for Changeset<RollingStockModel> {
             .startup_time(rolling_stock.startup_time)
             .startup_acceleration(rolling_stock.startup_acceleration)
             .comfort_acceleration(rolling_stock.comfort_acceleration)
-            .gamma(rolling_stock.gamma)
+            .const_gamma(rolling_stock.const_gamma)
             .inertia_coefficient(rolling_stock.inertia_coefficient)
             .mass(rolling_stock.mass)
             .rolling_resistance(rolling_stock.rolling_resistance)
@@ -103,7 +102,7 @@ impl From<RollingStockModel> for RollingStockForm {
             startup_time: value.startup_time,
             startup_acceleration: value.startup_acceleration,
             comfort_acceleration: value.comfort_acceleration,
-            gamma: value.gamma,
+            const_gamma: value.const_gamma,
             inertia_coefficient: value.inertia_coefficient,
             mass: value.mass,
             rolling_resistance: value.rolling_resistance,

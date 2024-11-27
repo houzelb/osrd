@@ -1,6 +1,3 @@
-mod gamma;
-pub use gamma::Gamma;
-
 mod effort_curves;
 pub use effort_curves::ConditionalEffortCurve;
 pub use effort_curves::EffortCurve;
@@ -41,7 +38,6 @@ use std::collections::HashMap;
 editoast_common::schemas! {
     effort_curves::schemas(),
     energy_source::schemas(),
-    gamma::schemas(),
     loading_gauge_type::schemas(),
     rolling_stock_metadata::schemas(),
     rolling_resistance::schemas(),
@@ -66,7 +62,9 @@ pub struct RollingStock {
     pub startup_acceleration: f64,
     /// In m/s²
     pub comfort_acceleration: f64,
-    pub gamma: Gamma,
+    // The constant gamma braking coefficient used when NOT circulating
+    // under ETCS/ERTMS signaling system in m/s^2
+    pub const_gamma: f64,
     pub inertia_coefficient: f64,
     /// In kg
     pub mass: f64,
@@ -77,9 +75,11 @@ pub struct RollingStock {
     pub power_restrictions: HashMap<String, String>,
     #[serde(default)]
     pub energy_sources: Vec<EnergySource>,
-    /// The time the train takes before actually using electrical power (in seconds). Is null if the train is not electric.
+    /// The time the train takes before actually using electrical power (in seconds).
+    /// Is null if the train is not electric.
     pub electrical_power_startup_time: Option<f64>,
-    /// The time it takes to raise this train's pantograph in seconds. Is null if the train is not electric.
+    /// The time it takes to raise this train's pantograph in seconds.
+    /// Is null if the train is not electric.
     #[serde(default)]
     pub raise_pantograph_time: Option<f64>,
     pub supported_signaling_systems: RollingStockSupportedSignalingSystems,

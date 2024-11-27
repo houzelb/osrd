@@ -74,7 +74,7 @@ public class RJSRollingStockParser {
         if (Double.isNaN(rjsRollingStock.comfortAcceleration))
             throw OSRDError.newMissingRollingStockFieldError("comfort_acceleration");
 
-        if (rjsRollingStock.gamma == null) throw OSRDError.newMissingRollingStockFieldError("gamma");
+        if (Double.isNaN(rjsRollingStock.constGamma)) throw OSRDError.newMissingRollingStockFieldError("const_gamma");
 
         if (Double.isNaN(rjsRollingStock.inertiaCoefficient))
             throw OSRDError.newMissingRollingStockFieldError("inertia_coefficient");
@@ -84,12 +84,6 @@ public class RJSRollingStockParser {
         if (Double.isNaN(rjsRollingStock.mass)) throw OSRDError.newMissingRollingStockFieldError("mass");
 
         var rollingResistance = parseRollingResistance(rjsRollingStock.rollingResistance);
-
-        var gammaType =
-                switch (rjsRollingStock.gamma.type) {
-                    case MAX -> RollingStock.GammaType.MAX;
-                    case CONST -> RollingStock.GammaType.CONST;
-                };
 
         return new RollingStock(
                 rjsRollingStock.getID(),
@@ -103,8 +97,7 @@ public class RJSRollingStockParser {
                 rjsRollingStock.startUpTime,
                 rjsRollingStock.startUpAcceleration,
                 rjsRollingStock.comfortAcceleration,
-                rjsRollingStock.gamma.value,
-                gammaType,
+                rjsRollingStock.constGamma,
                 rjsRollingStock.loadingGauge,
                 modes,
                 rjsRollingStock.effortCurves.defaultMode,

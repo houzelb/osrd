@@ -15,8 +15,5 @@
         "B": 200,
         "C": 12
     },
-    "gamma": {
-        "value": 0.5,
-        "type": "CONST"
-    }
+    "const_gamma": 0.5
 }

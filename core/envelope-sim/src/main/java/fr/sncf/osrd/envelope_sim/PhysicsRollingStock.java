@@ -13,9 +13,6 @@ public interface PhysicsRollingStock {
     /** The maximum speed the train can reach, in m/s */
     double getMaxSpeed();
 
-    /** The type of gamma input of the train */
-    GammaType getGammaType();
-
     /** The resistance to movement at a given speed, in newtons */
     double getRollingResistance(double speed);
 
@@ -61,9 +58,4 @@ public interface PhysicsRollingStock {
 
     /** The maximum acceleration, in m/s^2, which can be applied at a given speed, in m/s */
     record TractiveEffortPoint(double speed, double maxEffort) {}
-
-    enum GammaType {
-        CONST,
-        MAX
-    }
 }

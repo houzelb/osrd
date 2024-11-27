@@ -32,14 +32,8 @@ public final class RollingStock implements PhysicsRollingStock {
     public final double B; // in newtons / (m/s)
     public final double C; // in newtons / (m/s^2)
 
-    /**
-     * the kind of deceleration input of the train. It can be: a constant value the maximum possible
-     * deceleration value
-     */
-    public final GammaType gammaType;
-
     /** the deceleration of the train, in m/s^2 */
-    public final double gamma;
+    public final double constGamma;
 
     /** the length of the train, in meters. */
     public final double length;
@@ -128,12 +122,7 @@ public final class RollingStock implements PhysicsRollingStock {
 
     @Override
     public double getMaxBrakingForce(double speed) {
-        return gamma * inertia;
-    }
-
-    @Override
-    public GammaType getGammaType() {
-        return gammaType;
+        return constGamma * inertia;
     }
 
     public record ModeEffortCurves(
@@ -160,9 +149,8 @@ public final class RollingStock implements PhysicsRollingStock {
     public record CurvesAndConditions(
             RangeMap<Double, TractiveEffortPoint[]> curves, RangeMap<Double, InfraConditions> conditions) {}
 
-    /** Returns Gamma */
     public double getDeceleration() {
-        return -gamma;
+        return -constGamma;
     }
 
     /**
@@ -291,8 +279,7 @@ public final class RollingStock implements PhysicsRollingStock {
             double startUpTime,
             double startUpAcceleration,
             double comfortAcceleration,
-            double gamma,
-            GammaType gammaType,
+            double constGamma,
             RJSLoadingGaugeType loadingGaugeType,
             Map<String, ModeEffortCurves> modes,
             String defaultMode,
@@ -310,8 +297,7 @@ public final class RollingStock implements PhysicsRollingStock {
                 startUpTime,
                 startUpAcceleration,
                 comfortAcceleration,
-                gamma,
-                gammaType,
+                constGamma,
                 loadingGaugeType,
                 modes,
                 defaultMode,
@@ -335,8 +321,7 @@ public final class RollingStock implements PhysicsRollingStock {
             double startUpTime,
             double startUpAcceleration,
             double comfortAcceleration,
-            double gamma,
-            GammaType gammaType,
+            double constGamma,
             RJSLoadingGaugeType loadingGaugeType,
             Map<String, ModeEffortCurves> modes,
             String defaultMode,
@@ -354,8 +339,7 @@ public final class RollingStock implements PhysicsRollingStock {
         this.startUpTime = startUpTime;
         this.startUpAcceleration = startUpAcceleration;
         this.comfortAcceleration = comfortAcceleration;
-        this.gamma = gamma;
-        this.gammaType = gammaType;
+        this.constGamma = constGamma;
         this.mass = mass;
         this.inertiaCoefficient = inertiaCoefficient;
         this.modes = modes;

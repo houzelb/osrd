@@ -5,7 +5,6 @@ use std::collections::HashMap;
 use editoast_derive::Model;
 use editoast_schemas::rolling_stock::EffortCurves;
 use editoast_schemas::rolling_stock::EnergySource;
-use editoast_schemas::rolling_stock::Gamma;
 use editoast_schemas::rolling_stock::LoadingGaugeType;
 use editoast_schemas::rolling_stock::RollingResistance;
 use editoast_schemas::rolling_stock::RollingStock;
@@ -49,8 +48,7 @@ pub struct RollingStockModel {
     pub startup_time: f64,
     pub startup_acceleration: f64,
     pub comfort_acceleration: f64,
-    #[model(json)]
-    pub gamma: Gamma,
+    pub const_gamma: f64,
     pub inertia_coefficient: f64,
     #[schema(required)]
     pub base_power_class: Option<String>,
@@ -155,7 +153,7 @@ impl From<RollingStockModel> for RollingStock {
             startup_time: rolling_stock_model.startup_time,
             startup_acceleration: rolling_stock_model.startup_acceleration,
             comfort_acceleration: rolling_stock_model.comfort_acceleration,
-            gamma: rolling_stock_model.gamma,
+            const_gamma: rolling_stock_model.const_gamma,
             inertia_coefficient: rolling_stock_model.inertia_coefficient,
             mass: rolling_stock_model.mass,
             rolling_resistance: rolling_stock_model.rolling_resistance,
@@ -183,7 +181,7 @@ impl From<RollingStock> for RollingStockModelChangeset {
             .startup_time(rolling_stock.startup_time)
             .startup_acceleration(rolling_stock.startup_acceleration)
             .comfort_acceleration(rolling_stock.comfort_acceleration)
-            .gamma(rolling_stock.gamma)
+            .const_gamma(rolling_stock.const_gamma)
             .inertia_coefficient(rolling_stock.inertia_coefficient)
             .mass(rolling_stock.mass)
             .rolling_resistance(rolling_stock.rolling_resistance)

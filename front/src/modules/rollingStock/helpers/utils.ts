@@ -92,7 +92,7 @@ export const getRollingStockEditorDefaultValues = (
         startupTime: rollingStockData.startup_time,
         startupAcceleration: rollingStockData.startup_acceleration,
         comfortAcceleration: rollingStockData.comfort_acceleration,
-        gammaValue: rollingStockData.gamma.value,
+        constGamma: rollingStockData.const_gamma,
         inertiaCoefficient: rollingStockData.inertia_coefficient,
         loadingGauge: rollingStockData.loading_gauge,
         rollingResistanceA: {
@@ -155,10 +155,7 @@ export const rollingStockEditorQueryArg = (
     startup_time: data.startupTime,
     startup_acceleration: data.startupAcceleration,
     comfort_acceleration: data.comfortAcceleration,
-    gamma: {
-      type: 'CONST',
-      value: data.gammaValue,
-    },
+    const_gamma: data.constGamma,
     inertia_coefficient: data.inertiaCoefficient,
     mass: handleUnitValue({ unit: 'kg', value: data.mass.value }, data.mass, data.mass) as number, // Back-end needs value in kg.
     rolling_resistance: {

@@ -2,7 +2,6 @@ use std::collections::BTreeMap;
 use std::collections::HashMap;
 
 use editoast_schemas::rolling_stock::EffortCurves;
-use editoast_schemas::rolling_stock::Gamma;
 use editoast_schemas::rolling_stock::RollingResistance;
 use editoast_schemas::rolling_stock::RollingStock;
 use editoast_schemas::rolling_stock::TowedRollingStock;
@@ -52,7 +51,10 @@ pub struct PhysicsConsist {
     #[derivative(Hash(hash_with = "editoast_common::hash_float::<5,_>"))]
     /// In m/s²
     pub comfort_acceleration: f64,
-    pub gamma: Gamma,
+    #[derivative(Hash(hash_with = "editoast_common::hash_float::<5,_>"))]
+    /// The constant gamma braking coefficient used when NOT circulating
+    /// under ETCS/ERTMS signaling system in m/s^2
+    pub const_gamma: f64,
     #[derivative(Hash(hash_with = "editoast_common::hash_float::<5,_>"))]
     pub inertia_coefficient: f64,
     /// Mass of the rolling stock in kg
@@ -226,7 +228,7 @@ impl From<PhysicsConsistParameters> for PhysicsConsist {
             startup_time: (traction_engine.startup_time * 1000.0).round() as u64,
             startup_acceleration,
             comfort_acceleration,
-            gamma: traction_engine.gamma,
+            const_gamma: traction_engine.const_gamma,
             inertia_coefficient,
             rolling_resistance,
             power_restrictions: traction_engine.power_restrictions.into_iter().collect(),

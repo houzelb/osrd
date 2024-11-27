@@ -31,7 +31,7 @@ export type RollingStockParametersValidValues = {
   startupTime: number;
   startupAcceleration: number;
   comfortAcceleration: number;
-  gammaValue: number;
+  constGamma: number;
   inertiaCoefficient: number;
   loadingGauge: LoadingGaugeType;
   rollingResistanceA: MultiUnitsParameter;
@@ -71,7 +71,7 @@ export type RollingStockParametersValues = {
   startupTime?: number;
   startupAcceleration?: number;
   comfortAcceleration?: number;
-  gammaValue?: number;
+  constGamma?: number;
   inertiaCoefficient?: number;
   loadingGauge: 'G1' | 'G2' | 'GA' | 'GB' | 'GB1' | 'GC' | 'FR3.3' | 'FR3.3/GB/G2' | 'GLOTT';
   rollingResistanceA?: MultiUnitsParameter;

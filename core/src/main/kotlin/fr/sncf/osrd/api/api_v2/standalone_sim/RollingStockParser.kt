@@ -31,8 +31,6 @@ fun parseRawRollingStock(
 
     val rollingResistance = parseRollingResistance(rawRollingStock.rollingResistance)
 
-    val gammaType = rawRollingStock.gamma.gammaType
-
     return RollingStock(
         "placeholder_name",
         rawRollingStock.length.distance.meters,
@@ -45,8 +43,7 @@ fun parseRawRollingStock(
         rawRollingStock.startupTime.seconds,
         rawRollingStock.startupAcceleration,
         rawRollingStock.comfortAcceleration,
-        rawRollingStock.gamma.value,
-        gammaType,
+        rawRollingStock.constGamma,
         loadingGaugeType,
         modes,
         rawRollingStock.effortCurves.defaultMode,

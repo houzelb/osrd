@@ -6224,18 +6224,6 @@ components:
             default: -1.0
           distribution:
             $ref: '#/components/schemas/AllowanceDistribution'
-    Gamma:
-      type: object
-      required:
-      - type
-      - value
-      properties:
-        type:
-          type: string
-        value:
-          type: number
-          format: double
-      additionalProperties: false
     GeoJson:
       oneOf:
       - $ref: '#/components/schemas/GeoJsonPoint'
@@ -6924,7 +6912,7 @@ components:
       - startup_time
       - startup_acceleration
       - comfort_acceleration
-      - gamma
+      - const_gamma
       - inertia_coefficient
       - mass
       - rolling_resistance
@@ -6939,14 +6927,15 @@ components:
         comfort_acceleration:
           type: number
           format: double
+        const_gamma:
+          type: number
+          format: double
         effort_curves:
           $ref: '#/components/schemas/LightEffortCurves'
         energy_sources:
           type: array
           items:
             $ref: '#/components/schemas/EnergySource'
-        gamma:
-          $ref: '#/components/schemas/Gamma'
         id:
           type: integer
           format: int64
@@ -8714,7 +8703,7 @@ components:
       - startup_time
       - startup_acceleration
       - comfort_acceleration
-      - gamma
+      - const_gamma
       - inertia_coefficient
       - base_power_class
       - mass
@@ -8734,6 +8723,9 @@ components:
         comfort_acceleration:
           type: number
           format: double
+        const_gamma:
+          type: number
+          format: double
         effort_curves:
           $ref: '#/components/schemas/EffortCurves'
         electrical_power_startup_time:
@@ -8744,8 +8736,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EnergySource'
-        gamma:
-          $ref: '#/components/schemas/Gamma'
         id:
           type: integer
           format: int64
@@ -8869,7 +8859,7 @@ components:
       - startup_time
       - startup_acceleration
       - comfort_acceleration
-      - gamma
+      - const_gamma
       - inertia_coefficient
       - mass
       - rolling_resistance
@@ -8884,6 +8874,9 @@ components:
         comfort_acceleration:
           type: number
           format: double
+        const_gamma:
+          type: number
+          format: double
         effort_curves:
           $ref: '#/components/schemas/EffortCurves'
         electrical_power_startup_time:
@@ -8896,8 +8889,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EnergySource'
-        gamma:
-          $ref: '#/components/schemas/Gamma'
         inertia_coefficient:
           type: number
           format: double
@@ -10639,13 +10630,14 @@ components:
       - startup_acceleration
       - inertia_coefficient
       - rolling_resistance
-      - gamma
+      - const_gamma
       properties:
         comfort_acceleration:
           type: number
           format: double
-        gamma:
-          $ref: '#/components/schemas/Gamma'
+        const_gamma:
+          type: number
+          format: double
         id:
           type: integer
           format: int64
@@ -10694,13 +10686,14 @@ components:
       - startup_acceleration
       - inertia_coefficient
       - rolling_resistance
-      - gamma
+      - const_gamma
       properties:
         comfort_acceleration:
           type: number
           format: double
-        gamma:
-          $ref: '#/components/schemas/Gamma'
+        const_gamma:
+          type: number
+          format: double
         inertia_coefficient:
           type: number
           format: double

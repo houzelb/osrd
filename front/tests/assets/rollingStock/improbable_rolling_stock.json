@@ -917,10 +917,7 @@
   "startup_time": 10.0,
   "startup_acceleration": 0.05,
   "comfort_acceleration": 0.25,
-  "gamma": {
-    "type": "CONST",
-    "value": 0.5
-  },
+  "const_gamma": 0.5,
   "inertia_coefficient": 1.05,
   "base_power_class": "5",
   "mass": 900000.0,

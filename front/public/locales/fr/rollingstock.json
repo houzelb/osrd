@@ -49,7 +49,7 @@
     "ressourcesNotFound": "Ressources introuvables"
   },
   "family": "Famille",
-  "gammaValue": "Décélération horaire",
+  "constGamma": "Décélération horaire",
   "grouping": "Regroupement",
   "inertiaCoefficient": "Coefficient d'inertie",
   "legend": "Légende",

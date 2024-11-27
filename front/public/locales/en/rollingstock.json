@@ -48,7 +48,7 @@
     "ressourcesNotFound": "Resources not found"
   },
   "family": "Family",
-  "gammaValue": "Timetable deceleration",
+  "constGamma": "Timetable deceleration",
   "grouping": "Clustering",
   "inertiaCoefficient": "Factor of inertia",
   "legend": "Legend",

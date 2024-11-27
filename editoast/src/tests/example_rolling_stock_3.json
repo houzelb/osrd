@@ -11,10 +11,7 @@
     "name": "other_rolling_stock",
     "mass": 50000.0,
     "loading_gauge": "G2",
-    "gamma": {
-        "value": 0.6,
-        "type": "MAX"
-    },
+    "const_gamma": 0.6,
     "rolling_resistance": {
         "type": "davis",
         "A": 200,

@@ -85,16 +85,6 @@ class EffortCurves(BaseModel, extra="forbid"):
         return self
 
 
-class GammaType(str, Enum):
-    CONST = "CONST"
-    MAX = "MAX"
-
-
-class Gamma(BaseModel, extra="forbid"):
-    type: GammaType
-    value: PositiveFloat
-
-
 class RollingStockLivery(BaseModel):
     name: str = Field(max_length=255)
 
@@ -207,7 +197,10 @@ class RollingStock(BaseModel, extra="forbid"):
     startup_time: NonNegativeFloat = Field(description="The time the train takes before it can start accelerating in s")
     startup_acceleration: NonNegativeFloat = Field(description="The maximum acceleration during startup in m/s^2")
     comfort_acceleration: NonNegativeFloat = Field(description="The maximum operational acceleration in m/s^2")
-    gamma: Gamma = Field(description="The max or const braking coefficient in m/s^2")
+    const_gamma: PositiveFloat = Field(
+        description="The constant gamma braking coefficient used when NOT circulating under "
+        "ETCS/ERTMS signaling system in m/s^2"
+    )
     inertia_coefficient: NonNegativeFloat = Field(description="The coefficient of inertia")
     mass: NonNegativeFloat = Field(description="The mass of the train, in kg")
     rolling_resistance: RollingResistance = Field(description="The formula to use to compute rolling resistance")
@@ -242,7 +235,10 @@ class TowedRollingStock(BaseModel, extra="forbid"):
     startup_acceleration: NonNegativeFloat = Field(description="The maximum acceleration during startup in m/s^2")
     inertia_coefficient: NonNegativeFloat = Field(description="The coefficient of inertia")
     rolling_resistance: RollingResistance = Field(description="The formula to use to compute rolling resistance")
-    gamma: Gamma = Field(description="The max or const braking coefficient in m/s^2")
+    const_gamma: PositiveFloat = Field(
+        description="The constant gamma braking coefficient used when NOT circulating under "
+        "ETCS/ERTMS signaling system in m/s^2"
+    )
 
 
 if __name__ == "__main__":
