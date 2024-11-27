@@ -73,20 +73,8 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
   }, [towedRollingStock]);
 
   const getLabel = (rs: LightRollingStockWithLiveries) => {
-    let res = '';
-    const { metadata, name } = rs;
-
-    if (metadata) {
-      const series = metadata.series ?? metadata.reference;
-      const subseries =
-        metadata.series && metadata.series !== metadata.subseries
-          ? metadata.subseries
-          : metadata.detail;
-      if (series) res += series;
-      if (subseries) res += series ? ` (${subseries})` : subseries;
-    }
-    if (name) res += ` -- ${name}`;
-    return res;
+    const secondPart = rs.metadata?.series || rs.metadata?.reference || '';
+    return secondPart ? `${rs.name} - ${secondPart}` : rs.name;
   };
 
   const onInputClick = () => {
