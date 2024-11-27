@@ -5,6 +5,7 @@ import { Alert, TriangleRight } from '@osrd-project/ui-icons';
 import cx from 'classnames';
 import { useTranslation } from 'react-i18next';
 import nextId from 'react-id-generator';
+import { useSelector } from 'react-redux';
 
 import type {
   PostSearchApiArg,
@@ -12,8 +13,7 @@ import type {
 } from 'common/api/osrdEditoastApi';
 import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import { MAIN_OP_CH_CODES } from 'common/Map/Search/useSearchOperationalPoint';
-import { useInfraID, useOsrdConfActions } from 'common/osrdContext';
-import { useStoreDataForRollingStockSelector } from 'modules/rollingStock/components/RollingStockSelector/useStoreDataForRollingStockSelector';
+import { useInfraID, useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import { useAppDispatch } from 'store';
 import { useDebounce } from 'utils/helpers';
 import {
@@ -68,7 +68,9 @@ const TypeAndPath = ({ setDisplayTypeAndPath }: TypeAndPathProps) => {
   const { t: tManageTrainSchedule } = useTranslation('operationalStudies/manageTrainSchedule');
   const { t: tTypeAndPath } = useTranslation('common/typeAndPath');
 
-  const { rollingStock } = useStoreDataForRollingStockSelector();
+  const { getRollingStockID } = useOsrdConfSelectors();
+  const rollingStockId = useSelector(getRollingStockID);
+
   const { updatePathSteps } = useOsrdConfActions();
 
   const [searchResults, setSearchResults] = useState<SearchResultItemOperationalPoint[]>([]);
@@ -160,7 +162,7 @@ const TypeAndPath = ({ setDisplayTypeAndPath }: TypeAndPathProps) => {
   const isInvalid = useMemo(() => opList.some((op) => !op.name && op.trigram !== ''), [opList]);
 
   const launchPathFinding = async () => {
-    if (infraId && rollingStock && opList.length > 0) {
+    if (infraId && rollingStockId && opList.length > 0) {
       const pathSteps = opList
         .filter((op) => op.trigram !== '')
         .map(({ uic, ch }) => ({

@@ -11,7 +11,6 @@ import { Spinner } from 'common/Loaders';
 import { useOsrdConfSelectors } from 'common/osrdContext';
 import { usePathfinding } from 'modules/pathfinding/hooks/usePathfinding';
 import { isPathStepInvalid } from 'modules/pathfinding/utils';
-import { useStoreDataForRollingStockSelector } from 'modules/rollingStock/components/RollingStockSelector/useStoreDataForRollingStockSelector';
 import { conditionalStringConcat, formatKmValue } from 'utils/strings';
 
 import { InfraHardError, InfraSoftError } from './InfraError';
@@ -29,7 +28,9 @@ const Pathfinding = ({ pathProperties, setPathProperties }: PathfindingProps) =>
   const hasInvalidPathStep = pathSteps.some((pathStep) => isPathStepInvalid(pathStep));
   const origin = useSelector(getOrigin, isEqual);
   const destination = useSelector(getDestination, isEqual);
-  const { rollingStock } = useStoreDataForRollingStockSelector();
+
+  const { getRollingStockID } = useOsrdConfSelectors();
+  const rollingStockId = useSelector(getRollingStockID);
 
   const {
     pathfindingState,
@@ -39,7 +40,7 @@ const Pathfinding = ({ pathProperties, setPathProperties }: PathfindingProps) =>
   const missingElements = conditionalStringConcat([
     [!origin, t('origin')],
     [!destination, t('destination')],
-    [!rollingStock, t('rollingstock')],
+    [!rollingStockId, t('rollingstock')],
   ]);
 
   const isPathFindingActive = Object.values(pathfindingState).every(
