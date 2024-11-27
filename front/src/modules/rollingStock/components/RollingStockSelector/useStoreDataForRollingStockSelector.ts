@@ -8,14 +8,15 @@ export const useStoreDataForRollingStockSelector = () => {
   const rollingStockId = useSelector(getRollingStockID);
   const rollingStockComfort = useSelector(getRollingStockComfort);
 
-  const { data: rollingStock } = osrdEditoastApi.endpoints.getRollingStockByRollingStockId.useQuery(
-    {
-      rollingStockId: rollingStockId!,
-    },
-    {
-      skip: !rollingStockId,
-    }
-  );
+  const { currentData: rollingStock } =
+    osrdEditoastApi.endpoints.getRollingStockByRollingStockId.useQuery(
+      {
+        rollingStockId: rollingStockId!,
+      },
+      {
+        skip: !rollingStockId,
+      }
+    );
 
   return {
     rollingStockId,
