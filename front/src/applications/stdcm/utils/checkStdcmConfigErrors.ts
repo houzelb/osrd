@@ -25,11 +25,14 @@ const checkStdcmConfigErrors = (
     return { errorType: StdcmConfigErrorTypes.PATHFINDING_FAILED };
   }
 
-  const areBothPointsASAP =
-    origin.arrivalType === ArrivalTimeTypes.ASAP &&
-    destination.arrivalType === ArrivalTimeTypes.ASAP;
+  const isOriginRespectDestinationSchedule =
+    origin.arrivalType === ArrivalTimeTypes.RESPECT_DESTINATION_SCHEDULE;
 
-  if (areBothPointsASAP) {
+  const isDestinationASAP = destination.arrivalType === ArrivalTimeTypes.ASAP;
+
+  const areBothPointsNotSchedule = isOriginRespectDestinationSchedule && isDestinationASAP;
+
+  if (areBothPointsNotSchedule) {
     return { errorType: StdcmConfigErrorTypes.NO_SCHEDULED_POINT };
   }
 

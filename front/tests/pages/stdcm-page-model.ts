@@ -318,7 +318,7 @@ class STDCMPage {
     await expect(this.timeOriginArrival).toHaveValue('');
     await expect(this.toleranceOriginArrival).toHaveValue('-30/+30');
     await this.dynamicOriginCh.selectOption('BC');
-    await this.originArrival.selectOption('asSoonAsPossible');
+    await this.originArrival.selectOption('respectDestinationSchedule');
     await expect(this.dateOriginArrival).not.toBeVisible();
     await expect(this.timeOriginArrival).not.toBeVisible();
     await expect(this.toleranceOriginArrival).not.toBeVisible();

@@ -33,6 +33,7 @@ type StdcmOpScheduleProps = {
     arrivalToleranceAfter: number;
   };
   opId: string;
+  isOrigin?: boolean;
 };
 
 const defaultDate = (date?: Date) => {
@@ -52,6 +53,7 @@ const StdcmOpSchedule = ({
   opScheduleTimeType,
   opToleranceValues,
   opId,
+  isOrigin = false,
 }: StdcmOpScheduleProps) => {
   const { t } = useTranslation('stdcm');
   const { getSearchDatetimeWindow } = useOsrdConfSelectors();
@@ -110,7 +112,11 @@ const StdcmOpSchedule = ({
               onArrivalTypeChange(e as ArrivalTimeTypes);
             }
           }}
-          {...createStringSelectOptions(['preciseTime', 'asSoonAsPossible'])}
+          {...createStringSelectOptions(
+            isOrigin
+              ? ['preciseTime', 'respectDestinationSchedule']
+              : ['preciseTime', 'asSoonAsPossible']
+          )}
           getOptionLabel={(option) => t(`trainPath.${option}`)}
           disabled={disabled}
         />
