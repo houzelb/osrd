@@ -91,6 +91,11 @@ const SpeedSpaceChartContainer = ({
       disableDragging
       enableResizing={{
         bottom: true,
+        top: false,
+        topLeft: false,
+        topRight: false,
+        left: false,
+        right: false,
       }}
       onResizeStart={() => {
         setBaseHeightOfSpeedSpaceChart(heightOfSpeedSpaceChart);

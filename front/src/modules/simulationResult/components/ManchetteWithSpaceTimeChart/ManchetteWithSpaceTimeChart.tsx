@@ -40,8 +40,10 @@ type ManchetteWithSpaceTimeChartProps = {
     totalTrains: number;
     allTrainsProjected: boolean;
   };
+  height?: number;
 };
-const DEFAULT_HEIGHT = 561;
+
+export const MANCHETTE_WITH_SPACE_TIME_CHART_DEFAULT_HEIGHT = 561;
 
 const ManchetteWithSpaceTimeChartWrapper = ({
   operationalPoints,
@@ -51,8 +53,8 @@ const ManchetteWithSpaceTimeChartWrapper = ({
   conflicts = [],
   workSchedules,
   projectionLoaderData: { totalTrains, allTrainsProjected },
+  height = MANCHETTE_WITH_SPACE_TIME_CHART_DEFAULT_HEIGHT,
 }: ManchetteWithSpaceTimeChartProps) => {
-  const [heightOfManchetteWithSpaceTimeChart] = useState(DEFAULT_HEIGHT);
   const manchetteWithSpaceTimeChartRef = useRef<HTMLDivElement>(null);
 
   const [waypointsPanelIsOpen, setWaypointsPanelIsOpen] = useState(false);
@@ -154,7 +156,8 @@ const ManchetteWithSpaceTimeChartWrapper = ({
     manchetteWaypoints,
     cutProjectedTrains,
     manchetteWithSpaceTimeChartRef,
-    selectedTrainScheduleId
+    selectedTrainScheduleId,
+    height
   );
 
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
@@ -202,17 +205,17 @@ const ManchetteWithSpaceTimeChartWrapper = ({
       <div
         ref={manchetteWithSpaceTimeChartRef}
         className="manchette flex"
-        style={{ height: `${heightOfManchetteWithSpaceTimeChart}px` }}
+        style={{ height }}
         onScroll={handleScroll}
       >
-        <Manchette {...manchetteProps} />
+        <Manchette {...manchetteProps} height={height} />
         <div
           className="space-time-chart-container"
           style={{
             bottom: 0,
             left: 0,
             top: 2,
-            height: `${heightOfManchetteWithSpaceTimeChart - 6}px`,
+            height: height - 6,
           }}
         >
           <div className="toolbar">
@@ -229,6 +232,7 @@ const ManchetteWithSpaceTimeChartWrapper = ({
           )}
           <SpaceTimeChart
             className="inset-0 absolute h-full"
+            height={height}
             spaceOrigin={
               (waypointsPanelData?.filteredWaypoints ?? operationalPoints).at(0)?.position || 0
             }
