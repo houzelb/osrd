@@ -176,6 +176,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await operationalStudiesPage.clickOnSimulationSettingsTab();
     await opSimulationSettingsPage.deactivateElectricalProfile();
     await opTimetablePage.clickOnEditTrainSchedule();
+    await page.waitForTimeout(500);
     await opTimetablePage.getTrainArrivalTime('11:52');
     await opTimetablePage.clickOnScenarioCollapseButton();
     await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
@@ -229,6 +230,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await operationalStudiesPage.clickOnSimulationSettingsTab();
     await opSimulationSettingsPage.selectCodeCompoOption('__PLACEHOLDER__');
     await opTimetablePage.clickOnEditTrainSchedule();
+    await page.waitForTimeout(500);
     await opTimetablePage.getTrainArrivalTime('11:52');
     await opTimetablePage.clickOnScenarioCollapseButton();
     await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
@@ -291,6 +293,7 @@ test.describe('Simulation Settings Tab Verification', () => {
     await operationalStudiesPage.clickOnSimulationSettingsTab();
     await opSimulationSettingsPage.activateMarecoMargin();
     await opTimetablePage.clickOnEditTrainSchedule();
+    await page.waitForTimeout(500);
     await opTimetablePage.getTrainArrivalTime('11:54');
     await opTimetablePage.clickOnScenarioCollapseButton();
     await opOutputTablePage.verifyTimeStopsDataSheetVisibility();
