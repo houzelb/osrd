@@ -2678,10 +2678,6 @@ export type EnergySource =
       max_input_power: SpeedDependantPower;
       max_output_power: SpeedDependantPower;
     };
-export type Gamma = {
-  type: string;
-  value: number;
-};
 export type RollingStockMetadata = {
   detail: string;
   family: string;
@@ -2706,9 +2702,9 @@ export type RollingStockSupportedSignalingSystems = string[];
 export type LightRollingStock = {
   base_power_class?: string | null;
   comfort_acceleration: number;
+  const_gamma: number;
   effort_curves: LightEffortCurves;
   energy_sources: EnergySource[];
-  gamma: Gamma;
   id: number;
   inertia_coefficient: number;
   length: number;
@@ -2894,10 +2890,10 @@ export type EffortCurves = {
 export type RollingStock = {
   base_power_class: string | null;
   comfort_acceleration: number;
+  const_gamma: number;
   effort_curves: EffortCurves;
   electrical_power_startup_time: number | null;
   energy_sources: EnergySource[];
-  gamma: Gamma;
   id: number;
   inertia_coefficient: number;
   length: number;
@@ -2921,11 +2917,11 @@ export type RollingStock = {
 export type RollingStockForm = {
   base_power_class: string | null;
   comfort_acceleration: number;
+  const_gamma: number;
   effort_curves: EffortCurves;
   /** The time the train takes before actually using electrical power (in seconds). Is null if the train is not electric. */
   electrical_power_startup_time?: number | null;
   energy_sources?: EnergySource[];
-  gamma: Gamma;
   inertia_coefficient: number;
   length: number;
   loading_gauge: LoadingGaugeType;
@@ -3359,7 +3355,7 @@ export type RollingResistancePerWeight = {
 };
 export type TowedRollingStock = {
   comfort_acceleration: number;
-  gamma: Gamma;
+  const_gamma: number;
   id: number;
   inertia_coefficient: number;
   label: string;
@@ -3373,7 +3369,7 @@ export type TowedRollingStock = {
 };
 export type TowedRollingStockForm = {
   comfort_acceleration: number;
-  gamma: Gamma;
+  const_gamma: number;
   inertia_coefficient: number;
   label: string;
   length: number;

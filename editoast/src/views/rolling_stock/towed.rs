@@ -17,7 +17,6 @@ use diesel_async::scoped_futures::ScopedFutureExt as _;
 use editoast_authz::BuiltinRole;
 use editoast_derive::EditoastError;
 use editoast_models::DbConnectionPoolV2;
-use editoast_schemas::rolling_stock::Gamma;
 use editoast_schemas::rolling_stock::RollingResistancePerWeight;
 use editoast_schemas::rolling_stock::ROLLING_STOCK_RAILJSON_VERSION;
 use serde::Deserialize;
@@ -60,7 +59,7 @@ struct TowedRollingStock {
     startup_acceleration: f64,
     inertia_coefficient: f64,
     rolling_resistance: RollingResistancePerWeight,
-    gamma: Gamma,
+    const_gamma: f64,
 }
 
 impl From<TowedRollingStockModel> for TowedRollingStock {
@@ -77,7 +76,7 @@ impl From<TowedRollingStockModel> for TowedRollingStock {
             startup_acceleration: towed_rolling_stock.startup_acceleration,
             inertia_coefficient: towed_rolling_stock.inertia_coefficient,
             rolling_resistance: towed_rolling_stock.rolling_resistance,
-            gamma: towed_rolling_stock.gamma,
+            const_gamma: towed_rolling_stock.const_gamma,
         }
     }
 }
@@ -105,7 +104,7 @@ pub struct TowedRollingStockForm {
     pub startup_acceleration: f64,
     pub inertia_coefficient: f64,
     pub rolling_resistance: RollingResistancePerWeight,
-    pub gamma: Gamma,
+    pub const_gamma: f64,
 }
 
 impl From<TowedRollingStockForm> for Changeset<TowedRollingStockModel> {
@@ -121,7 +120,7 @@ impl From<TowedRollingStockForm> for Changeset<TowedRollingStockModel> {
             .startup_acceleration(towed_rolling_stock_form.startup_acceleration)
             .inertia_coefficient(towed_rolling_stock_form.inertia_coefficient)
             .rolling_resistance(towed_rolling_stock_form.rolling_resistance)
-            .gamma(towed_rolling_stock_form.gamma)
+            .const_gamma(towed_rolling_stock_form.const_gamma)
     }
 }
 
@@ -380,10 +379,7 @@ mod tests {
                 "B": 100.0,
                 "C": 10.0,
             },
-            "gamma": {
-                "type": "CONST",
-                "value": 1.0,
-            },
+            "const_gamma": 1.0,
         });
 
         let request = app

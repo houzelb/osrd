@@ -448,7 +448,7 @@ diesel::table! {
         startup_time -> Float8,
         startup_acceleration -> Float8,
         comfort_acceleration -> Float8,
-        gamma -> Jsonb,
+        const_gamma -> Float8,
         inertia_coefficient -> Float8,
         #[max_length = 255]
         base_power_class -> Nullable<Varchar>,
@@ -695,7 +695,7 @@ diesel::table! {
         startup_acceleration -> Float8,
         inertia_coefficient -> Float8,
         rolling_resistance -> Jsonb,
-        gamma -> Jsonb,
+        const_gamma -> Float8,
         version -> Int8,
         #[max_length = 255]
         label -> Varchar,

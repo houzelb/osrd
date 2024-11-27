@@ -1,4 +1,3 @@
-use super::Gamma;
 use super::RollingResistancePerWeight;
 
 #[derive(Debug, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -16,5 +15,7 @@ pub struct TowedRollingStock {
     pub startup_acceleration: f64,
     pub inertia_coefficient: f64,
     pub rolling_resistance: RollingResistancePerWeight,
-    pub gamma: Gamma,
+    /// The constant gamma braking coefficient used when NOT circulating
+    /// under ETCS/ERTMS signaling system in m/s^2
+    pub const_gamma: f64,
 }

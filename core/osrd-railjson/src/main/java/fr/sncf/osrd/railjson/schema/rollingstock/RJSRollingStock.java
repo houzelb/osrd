@@ -3,7 +3,6 @@ package fr.sncf.osrd.railjson.schema.rollingstock;
 import com.squareup.moshi.Json;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import fr.sncf.osrd.railjson.schema.common.Identified;
 import java.util.Map;
 
@@ -58,8 +57,9 @@ public class RJSRollingStock implements Identified {
     @Json(name = "comfort_acceleration")
     public double comfortAcceleration = Double.NaN;
 
-    /** The braking deceleration coefficient can be the max or constant (depends on type field). */
-    public RJSGamma gamma = null;
+    /** The constant gamma braking coefficient used when NOT circulating under ETCS/ERTMS signaling system in m/s^2 */
+    @Json(name = "const_gamma")
+    public double constGamma = Double.NaN;
 
     /**
      * Inertia coefficient. The mass alone isn't sufficient to compute accelerations, as the wheels
@@ -86,17 +86,6 @@ public class RJSRollingStock implements Identified {
 
     @Json(name = "supported_signaling_systems")
     public String[] supportedSignalingSystems = new String[0];
-
-    public enum GammaType {
-        CONST,
-        MAX
-    }
-
-    @SuppressFBWarnings("UWF_NULL_FIELD")
-    public static final class RJSGamma {
-        public double value = Double.NaN;
-        public GammaType type = null;
-    }
 
     @Override
     public String getID() {

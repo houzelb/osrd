@@ -114,8 +114,9 @@ public final class TrainPhysicsIntegrator {
         assert brakingForce >= 0.;
         assert tractionForce >= 0.;
 
-        if (brakingForce > 0 && rollingStock.getGammaType() == PhysicsRollingStock.GammaType.CONST)
+        if (brakingForce > 0) {
             return rollingStock.getDeceleration();
+        }
 
         // the sum of forces that always go the direction opposite to the train's movement
         double oppositeForce = rollingResistance + brakingForce;

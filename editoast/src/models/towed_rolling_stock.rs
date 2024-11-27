@@ -1,5 +1,4 @@
 use editoast_derive::Model;
-use editoast_schemas::rolling_stock::Gamma;
 use editoast_schemas::rolling_stock::RollingResistancePerWeight;
 use editoast_schemas::rolling_stock::TowedRollingStock;
 use serde::Deserialize;
@@ -31,8 +30,7 @@ pub struct TowedRollingStockModel {
     pub inertia_coefficient: f64,
     #[model(json)]
     pub rolling_resistance: RollingResistancePerWeight,
-    #[model(json)]
-    pub gamma: Gamma,
+    pub const_gamma: f64,
 
     pub version: i64,
 }
@@ -49,7 +47,7 @@ impl From<TowedRollingStockModel> for TowedRollingStock {
             startup_acceleration: model.startup_acceleration,
             inertia_coefficient: model.inertia_coefficient,
             rolling_resistance: model.rolling_resistance,
-            gamma: model.gamma,
+            const_gamma: model.const_gamma,
         }
     }
 }
@@ -66,6 +64,6 @@ impl From<TowedRollingStock> for Changeset<TowedRollingStockModel> {
             .startup_acceleration(towed_rolling_stock.startup_acceleration)
             .inertia_coefficient(towed_rolling_stock.inertia_coefficient)
             .rolling_resistance(towed_rolling_stock.rolling_resistance)
-            .gamma(towed_rolling_stock.gamma)
+            .const_gamma(towed_rolling_stock.const_gamma)
     }
 }

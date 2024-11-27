@@ -106,9 +106,9 @@ export default function RollingStockCardDetail({
           <td>{rs.inertia_coefficient}</td>
         </tr>
         <tr>
-          <td className="text-primary">{t('gammaValue')}</td>
+          <td className="text-primary">{t('constGamma')}</td>
           <td>
-            {rs.gamma.value}
+            {rs.const_gamma}
             <span className="small ml-1 text-muted">m/s²</span>
           </td>
         </tr>

@@ -12,7 +12,6 @@ use editoast_schemas::infra::InfraObject;
 use editoast_schemas::infra::RailJson;
 use editoast_schemas::primitives::OSRDObject;
 use editoast_schemas::rolling_stock::EffortCurves;
-use editoast_schemas::rolling_stock::Gamma;
 use editoast_schemas::rolling_stock::LoadingGaugeType;
 use editoast_schemas::rolling_stock::RollingResistance;
 use editoast_schemas::rolling_stock::RollingResistancePerWeight;
@@ -239,10 +238,7 @@ pub fn create_towed_rolling_stock() -> TowedRollingStock {
             B: 0.01,   // In N/(m/s)
             C: 0.0002, // In N/(m/s)²
         },
-        gamma: Gamma {
-            gamma_type: "CONST".to_string(),
-            value: 1.0,
-        },
+        const_gamma: 1.0,
         railjson_version: "3.4".to_string(),
     }
 }
@@ -261,10 +257,7 @@ pub fn create_simple_rolling_stock() -> RollingStock {
         electrical_power_startup_time: None,
         raise_pantograph_time: None,
         energy_sources: vec![],
-        gamma: Gamma {
-            gamma_type: "CONST".to_string(),
-            value: 1.0,
-        },
+        const_gamma: 1.0,
         locked: false,
         metadata: None,
         power_restrictions: HashMap::new(),

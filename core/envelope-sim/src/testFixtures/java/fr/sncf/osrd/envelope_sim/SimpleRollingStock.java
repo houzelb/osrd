@@ -12,14 +12,8 @@ public class SimpleRollingStock implements PhysicsRollingStock {
     public final double B; // in newtons / (m/s)
     public final double C; // in newtons / (m/s^2)
 
-    /**
-     * the kind of deceleration input of the train. It can be: a constant value the maximum possible
-     * deceleration value
-     */
-    public final GammaType gammaType;
-
     /** the deceleration of the train, in m/s^2 */
-    public final double gamma;
+    public final double constGamma;
 
     /** the length of the train, in meters. */
     public final double length;
@@ -50,8 +44,7 @@ public class SimpleRollingStock implements PhysicsRollingStock {
             double b,
             double c,
             double maxSpeed,
-            double gamma,
-            GammaType gammaType) {
+            double constGamma) {
         this.length = length;
         this.mass = mass;
         this.inertiaCoefficient = inertiaCoefficient;
@@ -60,8 +53,7 @@ public class SimpleRollingStock implements PhysicsRollingStock {
         this.B = b;
         this.C = c;
         this.maxSpeed = maxSpeed;
-        this.gamma = gamma;
-        this.gammaType = gammaType;
+        this.constGamma = constGamma;
     }
 
     @Override
@@ -85,11 +77,6 @@ public class SimpleRollingStock implements PhysicsRollingStock {
     }
 
     @Override
-    public GammaType getGammaType() {
-        return gammaType;
-    }
-
-    @Override
     public double getRollingResistance(double speed) {
         speed = Math.abs(speed);
         // this formula is called the Davis equation.
@@ -105,12 +92,12 @@ public class SimpleRollingStock implements PhysicsRollingStock {
 
     @Override
     public double getDeceleration() {
-        return -gamma;
+        return -constGamma;
     }
 
     @Override
     public double getMaxBrakingForce(double speed) {
-        return gamma * inertia;
+        return constGamma * inertia;
     }
 
     /**
@@ -157,7 +144,7 @@ public class SimpleRollingStock implements PhysicsRollingStock {
      * ======================================================== Constant rolling stocks and curves
      * ===========================================================
      */
-    public static SimpleRollingStock build(double length, double gamma, GammaType gammaType) {
+    public static SimpleRollingStock build(double length, double constGamma) {
         double trainMass = 850000; // in kilos
         return new SimpleRollingStock(
                 length,
@@ -167,8 +154,7 @@ public class SimpleRollingStock implements PhysicsRollingStock {
                 ((0.008 * trainMass) / 100) * 3.6,
                 (((0.00012 * trainMass) / 100) * 3.6) * 3.6,
                 MAX_SPEED,
-                gamma,
-                gammaType);
+                constGamma);
     }
 
     public static final ImmutableRangeMap<Double, TractiveEffortPoint[]> LINEAR_EFFORT_CURVE_MAP =
@@ -177,9 +163,9 @@ public class SimpleRollingStock implements PhysicsRollingStock {
     public static final ImmutableRangeMap<Double, TractiveEffortPoint[]> HYPERBOLIC_EFFORT_CURVE_MAP =
             createEffortCurveMap(MAX_SPEED, CurveShape.HYPERBOLIC);
 
-    public static final SimpleRollingStock SHORT_TRAIN = SimpleRollingStock.build(1, .5, GammaType.CONST);
+    public static final SimpleRollingStock SHORT_TRAIN = SimpleRollingStock.build(1, .5);
 
-    public static final SimpleRollingStock STANDARD_TRAIN = SimpleRollingStock.build(400, .5, GammaType.CONST);
+    public static final SimpleRollingStock STANDARD_TRAIN = SimpleRollingStock.build(400, .5);
 
-    public static final SimpleRollingStock MAX_DEC_TRAIN = SimpleRollingStock.build(400, .95, GammaType.MAX);
+    public static final SimpleRollingStock MAX_DEC_TRAIN = SimpleRollingStock.build(400, .95);
 }

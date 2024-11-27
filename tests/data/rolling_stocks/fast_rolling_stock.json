@@ -10,10 +10,7 @@
   "name": "fast_rolling_stock",
   "mass": 900000,
   "loading_gauge": "G1",
-  "gamma": {
-    "value": 0.5,
-    "type": "CONST"
-  },
+  "const_gamma": 0.5,
   "rolling_resistance": {
     "type": "davis",
     "A": 5400,

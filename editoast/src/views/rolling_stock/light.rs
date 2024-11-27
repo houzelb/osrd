@@ -8,7 +8,6 @@ use editoast_models::DbConnection;
 use editoast_models::DbConnectionPoolV2;
 use editoast_schemas::rolling_stock::EffortCurves;
 use editoast_schemas::rolling_stock::EnergySource;
-use editoast_schemas::rolling_stock::Gamma;
 use editoast_schemas::rolling_stock::LoadingGaugeType;
 use editoast_schemas::rolling_stock::ModeEffortCurves;
 use editoast_schemas::rolling_stock::RollingResistance;
@@ -220,7 +219,7 @@ struct LightRollingStock {
     startup_time: f64,
     startup_acceleration: f64,
     comfort_acceleration: f64,
-    gamma: Gamma,
+    const_gamma: f64,
     inertia_coefficient: f64,
     mass: f64,
     rolling_resistance: RollingResistance,
@@ -244,7 +243,7 @@ impl From<RollingStockModel> for LightRollingStock {
             startup_time,
             startup_acceleration,
             comfort_acceleration,
-            gamma,
+            const_gamma,
             inertia_coefficient,
             base_power_class,
             mass,
@@ -269,7 +268,7 @@ impl From<RollingStockModel> for LightRollingStock {
             startup_time,
             startup_acceleration,
             comfort_acceleration,
-            gamma,
+            const_gamma,
             inertia_coefficient,
             mass,
             rolling_resistance,

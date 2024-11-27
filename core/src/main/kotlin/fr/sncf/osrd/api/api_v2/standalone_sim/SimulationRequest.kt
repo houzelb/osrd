@@ -5,7 +5,6 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import fr.sncf.osrd.api.api_v2.DirectionalTrackRange
 import fr.sncf.osrd.api.api_v2.RangeValues
 import fr.sncf.osrd.conflicts.TravelledPath
-import fr.sncf.osrd.envelope_sim.PhysicsRollingStock.GammaType
 import fr.sncf.osrd.railjson.schema.rollingstock.Comfort
 import fr.sncf.osrd.railjson.schema.rollingstock.RJSEffortCurves.RJSModeEffortCurve
 import fr.sncf.osrd.railjson.schema.rollingstock.RJSRollingResistance
@@ -66,18 +65,13 @@ class PhysicsRollingStockModel(
     @Json(name = "startup_time") val startupTime: Duration,
     @Json(name = "startup_acceleration") val startupAcceleration: Double,
     @Json(name = "comfort_acceleration") val comfortAcceleration: Double,
-    val gamma: Gamma,
+    @Json(name = "const_gamma") val constGamma: Double,
     @Json(name = "inertia_coefficient") val inertiaCoefficient: Double,
     val mass: Long, // kg
     @Json(name = "rolling_resistance") val rollingResistance: RJSRollingResistance,
     @Json(name = "power_restrictions") val powerRestrictions: Map<String, String>,
     @Json(name = "electrical_power_startup_time") val electricalPowerStartupTime: Duration?,
     @Json(name = "raise_pantograph_time") val raisePantographTime: Duration?,
-)
-
-class Gamma(
-    @Json(name = "type") val gammaType: GammaType,
-    val value: Double,
 )
 
 class EffortCurve(
