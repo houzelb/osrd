@@ -7,7 +7,10 @@ import { useTranslation } from 'react-i18next';
 import type { SimulationResultsData } from 'applications/operationalStudies/types';
 import type { Conflict } from 'common/api/osrdEditoastApi';
 import SimulationWarpedMap from 'common/Map/WarpedMap/SimulationWarpedMap';
-import ManchetteWithSpaceTimeChartWrapper from 'modules/simulationResult/components/ManchetteWithSpaceTimeChart/ManchetteWithSpaceTimeChart';
+import ResizableSection from 'common/ResizableSection';
+import ManchetteWithSpaceTimeChartWrapper, {
+  MANCHETTE_WITH_SPACE_TIME_CHART_DEFAULT_HEIGHT,
+} from 'modules/simulationResult/components/ManchetteWithSpaceTimeChart/ManchetteWithSpaceTimeChart';
 import SimulationResultsMap from 'modules/simulationResult/components/SimulationResultsMap/SimulationResultsMap';
 import useGetProjectedTrainOperationalPoints from 'modules/simulationResult/components/SpaceTimeChart/useGetProjectedTrainOperationalPoints';
 import useProjectedConflicts from 'modules/simulationResult/components/SpaceTimeChart/useProjectedConflicts';
@@ -24,6 +27,7 @@ import { getPointCoordinates } from 'utils/geometry';
 
 const SPEED_SPACE_CHART_HEIGHT = 521.5;
 const HANDLE_TAB_RESIZE_HEIGHT = 20;
+const MANCHETTE_HEIGHT_DIFF = 76;
 
 type SimulationResultsProps = {
   scenarioData: { name: string; infraName: string };
@@ -55,6 +59,10 @@ const SimulationResults = ({
 
   const [extViewport, setExtViewport] = useState<Viewport>();
   const [showWarpedMap, setShowWarpedMap] = useState(false);
+
+  const [manchetteWithSpaceTimeChartHeight, setManchetteWithSpaceTimeChartHeight] = useState(
+    MANCHETTE_WITH_SPACE_TIME_CHART_DEFAULT_HEIGHT
+  );
 
   const [speedSpaceChartContainerHeight, setSpeedSpaceChartContainerHeight] =
     useState(SPEED_SPACE_CHART_HEIGHT);
@@ -131,42 +139,52 @@ const SimulationResults = ({
       )}
 
       {/* SIMULATION : SPACE TIME CHART */}
-      <div className="simulation-warped-map d-flex flex-row align-items-stretch mb-2">
-        {projectionData && projectionData.projectedTrains.length > 0 && pathProperties && (
-          <>
-            <button
-              type="button"
-              className="show-warped-map-button my-3 ml-3 mr-1"
-              aria-label={t('toggleWarpedMap')}
-              title={t('toggleWarpedMap')}
-              onClick={() => setShowWarpedMap(!showWarpedMap)}
-            >
-              {showWarpedMap ? <ChevronLeft /> : <ChevronRight />}
-            </button>
-            <SimulationWarpedMap
-              collapsed={!showWarpedMap}
-              pathGeometry={projectionData.geometry}
-            />
+      <ResizableSection
+        height={manchetteWithSpaceTimeChartHeight}
+        setHeight={setManchetteWithSpaceTimeChartHeight}
+        minHeight={MANCHETTE_WITH_SPACE_TIME_CHART_DEFAULT_HEIGHT}
+      >
+        <div
+          className="simulation-warped-map d-flex flex-row align-items-stretch mb-2"
+          style={{ height: manchetteWithSpaceTimeChartHeight }}
+        >
+          {projectionData && projectionData.projectedTrains.length > 0 && pathProperties && (
+            <>
+              <button
+                type="button"
+                className="show-warped-map-button my-3 ml-3 mr-1"
+                aria-label={t('toggleWarpedMap')}
+                title={t('toggleWarpedMap')}
+                onClick={() => setShowWarpedMap(!showWarpedMap)}
+              >
+                {showWarpedMap ? <ChevronLeft /> : <ChevronRight />}
+              </button>
+              <SimulationWarpedMap
+                collapsed={!showWarpedMap}
+                pathGeometry={projectionData.geometry}
+              />
 
-            <div className="osrd-simulation-container d-flex flex-grow-1 flex-shrink-1">
-              <div className="chart-container">
-                <ManchetteWithSpaceTimeChartWrapper
-                  operationalPoints={projectedOperationalPoints}
-                  projectPathTrainResult={projectionData?.projectedTrains}
-                  selectedTrainScheduleId={selectedTrainSchedule?.id}
-                  waypointsPanelData={{
-                    filteredWaypoints: filteredOperationalPoints,
-                    setFilteredWaypoints: setFilteredOperationalPoints,
-                    projectionPath: projectionData.trainSchedule.path,
-                  }}
-                  conflicts={conflictZones}
-                  projectionLoaderData={projectionData.projectionLoaderData}
-                />
+              <div className="osrd-simulation-container d-flex flex-grow-1 flex-shrink-1">
+                <div className="chart-container">
+                  <ManchetteWithSpaceTimeChartWrapper
+                    operationalPoints={projectedOperationalPoints}
+                    projectPathTrainResult={projectionData?.projectedTrains}
+                    selectedTrainScheduleId={selectedTrainSchedule?.id}
+                    waypointsPanelData={{
+                      filteredWaypoints: filteredOperationalPoints,
+                      setFilteredWaypoints: setFilteredOperationalPoints,
+                      projectionPath: projectionData.trainSchedule.path,
+                    }}
+                    conflicts={conflictZones}
+                    projectionLoaderData={projectionData.projectionLoaderData}
+                    height={manchetteWithSpaceTimeChartHeight - MANCHETTE_HEIGHT_DIFF}
+                  />
+                </div>
               </div>
-            </div>
-          </>
-        )}
-      </div>
+            </>
+          )}
+        </div>
+      </ResizableSection>
 
       {/* TRAIN : SPACE SPEED CHART */}
       {selectedTrainRollingStock && trainSimulation && pathProperties && selectedTrainSchedule && (
