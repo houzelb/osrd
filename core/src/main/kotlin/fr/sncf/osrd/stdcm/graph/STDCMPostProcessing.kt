@@ -169,6 +169,7 @@ class STDCMPostProcessing(private val graph: STDCMGraph) {
                 node,
                 nodes.subList(firstPlannedNodeIndex + 1, nodes.size),
                 mutableStopData,
+                timeData,
             )
         var actualStopAddedTime = min(maxAddedTime, timeDiff)
 
@@ -231,7 +232,9 @@ class STDCMPostProcessing(private val graph: STDCMGraph) {
         node: STDCMNode,
         nextNodes: List<STDCMNode>,
         mutableStopData: MutableList<StopTimeData>,
+        lastTimeData: TimeData,
     ): Double {
+        if (lastStopIndexBeforeNode == 0) return lastTimeData.maxFirstDepartureDelaying
         var maxTimeDiff = Double.POSITIVE_INFINITY
         var nextStopIndex = lastStopIndexBeforeNode
         if (node.stopDuration != null) nextStopIndex++
