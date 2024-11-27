@@ -46,7 +46,7 @@
       "downloadSimulationSheet": "Download simulation report sheet",
       "formatCreationDate": "{{month}}/{{day}}/{{year}} {{hours}}:{{minutes}}",
       "gesicoRequest": "and attach this document to your GESICO DSDM request.",
-      "notFound": "No solution was found for this configuration",
+      "notFound": "No path was found for this configuration",
       "conflictsTitle": "Here are the problems encountered when calculating the shortest path:",
       "trackConflict": "conflict with a train path between <strong>{{waypointBefore}}</strong> and <strong>{{waypointAfter}}</strong> from {{startDate}} at {{startTime}} to {{endDate}} at {{endTime}}",
       "trackConflictSameDay": "conflict with a train path between <strong>{{waypointBefore}}</strong> and <strong>{{waypointAfter}}</strong> on {{startDate}} between {{startTime}} and {{endTime}}",
@@ -60,14 +60,14 @@
       "retainThisSimulation": "Retain this simulation",
       "simulationName": {
         "withOutputs": "Simulation n°{{id}}",
-        "withoutOutputs": "Without result"
+        "withoutOutputs": "No capacity"
       },
       "simulationSelected": "You have selected this simulation",
       "startNewQuery": "Start a new query",
       "status": {
         "completed": "Calculation completed",
         "errorMessage": "We are sorry that we could not process your request. The LMR team has been notified and will be aware of the situation as soon as possible.",
-        "failed": "A technical problem occurred"
+        "failed": "A technical issue has occurred"
       },
       "upgrade": {
         "arrivalIncompatible": "Arrival time incompatible",
@@ -106,6 +106,7 @@
     "origin": "Origin",
     "posteriorPath": "Posterior path",
     "preciseTime": "precise time",
+    "respectDestinationSchedule": "respect the destination schedule",
     "stopFor": "Minimum stop time",
     "stopType": {
       "driverSwitch": "driver switch",

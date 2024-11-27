@@ -88,6 +88,7 @@ const StdcmOrigin = ({ disabled = false }: StdcmConfigCardProps) => {
         opScheduleTimeType={origin.arrivalType}
         disabled={disabled}
         opId="origin-arrival"
+        isOrigin
       />
     </StdcmCard>
   );

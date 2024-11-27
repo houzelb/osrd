@@ -152,6 +152,7 @@ export type StdcmConfigCardProps = {
 export enum ArrivalTimeTypes {
   PRECISE_TIME = 'preciseTime',
   ASAP = 'asSoonAsPossible',
+  RESPECT_DESTINATION_SCHEDULE = 'respectDestinationSchedule',
 }
 
 export enum StdcmConfigErrorTypes {
