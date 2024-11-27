@@ -134,12 +134,26 @@ data class STDCMNode(
         return relativeMaxTimeDiff
     }
 
+    /** Returns true if there's no stop between the start and this node (excluded). */
+    private fun isBeforeFirstStop(): Boolean {
+        var edge = previousEdge
+        while (true) {
+            if (edge == null) return true
+            val node = edge.previousNode
+            if (node.stopDuration != null) return false
+            edge = node.previousEdge
+        }
+    }
+
     /**
      * Compute how much delay we can add to the current node, given some elements about what happens
      * further down the path. The tricky part is identifying how stop durations may be adjusted to
      * locally change passage times without conflict.
      */
     private fun computeMaxAddedDelay(updatedTimeData: TimeData): Double {
+        if (isBeforeFirstStop()) {
+            return updatedTimeData.maxFirstDepartureDelaying
+        }
         var maxAddedDelay = Double.POSITIVE_INFINITY
 
         // List of stops that haven't been reached on this node

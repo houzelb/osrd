@@ -254,6 +254,7 @@ class FullSTDCMTests {
         } else {
             assertEquals(expectedPassageTime, res.departureTime + res.envelope.totalTime, timeStep)
         }
+        assertTrue(res.departureTime <= 12_000.0) // Max departure delay
     }
 
     /** Check that the result we find doesn't cause a conflict */
@@ -379,6 +380,14 @@ class FullSTDCMTests {
                 null,
                 PlannedTimingData(10_000.seconds, 300.seconds, 300.seconds),
                 10_000.0,
+                true,
+            ),
+            Arguments.of(
+                start,
+                end,
+                null,
+                PlannedTimingData(20_000.seconds, 1_000.seconds, 1_000.seconds),
+                19_000.0, // We'd need more than max departure delay to reach 20_000
                 true,
             ),
         )
