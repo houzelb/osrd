@@ -212,6 +212,13 @@ impl PhysicsConsistParameters {
             self.traction_engine.rolling_resistance.clone()
         }
     }
+
+    pub fn compute_const_gamma(&self) -> f64 {
+        self.towed_rolling_stock
+            .as_ref()
+            .map(|towed| f64::min(towed.const_gamma, self.traction_engine.const_gamma))
+            .unwrap_or_else(|| self.traction_engine.const_gamma)
+    }
 }
 
 impl From<PhysicsConsistParameters> for PhysicsConsist {
@@ -223,6 +230,7 @@ impl From<PhysicsConsistParameters> for PhysicsConsist {
         let inertia_coefficient = params.compute_inertia_coefficient();
         let mass = params.compute_mass();
         let rolling_resistance = params.compute_rolling_resistance();
+        let const_gamma = params.compute_const_gamma();
 
         let traction_engine = params.traction_engine;
 
@@ -235,7 +243,7 @@ impl From<PhysicsConsistParameters> for PhysicsConsist {
             startup_time: (traction_engine.startup_time * 1000.0).round() as u64,
             startup_acceleration,
             comfort_acceleration,
-            const_gamma: traction_engine.const_gamma,
+            const_gamma,
             inertia_coefficient,
             rolling_resistance,
             power_restrictions: traction_engine.power_restrictions.into_iter().collect(),
@@ -636,5 +644,20 @@ mod tests {
             physics_consist.compute_rolling_resistance(),
             physics_consist.traction_engine.rolling_resistance,
         );
+    }
+
+    #[test]
+    fn physics_consist_compute_gamma() {
+        // Towed const gamma 0.5
+        let mut physics_consist = create_physics_consist();
+        physics_consist.traction_engine.const_gamma = 0.4;
+
+        assert_eq!(physics_consist.compute_const_gamma(), 0.4);
+
+        physics_consist.traction_engine.const_gamma = 0.6;
+        assert_eq!(physics_consist.compute_const_gamma(), 0.5);
+
+        physics_consist.towed_rolling_stock = None;
+        assert_eq!(physics_consist.compute_const_gamma(), 0.6);
     }
 }
