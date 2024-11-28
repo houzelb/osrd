@@ -24,6 +24,10 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           set -eo pipefail
+
+          # disable cache mounts as github cache is slow
+          find -name Dockerfile -print0 | xargs -0 sed -Ei 's/--mount=type=cache,target=[^[:blank:]]+//g'
+
           echo ::group::Github context
           python3 -m json.tool <<< "${GITHUB_CONTEXT}"
           echo ::endgroup::
