@@ -15,7 +15,7 @@ const usePathProperties = (
   const [pathProperties, setPathProperties] = useState<PathProperties>();
 
   const [postPathProperties] =
-    osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useMutation();
+    osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useLazyQuery();
 
   useEffect(() => {
     const getPathProperties = async () => {

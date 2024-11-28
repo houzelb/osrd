@@ -175,7 +175,7 @@ export const usePathfinding = (
   const [postPathfindingBlocks] =
     osrdEditoastApi.endpoints.postInfraByInfraIdPathfindingBlocks.useLazyQuery();
   const [postPathProperties] =
-    osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useMutation();
+    osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useLazyQuery();
 
   const { updatePathSteps } = useOsrdConfActions();
   const { infraId } = useScenarioContext();

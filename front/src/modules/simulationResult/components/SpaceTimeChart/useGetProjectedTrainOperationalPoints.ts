@@ -39,7 +39,7 @@ const useGetProjectedTrainOperationalPoints = (
   );
 
   const [postPathProperties] =
-    osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useMutation();
+    osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useLazyQuery();
 
   useEffect(() => {
     const getOperationalPoints = async () => {

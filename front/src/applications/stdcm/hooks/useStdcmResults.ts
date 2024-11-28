@@ -26,7 +26,7 @@ const useStdcmResults = (
   const selectedTrainId = useSelector(getSelectedTrainId);
 
   const [postPathProperties] =
-    osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useMutation();
+    osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useLazyQuery();
 
   const { data: otherSelectedTrainSchedule } =
     osrdEditoastApi.endpoints.getTrainScheduleById.useQuery(
