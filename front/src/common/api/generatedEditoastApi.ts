@@ -304,7 +304,7 @@ const injectedRtkApi = api
         }),
         providesTags: ['infra', 'pathfinding'],
       }),
-      postInfraByInfraIdPathfindingBlocks: build.mutation<
+      postInfraByInfraIdPathfindingBlocks: build.query<
         PostInfraByInfraIdPathfindingBlocksApiResponse,
         PostInfraByInfraIdPathfindingBlocksApiArg
       >({
@@ -313,7 +313,7 @@ const injectedRtkApi = api
           method: 'POST',
           body: queryArg.pathfindingInput,
         }),
-        invalidatesTags: ['pathfinding'],
+        providesTags: ['pathfinding'],
       }),
       getInfraByInfraIdRailjson: build.query<
         GetInfraByInfraIdRailjsonApiResponse,

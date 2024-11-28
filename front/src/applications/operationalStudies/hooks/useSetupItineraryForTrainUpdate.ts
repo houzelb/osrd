@@ -72,7 +72,7 @@ const useSetupItineraryForTrainUpdate = (
   const [getRollingStockByName] =
     osrdEditoastApi.endpoints.getRollingStockNameByRollingStockName.useLazyQuery();
   const [postPathfindingBlocks] =
-    osrdEditoastApi.endpoints.postInfraByInfraIdPathfindingBlocks.useMutation();
+    osrdEditoastApi.endpoints.postInfraByInfraIdPathfindingBlocks.useLazyQuery();
   const [postPathProperties] =
     osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useMutation();
   const { infraId } = useScenarioContext();
