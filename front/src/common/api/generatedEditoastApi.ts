@@ -280,7 +280,7 @@ const injectedRtkApi = api
         }),
         providesTags: ['infra'],
       }),
-      postInfraByInfraIdPathProperties: build.mutation<
+      postInfraByInfraIdPathProperties: build.query<
         PostInfraByInfraIdPathPropertiesApiResponse,
         PostInfraByInfraIdPathPropertiesApiArg
       >({
@@ -290,7 +290,7 @@ const injectedRtkApi = api
           body: queryArg.pathPropertiesInput,
           params: { props: queryArg.props },
         }),
-        invalidatesTags: ['pathfinding'],
+        providesTags: ['pathfinding'],
       }),
       postInfraByInfraIdPathfinding: build.query<
         PostInfraByInfraIdPathfindingApiResponse,

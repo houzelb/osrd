@@ -13,7 +13,7 @@ const useProjectedConflicts = (
   path: PathfindingResultSuccess | undefined
 ) => {
   const [postPathProperties] =
-    osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useMutation();
+    osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useLazyQuery();
 
   const [projectedZones, setProjectedZones] = useState<PathProperties['zones']>();
   useEffect(() => {
