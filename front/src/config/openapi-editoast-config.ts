@@ -12,6 +12,7 @@ const config: ConfigFile = {
     {
       pattern: [
         'postInfraByInfraIdObjectsAndObjectType',
+        'postInfraByInfraIdPathfinding',
         'postTrainSchedule',
         'postTrainScheduleSimulationSummary',
         'postTrainScheduleProjectPath',
