@@ -34,7 +34,7 @@ const RouteEditionPanel = () => {
   const { t } = useTranslation();
   const infraID = useInfraID();
   const dispatch = useAppDispatch();
-  const [postPathfinding] = osrdEditoastApi.endpoints.postInfraByInfraIdPathfinding.useMutation();
+  const [postPathfinding] = osrdEditoastApi.endpoints.postInfraByInfraIdPathfinding.useLazyQuery();
   const { state, setState, isFormSubmited, setIsFormSubmited } = useContext(
     EditorContext
   ) as ExtendedEditorContextType<RouteEditionState>;
