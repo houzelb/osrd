@@ -8,6 +8,7 @@ interface Margin {
 export interface StationData {
   stationName: string;
   stationCh: string;
+  trackName: string;
   requestedArrival: string;
   requestedDeparture: string;
   stopTime: string;
@@ -58,6 +59,7 @@ export function normalizeData(data: StationData[]): StationData[] {
   return data.map((item) => ({
     stationName: cleanWhitespace(item.stationName),
     stationCh: cleanWhitespace(item.stationCh),
+    trackName: cleanWhitespace(item.trackName),
     requestedArrival: cleanWhitespace(item.requestedArrival),
     requestedDeparture: cleanWhitespace(item.requestedDeparture),
     stopTime: cleanWhitespace(item.stopTime),

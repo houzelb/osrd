@@ -53,6 +53,7 @@ class OperationalStudiesOutputTablePage extends OperationalStudiesTimetablePage 
       const [
         stationName,
         stationCh,
+        trackName,
         requestedArrival,
         requestedDeparture,
         stopTime,
@@ -70,6 +71,10 @@ class OperationalStudiesOutputTablePage extends OperationalStudiesTimetablePage 
           false
         ),
         OperationalStudiesOutputTablePage.getCellValue(cells.nth(headerIndexMap[translations.ch])),
+        OperationalStudiesOutputTablePage.getCellValue(
+          cells.nth(headerIndexMap[translations.trackName]),
+          false
+        ),
         OperationalStudiesOutputTablePage.getCellValue(
           cells.nth(headerIndexMap[translations.arrivalTime]),
           false
@@ -114,6 +119,7 @@ class OperationalStudiesOutputTablePage extends OperationalStudiesTimetablePage 
       actualTableData.push({
         stationName,
         stationCh,
+        trackName,
         requestedArrival,
         requestedDeparture,
         stopTime,
