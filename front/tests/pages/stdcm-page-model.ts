@@ -138,7 +138,7 @@ class STDCMPage {
     this.lengthField = page.locator('#length');
     this.codeCompoField = page.locator('#speed-limit-by-tag-selector');
     this.maxSpeedField = page.locator('#maxSpeed');
-    this.addViaButton = page.locator('.stdcm-card.has-tip .stdcm-card__body.add-via button');
+    this.addViaButton = page.locator('.stdcm-vias-list button .stdcm-card__body.add-via');
     this.launchSimulationButton = page.getByTestId('launch-simulation-button');
     this.originChField = this.originCard.locator('[id^="id"][id$="-ch"]');
     this.destinationChField = this.destinationCard.locator('[id^="id"][id$="-ch"]');

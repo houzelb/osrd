@@ -9,6 +9,14 @@
     margin-top: 18px;
   }
 
+  button {
+    text-align: left;
+  }
+
+  button:focus {
+    outline: none;
+  }
+
   .stdcm-card__header {
     button {
       font-size: 0.875rem;
