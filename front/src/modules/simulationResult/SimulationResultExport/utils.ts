@@ -100,12 +100,12 @@ const getTimeAndSpeed = (
  * on their positions if they match or interpolate its time if they don't
  * @returns the computed operational points for each simulation (base and finalOutput)
  */
-export const formatOperationalPoints = async (
+export const formatOperationalPoints = (
   operationalPoints: PathPropertiesFormatted['operationalPoints'],
   simulatedTrain: SimulationResponseSuccess,
   train: TrainScheduleBase,
   trackSections: Record<string, TrackSection>
-): Promise<OperationalPointWithTimeAndSpeed[]> => {
+): OperationalPointWithTimeAndSpeed[] => {
   // Format operational points
   const formattedStops: OperationalPointWithTimeAndSpeed[] = [];
 

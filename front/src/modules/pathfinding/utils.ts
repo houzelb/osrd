@@ -17,8 +17,8 @@ import getStepLocation from './helpers/getStepLocation';
 
 export const formatSuggestedOperationalPoints = (
   operationalPoints: NonNullable<Required<PathProperties['operational_points']>>,
-  geometry?: GeoJsonLineString,
-  pathLength?: number
+  geometry: GeoJsonLineString,
+  pathLength: number
 ): SuggestedOP[] =>
   operationalPoints.map((op) => ({
     opId: op.id,
@@ -33,11 +33,7 @@ export const formatSuggestedOperationalPoints = (
     offsetOnTrack: op.part.position,
     track: op.part.track,
     positionOnPath: op.position,
-    coordinates:
-      (geometry !== undefined &&
-        pathLength !== undefined &&
-        getPointCoordinates(geometry, pathLength, op.position)) ||
-      undefined,
+    coordinates: getPointCoordinates(geometry, pathLength, op.position),
   }));
 
 export const matchPathStepAndOp = (
