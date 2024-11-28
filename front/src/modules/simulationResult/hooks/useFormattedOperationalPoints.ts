@@ -30,7 +30,7 @@ export const useFormattedOperationalPoints = (
 
         const trackIds = pathProperties.operationalPoints.map((op) => op.part.track);
         const trackSections = await getTrackSectionsByIds(trackIds);
-        const formattedOperationalPoints = await formatOperationalPoints(
+        const formattedOperationalPoints = formatOperationalPoints(
           pathProperties.operationalPoints,
           simulatedTrain,
           train,
