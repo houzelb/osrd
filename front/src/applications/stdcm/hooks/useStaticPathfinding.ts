@@ -23,7 +23,7 @@ const useStaticPathfinding = (infra?: InfraWithState) => {
   const [pathfinding, setPathfinding] = useState<PathfindingResult>();
 
   const [postPathfindingBlocks] =
-    osrdEditoastApi.endpoints.postInfraByInfraIdPathfindingBlocks.useMutation();
+    osrdEditoastApi.endpoints.postInfraByInfraIdPathfindingBlocks.useLazyQuery();
 
   const pathStepsLocations = useMemo(
     () =>

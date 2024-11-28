@@ -13,6 +13,7 @@ const config: ConfigFile = {
       pattern: [
         'postInfraByInfraIdObjectsAndObjectType',
         'postInfraByInfraIdPathfinding',
+        'postInfraByInfraIdPathfindingBlocks',
         'postTrainSchedule',
         'postTrainScheduleSimulationSummary',
         'postTrainScheduleProjectPath',

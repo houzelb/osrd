@@ -173,7 +173,7 @@ export const usePathfinding = (
   const [isPathfindingInitialized, setIsPathfindingInitialized] = useState(false);
 
   const [postPathfindingBlocks] =
-    osrdEditoastApi.endpoints.postInfraByInfraIdPathfindingBlocks.useMutation();
+    osrdEditoastApi.endpoints.postInfraByInfraIdPathfindingBlocks.useLazyQuery();
   const [postPathProperties] =
     osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useMutation();
 
