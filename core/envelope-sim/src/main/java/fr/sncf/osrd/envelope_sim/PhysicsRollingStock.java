@@ -53,9 +53,6 @@ public interface PhysicsRollingStock {
     /** The maximum constant deceleration, in m/s^2 */
     double getDeceleration();
 
-    /** The maximum braking force which can be applied at a given speed, in newtons */
-    double getMaxBrakingForce(double speed);
-
     /** The maximum acceleration, in m/s^2, which can be applied at a given speed, in m/s */
     record TractiveEffortPoint(double speed, double maxEffort) {}
 }

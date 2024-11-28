@@ -120,11 +120,6 @@ public final class RollingStock implements PhysicsRollingStock {
         return B + 2 * C * speed;
     }
 
-    @Override
-    public double getMaxBrakingForce(double speed) {
-        return constGamma * inertia;
-    }
-
     public record ModeEffortCurves(
             boolean isElectric, TractiveEffortPoint[] defaultCurve, ConditionalEffortCurve[] curves) {}
 

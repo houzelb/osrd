@@ -92,7 +92,7 @@ public class TrainPhysicsIntegratorTest {
         double rollingResistance = testRollingStock.getRollingResistance(speed);
         double weightForce = getWeightForce(testRollingStock, testPath, position);
         var acceleration = TrainPhysicsIntegrator.computeAcceleration(
-                testRollingStock, rollingResistance, weightForce, speed, 500000.0, 0, +1);
+                testRollingStock, rollingResistance, weightForce, speed, 500000.0, false, +1);
         var step = newtonStep(TIME_STEP, speed, acceleration, +1);
         position += step.positionDelta;
         speed = step.endSpeed;

@@ -66,7 +66,6 @@ public final class TrainPhysicsIntegrator {
 
     private IntegrationStep step(double timeStep, double position, double speed) {
         double tractionForce = 0;
-        double brakingForce = 0;
         var tractiveEffortCurve = tractiveEffortCurveMap.get(Math.min(Math.max(0, position), path.getLength()));
         assert tractiveEffortCurve != null;
         double maxTractionForce = PhysicsRollingStock.getMaxEffort(speed, tractiveEffortCurve);
@@ -75,7 +74,7 @@ public final class TrainPhysicsIntegrator {
 
         if (action == Action.ACCELERATE) tractionForce = maxTractionForce;
 
-        if (action == Action.BRAKE) brakingForce = rollingStock.getMaxBrakingForce(speed);
+        boolean isBraking = (action == Action.BRAKE);
 
         if (action == Action.MAINTAIN) {
             tractionForce = rollingResistance - weightForce;
@@ -84,7 +83,7 @@ public final class TrainPhysicsIntegrator {
         }
 
         double acceleration = computeAcceleration(
-                rollingStock, rollingResistance, weightForce, speed, tractionForce, brakingForce, directionSign);
+                rollingStock, rollingResistance, weightForce, speed, tractionForce, isBraking, directionSign);
         return newtonStep(timeStep, speed, acceleration, directionSign);
     }
 
@@ -108,34 +107,31 @@ public final class TrainPhysicsIntegrator {
             double weightForce,
             double currentSpeed,
             double tractionForce,
-            double brakingForce,
+            boolean isBraking,
             double directionSign) {
 
-        assert brakingForce >= 0.;
         assert tractionForce >= 0.;
 
-        if (brakingForce > 0) {
+        if (isBraking) {
             return rollingStock.getDeceleration();
         }
 
-        // the sum of forces that always go the direction opposite to the train's movement
-        double oppositeForce = rollingResistance + brakingForce;
         if (currentSpeed == 0 && directionSign > 0) {
             // If we are stopped and if the forces are not enough to compensate the opposite force,
             // the rolling resistance and braking force don't apply and the speed stays at 0
             // Unless we integrate backwards, then we need the speed to increase
             var totalOtherForce = tractionForce + weightForce;
-            if (Math.abs(totalOtherForce) < oppositeForce) return 0.0;
+            if (Math.abs(totalOtherForce) < rollingResistance) return 0.0;
         }
 
         // as the oppositeForces are reaction forces, they need to be adjusted to be opposed to the
         // other forces
         if (currentSpeed >= 0.0) {
             // if the train is moving forward or still, the opposite forces are negative
-            return (tractionForce + weightForce - oppositeForce) / rollingStock.getInertia();
+            return (tractionForce + weightForce - rollingResistance) / rollingStock.getInertia();
         } else {
             // if the train is moving backwards, the opposite forces are positive
-            return (tractionForce + weightForce + oppositeForce) / rollingStock.getInertia();
+            return (tractionForce + weightForce + rollingResistance) / rollingStock.getInertia();
         }
     }
 
