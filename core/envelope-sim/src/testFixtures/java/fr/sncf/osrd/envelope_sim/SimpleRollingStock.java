@@ -95,11 +95,6 @@ public class SimpleRollingStock implements PhysicsRollingStock {
         return -constGamma;
     }
 
-    @Override
-    public double getMaxBrakingForce(double speed) {
-        return constGamma * inertia;
-    }
-
     /**
      * The tractive effort curve shape. It can be either linear (effort proportional to speed), or
      * hyperbolic (effort inversely proportional to speed -> constant power)
