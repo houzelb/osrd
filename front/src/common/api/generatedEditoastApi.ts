@@ -269,7 +269,7 @@ const injectedRtkApi = api
         query: (queryArg) => ({ url: `/infra/${queryArg.infraId}/lock`, method: 'POST' }),
         invalidatesTags: ['infra'],
       }),
-      postInfraByInfraIdObjectsAndObjectType: build.mutation<
+      postInfraByInfraIdObjectsAndObjectType: build.query<
         PostInfraByInfraIdObjectsAndObjectTypeApiResponse,
         PostInfraByInfraIdObjectsAndObjectTypeApiArg
       >({
@@ -278,7 +278,7 @@ const injectedRtkApi = api
           method: 'POST',
           body: queryArg.body,
         }),
-        invalidatesTags: ['infra'],
+        providesTags: ['infra'],
       }),
       postInfraByInfraIdPathProperties: build.mutation<
         PostInfraByInfraIdPathPropertiesApiResponse,

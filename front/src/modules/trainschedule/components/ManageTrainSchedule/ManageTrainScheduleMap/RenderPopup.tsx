@@ -40,7 +40,7 @@ function RenderPopup({ pathProperties }: RenderPopupProps) {
   const [trackOffset, setTrackOffset] = useState(0);
 
   const [getTrackEntity] =
-    osrdEditoastApi.endpoints.postInfraByInfraIdObjectsAndObjectType.useMutation();
+    osrdEditoastApi.endpoints.postInfraByInfraIdObjectsAndObjectType.useLazyQuery();
 
   useEffect(() => {
     const calculateOffset = async () => {

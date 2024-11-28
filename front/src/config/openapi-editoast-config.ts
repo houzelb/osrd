@@ -11,6 +11,7 @@ const config: ConfigFile = {
   endpointOverrides: [
     {
       pattern: [
+        'postInfraByInfraIdObjectsAndObjectType',
         'postTrainSchedule',
         'postTrainScheduleSimulationSummary',
         'postTrainScheduleProjectPath',

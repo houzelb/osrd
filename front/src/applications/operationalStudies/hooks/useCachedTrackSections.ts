@@ -9,7 +9,7 @@ export default function useCachedTrackSections(infraId: number) {
   const trackIdsRef = useRef<Set<string>>(new Set());
   const trackSectionsRef = useRef<Record<string, TrackSection>>({});
   const [loadInfraObject, { isLoading }] =
-    osrdEditoastApi.endpoints.postInfraByInfraIdObjectsAndObjectType.useMutation();
+    osrdEditoastApi.endpoints.postInfraByInfraIdObjectsAndObjectType.useLazyQuery();
 
   const getTrackSectionsByIds = useCallback(
     async (requestedTrackIds: string[]) => {
