@@ -107,6 +107,14 @@
 
         .stdcm-vias-list {
           margin-block: 16px;
+
+          button {
+            text-align: left;
+          }
+
+          button:focus {
+            outline: none;
+          }
         }
 
         .stdcm-origin-icon,
