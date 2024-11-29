@@ -35,7 +35,7 @@ const Pathfinding = ({ pathProperties, setPathProperties }: PathfindingProps) =>
   const {
     pathfindingState,
     infraInfos: { infra, reloadCount },
-  } = usePathfinding(setPathProperties, pathProperties);
+  } = usePathfinding(setPathProperties);
 
   const missingElements = conditionalStringConcat([
     [!origin, t('origin')],
@@ -62,8 +62,8 @@ const Pathfinding = ({ pathProperties, setPathProperties }: PathfindingProps) =>
       {infra && infra.state === 'ERROR' && <InfraHardError />}
 
       {!pathfindingState.error &&
-        !pathfindingState.running &&
-        pathfindingState.done &&
+        !pathfindingState.isRunning &&
+        pathfindingState.isDone &&
         origin &&
         destination &&
         !hasInvalidPathStep && (
@@ -98,9 +98,11 @@ const Pathfinding = ({ pathProperties, setPathProperties }: PathfindingProps) =>
                 <Stop />
               </span>
               <span className="flex-grow-1">
-                {hasInvalidPathStep
+                {!pathfindingState.error
                   ? t('InvalidTrainScheduleStep')
-                  : t('pathfindingError', { errorMessage: t(pathfindingState.error) })}
+                  : t('pathfindingError', {
+                      errorMessage: t(pathfindingState.error),
+                    })}
               </span>
             </div>
           )}
@@ -114,7 +116,7 @@ const Pathfinding = ({ pathProperties, setPathProperties }: PathfindingProps) =>
               </span>
             </div>
           )}
-          {pathfindingState.running && (
+          {pathfindingState.isRunning && (
             <div className="content pathfinding-loading">
               <span className="lead">
                 <Spinner />

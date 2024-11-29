@@ -48,6 +48,7 @@ export const defaultCommonConf: OsrdConfState = {
   pathSteps: [null, null],
   rollingStockComfort: 'STANDARD' as const,
   startTime: new Date().toISOString(),
+  shoudlLaunchPathfinding: false,
 };
 
 interface CommonConfReducers<S extends OsrdConfState> extends InfraStateReducers<S> {
@@ -75,7 +76,10 @@ interface CommonConfReducers<S extends OsrdConfState> extends InfraStateReducers
   ['updateFeatureInfoClick']: CaseReducer<S, PayloadAction<S['featureInfoClick']>>;
   ['updatePathSteps']: CaseReducer<
     S,
-    PayloadAction<{ pathSteps: S['pathSteps']; resetPowerRestrictions?: boolean }>
+    PayloadAction<{
+      pathSteps: S['pathSteps'];
+      options?: { resetPowerRestrictions?: boolean; shouldNotLaunchPathfinding?: boolean };
+    }>
   >;
   ['deleteItinerary']: CaseReducer<S>;
   ['clearVias']: CaseReducer<S>;
@@ -94,6 +98,7 @@ interface CommonConfReducers<S extends OsrdConfState> extends InfraStateReducers
   ['updateStartTime']: CaseReducer<S, PayloadAction<S['startTime']>>;
   ['updateOrigin']: CaseReducer<S, PayloadAction<ArrayElement<S['pathSteps']>>>;
   ['updateDestination']: CaseReducer<S, PayloadAction<ArrayElement<S['pathSteps']>>>;
+  ['resetShouldLaunchPathfinding']: CaseReducer<S>;
 }
 
 export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfReducers<S> {
@@ -143,6 +148,7 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
     },
     updateRollingStockID(state: Draft<S>, action: PayloadAction<S['rollingStockID']>) {
       state.rollingStockID = action.payload;
+      state.shoudlLaunchPathfinding = true;
     },
     updateSpeedLimitByTag(state: Draft<S>, action: PayloadAction<S['speedLimitByTag'] | null>) {
       state.speedLimitByTag = action.payload === null ? undefined : action.payload;
@@ -178,23 +184,32 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
     },
     updatePathSteps(
       state: Draft<S>,
-      action: PayloadAction<{ pathSteps: S['pathSteps']; resetPowerRestrictions?: boolean }>
+      action: PayloadAction<{
+        pathSteps: S['pathSteps'];
+        options?: { resetPowerRestrictions?: boolean; shouldNotLaunchPathfinding?: boolean };
+      }>
     ) {
       state.pathSteps = action.payload.pathSteps;
-      if (action.payload.resetPowerRestrictions) {
+      if (action.payload.options?.resetPowerRestrictions) {
         state.powerRestriction = [];
+      }
+      if (!action.payload.options?.shouldNotLaunchPathfinding) {
+        state.shoudlLaunchPathfinding = true;
       }
     },
     deleteItinerary(state: Draft<S>) {
       state.pathSteps = [null, null];
+      state.powerRestriction = [];
     },
     clearVias(state: Draft<S>) {
       state.pathSteps = [state.pathSteps[0], state.pathSteps[state.pathSteps.length - 1]];
+      state.shoudlLaunchPathfinding = true;
     },
     // Use this action in the via list, not the suggested op list
     deleteVia(state: Draft<S>, action: PayloadAction<number>) {
       // Index takes count of the origin in the array
       state.pathSteps = removeElementAtIndex(state.pathSteps, action.payload + 1);
+      state.shoudlLaunchPathfinding = true;
     },
     // Use this action only to via added by click on map
     addVia(
@@ -209,10 +224,12 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
         action.payload.newVia,
         action.payload.pathProperties
       );
+      state.shoudlLaunchPathfinding = true;
     },
     moveVia: {
       reducer: (state: Draft<S>, action: PayloadAction<S['pathSteps']>) => {
         state.pathSteps = action.payload;
+        state.shoudlLaunchPathfinding = true;
       },
       prepare: (vias: S['pathSteps'], from: number, to: number) => {
         const newVias = Array.from(vias);
@@ -249,6 +266,7 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
           }
         : null;
       state.pathSteps = updateOriginPathStep(state.pathSteps, newPoint, true);
+      state.shoudlLaunchPathfinding = true;
     },
     updateDestination(state: Draft<S>, action: PayloadAction<ArrayElement<S['pathSteps']>>) {
       const prevDestinationArrivalType = state.pathSteps.at(-1)?.arrivalType;
@@ -260,6 +278,10 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
           }
         : null;
       state.pathSteps = updateDestinationPathStep(state.pathSteps, newPoint, true);
+      state.shoudlLaunchPathfinding = true;
+    },
+    resetShouldLaunchPathfinding(state: Draft<S>) {
+      state.shoudlLaunchPathfinding = false;
     },
   };
 }

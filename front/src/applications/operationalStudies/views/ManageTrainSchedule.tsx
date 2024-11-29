@@ -27,6 +27,7 @@ import { Map } from 'modules/trainschedule/components/ManageTrainSchedule';
 import SimulationSettings from 'modules/trainschedule/components/ManageTrainSchedule/SimulationSettings';
 import TrainSettings from 'modules/trainschedule/components/ManageTrainSchedule/TrainSettings';
 import { formatKmValue } from 'utils/strings';
+import { usePathfinding } from 'modules/pathfinding/hooks/usePathfinding';
 
 type ManageTrainScheduleProps = {
   trainIdToEdit?: number;
@@ -34,15 +35,30 @@ type ManageTrainScheduleProps = {
 
 const ManageTrainSchedule = ({ trainIdToEdit }: ManageTrainScheduleProps) => {
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
-  const { getOrigin, getDestination, getPathSteps, getConstraintDistribution, getStartTime } =
-    useOsrdConfSelectors();
+  const {
+    getOrigin,
+    getDestination,
+    getPathSteps,
+    getConstraintDistribution,
+    getStartTime,
+    getShouldLaunchPathfinding,
+  } = useOsrdConfSelectors();
   const origin = useSelector(getOrigin);
   const destination = useSelector(getDestination);
   const pathSteps = useSelector(getPathSteps);
   const constraintDistribution = useSelector(getConstraintDistribution);
   const startTime = useSelector(getStartTime);
 
+  const shouldLaunchPathfinding = useSelector(getShouldLaunchPathfinding);
+
+  useEffect(() => console.log(shouldLaunchPathfinding), [shouldLaunchPathfinding]);
+
   const [pathProperties, setPathProperties] = useState<ManageTrainSchedulePathProperties>();
+
+  // const {
+  //   pathfindingState,
+  //   infraInfos: { infra, reloadCount },
+  // } = usePathfinding(setPathProperties, pathProperties);
 
   const { speedLimitByTag, speedLimitsByTags, dispatchUpdateSpeedLimitByTag } =
     useStoreDataForSpeedLimitByTagSelector();

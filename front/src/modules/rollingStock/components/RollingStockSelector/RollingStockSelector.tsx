@@ -28,16 +28,12 @@ const RollingStockSelector = ({
   rollingStockSelected,
   rollingStockComfort,
   image,
-  pathProperties,
-  setPathProperties,
 }: RollingStockProps) => {
   const { openModal } = useModal();
 
   const ref2scroll = useRef<HTMLDivElement>(null);
 
   const { t } = useTranslation('rollingstock');
-
-  usePathfinding(setPathProperties, pathProperties);
 
   return (
     <div className="osrd-config-item mb-2">

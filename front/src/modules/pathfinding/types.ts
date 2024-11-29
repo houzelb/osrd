@@ -1,6 +1,14 @@
 import type { RollingStockWithLiveries } from 'common/api/osrdEditoastApi';
 import type { PathStep } from 'reducers/osrdconf/types';
 
+
+export type PathfindingState2 = {
+  isRunning: boolean;
+  isDone: boolean;
+  error?: string;
+  missingParam: boolean;
+};
+
 export type PathfindingState = {
   running: boolean;
   done: boolean;

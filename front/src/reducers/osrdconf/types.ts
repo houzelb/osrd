@@ -43,6 +43,7 @@ export interface OsrdConfState extends InfraState {
   rollingStockComfort: Comfort;
   // Format ISO 8601
   startTime: string;
+  shoudlLaunchPathfinding: boolean;
 }
 
 export interface StandardAllowance {

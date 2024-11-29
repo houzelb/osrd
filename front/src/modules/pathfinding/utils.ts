@@ -59,38 +59,36 @@ export const matchPathStepAndOp = (
 export const getPathfindingQuery = ({
   infraId,
   rollingStock,
-  origin,
-  destination,
   pathSteps,
 }: {
   infraId?: number;
   rollingStock?: RollingStockWithLiveries;
-  origin: PathStep | null;
-  destination: PathStep | null;
   pathSteps: (PathStep | null)[];
 }): PostInfraByInfraIdPathfindingBlocksApiArg | null => {
-  if (infraId && rollingStock && origin && destination) {
-    // Only origin and destination can be null so we can compact and we want to remove any via that would be null
-    const pathItems: PathfindingInput['path_items'] = compact(pathSteps).map((step) =>
-      getStepLocation(step)
-    );
-
-    return {
-      infraId,
-      pathfindingInput: {
-        path_items: pathItems,
-        rolling_stock_is_thermal: isThermal(rollingStock.effort_curves.modes),
-        rolling_stock_loading_gauge: rollingStock.loading_gauge,
-        rolling_stock_supported_electrifications: getSupportedElectrification(
-          rollingStock.effort_curves.modes
-        ),
-        rolling_stock_supported_signaling_systems: rollingStock.supported_signaling_systems,
-        rolling_stock_maximum_speed: rollingStock.max_speed,
-        rolling_stock_length: rollingStock.length,
-      },
-    };
+  const origin = pathSteps.at(0);
+  const destination = pathSteps.at(-1);
+  if (!infraId || !rollingStock || !origin || !destination) {
+    return null;
   }
-  return null;
+  // Only origin and destination can be null so we can compact and we want to remove any via that would be null
+  const pathItems: PathfindingInput['path_items'] = compact(pathSteps)
+    .filter((step) => !step.isInvalid)
+    .map((step) => getStepLocation(step));
+
+  return {
+    infraId,
+    pathfindingInput: {
+      path_items: pathItems,
+      rolling_stock_is_thermal: isThermal(rollingStock.effort_curves.modes),
+      rolling_stock_loading_gauge: rollingStock.loading_gauge,
+      rolling_stock_supported_electrifications: getSupportedElectrification(
+        rollingStock.effort_curves.modes
+      ),
+      rolling_stock_supported_signaling_systems: rollingStock.supported_signaling_systems,
+      rolling_stock_maximum_speed: rollingStock.max_speed,
+      rolling_stock_length: rollingStock.length,
+    },
+  };
 };
 
 export const upsertPathStepsInOPs = (ops: SuggestedOP[], pathSteps: PathStep[]): SuggestedOP[] => {
