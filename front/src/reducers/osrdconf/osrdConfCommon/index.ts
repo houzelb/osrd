@@ -4,6 +4,7 @@ import { omit } from 'lodash';
 
 import type { ManageTrainSchedulePathProperties } from 'applications/operationalStudies/types';
 import { ArrivalTimeTypes, type StdcmStopTypes } from 'applications/stdcm/types';
+import { matchPathStepAndOp } from 'modules/pathfinding/utils';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import { type InfraStateReducers, buildInfraStateReducers, infraState } from 'reducers/infra';
 import {
@@ -73,10 +74,9 @@ interface CommonConfReducers<S extends OsrdConfState> extends InfraStateReducers
   ['updateGridMarginBefore']: CaseReducer<S, PayloadAction<S['gridMarginBefore']>>;
   ['updateGridMarginAfter']: CaseReducer<S, PayloadAction<S['gridMarginAfter']>>;
   ['updateFeatureInfoClick']: CaseReducer<S, PayloadAction<S['featureInfoClick']>>;
-  ['updatePathSteps']: CaseReducer<
-    S,
-    PayloadAction<{ pathSteps: S['pathSteps']; resetPowerRestrictions?: boolean }>
-  >;
+  ['updatePathSteps']: CaseReducer<S, PayloadAction<S['pathSteps']>>;
+  ['replaceItinerary']: CaseReducer<S, PayloadAction<S['pathSteps']>>;
+  ['reverseItinerary']: CaseReducer<S>;
   ['deleteItinerary']: CaseReducer<S>;
   ['clearVias']: CaseReducer<S>;
   ['deleteVia']: CaseReducer<S, PayloadAction<number>>;
@@ -88,6 +88,7 @@ interface CommonConfReducers<S extends OsrdConfState> extends InfraStateReducers
     reducer: CaseReducer<S, PayloadAction<S['pathSteps']>>;
     prepare: PrepareAction<S['pathSteps']>;
   };
+  ['removeVia']: CaseReducer<S, PayloadAction<SuggestedOP>>;
   ['upsertViaFromSuggestedOP']: CaseReducer<S, PayloadAction<SuggestedOP>>;
   ['upsertSeveralViasFromSuggestedOP']: CaseReducer<S, PayloadAction<SuggestedOP[]>>;
   ['updateRollingStockComfort']: CaseReducer<S, PayloadAction<S['rollingStockComfort']>>;
@@ -176,25 +177,40 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
       const feature = omit(action.payload.feature, ['_vectorTileFeature']);
       state.featureInfoClick = { ...action.payload, feature };
     },
-    updatePathSteps(
-      state: Draft<S>,
-      action: PayloadAction<{ pathSteps: S['pathSteps']; resetPowerRestrictions?: boolean }>
-    ) {
-      state.pathSteps = action.payload.pathSteps;
-      if (action.payload.resetPowerRestrictions) {
-        state.powerRestriction = [];
-      }
+    // update path steps without changing the itinerary (only add vias on the existing pathfinding,
+    // add schedules, margins or power restrictions)
+    updatePathSteps(state: Draft<S>, action: PayloadAction<S['pathSteps']>) {
+      state.pathSteps = action.payload;
     },
     deleteItinerary(state: Draft<S>) {
       state.pathSteps = [null, null];
+      state.powerRestriction = [];
+    },
+    replaceItinerary(state: Draft<S>, action: PayloadAction<S['pathSteps']>) {
+      state.pathSteps = action.payload;
+      state.powerRestriction = [];
+    },
+    reverseItinerary(state: Draft<S>) {
+      state.pathSteps = [...state.pathSteps].reverse();
+      state.powerRestriction = [];
     },
     clearVias(state: Draft<S>) {
       state.pathSteps = [state.pathSteps[0], state.pathSteps[state.pathSteps.length - 1]];
+      state.powerRestriction = [];
+    },
+    // Use this action in the suggested ops list, not the via list
+    removeVia(state: Draft<S>, action: PayloadAction<SuggestedOP>) {
+      // Index takes count of the origin in the array
+      state.pathSteps = state.pathSteps.filter(
+        (step) => !step || matchPathStepAndOp(step, action.payload)
+      );
+      state.powerRestriction = [];
     },
     // Use this action in the via list, not the suggested op list
     deleteVia(state: Draft<S>, action: PayloadAction<number>) {
       // Index takes count of the origin in the array
       state.pathSteps = removeElementAtIndex(state.pathSteps, action.payload + 1);
+      state.powerRestriction = [];
     },
     // Use this action only to via added by click on map
     addVia(
@@ -209,10 +225,12 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
         action.payload.newVia,
         action.payload.pathProperties
       );
+      state.powerRestriction = [];
     },
     moveVia: {
       reducer: (state: Draft<S>, action: PayloadAction<S['pathSteps']>) => {
         state.pathSteps = action.payload;
+        state.powerRestriction = [];
       },
       prepare: (vias: S['pathSteps'], from: number, to: number) => {
         const newVias = Array.from(vias);
@@ -249,6 +267,7 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
           }
         : null;
       state.pathSteps = updateOriginPathStep(state.pathSteps, newPoint, true);
+      state.powerRestriction = [];
     },
     updateDestination(state: Draft<S>, action: PayloadAction<ArrayElement<S['pathSteps']>>) {
       const prevDestinationArrivalType = state.pathSteps.at(-1)?.arrivalType;
@@ -260,6 +279,7 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
           }
         : null;
       state.pathSteps = updateDestinationPathStep(state.pathSteps, newPoint, true);
+      state.powerRestriction = [];
     },
   };
 }

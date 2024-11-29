@@ -11,7 +11,7 @@ export function setPointIti(
   actions: ConfSliceActions,
   pathProperties?: ManageTrainSchedulePathProperties
 ) {
-  const { updateOrigin, updateDestination, addVia, updatePathSteps, updateFeatureInfoClick } =
+  const { updateOrigin, updateDestination, addVia, replaceItinerary, updateFeatureInfoClick } =
     actions;
   const { pathSteps } = store.getState().operationalStudiesConf;
 
@@ -27,9 +27,7 @@ export function setPointIti(
         store.dispatch(addVia({ newVia: pathStep, pathProperties }));
       } else {
         store.dispatch(
-          updatePathSteps({
-            pathSteps: addElementAtIndex(pathSteps, pathSteps.length - 1, pathStep),
-          })
+          replaceItinerary(addElementAtIndex(pathSteps, pathSteps.length - 1, pathStep))
         );
       }
   }

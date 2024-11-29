@@ -189,7 +189,7 @@ const useSetupItineraryForTrainUpdate = (
           const pathSteps = itinerary?.pathSteps;
 
           if (pathSteps) {
-            dispatch(updatePathSteps({ pathSteps }));
+            dispatch(updatePathSteps(pathSteps));
           }
 
           if (itinerary?.pathProperties) {

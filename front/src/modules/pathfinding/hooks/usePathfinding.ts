@@ -241,7 +241,7 @@ export const usePathfinding = (
         return step;
       });
 
-      dispatch(updatePathSteps({ pathSteps: updatedPathSteps }));
+      dispatch(updatePathSteps(updatedPathSteps));
       pathfindingDispatch({ type: 'PATHFINDING_FINISHED' });
       pathfindingDispatch({ type: 'PATHFINDING_PARAM_CHANGED' });
     } else {
@@ -338,7 +338,7 @@ export const usePathfinding = (
                 );
               }
               dispatch(
-                updatePathSteps({ pathSteps: updatedPathSteps, resetPowerRestrictions: true })
+                updatePathSteps(updatedPathSteps)
               );
 
               const allWaypoints = upsertPathStepsInOPs(

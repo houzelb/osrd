@@ -71,7 +71,7 @@ const TypeAndPath = ({ setDisplayTypeAndPath }: TypeAndPathProps) => {
   const { getRollingStockID } = useOsrdConfSelectors();
   const rollingStockId = useSelector(getRollingStockID);
 
-  const { updatePathSteps } = useOsrdConfActions();
+  const { replaceItinerary } = useOsrdConfActions();
 
   const [searchResults, setSearchResults] = useState<SearchResultItemOperationalPoint[]>([]);
   const [searchState, setSearch] = useState('');
@@ -172,7 +172,7 @@ const TypeAndPath = ({ setDisplayTypeAndPath }: TypeAndPathProps) => {
           id: nextId(),
         }));
 
-      dispatch(updatePathSteps({ pathSteps }));
+      dispatch(replaceItinerary(pathSteps));
       setDisplayTypeAndPath(false);
     }
   };

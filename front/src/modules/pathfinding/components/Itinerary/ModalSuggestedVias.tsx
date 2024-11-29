@@ -2,7 +2,6 @@ import { useCallback } from 'react';
 
 import { Dash, Plus, Trash } from '@osrd-project/ui-icons';
 import cx from 'classnames';
-import { compact } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
@@ -10,7 +9,7 @@ import ModalBodySNCF from 'common/BootstrapSNCF/ModalSNCF/ModalBodySNCF';
 import ModalFooterSNCF from 'common/BootstrapSNCF/ModalSNCF/ModalFooterSNCF';
 import ModalHeaderSNCF from 'common/BootstrapSNCF/ModalSNCF/ModalHeaderSNCF';
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
-import { isVia, matchPathStepAndOp } from 'modules/pathfinding/utils';
+import { isVia } from 'modules/pathfinding/utils';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import { useAppDispatch } from 'store';
 import { formatUicToCi } from 'utils/strings';
@@ -20,12 +19,11 @@ type ModalSuggestedViasProps = {
 };
 
 const ModalSuggestedVias = ({ suggestedVias }: ModalSuggestedViasProps) => {
-  const { updatePathSteps, upsertViaFromSuggestedOP, clearVias } = useOsrdConfActions();
-  const { getVias, getDestination, getPathSteps } = useOsrdConfSelectors();
+  const { upsertViaFromSuggestedOP, clearVias, removeVia } = useOsrdConfActions();
+  const { getVias, getDestination } = useOsrdConfSelectors();
   const dispatch = useAppDispatch();
   const vias = useSelector(getVias());
   const destination = useSelector(getDestination);
-  const pathSteps = useSelector(getPathSteps);
   const { t } = useTranslation('operationalStudies/manageTrainSchedule');
 
   const isOriginOrDestination = useCallback(
@@ -34,14 +32,7 @@ const ModalSuggestedVias = ({ suggestedVias }: ModalSuggestedViasProps) => {
     [destination]
   );
 
-  const removeViaFromPath = (op: SuggestedOP) => {
-    const updatedPathSteps = compact(pathSteps).filter((step) => !matchPathStepAndOp(step, op));
-    dispatch(
-      updatePathSteps({
-        pathSteps: updatedPathSteps,
-      })
-    );
-  };
+  const removeViaFromPath = (op: SuggestedOP) => dispatch(removeVia(op));
 
   const formatOP = (op: SuggestedOP, idx: number, idxTrueVia: number) => {
     const isInVias = isVia(vias, op);
