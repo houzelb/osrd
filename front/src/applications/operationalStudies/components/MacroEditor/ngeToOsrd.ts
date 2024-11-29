@@ -2,6 +2,7 @@ import { compact, uniq } from 'lodash';
 
 import {
   osrdEditoastApi,
+  type MacroNodeResponse,
   type SearchResultItemOperationalPoint,
   type TrainScheduleBase,
   type TrainScheduleResult,
@@ -10,7 +11,7 @@ import type { AppDispatch } from 'store';
 import { formatToIsoDate } from 'utils/date';
 import { calculateTimeDifferenceInSeconds, formatDurationAsISO8601 } from 'utils/timeManipulation';
 
-import nodeStore from './nodeStore';
+import type MacroEditorState from './MacroEditorState';
 import { DEFAULT_TRAINRUN_FREQUENCIES, DEFAULT_TRAINRUN_FREQUENCY } from './osrdToNge';
 import type {
   NetzgrafikDto,
@@ -372,28 +373,152 @@ const handleTrainrunOperation = async ({
   }
 };
 
-const handleUpdateNode = (timeTableId: number, node: NodeDto) => {
-  const { betriebspunktName: trigram, positionX, positionY } = node;
-  nodeStore.set(timeTableId, { trigram, positionX, positionY });
+const apiCreateNode = async (
+  state: MacroEditorState,
+  dispatch: AppDispatch,
+  node: Omit<MacroNodeResponse, 'id'>
+) => {
+  try {
+    const createPromise = dispatch(
+      osrdEditoastApi.endpoints.postProjectsByProjectIdStudiesAndStudyIdScenariosScenarioIdMacroNodes.initiate(
+        {
+          projectId: state.scenario.project.id,
+          studyId: state.scenario.study_id,
+          scenarioId: state.scenario.id,
+          macroNodeForm: node,
+        }
+      )
+    );
+    const newNode = await createPromise.unwrap();
+    state.indexNode(newNode, true);
+  } catch (e) {
+    console.error(e);
+  }
 };
 
-const handleNodeOperation = ({
+const apiUpdateNode = async (
+  state: MacroEditorState,
+  dispatch: AppDispatch,
+  node: MacroNodeResponse
+) => {
+  try {
+    await dispatch(
+      osrdEditoastApi.endpoints.putProjectsByProjectIdStudiesAndStudyIdScenariosScenarioIdMacroNodesNodeId.initiate(
+        {
+          projectId: state.scenario.project.id,
+          studyId: state.scenario.study_id,
+          scenarioId: state.scenario.id,
+          nodeId: node.id,
+          macroNodeForm: node,
+        }
+      )
+    );
+    state.indexNode(node, true);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const apiDeleteNode = async (
+  state: MacroEditorState,
+  dispatch: AppDispatch,
+  node: MacroNodeResponse
+) => {
+  try {
+    await dispatch(
+      osrdEditoastApi.endpoints.deleteProjectsByProjectIdStudiesAndStudyIdScenariosScenarioIdMacroNodesNodeId.initiate(
+        {
+          projectId: state.scenario.project.id,
+          studyId: state.scenario.study_id,
+          scenarioId: state.scenario.id,
+          nodeId: node.id,
+        }
+      )
+    );
+    state.deleteNodeByKey(node.path_item_key);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+/**
+ * Cast a NGE node to a node.
+ */
+const castNgeNode = (
+  node: NetzgrafikDto['nodes'][0],
+  labels: NetzgrafikDto['labels']
+): Omit<MacroNodeResponse, 'path_item_key'> => ({
+  id: node.id,
+  trigram: node.betriebspunktName,
+  full_name: node.fullName,
+  connection_time: node.connectionTime,
+  position_x: node.positionX,
+  position_y: node.positionY,
+  labels: node.labelIds
+    .map((id) => {
+      const ngeLabel = labels.find((e) => e.id === id);
+      if (ngeLabel) return ngeLabel.label;
+      return null;
+    })
+    .filter((n) => n !== null) as string[],
+});
+
+const handleNodeOperation = async ({
+  state,
   type,
   node,
-  timeTableId,
+  netzgrafikDto,
+  dispatch,
 }: {
+  state: MacroEditorState;
   type: NGEEvent['type'];
   node: NodeDto;
-  timeTableId: number;
+  netzgrafikDto: NetzgrafikDto;
+  dispatch: AppDispatch;
 }) => {
+  const indexNode = state.getNodeById(node.id);
   switch (type) {
     case 'create':
     case 'update': {
-      handleUpdateNode(timeTableId, node);
+      if (indexNode) {
+        if (indexNode.saved) {
+          // Update the key if trigram has changed and key is based on it
+          let nodeKey = indexNode.node.path_item_key;
+          if (nodeKey.startsWith('trigram:') && indexNode.node.trigram !== node.betriebspunktName) {
+            nodeKey = `trigram:${node.betriebspunktName}`;
+          }
+          await apiUpdateNode(state, dispatch, {
+            ...indexNode.node,
+            ...castNgeNode(node, netzgrafikDto.labels),
+            id: indexNode.node.id,
+            path_item_key: nodeKey,
+          });
+        } else {
+          const newNode = {
+            ...indexNode.node,
+            ...castNgeNode(node, netzgrafikDto.labels),
+          };
+          // Create the node
+          await apiCreateNode(state, dispatch, newNode);
+          // keep track of the ID given by NGE
+          state.nodesIdToKey[node.id] = newNode.path_item_key;
+        }
+      } else {
+        // It's an unknown node, we need to create it in the db
+        // We assume that `betriebspunktName` is a trigram
+        const key = `trigram:${node.betriebspunktName}`;
+        // Create the node
+        await apiCreateNode(state, dispatch, {
+          ...castNgeNode(node, netzgrafikDto.labels),
+          path_item_key: key,
+        });
+        // keep track of the ID given by NGE
+        state.nodesIdToKey[node.id] = key;
+      }
       break;
     }
     case 'delete': {
-      nodeStore.delete(timeTableId, node.betriebspunktName);
+      if (indexNode) await apiDeleteNode(state, dispatch, indexNode.node);
       break;
     }
     default:
@@ -442,6 +567,7 @@ const handleLabelOperation = async ({
 const handleOperation = async ({
   event,
   dispatch,
+  state,
   infraId,
   timeTableId,
   netzgrafikDto,
@@ -450,6 +576,7 @@ const handleOperation = async ({
 }: {
   event: NGEEvent;
   dispatch: AppDispatch;
+  state: MacroEditorState;
   infraId: number;
   timeTableId: number;
   netzgrafikDto: NetzgrafikDto;
@@ -459,7 +586,7 @@ const handleOperation = async ({
   const { type } = event;
   switch (event.objectType) {
     case 'node':
-      handleNodeOperation({ type, node: event.node, timeTableId });
+      await handleNodeOperation({ state, dispatch, netzgrafikDto, type, node: event.node });
       break;
     case 'trainrun': {
       await handleTrainrunOperation({

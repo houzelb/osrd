@@ -1,32 +1,28 @@
-import { compact } from 'lodash';
+import { isNil, uniqBy } from 'lodash';
 
-import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import type {
-  SearchResultItemOperationalPoint,
+  MacroNodeResponse,
   SearchPayload,
   SearchQuery,
-  TrainScheduleResult,
+  SearchResultItemOperationalPoint,
 } from 'common/api/osrdEditoastApi';
+import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import type { AppDispatch } from 'store';
 
-import nodeStore from './nodeStore';
-import { findOpFromPathItem, addDurationToDate } from './utils';
-import type {
-  NodeDto,
-  PortDto,
-  TimeLockDto,
-  TrainrunDto,
-  TrainrunSectionDto,
-  TrainrunCategory,
-  TrainrunFrequency,
-  TrainrunTimeCategory,
-  NetzgrafikDto,
-  LabelDto,
-  LabelGroupDto,
+import MacroEditorState, { type NodeIndex } from './MacroEditorState';
+import { addDurationToDate } from './utils';
+import {
+  type PortDto,
+  type TimeLockDto,
+  type TrainrunSectionDto,
+  type TrainrunCategory,
+  type TrainrunTimeCategory,
+  type TrainrunFrequency,
+  type NetzgrafikDto,
+  type LabelGroupDto,
+  PortAlignment,
 } from '../NGE/types';
-import { PortAlignment } from '../NGE/types';
 
-// TODO: make this optional in NGE since it's SBB-specific
 const TRAINRUN_CATEGORY_HALTEZEITEN = {
   HaltezeitIPV: { haltezeit: 0, no_halt: false },
   HaltezeitA: { haltezeit: 0, no_halt: false },
@@ -129,11 +125,8 @@ const DEFAULT_TIME_LOCK: TimeLockDto = {
  * Build a search query to fetch all operational points from their UICs,
  * trigrams and IDs.
  */
-const buildOpQuery = (
-  infraId: number,
-  trainSchedules: TrainScheduleResult[]
-): SearchPayload | null => {
-  const pathItems = trainSchedules.map((schedule) => schedule.path).flat();
+const buildOpQuery = (state: MacroEditorState): SearchPayload | null => {
+  const pathItems = state.trainSchedules.flatMap((train) => train.path);
   const pathItemQueries = [];
   const pathItemSet = new Set<string>();
   for (const item of pathItems) {
@@ -170,7 +163,7 @@ const buildOpQuery = (
 
   return {
     object: 'operationalpoint',
-    query: ['and', ['=', ['infra_id'], infraId], ['or', ...pathItemQueries]],
+    query: ['and', ['=', ['infra_id'], state.scenario.infra_id], ['or', ...pathItemQueries]],
   };
 };
 
@@ -178,19 +171,26 @@ const buildOpQuery = (
  * Execute the search payload and collect all result pages.
  */
 const executeSearch = async (
-  searchPayload: SearchPayload,
+  state: MacroEditorState,
   dispatch: AppDispatch
 ): Promise<SearchResultItemOperationalPoint[]> => {
+  const searchPayload = buildOpQuery(state);
+  if (!searchPayload) {
+    return [];
+  }
   const pageSize = 100;
   let done = false;
   const searchResults: SearchResultItemOperationalPoint[] = [];
   for (let page = 1; !done; page += 1) {
     const searchPromise = dispatch(
-      osrdEditoastApi.endpoints.postSearch.initiate({
-        page,
-        pageSize,
-        searchPayload,
-      })
+      osrdEditoastApi.endpoints.postSearch.initiate(
+        {
+          page,
+          pageSize,
+          searchPayload,
+        },
+        { track: false }
+      )
     );
     const results = (await searchPromise.unwrap()) as SearchResultItemOperationalPoint[];
     searchResults.push(...results);
@@ -200,150 +200,220 @@ const executeSearch = async (
 };
 
 /**
- * Convert geographic coordinates (latitude/longitude) into screen coordinates
- * (pixels).
+ * Apply a layout on nodes and save the new position.
+ * Nodes that are saved are fixed.
  */
-const convertGeoCoords = (nodes: NodeDto[]) => {
-  const xCoords = nodes.map((node) => node.positionX);
-  const yCoords = nodes.map((node) => node.positionY);
+const applyLayout = (state: MacroEditorState) => {
+  const indexedNodes = uniqBy(
+    state.trainSchedules.flatMap((ts) => ts.path),
+    MacroEditorState.getPathKey
+  ).map((pathItem) => {
+    const key = MacroEditorState.getPathKey(pathItem);
+    return state.getNodeByKey(key)!;
+  });
+
+  const geoNodes = indexedNodes.filter((n) => n.node.geocoord);
+  const xCoords = geoNodes.map((n) => n.node.geocoord!.lng);
+  const yCoords = geoNodes.map((n) => n.node.geocoord!.lat);
   const minX = Math.min(...xCoords);
   const minY = Math.min(...yCoords);
   const maxX = Math.max(...xCoords);
   const maxY = Math.max(...yCoords);
   const width = maxX - minX;
   const height = maxY - minY;
+
   // TODO: grab NGE component size
   const scaleX = 800;
   const scaleY = 500;
   const padding = 0.1;
 
-  for (const node of nodes) {
-    const normalizedX = (node.positionX - minX) / (width || 1);
-    const normalizedY = 1 - (node.positionY - minY) / (height || 1);
-    const paddedX = normalizedX * (1 - 2 * padding) + padding;
-    const paddedY = normalizedY * (1 - 2 * padding) + padding;
-    node.positionX = scaleX * paddedX;
-    node.positionY = scaleY * paddedY;
+  for (const n of indexedNodes) {
+    if (!n.saved && n.node.geocoord !== undefined) {
+      const normalizedX = (n.node.geocoord.lng - minX) / (width || 1);
+      const normalizedY = 1 - (n.node.geocoord.lat - minY) / (height || 1);
+      const paddedX = normalizedX * (1 - 2 * padding) + padding;
+      const paddedY = normalizedY * (1 - 2 * padding) + padding;
+      state.updateNodeDataByKey(n.node.path_item_key, {
+        position_x: Math.round(scaleX * paddedX),
+        position_y: Math.round(scaleY * paddedY),
+      });
+    }
   }
 };
 
-const importTimetable = async (
-  infraId: number,
-  timetableId: number,
+/**
+ * Get nodes of the scenario that are saved in the DB.
+ */
+const apiGetSavedNodes = async (
+  state: MacroEditorState,
   dispatch: AppDispatch
-): Promise<NetzgrafikDto> => {
-  const timetablePromise = dispatch(
-    osrdEditoastApi.endpoints.getTimetableById.initiate({ id: timetableId })
-  );
-  const { train_ids } = await timetablePromise.unwrap();
+): Promise<MacroNodeResponse[]> => {
+  const pageSize = 100;
+  let page = 1;
+  let reachEnd = false;
+  const result: MacroNodeResponse[] = [];
+  while (!reachEnd) {
+    const promise = dispatch(
+      osrdEditoastApi.endpoints.getProjectsByProjectIdStudiesAndStudyIdScenariosScenarioIdMacroNodes.initiate(
+        {
+          projectId: state.scenario.project.id,
+          studyId: state.scenario.study_id,
+          scenarioId: state.scenario.id,
+          pageSize,
+          page,
+        },
+        { forceRefetch: true, subscribe: false }
+      )
+    );
+    // need to unsubscribe on get call to avoid cache issue
+    const { data } = await promise;
+    if (data) result.push(...data.results);
+    reachEnd = isNil(data?.next);
+    page += 1;
+  }
+  return result;
+};
 
-  const trainSchedulesPromise = dispatch(
-    osrdEditoastApi.endpoints.postTrainSchedule.initiate({
-      body: { ids: train_ids },
-    })
-  );
-  const trainSchedules = await trainSchedulesPromise.unwrap();
-
-  const searchPayload = buildOpQuery(infraId, trainSchedules);
-  const searchResults = searchPayload ? await executeSearch(searchPayload, dispatch) : [];
-
-  const resource = {
-    id: 1,
-    capacity: trainSchedules.length,
-  };
-
-  const nodes: NodeDto[] = [];
-  const nodesById = new Map<number, NodeDto>();
-  let nodeId = 0;
-  let nodePositionX = 0;
-  const createNode = ({
-    trigram,
-    fullName,
-    positionX,
-    positionY,
-  }: {
-    trigram?: string;
-    fullName?: string;
-    positionX?: number;
-    positionY?: number;
-  }): NodeDto => {
-    if (positionX === undefined) {
-      positionX = nodePositionX;
-      nodePositionX += 200;
-    }
-
-    const node = {
-      id: nodeId,
-      betriebspunktName: trigram || '',
-      fullName: fullName || '',
-      positionX,
-      positionY: positionY || 0,
-      ports: [],
-      transitions: [],
-      connections: [],
-      resourceId: resource.id,
-      perronkanten: 10,
-      connectionTime: 0,
-      trainrunCategoryHaltezeiten: TRAINRUN_CATEGORY_HALTEZEITEN,
-      symmetryAxis: 0,
-      warnings: [],
-      labelIds: [],
-    };
-
-    nodeId += 1;
-    nodes.push(node);
-    nodesById.set(node.id, node);
-
-    return node;
-  };
-
-  const DTOLabels: LabelDto[] = [];
-  // Create one NGE train run per OSRD train schedule
-  let labelId = 0;
-  const trainruns: TrainrunDto[] = trainSchedules.map((trainSchedule) => {
-    const formatedLabels: (LabelDto | undefined)[] = [];
-    let trainrunFrequency: TrainrunFrequency | undefined;
-    if (trainSchedule.labels) {
-      trainSchedule.labels.forEach((label) => {
-        // Frenquency labels management from OSRD (labels for moment manage 'frequency::30' and 'frequency::120')
-        if (label.includes('frequency')) {
-          const frequency = parseInt(label.split('::')[1], 10);
-          if (!trainrunFrequency || trainrunFrequency.frequency > frequency) {
-            const trainrunFrequencyFind = DEFAULT_TRAINRUN_FREQUENCIES.find(
-              (freq) => freq.frequency === frequency
-            );
-            trainrunFrequency = trainrunFrequencyFind || trainrunFrequency;
-          }
-          return;
+const apiDeleteNode = async (
+  state: MacroEditorState,
+  dispatch: AppDispatch,
+  node: MacroNodeResponse
+) => {
+  try {
+    await dispatch(
+      osrdEditoastApi.endpoints.deleteProjectsByProjectIdStudiesAndStudyIdScenariosScenarioIdMacroNodesNodeId.initiate(
+        {
+          projectId: state.scenario.project.id,
+          studyId: state.scenario.study_id,
+          scenarioId: state.scenario.id,
+          nodeId: node.id,
         }
-        const DTOLabel = DTOLabels.find((DTOlabel) => DTOlabel.label === label);
-        if (DTOLabel) {
-          formatedLabels.push(DTOLabel);
-        } else {
-          const newDTOLabel: LabelDto = {
-            id: labelId,
-            label,
-            labelGroupId: DEFAULT_LABEL_GROUP.id,
-            labelRef: 'Trainrun',
-          };
-          DTOLabels.push(newDTOLabel);
-          labelId += 1;
-          formatedLabels.push(newDTOLabel);
-        }
-      });
-    }
+      )
+    );
+  } catch (e) {
+    console.error(e);
+  }
+};
 
-    return {
-      id: trainSchedule.id,
-      name: trainSchedule.train_name,
-      categoryId: DEFAULT_TRAINRUN_CATEGORY.id,
-      frequencyId: trainrunFrequency?.id || DEFAULT_TRAINRUN_FREQUENCY.id,
-      trainrunTimeCategoryId: DEFAULT_TRAINRUN_TIME_CATEGORY.id,
-      labelIds: compact(formatedLabels).map((label) => label.id),
+/**
+ * Cast a node into NGE format.
+ */
+const castNodeToNge = (
+  state: MacroEditorState,
+  node: NodeIndex['node']
+): NetzgrafikDto['nodes'][0] => {
+  const labelsList = Array.from(state.labels);
+  return {
+    id: node.id,
+    betriebspunktName: node.trigram || '',
+    fullName: node.full_name || '',
+    positionX: node.position_x,
+    positionY: node.position_y,
+    ports: [],
+    transitions: [],
+    connections: [],
+    resourceId: state.ngeResource.id,
+    perronkanten: 10,
+    connectionTime: node.connection_time,
+    trainrunCategoryHaltezeiten: TRAINRUN_CATEGORY_HALTEZEITEN,
+    symmetryAxis: 0,
+    warnings: [],
+    labelIds: (node.labels || []).map((l) => labelsList.findIndex((e) => e === l)),
+  };
+};
+
+/**
+ * Load & index the data of the train schedule for the given scenario
+ */
+export const loadAndIndexNge = async (
+  state: MacroEditorState,
+  dispatch: AppDispatch
+): Promise<void> => {
+  // Load path items
+  let nbNodesIndexed = 0;
+  state.trainSchedules
+    .flatMap((train) => train.path)
+    .forEach((pathItem, index) => {
+      const key = MacroEditorState.getPathKey(pathItem);
+      if (!state.getNodeByKey(key)) {
+        const macroNode = {
+          // negative is just to be sure that the id is not already taken
+          // by a node saved in the DB
+          id: index * -1,
+          path_item_key: key,
+          connection_time: 0,
+          labels: [],
+          // we put the nodes on a grid
+          position_x: (nbNodesIndexed % 8) * 200,
+          position_y: Math.trunc(nbNodesIndexed / 8),
+        };
+        state.indexNode(macroNode);
+        nbNodesIndexed += 1;
+      }
+    });
+
+  // Enhance nodes by calling the search API
+  const searchResults = await executeSearch(state, dispatch);
+  searchResults.forEach((searchResult) => {
+    const macroNode = {
+      fullName: searchResult.name,
+      trigram: searchResult.trigram + (searchResult.ch ? `/${searchResult.ch}` : ''),
+      geocoord: {
+        lng: searchResult.geographic.coordinates[0],
+        lat: searchResult.geographic.coordinates[1],
+      },
     };
+    MacroEditorState.getPathKeys(searchResult).forEach((pathKey) => {
+      state.updateNodeDataByKey(pathKey, macroNode);
+    });
   });
 
-  let portId = 0;
+  // Load saved nodes and update the indexed nodes
+  // If a saved node is not present in the train schedule, we delete it
+  // this can happen if we delete a TS on which a node was saved
+  const savedNodes = await apiGetSavedNodes(state, dispatch);
+  await Promise.all(
+    savedNodes.map(async (n) => {
+      if (state.getNodeByKey(n.path_item_key)) state.updateNodeDataByKey(n.path_item_key, n, true);
+      else await apiDeleteNode(state, dispatch, n);
+    })
+  );
+
+  // Dedup nodes
+  state.dedupNodes();
+
+  // Index trainschedule labels
+  state.trainSchedules.forEach((ts) => {
+    ts.labels?.forEach((l) => {
+      state.labels.add(l);
+    });
+  });
+
+  // Now that we have all nodes, we apply a layout
+  applyLayout(state);
+};
+
+/**
+ * Translate the train schedule in NGE "trainruns".
+ */
+const getNgeTrainruns = (state: MacroEditorState) =>
+  state.trainSchedules.map((trainSchedule) => ({
+    id: trainSchedule.id,
+    name: trainSchedule.train_name,
+    categoryId: DEFAULT_TRAINRUN_CATEGORY.id,
+    frequencyId: DEFAULT_TRAINRUN_FREQUENCY.id,
+    trainrunTimeCategoryId: DEFAULT_TRAINRUN_TIME_CATEGORY.id,
+    labelIds: (trainSchedule.labels || []).map((l) =>
+      Array.from(state.labels).findIndex((e) => e === l)
+    ),
+  }));
+
+/**
+ * Translate the train schedule in NGE "trainrunSection" & "nodes".
+ * It is needed to return the nodes as well, because we add ports & transitions on them
+ */
+const getNgeTrainrunSectionsWithNodes = (state: MacroEditorState) => {
+  let portId = 1;
   const createPort = (trainrunSectionId: number) => {
     const port = {
       id: portId,
@@ -355,7 +425,7 @@ const importTimetable = async (
     return port;
   };
 
-  let transitionId = 0;
+  let transitionId = 1;
   const createTransition = (port1Id: number, port2Id: number) => {
     const transition = {
       id: transitionId,
@@ -367,160 +437,147 @@ const importTimetable = async (
     return transition;
   };
 
+  // Track nge nodes
+  const ngeNodesByPathKey: Record<string, NetzgrafikDto['nodes'][0]> = {};
   let trainrunSectionId = 0;
-  const nodesByOpId = new Map<string, NodeDto>();
-  const trainrunSections: TrainrunSectionDto[] = trainSchedules
-    .map((trainSchedule) => {
-      // Figure out the node ID for each path item
-      const pathNodeIds = trainSchedule.path.map((pathItem) => {
-        const op = findOpFromPathItem(pathItem, searchResults);
-        if (op) {
-          let node = nodesByOpId.get(op.obj_id);
-          if (!node) {
-            node = createNode({
-              trigram: op.trigram + (op.ch ? `/${op.ch}` : ''),
-              fullName: op.name,
-              positionX: op.geographic.coordinates[0],
-              positionY: op.geographic.coordinates[1],
-            });
-            nodesByOpId.set(op.obj_id, node);
-          }
+  const trainrunSections: TrainrunSectionDto[] = state.trainSchedules.flatMap((trainSchedule) => {
+    // Figure out the primary node key for each path item
+    const pathNodeKeys = trainSchedule.path.map((pathItem) => {
+      const node = state.getNodeByKey(MacroEditorState.getPathKey(pathItem));
+      return node!.node.path_item_key;
+    });
 
-          return node.id;
-        }
+    const startTime = new Date(trainSchedule.start_time);
+    const createTimeLock = (time: Date): TimeLockDto => ({
+      time: time.getMinutes(),
+      // getTime() is in milliseconds, consecutiveTime is in minutes
+      consecutiveTime: (time.getTime() - startTime.getTime()) / (60 * 1000),
+      lock: false,
+      warning: null,
+      timeFormatter: null,
+    });
 
-        let trigram: string | undefined;
-        if ('trigram' in pathItem) {
-          trigram = pathItem.trigram;
-          if (pathItem.secondary_code) {
-            trigram += `/${pathItem.secondary_code}`;
-          }
-        }
-
-        const node = createNode({ trigram });
-        return node.id;
-      });
-
-      const startTime = new Date(trainSchedule.start_time);
-      const createTimeLock = (time: Date): TimeLockDto => ({
-        time: time.getMinutes(),
-        // getTime() is in milliseconds, consecutiveTime is in minutes
-        consecutiveTime: (time.getTime() - startTime.getTime()) / (60 * 1000),
-        lock: false,
-        warning: null,
-        timeFormatter: null,
-      });
-
-      // OSRD describes the path in terms of nodes, NGE describes it in terms
-      // of sections between nodes. Iterate over path items two-by-two to
-      // convert them.
-      let prevPort: PortDto | null = null;
-      return pathNodeIds.slice(0, -1).map((sourceNodeId, i) => {
-        const targetNodeId = pathNodeIds[i + 1];
-
-        const sourcePort = createPort(trainrunSectionId);
-        const targetPort = createPort(trainrunSectionId);
-
-        const sourceNode = nodesById.get(sourceNodeId)!;
-        const targetNode = nodesById.get(targetNodeId)!;
-        sourceNode.ports.push(sourcePort);
-        targetNode.ports.push(targetPort);
-
-        const sourceScheduleEntry = trainSchedule.schedule!.find(
-          (entry) => entry.at === trainSchedule.path[i].id
+    // OSRD describes the path in terms of nodes, NGE describes it in terms
+    // of sections between nodes. Iterate over path items two-by-two to
+    // convert them.
+    let prevPort: PortDto | null = null;
+    return pathNodeKeys.slice(0, -1).map((sourceNodeKey, i) => {
+      // Get the source node or created it
+      if (!ngeNodesByPathKey[sourceNodeKey]) {
+        ngeNodesByPathKey[sourceNodeKey] = castNodeToNge(
+          state,
+          state.getNodeByKey(sourceNodeKey)!.node
         );
-        const targetScheduleEntry = trainSchedule.schedule!.find(
-          (entry) => entry.at === trainSchedule.path[i + 1].id
+      }
+      const sourceNode = ngeNodesByPathKey[sourceNodeKey];
+
+      // Get the target node or created it
+      const targetNodeKey = pathNodeKeys[i + 1];
+      if (!ngeNodesByPathKey[targetNodeKey]) {
+        ngeNodesByPathKey[targetNodeKey] = castNodeToNge(
+          state,
+          state.getNodeByKey(targetNodeKey)!.node
         );
+      }
+      const targetNode = ngeNodesByPathKey[targetNodeKey];
 
-        // Create a transition between the previous section and the one we're
-        // creating
-        if (prevPort) {
-          const transition = createTransition(prevPort.id, sourcePort.id);
-          transition.isNonStopTransit = !sourceScheduleEntry?.stop_for;
-          sourceNode.transitions.push(transition);
-        }
-        prevPort = targetPort;
+      // Adding port
+      const sourcePort = createPort(trainrunSectionId);
+      sourceNode.ports.push(sourcePort);
+      const targetPort = createPort(trainrunSectionId);
+      targetNode.ports.push(targetPort);
 
-        let sourceDeparture = { ...DEFAULT_TIME_LOCK };
-        if (i === 0) {
-          sourceDeparture = createTimeLock(startTime);
-        } else if (sourceScheduleEntry && sourceScheduleEntry.arrival) {
-          sourceDeparture = createTimeLock(
-            addDurationToDate(
-              addDurationToDate(startTime, sourceScheduleEntry.arrival),
-              sourceScheduleEntry.stop_for || 'P0D'
-            )
-          );
-        }
+      // Adding schedule
+      const sourceScheduleEntry = trainSchedule.schedule!.find(
+        (entry) => entry.at === trainSchedule.path[i].id
+      );
+      const targetScheduleEntry = trainSchedule.schedule!.find(
+        (entry) => entry.at === trainSchedule.path[i + 1].id
+      );
 
-        let targetArrival = { ...DEFAULT_TIME_LOCK };
-        if (targetScheduleEntry && targetScheduleEntry.arrival) {
-          targetArrival = createTimeLock(addDurationToDate(startTime, targetScheduleEntry.arrival));
-        }
+      // Create a transition between the previous section and the one we're creating
+      if (prevPort) {
+        const transition = createTransition(prevPort.id, sourcePort.id);
+        transition.isNonStopTransit = !sourceScheduleEntry?.stop_for;
+        sourceNode.transitions.push(transition);
+      }
+      prevPort = targetPort;
 
-        const travelTime = { ...DEFAULT_TIME_LOCK };
-        if (targetArrival.consecutiveTime !== null && sourceDeparture.consecutiveTime !== null) {
-          travelTime.time = targetArrival.consecutiveTime - sourceDeparture.consecutiveTime;
-          travelTime.consecutiveTime = travelTime.time;
-        }
+      let sourceDeparture = { ...DEFAULT_TIME_LOCK };
+      if (i === 0) {
+        sourceDeparture = createTimeLock(startTime);
+      } else if (sourceScheduleEntry && sourceScheduleEntry.arrival) {
+        sourceDeparture = createTimeLock(
+          addDurationToDate(
+            addDurationToDate(startTime, sourceScheduleEntry.arrival),
+            sourceScheduleEntry.stop_for || 'P0D'
+          )
+        );
+      }
 
-        const trainrunSection = {
-          id: trainrunSectionId,
-          sourceNodeId,
-          sourcePortId: sourcePort.id,
-          targetNodeId,
-          targetPortId: targetPort.id,
-          travelTime,
-          sourceDeparture,
-          sourceArrival: { ...DEFAULT_TIME_LOCK },
-          targetDeparture: { ...DEFAULT_TIME_LOCK },
-          targetArrival,
-          numberOfStops: 0,
-          trainrunId: trainSchedule.id,
-          resourceId: resource.id,
-          path: {
-            path: [],
-            textPositions: [],
-          },
-          specificTrainrunSectionFrequencyId: 0,
-          warnings: [],
-        };
-        trainrunSectionId += 1;
+      let targetArrival = { ...DEFAULT_TIME_LOCK };
+      if (targetScheduleEntry && targetScheduleEntry.arrival) {
+        targetArrival = createTimeLock(addDurationToDate(startTime, targetScheduleEntry.arrival));
+      }
 
-        return trainrunSection;
-      });
-    })
-    .flat();
+      const travelTime = { ...DEFAULT_TIME_LOCK };
+      if (targetArrival.consecutiveTime !== null && sourceDeparture.consecutiveTime !== null) {
+        travelTime.time = targetArrival.consecutiveTime - sourceDeparture.consecutiveTime;
+        travelTime.consecutiveTime = travelTime.time;
+      }
 
-  convertGeoCoords([...nodesByOpId.values()]);
+      const trainrunSection = {
+        id: trainrunSectionId,
+        sourceNodeId: sourceNode.id,
+        sourcePortId: sourcePort.id,
+        targetNodeId: targetNode.id,
+        targetPortId: targetPort.id,
+        travelTime,
+        sourceDeparture,
+        sourceArrival: { ...DEFAULT_TIME_LOCK },
+        targetDeparture: { ...DEFAULT_TIME_LOCK },
+        targetArrival,
+        numberOfStops: 0,
+        trainrunId: trainSchedule.id,
+        resourceId: state.ngeResource.id,
+        path: {
+          path: [],
+          textPositions: [],
+        },
+        specificTrainrunSectionFrequencyId: 0,
+        warnings: [],
+      };
 
-  // eslint-disable-next-line no-restricted-syntax
-  for (const node of nodes) {
-    // eslint-disable-next-line no-continue
-    if (!node.betriebspunktName) continue;
-    const savedNode = nodeStore.get(timetableId, node.betriebspunktName);
-    if (savedNode) {
-      node.positionX = savedNode.positionX;
-      node.positionY = savedNode.positionY;
-    }
-  }
+      trainrunSectionId += 1;
+      return trainrunSection;
+    });
+  });
 
   return {
-    ...DEFAULT_DTO,
-    labels: DTOLabels,
-    labelGroups: [DEFAULT_LABEL_GROUP],
-    resources: [resource],
-    metadata: {
-      netzgrafikColors: [],
-      trainrunCategories: [DEFAULT_TRAINRUN_CATEGORY],
-      trainrunFrequencies: DEFAULT_TRAINRUN_FREQUENCIES,
-      trainrunTimeCategories: [DEFAULT_TRAINRUN_TIME_CATEGORY],
-    },
-    nodes,
-    trainruns,
     trainrunSections,
+    nodes: Object.values(ngeNodesByPathKey),
   };
 };
 
-export default importTimetable;
+/**
+ * Return a compatible object for NGE
+ */
+export const getNgeDto = (state: MacroEditorState): NetzgrafikDto => ({
+  ...DEFAULT_DTO,
+  labels: Array.from(state.labels).map((l, i) => ({
+    id: i,
+    label: l,
+    labelGroupId: DEFAULT_LABEL_GROUP.id,
+    labelRef: 'Trainrun',
+  })),
+  labelGroups: [DEFAULT_LABEL_GROUP],
+  resources: [state.ngeResource],
+  metadata: {
+    netzgrafikColors: [],
+    trainrunCategories: [DEFAULT_TRAINRUN_CATEGORY],
+    trainrunFrequencies: [DEFAULT_TRAINRUN_FREQUENCY],
+    trainrunTimeCategories: [DEFAULT_TRAINRUN_TIME_CATEGORY],
+  },
+  trainruns: getNgeTrainruns(state),
+  ...getNgeTrainrunSectionsWithNodes(state),
+});

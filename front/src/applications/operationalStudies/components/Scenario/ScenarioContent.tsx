@@ -1,12 +1,16 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { ChevronRight } from '@osrd-project/ui-icons';
 import cx from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { GiElectric } from 'react-icons/gi';
 
+import MacroEditorState from 'applications/operationalStudies/components/MacroEditor/MacroEditorState';
 import handleOperation from 'applications/operationalStudies/components/MacroEditor/ngeToOsrd';
-import importTimetableToNGE from 'applications/operationalStudies/components/MacroEditor/osrdToNge';
+import {
+  loadAndIndexNge,
+  getNgeDto,
+} from 'applications/operationalStudies/components/MacroEditor/osrdToNge';
 import MicroMacroSwitch from 'applications/operationalStudies/components/MicroMacroSwitch';
 import NGE from 'applications/operationalStudies/components/NGE/NGE';
 import type { NetzgrafikDto, NGEEvent } from 'applications/operationalStudies/components/NGE/types';
@@ -72,6 +76,7 @@ const ScenarioContent = ({
     [setIsMacro, setCollapsedTimetable]
   );
 
+  const macroEditorState = useRef<MacroEditorState>();
   const [ngeDto, setNgeDto] = useState<NetzgrafikDto>();
   const [ngeUpsertedTrainSchedules, setNgeUpsertedTrainSchedules] = useState<
     Map<number, TrainScheduleResult>
@@ -84,11 +89,14 @@ const ScenarioContent = ({
     }
 
     const doImport = async () => {
-      const dto = await importTimetableToNGE(scenario.infra_id, scenario.timetable_id, dispatch);
+      const state = new MacroEditorState(scenario, trainSchedules || []);
+      await loadAndIndexNge(state, dispatch);
+      const dto = getNgeDto(state);
+      macroEditorState.current = state;
       setNgeDto(dto);
     };
     doImport();
-  }, [scenario, isMacro]);
+  }, [scenario, isMacro, trainSchedules]);
 
   useEffect(() => {
     if (isMacro) {
@@ -105,6 +113,7 @@ const ScenarioContent = ({
   const handleNGEOperation = (event: NGEEvent, netzgrafikDto: NetzgrafikDto) =>
     handleOperation({
       event,
+      state: macroEditorState.current!,
       dispatch,
       infraId: infra.id,
       timeTableId: scenario.timetable_id,
