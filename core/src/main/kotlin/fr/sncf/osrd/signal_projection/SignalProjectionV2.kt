@@ -277,6 +277,11 @@ private fun signalUpdates(
         for (i in 0 until events.size - 1) {
             val event = events[i]
             val nextEvent = events[i + 1]
+
+            if (listOf("VL", "300VL").contains(event.newAspect)) {
+                continue
+            }
+
             signalUpdates.add(
                 SignalUpdate(
                     physicalSignalName!!,
