@@ -47,14 +47,13 @@ const StdcmLinkedPathSearch = ({
   return (
     <div className={`stdcm-linked-path-search-container ${className}`}>
       {!displayLinkedPathSearch ? (
-        <div tabIndex={0} role="button" onClick={() => setShowLinkedPathSearch(true)}>
-          <StdcmDefaultCard
-            disabled={disabled}
-            text={defaultCardText}
-            Icon={cardIcon}
-            className="add-linked-path"
-          />
-        </div>
+        <StdcmDefaultCard
+          disabled={disabled}
+          text={defaultCardText}
+          Icon={cardIcon}
+          className="add-linked-path"
+          onClick={() => setShowLinkedPathSearch(true)}
+        />
       ) : (
         <StdcmCard
           disabled={disabled}
