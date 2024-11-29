@@ -49,8 +49,6 @@ const useStaticPathfinding = (infra?: InfraWithState) => {
       const payload = getPathfindingQuery({
         infraId: infra.id,
         rollingStock,
-        origin: pathStepsLocations.at(0) || null,
-        destination: pathStepsLocations.at(-1) || null,
         pathSteps: pathStepsLocations,
       });
 

@@ -190,8 +190,6 @@ export const usePathfinding = (
     return getPathfindingQuery({
       infraId,
       rollingStock,
-      origin,
-      destination,
       pathSteps: filteredPathSteps,
     });
   };
