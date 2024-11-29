@@ -59,16 +59,14 @@ export const matchPathStepAndOp = (
 export const getPathfindingQuery = ({
   infraId,
   rollingStock,
-  origin,
-  destination,
   pathSteps,
 }: {
   infraId?: number;
   rollingStock?: RollingStockWithLiveries;
-  origin: PathStep | null;
-  destination: PathStep | null;
   pathSteps: (PathStep | null)[];
 }): PostInfraByInfraIdPathfindingBlocksApiArg | null => {
+  const origin = pathSteps.at(0);
+  const destination = pathSteps.at(-1);
   if (infraId && rollingStock && origin && destination) {
     // Only origin and destination can be null so we can compact and we want to remove any via that would be null
     const pathItems: PathfindingInput['path_items'] = compact(pathSteps).map((step) =>
