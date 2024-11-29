@@ -88,7 +88,7 @@ const TimesStopsInput = ({ allWaypoints, startTime, pathSteps }: TimesStopsInput
       }
       return step;
     });
-    dispatch(updatePathSteps({ pathSteps: updatedPathSteps }));
+    dispatch(updatePathSteps(updatedPathSteps));
   };
 
   const onChange = useCallback(

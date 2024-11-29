@@ -37,7 +37,7 @@ const Itinerary = ({
   shouldManageStopDuration,
 }: ItineraryProps) => {
   const { getPathSteps, getOrigin, getDestination, getPowerRestriction } = useOsrdConfSelectors();
-  const { updatePathSteps } = useOsrdConfActions();
+  const { reverseItinerary, deleteItinerary } = useOsrdConfActions();
   const origin = useSelector(getOrigin);
   const destination = useSelector(getDestination);
   const pathSteps = useSelector(getPathSteps);
@@ -80,15 +80,14 @@ const Itinerary = ({
   };
 
   const inverseOD = () => {
-    const revertedPathSteps = [...pathSteps].reverse();
     notifyRestrictionResetWarning();
-    dispatch(updatePathSteps({ pathSteps: revertedPathSteps, resetPowerRestrictions: true }));
+    dispatch(reverseItinerary());
   };
 
   const resetPathfinding = () => {
     setPathProperties(undefined);
     notifyRestrictionResetWarning();
-    dispatch(updatePathSteps({ pathSteps: [null, null], resetPowerRestrictions: true }));
+    dispatch(deleteItinerary());
   };
 
   useEffect(() => {
