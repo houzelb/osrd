@@ -3,6 +3,7 @@ package fr.sncf.osrd.stdcm.graph
 import fr.sncf.osrd.api.pathfinding.makePathProps
 import fr.sncf.osrd.envelope.OverlayEnvelopeBuilder
 import fr.sncf.osrd.envelope.part.ConstrainedEnvelopePartBuilder
+import fr.sncf.osrd.envelope.part.EnvelopePart
 import fr.sncf.osrd.envelope.part.EnvelopePartBuilder
 import fr.sncf.osrd.envelope.part.constraints.EnvelopeConstraint
 import fr.sncf.osrd.envelope.part.constraints.EnvelopePartConstraintType
@@ -16,6 +17,7 @@ import fr.sncf.osrd.envelope_sim_infra.EnvelopeTrainPath
 import fr.sncf.osrd.envelope_sim_infra.computeMRSP
 import fr.sncf.osrd.graph.PathfindingEdgeRangeId
 import fr.sncf.osrd.reporting.exceptions.OSRDError
+import fr.sncf.osrd.utils.SelfTypeHolder
 import fr.sncf.osrd.utils.units.meters
 import fr.sncf.osrd.utils.units.sumDistances
 import java.util.*
@@ -72,6 +74,10 @@ class EngineeringAllowanceManager(private val graph: STDCMGraph) {
      * actual simulations.
      */
     private fun getSlowestRunningTime(edges: List<STDCMEdge>): Double {
+        // We compute the slowest possible envelope: start at the fixed speed,
+        // then brake fully, then accelerate fully until reaching the fixed end speed.
+
+        // Fetch path data
         val beginSpeed = edges.first().beginSpeed
         val endSpeed = edges.last().endSpeed
         val blockRanges =
@@ -94,7 +100,9 @@ class EngineeringAllowanceManager(private val graph: STDCMGraph) {
             )
         val envelopePath = EnvelopeTrainPath.from(graph.rawInfra, pathProperties)
         val context = build(graph.rollingStock, envelopePath, graph.timeStep, graph.comfort)
+
         try {
+            // Compute max speed envelope, without any slowing down
             val maxSpeedEnvelope = MaxSpeedEnvelope.from(context, DoubleArray(0), mrsp)
             val maxEffort = MaxEffortEnvelope.from(context, beginSpeed, maxSpeedEnvelope)
             if (maxEffort.none { it.hasAttr(EnvelopeProfile.CONSTANT_SPEED) }) {
@@ -102,6 +110,7 @@ class EngineeringAllowanceManager(private val graph: STDCMGraph) {
             }
             if (beginSpeed == 0.0 || endSpeed == 0.0) return Double.POSITIVE_INFINITY
 
+            // Compute the speedup part to reach the end speed
             val speedupPartBuilder = EnvelopePartBuilder()
             speedupPartBuilder.setAttr(EnvelopeProfile.ACCELERATING)
             val overlayBuilder =
@@ -118,9 +127,34 @@ class EngineeringAllowanceManager(private val graph: STDCMGraph) {
                 -1.0
             )
             val builder = OverlayEnvelopeBuilder.backward(maxEffort)
-            if (speedupPartBuilder.stepCount() > 1) builder.addPart(speedupPartBuilder.build())
+            if (speedupPartBuilder.stepCount() > 1) {
+                val speedupPart = speedupPartBuilder.build()
+                builder.addPart(speedupPart)
+                val lastAccelerationPosition = speedupPart.beginPos
+                if (lastAccelerationPosition > 0.0) {
+                    // The acceleration part reach 0 speed
+                    // Envelope looks like this:
+                    //
+                    // _________   x
+                    //            /
+                    //           /
+                    //          /
+                    // We need to set the first constant speed part to 0
+                    // so that we can use it as floor constraint
+                    builder.addPart(
+                        EnvelopePart.generateTimes(
+                            mutableListOf<SelfTypeHolder?>(
+                                EnvelopeProfile.CONSTANT_SPEED,
+                            ),
+                            doubleArrayOf(0.0, lastAccelerationPosition),
+                            doubleArrayOf(1e-5, 1e-5) // >0 to avoid NaN time delta
+                        )
+                    )
+                }
+            }
             val withSpeedup = builder.build()
 
+            // Add slowdown part
             val slowdownPartBuilder = EnvelopePartBuilder()
             slowdownPartBuilder.setAttr(EnvelopeProfile.BRAKING)
             val slowdownOverlayBuilder =
@@ -130,13 +164,14 @@ class EngineeringAllowanceManager(private val graph: STDCMGraph) {
                     EnvelopeConstraint(withSpeedup, EnvelopePartConstraintType.FLOOR)
                 )
             EnvelopeDeceleration.decelerate(context, 0.0, beginSpeed, slowdownOverlayBuilder, 1.0)
-            val slowdownBuilder = OverlayEnvelopeBuilder.backward(withSpeedup)
+            val slowdownBuilder = OverlayEnvelopeBuilder.forward(withSpeedup)
             if (slowdownPartBuilder.stepCount() > 1)
                 slowdownBuilder.addPart(slowdownPartBuilder.build())
             val slowestEnvelope = slowdownBuilder.build()
-            if (slowestEnvelope.minSpeed == 0.0) return Double.POSITIVE_INFINITY
+            if (slowestEnvelope.minSpeed <= 1.0) return Double.POSITIVE_INFINITY
             return slowestEnvelope.totalTime
         } catch (e: OSRDError) {
+            // We can be pessimistic: simulation error = no allowance
             return 0.0
         }
     }
