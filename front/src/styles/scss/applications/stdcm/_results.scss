@@ -1,6 +1,6 @@
 .stdcm-results {
   background-color: rgb(233, 239, 242);
-  padding: 29px 30px 32px 32px;
+  padding: 29px 32px 32px;
   position: relative;
 
   .simulation-navigator {
@@ -138,18 +138,17 @@
 
   .simulation-results {
     display: flex;
-    justify-content: space-between;
 
     .results-and-sheet {
       display: flex;
       flex-direction: column;
-      width: 70%;
 
       .table-container::-webkit-scrollbar {
         display: none; /* Safari and Chrome */
       }
 
       .table-container {
+        width: 804px;
         margin-right: 32px;
 
         .table-results {
@@ -172,6 +171,9 @@
             padding-bottom: 5px;
             vertical-align: middle;
           }
+          .head-stop {
+            text-align: center;
+          }
           th:last-child {
             text-transform: none;
           }
@@ -190,20 +192,23 @@
             vertical-align: middle;
           }
           .index {
-            padding-left: 32px;
+            width: 64px;
+            text-align: end;
+            padding-right: 24px;
           }
-          .pr {
-            padding-right: 199px;
+          .name {
+            width: 232px;
           }
           .ch {
-            padding-right: 36px;
+            width: 56px;
           }
           .stop {
             font-size: 0.875rem;
             font-weight: 600;
             color: rgb(0, 0, 0);
             line-height: 20px;
-            width: 75px;
+            width: 72px;
+            text-align: center;
           }
           .stop-with-duration {
             font-size: 0.875rem;
@@ -216,13 +221,17 @@
             text-align: center;
           }
           .weight {
-            padding-left: 33px;
-            color: '#797671';
+            width: 128px;
+            padding-left: 40px;
 
             &.lastStep {
               color: '#797671';
             }
           }
+          .ref {
+            width: 108px;
+          }
+
           .semi-bold-output {
             font-weight: 600;
           }
@@ -323,19 +332,19 @@
     }
 
     .simulation-failure {
-      text-align: left;
-      letter-spacing: 0;
       display: flex;
       flex-direction: column;
+      flex-shrink: 0;
+      width: 836px;
       min-height: 168px;
-      width: 70%;
+      text-align: left;
+      letter-spacing: 0;
       color: var(--grey80);
 
       .title {
         color: rgba(33, 100, 130, 1);
         font-size: 1.5rem;
         font-weight: 600;
-        font-style: SemiBold;
         line-height: 32px;
         margin-bottom: 7px;
       }
@@ -351,11 +360,11 @@
     }
 
     .map-results {
+      flex-grow: 1;
       position: sticky;
       top: 0;
       width: 40%;
       height: 540px;
-      margin-right: 32px;
       border-radius: 8px;
       border: 1px solid rgba(255, 255, 255, 1);
       box-shadow:
