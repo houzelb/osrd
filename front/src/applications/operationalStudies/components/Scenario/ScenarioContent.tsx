@@ -1,11 +1,10 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 import { ChevronRight } from '@osrd-project/ui-icons';
 import cx from 'classnames';
 import { useTranslation } from 'react-i18next';
 
 import handleOperation from 'applications/operationalStudies/components/MacroEditor/ngeToOsrd';
-import importTimetableToNGE from 'applications/operationalStudies/components/MacroEditor/osrdToNge';
 import MicroMacroSwitch from 'applications/operationalStudies/components/MicroMacroSwitch';
 import NGE from 'applications/operationalStudies/components/NGE/NGE';
 import type { NetzgrafikDto, NGEEvent } from 'applications/operationalStudies/components/NGE/types';
@@ -14,6 +13,10 @@ import useScenarioData from 'applications/operationalStudies/hooks/useScenarioDa
 import ImportTrainSchedule from 'applications/operationalStudies/views/ImportTrainSchedule';
 import ManageTrainSchedule from 'applications/operationalStudies/views/ManageTrainSchedule';
 import SimulationResults from 'applications/operationalStudies/views/SimulationResults';
+import {
+  loadAndIndexNge,
+  getNgeDto,
+} from 'applications/operationalStudies/components/MacroEditor/osrdToNge';
 import type {
   InfraWithState,
   ScenarioResponse,
@@ -26,6 +29,7 @@ import Timetable from 'modules/trainschedule/components/Timetable/Timetable';
 import { useAppDispatch } from 'store';
 
 import ScenarioDescription from './ScenarioDescription';
+import MacroEditorState from '../MacroEditor/MacroEditorState';
 
 type ScenarioDescriptionProps = {
   scenario: ScenarioResponse;
@@ -59,11 +63,14 @@ const ScenarioContent = ({
     upsertTrainSchedules,
     removeTrains,
   } = useScenarioData(scenario, timetable, infra);
-
+  const macroEditorState = useRef<MacroEditorState>();
   const [ngeDto, setNgeDto] = useState<NetzgrafikDto>();
 
   const dtoImport = async () => {
-    const dto = await importTimetableToNGE(scenario.infra_id, scenario.timetable_id, dispatch);
+    const state = new MacroEditorState(scenario, trainSchedules || []);
+    await loadAndIndexNge(state, dispatch);
+    const dto = getNgeDto(state);
+    macroEditorState.current = state;
     setNgeDto(dto);
   };
 
@@ -86,6 +93,7 @@ const ScenarioContent = ({
   const handleNGEOperation = (event: NGEEvent, netzgrafikDto: NetzgrafikDto) => {
     handleOperation({
       event,
+      state: macroEditorState.current!,
       dispatch,
       infraId: infra.id,
       timeTableId: scenario.timetable_id,

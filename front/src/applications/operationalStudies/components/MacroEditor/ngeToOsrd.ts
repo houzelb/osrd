@@ -10,8 +10,10 @@ import type { AppDispatch } from 'store';
 import { formatToIsoDate } from 'utils/date';
 import { calculateTimeDifferenceInSeconds, formatDurationAsISO8601 } from 'utils/timeManipulation';
 
-import nodeStore from './nodeStore';
+import type MacroEditorState from './MacroEditorState';
+import type { NodeIndexed } from './MacroEditorState';
 import { DEFAULT_TRAINRUN_FREQUENCIES, DEFAULT_TRAINRUN_FREQUENCY } from './osrdToNge';
+import { createMacroNode, deleteMacroNodeByNgeId, updateMacroNode } from './utils';
 import type {
   NetzgrafikDto,
   NGEEvent,
@@ -375,28 +377,85 @@ const handleTrainrunOperation = async ({
   }
 };
 
-const handleUpdateNode = (timeTableId: number, node: NodeDto) => {
-  const { betriebspunktName: trigram, positionX, positionY } = node;
-  nodeStore.set(timeTableId, { trigram, positionX, positionY });
-};
+/**
+ * Cast a NGE node to a node.
+ */
+const castNgeNode = (
+  node: NetzgrafikDto['nodes'][0],
+  labels: NetzgrafikDto['labels']
+): Omit<NodeIndexed, 'path_item_key' | 'dbId'> => ({
+  ngeId: node.id,
+  trigram: node.betriebspunktName,
+  full_name: node.fullName,
+  connection_time: node.connectionTime,
+  position_x: node.positionX,
+  position_y: node.positionY,
+  labels: node.labelIds
+    .map((id) => {
+      const ngeLabel = labels.find((e) => e.id === id);
+      if (ngeLabel) return ngeLabel.label;
+      return null;
+    })
+    .filter((n) => n !== null) as string[],
+});
 
-const handleNodeOperation = ({
+const handleNodeOperation = async ({
+  state,
   type,
   node,
-  timeTableId,
+  netzgrafikDto,
+  dispatch,
 }: {
+  state: MacroEditorState;
   type: NGEEvent['type'];
   node: NodeDto;
-  timeTableId: number;
+  netzgrafikDto: NetzgrafikDto;
+  dispatch: AppDispatch;
 }) => {
+  const indexNode = state.getNodeByNgeId(node.id);
   switch (type) {
     case 'create':
     case 'update': {
-      handleUpdateNode(timeTableId, node);
+      if (indexNode) {
+        if (indexNode.dbId) {
+          // Update the key if trigram has changed and key is based on it
+          let nodeKey = indexNode.path_item_key;
+          if (nodeKey.startsWith('trigram:') && indexNode.trigram !== node.betriebspunktName) {
+            nodeKey = `trigram:${node.betriebspunktName}`;
+          }
+          await updateMacroNode(state, dispatch, {
+            ...indexNode,
+            ...castNgeNode(node, netzgrafikDto.labels),
+            dbId: indexNode.dbId,
+            path_item_key: nodeKey,
+          });
+        } else {
+          const newNode = {
+            ...indexNode,
+            ...castNgeNode(node, netzgrafikDto.labels),
+          };
+          // Create the node
+          await createMacroNode(state, dispatch, newNode, node.id);
+        }
+      } else {
+        // It's an unknown node, we need to create it in the db
+        // We assume that `betriebspunktName` is a trigram
+        const key = `trigram:${node.betriebspunktName}`;
+        // Create the node
+        await createMacroNode(
+          state,
+          dispatch,
+          {
+            ...castNgeNode(node, netzgrafikDto.labels),
+            path_item_key: key,
+          },
+          node.id
+        );
+      }
       break;
     }
     case 'delete': {
-      nodeStore.delete(timeTableId, node.betriebspunktName);
+      if (indexNode) await deleteMacroNodeByNgeId(state, dispatch, node.id);
       break;
     }
     default:
@@ -445,6 +504,7 @@ const handleLabelOperation = async ({
 const handleOperation = async ({
   event,
   dispatch,
+  state,
   infraId,
   timeTableId,
   netzgrafikDto,
@@ -453,6 +513,7 @@ const handleOperation = async ({
 }: {
   event: NGEEvent;
   dispatch: AppDispatch;
+  state: MacroEditorState;
   infraId: number;
   timeTableId: number;
   netzgrafikDto: NetzgrafikDto;
@@ -462,7 +523,7 @@ const handleOperation = async ({
   const { type } = event;
   switch (event.objectType) {
     case 'node':
-      handleNodeOperation({ type, node: event.node, timeTableId });
+      await handleNodeOperation({ state, dispatch, netzgrafikDto, type, node: event.node });
       break;
     case 'trainrun': {
       await handleTrainrunOperation({
