@@ -39,9 +39,9 @@ const StcdmResultsTable = ({
             <th aria-label="line-count" />
             <th>{t('operationalPoint')}</th>
             <th>{t('code')}</th>
-            <th>{t('endStop')}</th>
-            <th>{t('passageStop')}</th>
-            <th>{t('startStop')}</th>
+            <th className="head-stop">{t('endStop')}</th>
+            <th className="head-stop">{t('passageStop')}</th>
+            <th className="head-stop">{t('startStop')}</th>
             <th className="weight">{t('weight')}</th>
             <th>{t('refEngine')}</th>
           </tr>
@@ -76,7 +76,7 @@ const StcdmResultsTable = ({
                   >
                     {index + 1}
                   </td>
-                  <td style={{ color: 'rgb(49, 46, 43)' }}>
+                  <td className="name" style={{ color: 'rgb(49, 46, 43)' }}>
                     {isNotExtremity &&
                     !isRequestedPathStep &&
                     step.name === prevStep.name &&
@@ -112,7 +112,7 @@ const StcdmResultsTable = ({
                   <td className="weight" style={{ color: !isFirstStep ? '#797671' : '#312E2B' }}>
                     {isNotExtremity ? '=' : `${Math.floor(mass)}t`}
                   </td>
-                  <td style={{ color: !isFirstStep ? '#797671' : '#312E2B' }}>
+                  <td className="ref" style={{ color: !isFirstStep ? '#797671' : '#312E2B' }}>
                     {isNotExtremity ? '=' : stdcmData.rollingStock.metadata?.reference}
                   </td>
                 </tr>
