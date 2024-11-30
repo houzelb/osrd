@@ -45,6 +45,8 @@ interface RawSignalingInfra : RoutingInfra {
 
     fun getLogicalSignals(signal: PhysicalSignalId): StaticIdxList<LogicalSignal>
 
+    fun findPhysicalSignal(signalName: String): PhysicalSignalId?
+
     fun getPhysicalSignal(signal: LogicalSignalId): PhysicalSignalId
 
     fun getPhysicalSignalTrack(signal: PhysicalSignalId): TrackSectionId

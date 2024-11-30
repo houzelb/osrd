@@ -217,6 +217,7 @@ class RawInfraImpl(
 ) : RawInfra {
     private val zoneNameMap: HashMap<String, ZoneId> = HashMap()
     private val detectorNameMap: HashMap<String, DetectorId> = HashMap()
+    private val physicalSignalNameMap: HashMap<String, PhysicalSignalId> = HashMap()
     private val cachePerDirTrackChunk = IdxMap<DirTrackChunkId, MutableList<TrackChunkSignal>>()
     private val cachePerZonePath: StaticPool<ZonePath, ZonePathCache>
     private val trackChunksBounds =
@@ -432,6 +433,7 @@ class RawInfraImpl(
             for (child in physicalSignalPool[physicalSignal].logicalSignals) {
                 parentSignalMap[child] = physicalSignal
             }
+            physicalSignalNameMap.put(physicalSignalPool[physicalSignal].name!!, physicalSignal)
         }
     }
 
@@ -744,6 +746,10 @@ class RawInfraImpl(
 
     override fun getLogicalSignals(signal: PhysicalSignalId): StaticIdxList<LogicalSignal> {
         return physicalSignalPool[signal].logicalSignals
+    }
+
+    override fun findPhysicalSignal(signalName: String): PhysicalSignalId? {
+        return physicalSignalNameMap[signalName]
     }
 
     override fun getPhysicalSignal(signal: LogicalSignalId): PhysicalSignalId {

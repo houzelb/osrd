@@ -4,7 +4,8 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
-import fr.sncf.osrd.api.SignalProjectionEndpoint.SignalProjectionResult
+import fr.sncf.osrd.api.api_v2.SignalCriticalPosition
+import fr.sncf.osrd.api.api_v2.ZoneUpdate
 import fr.sncf.osrd.api.pathfinding.makeChunkPath
 import fr.sncf.osrd.railjson.schema.common.ID
 import fr.sncf.osrd.railjson.schema.rollingstock.RJSRollingResistance
@@ -13,11 +14,18 @@ import fr.sncf.osrd.railjson.schema.schedule.RJSAllowanceValue
 import fr.sncf.osrd.railjson.schema.schedule.RJSTrainPath
 import fr.sncf.osrd.reporting.warnings.DiagnosticRecorderImpl
 import fr.sncf.osrd.reporting.warnings.Warning
+import fr.sncf.osrd.signal_projection.projectSignals
+import fr.sncf.osrd.sim_infra.api.Block
 import fr.sncf.osrd.sim_infra.api.convertRoutePath
-import fr.sncf.osrd.standalone_sim.project
+import fr.sncf.osrd.sim_infra.api.findSignalingSystemOrThrow
+import fr.sncf.osrd.standalone_sim.recoverBlockPath
 import fr.sncf.osrd.standalone_sim.result.ResultTrain
 import fr.sncf.osrd.standalone_sim.result.ResultTrain.SignalSighting
 import fr.sncf.osrd.standalone_sim.result.SignalUpdate
+import fr.sncf.osrd.utils.indexing.mutableStaticIdxArrayListOf
+import fr.sncf.osrd.utils.units.Offset
+import fr.sncf.osrd.utils.units.meters
+import fr.sncf.osrd.utils.units.seconds
 import org.takes.Request
 import org.takes.Response
 import org.takes.Take
@@ -47,13 +55,67 @@ class SignalProjectionEndpoint(private val infraManager: InfraManager) : Take {
             val routePath =
                 infra.rawInfra.convertRoutePath(request.trainPath!!.routePath.map { it.route })
 
-            val result =
-                project(
+            val sigSystemManager = infra.signalingSimulator.sigModuleManager
+            val bal = sigSystemManager.findSignalingSystemOrThrow("BAL")
+            val bapr = sigSystemManager.findSignalingSystemOrThrow("BAPR")
+            val tvm300 = sigSystemManager.findSignalingSystemOrThrow("TVM300")
+            val tvm430 = sigSystemManager.findSignalingSystemOrThrow("TVM430")
+
+            // Recover blocks from the route path
+            val detailedBlockPath = recoverBlockPath(infra.signalingSimulator, infra, routePath)
+            val blockPath = mutableStaticIdxArrayListOf<Block>()
+            for (block in detailedBlockPath) blockPath.add(block.block)
+
+            val signalCriticalPosition =
+                request.signalSightings!!.map {
+                    SignalCriticalPosition(
+                        it.signal,
+                        it.time.seconds,
+                        Offset(it.offset.meters),
+                        it.state
+                    )
+                }
+
+            val zoneUpdates =
+                request.zoneUpdates!!.map {
+                    ZoneUpdate(it.zone, it.time.seconds, Offset(it.offset.meters), it.isEntry)
+                }
+
+            val simulationEndTime = request.zoneUpdates!!.maxOf { it.time.seconds } + 3600.seconds
+
+            val updates =
+                projectSignals(
                     infra,
                     chunkPath,
+                    blockPath,
                     routePath,
-                    request.signalSightings!!,
-                    request.zoneUpdates!!
+                    signalCriticalPosition,
+                    zoneUpdates,
+                    simulationEndTime
+                )
+
+            val result =
+                SignalProjectionResult(
+                    updates.map {
+                        val physicalSignalId = infra.rawInfra.findPhysicalSignal(it.signalID)!!
+                        val physicalSignalTrack =
+                            infra.rawInfra.getPhysicalSignalTrack(physicalSignalId)
+                        val physicalSignalTrackOffset =
+                            infra.rawInfra.getPhysicalSignalTrackOffset(physicalSignalId)
+                        val track = infra.rawInfra.getTrackSectionName(physicalSignalTrack)
+                        SignalUpdate(
+                            it.signalID,
+                            it.timeStart.seconds,
+                            it.timeEnd.seconds,
+                            it.positionStart.distance.meters,
+                            it.positionEnd.distance.meters,
+                            it.color,
+                            it.blinking,
+                            it.aspectLabel,
+                            track,
+                            physicalSignalTrackOffset.distance.meters
+                        )
+                    }
                 )
 
             result.warnings = recorder.warnings
