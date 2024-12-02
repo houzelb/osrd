@@ -11,7 +11,6 @@ import type {
   PathfindingInputError,
   PathfindingResultSuccess,
   PostInfraByInfraIdPathPropertiesApiArg,
-  PostInfraByInfraIdPathfindingBlocksApiArg,
   RollingStockWithLiveries,
 } from 'common/api/osrdEditoastApi';
 import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
@@ -182,20 +181,6 @@ export const usePathfinding = (
   const { updatePathSteps } = useOsrdConfActions();
   const { infraId } = useScenarioContext();
 
-  const generatePathfindingParams = (): PostInfraByInfraIdPathfindingBlocksApiArg | null => {
-    setPathProperties?.(undefined);
-
-    const filteredPathSteps = pathSteps.filter(
-      (step) => step !== null && step.coordinates !== null && !step.isInvalid
-    );
-
-    return getPathfindingQuery({
-      infraId,
-      rollingStock,
-      pathSteps: filteredPathSteps,
-    });
-  };
-
   useEffect(() => {
     if (isPathfindingInitialized) {
       pathfindingDispatch({
@@ -331,12 +316,18 @@ export const usePathfinding = (
     };
 
     const startPathFinding = async () => {
+      setPathProperties?.(undefined);
       if (pathfindingState.running) {
         return;
       }
 
       pathfindingDispatch({ type: 'PATHFINDING_STARTED' });
-      const pathfindingInput = generatePathfindingParams();
+      const pathfindingInput = getPathfindingQuery({
+        infraId,
+        rollingStock,
+        pathSteps: pathSteps.filter((step) => step !== null && !step.isInvalid),
+      });
+
       if (!pathfindingInput) {
         dispatch(
           setFailure({
