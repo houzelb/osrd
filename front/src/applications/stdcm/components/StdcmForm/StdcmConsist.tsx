@@ -52,6 +52,7 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
     onTotalLengthChange,
     maxSpeed,
     onMaxSpeedChange,
+    prefillConsist,
   } = useStdcmConsist();
 
   const { filters, searchRollingStock, searchRollingStockById, filteredRollingStockList } =
@@ -91,6 +92,7 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
   };
 
   const onSelectSuggestion = (option?: LightRollingStockWithLiveries) => {
+    prefillConsist(option, towedRollingStock);
     dispatch(updateRollingStockID(option?.id));
   };
 
@@ -144,6 +146,7 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           suggestions={filteredTowedRollingStockList}
           getSuggestionLabel={(suggestion: TowedRollingStock) => suggestion.name}
           onSelectSuggestion={(towed) => {
+            prefillConsist(rollingStock, towed);
             dispatch(updateTowedRollingStockID(towed?.id));
           }}
         />

@@ -8,7 +8,7 @@ const useStdcmTowedRollingStock = () => {
   const { getTowedRollingStockID } = useOsrdConfSelectors() as StdcmConfSelectors;
   const towedRollingStockId = useSelector(getTowedRollingStockID);
 
-  const { data: towedRollingStock } =
+  const { currentData: towedRollingStock } =
     osrdEditoastApi.endpoints.getTowedRollingStockByTowedRollingStockId.useQuery(
       {
         towedRollingStockId: towedRollingStockId!,
