@@ -101,3 +101,11 @@ export function decimalToPercentage(value: number) {
 export function tToKg(value: number) {
   return value * 1000;
 }
+
+/**
+ * ex: converts 12000kg to 12t
+ * @param value in kg
+ */
+export function kgToT(value: number) {
+  return value / 1000;
+}
