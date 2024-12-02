@@ -147,7 +147,7 @@ function init({
 }
 
 export const usePathfinding = (
-  setPathProperties?: (pathProperties?: ManageTrainSchedulePathProperties) => void | null,
+  setPathProperties: (pathProperties?: ManageTrainSchedulePathProperties) => void | null,
   pathProperties?: ManageTrainSchedulePathProperties
 ) => {
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
@@ -304,7 +304,7 @@ export const usePathfinding = (
         compact(updatedPathSteps)
       );
 
-      setPathProperties?.({
+      setPathProperties({
         electrifications,
         geometry,
         suggestedOperationalPoints,
@@ -316,7 +316,7 @@ export const usePathfinding = (
     };
 
     const startPathFinding = async () => {
-      setPathProperties?.(undefined);
+      setPathProperties(undefined);
       if (pathfindingState.running) {
         return;
       }
