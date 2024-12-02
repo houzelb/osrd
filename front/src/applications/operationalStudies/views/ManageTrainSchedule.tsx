@@ -1,11 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
-
 import { compact } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
 import useSetupItineraryForTrainUpdate from 'applications/operationalStudies/hooks/useSetupItineraryForTrainUpdate';
-import type { ManageTrainSchedulePathProperties } from 'applications/operationalStudies/types';
 import allowancesPic from 'assets/pictures/components/allowances.svg';
 import pahtFindingPic from 'assets/pictures/components/pathfinding.svg';
 import simulationSettings from 'assets/pictures/components/simulationSettings.svg';
@@ -15,8 +12,6 @@ import { useStoreDataForSpeedLimitByTagSelector } from 'common/SpeedLimitByTagSe
 import Tabs from 'common/Tabs';
 import IncompatibleConstraints from 'modules/pathfinding/components/IncompatibleConstraints';
 import Itinerary from 'modules/pathfinding/components/Itinerary/Itinerary';
-import getPathVoltages from 'modules/pathfinding/helpers/getPathVoltages';
-import { upsertPathStepsInOPs } from 'modules/pathfinding/utils';
 import PowerRestrictionsSelector from 'modules/powerRestriction/components/PowerRestrictionsSelector';
 import RollingStock2Img from 'modules/rollingStock/components/RollingStock2Img';
 import { RollingStockSelector } from 'modules/rollingStock/components/RollingStockSelector';
@@ -28,12 +23,16 @@ import SimulationSettings from 'modules/trainschedule/components/ManageTrainSche
 import TrainSettings from 'modules/trainschedule/components/ManageTrainSchedule/TrainSettings';
 import { formatKmValue } from 'utils/strings';
 
+import { useManageTrainScheduleContext } from '../hooks/useManageTrainScheduleContext';
+
 type ManageTrainScheduleProps = {
   trainIdToEdit?: number;
 };
 
 const ManageTrainSchedule = ({ trainIdToEdit }: ManageTrainScheduleProps) => {
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
+  const { pathProperties, setPathProperties, voltageRanges } = useManageTrainScheduleContext();
+
   const { getOrigin, getDestination, getPathSteps, getConstraintDistribution, getStartTime } =
     useOsrdConfSelectors();
   const origin = useSelector(getOrigin);
@@ -42,34 +41,15 @@ const ManageTrainSchedule = ({ trainIdToEdit }: ManageTrainScheduleProps) => {
   const constraintDistribution = useSelector(getConstraintDistribution);
   const startTime = useSelector(getStartTime);
 
-  const [pathProperties, setPathProperties] = useState<ManageTrainSchedulePathProperties>();
-
   const { speedLimitByTag, speedLimitsByTags, dispatchUpdateSpeedLimitByTag } =
     useStoreDataForSpeedLimitByTagSelector();
 
   const { rollingStockId, rollingStockComfort, rollingStock } =
     useStoreDataForRollingStockSelector();
 
-  useEffect(() => {
-    if (pathProperties) {
-      const allWaypoints = upsertPathStepsInOPs(
-        pathProperties.suggestedOperationalPoints,
-        compact(pathSteps)
-      );
-      setPathProperties({
-        ...pathProperties,
-        allWaypoints,
-      });
-    }
-  }, []);
-
-  const voltageRanges = useMemo(
-    () => getPathVoltages(pathProperties?.electrifications, pathProperties?.length),
-    [pathProperties]
-  );
   // TODO TS2 : test this hook in simulation results issue
   if (trainIdToEdit) {
-    useSetupItineraryForTrainUpdate(setPathProperties, trainIdToEdit);
+    useSetupItineraryForTrainUpdate(trainIdToEdit);
   }
 
   const tabRollingStock = {
