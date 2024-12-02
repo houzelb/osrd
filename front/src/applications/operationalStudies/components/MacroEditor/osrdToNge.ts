@@ -242,7 +242,9 @@ const importTimetable = async (
       body: { ids: train_ids },
     })
   );
-  const trainSchedules = await trainSchedulesPromise.unwrap();
+  const trainSchedules = (await trainSchedulesPromise.unwrap()).filter(
+    (trainSchedule) => trainSchedule.path.length >= 2
+  );
 
   const searchPayload = buildOpQuery(infraId, trainSchedules);
   const searchResults = searchPayload ? await executeSearch(searchPayload, dispatch) : [];
