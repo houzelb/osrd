@@ -92,20 +92,18 @@ export async function clickWithDelay(element: Locator, delay = 500): Promise<voi
 /**
  * Convert a date string from YYYY-MM-DD format to "DD mmm YYYY" format.
  * @param dateString - The input date string in YYYY-MM-DD format.
+ * @param OSRDLanguage - The current language of the application
  * @returns The formatted date string in "DD mmm YYYY" format.
  */
-export function formatDateToDayMonthYear(dateString: string): string {
+export function formatDateToDayMonthYear(dateString: string, OSRDLanguage: string): string {
+  const locale = OSRDLanguage === 'English' ? 'en-GB' : 'fr-FR';
   const date = new Date(dateString);
-
-  // Format the date to "15 Oct 2024" using toLocaleDateString
-  const formattedDate = date.toLocaleDateString('en-GB', {
+  const formattedDate = date.toLocaleDateString(locale, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
   });
-
-  // Convert the short month (first letter capitalized) to lowercase
-  return formattedDate.replace(/([A-Z])/g, (match) => match.toLowerCase());
+  return formattedDate.replace('.', '');
 }
 /**
  * Waits until the infrastructure state becomes 'CACHED' before proceeding to the next step.

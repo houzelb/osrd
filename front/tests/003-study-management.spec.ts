@@ -37,7 +37,7 @@ test.describe('Validate the Study creation workflow', () => {
     const translations = OSRDLanguage === 'English' ? enTranslations : frTranslations;
     const studyName = `${studyData.name} ${uuidv4()}`; // Unique study name
     const todayDateISO = new Date().toISOString().split('T')[0]; // Get today's date in ISO format
-    const expectedDate = formatDateToDayMonthYear(todayDateISO);
+    const expectedDate = formatDateToDayMonthYear(todayDateISO, OSRDLanguage);
     // Create a new study using the study page model
     await studyPage.createStudy({
       name: studyName,
@@ -79,7 +79,7 @@ test.describe('Validate the Study creation workflow', () => {
     await page.goto(`/operational-studies/projects/${project.id}/studies/${study.id}`);
     const translations = OSRDLanguage === 'English' ? enTranslations : frTranslations;
     const tomorrowDateISO = new Date(Date.now() + 86400000).toISOString().split('T')[0]; // Get tomorrow's date in ISO format
-    const expectedDate = formatDateToDayMonthYear(tomorrowDateISO);
+    const expectedDate = formatDateToDayMonthYear(tomorrowDateISO, OSRDLanguage);
     // Update the study with new values
     await studyPage.updateStudy({
       name: `${study.name} (updated)`,
