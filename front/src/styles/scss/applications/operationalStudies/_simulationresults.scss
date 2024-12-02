@@ -60,7 +60,7 @@
   }
 
   .time-stop-outputs {
-    margin: 0 30px 27px 38px;
+    margin: 0 30px 28px 38px;
   }
 
   .driver-train-schedule {
@@ -73,10 +73,14 @@
   .simulation-sheet-container {
     display: flex;
     justify-content: space-between;
-    padding: 0 33.5px 75px 32.5px;
+    padding: 0 33.5px 75px 42.5px;
     button {
-      background-color: rgba(235, 235, 234, 0.4); // grey10 with 40% opacity
+      background-color: var(--black5);
       font-weight: 500;
+      font-size: 1rem;
+    }
+    svg {
+      color: var(--primary60);
     }
   }
 

@@ -74,6 +74,7 @@ const SimulationResultExport = ({
             onClick={() => window.open(url as string, '_blank')}
             variant="Quiet"
             label={t('simulationSheet')}
+            size="medium"
             leadingIcon={<File />}
           />
         )}
@@ -85,7 +86,8 @@ const SimulationResultExport = ({
           exportTrainCSV(simulatedTrain, operationalPoints, pathElectrifications, train)
         }
         variant="Quiet"
-        label=".CSV"
+        label=".csv"
+        size="medium"
         leadingIcon={<Download />}
       />
     </div>
