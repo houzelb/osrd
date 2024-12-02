@@ -11,28 +11,30 @@ interface ETCSBrakingSimulator {
     val rollingStock: RollingStock
     val timeStep: Double
 
-    /**
-     * Compute the ETCS braking envelope from the MRSP: for each decreasing speed transition,
-     * compute the corresponding ETCS braking curve.
-     */
-    fun getETCSBrakingEnvelopeFromMrsp(mrsp: Envelope)
-
-    /**
-     * Compute the ETCS braking envelope from target: compute the corresponding ETCS braking curve
-     * decreasing from rolling stock max speed and ending at target offset/speed-wise.
-     */
-    fun getETCSBrakingEnvelopeFromTarget(target: Target)
+    /** Compute the ETCS braking envelope from the MRSP, for each LOA and EOA. */
+    fun addETCSBrakingParts(
+        mrsp: Envelope,
+        limitsOfAuthority: Collection<LimitOfAuthority>,
+        endsOfAuthority: Collection<EndOfAuthority>
+    ): Envelope
 }
 
-data class Target(
+data class LimitOfAuthority(
     val offset: Offset<Path>,
     val speed: Double,
-    val type: TargetType = if (speed != 0.0) TargetType.SLOWDOWN else TargetType.STOP
-)
+) {
+    init {
+        assert(speed > 0)
+    }
+}
 
-enum class TargetType {
-    SLOWDOWN,
-    STOP
+data class EndOfAuthority(
+    val offsetEOA: Offset<Path>,
+    val offsetSVL: Offset<Path>?,
+) {
+    init {
+        if (offsetSVL != null) assert(offsetSVL >= offsetEOA)
+    }
 }
 
 class ETCSBrakingSimulatorImpl(
@@ -41,11 +43,11 @@ class ETCSBrakingSimulatorImpl(
     override val timeStep: Double
 ) : ETCSBrakingSimulator {
 
-    override fun getETCSBrakingEnvelopeFromMrsp(mrsp: Envelope) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getETCSBrakingEnvelopeFromTarget(target: Target) {
+    override fun addETCSBrakingParts(
+        mrsp: Envelope,
+        limitsOfAuthority: Collection<LimitOfAuthority>,
+        endsOfAuthority: Collection<EndOfAuthority>
+    ): Envelope {
         TODO("Not yet implemented")
     }
 }
