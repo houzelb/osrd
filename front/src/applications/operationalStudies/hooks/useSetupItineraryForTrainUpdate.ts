@@ -30,6 +30,7 @@ import { castErrorToFailure } from 'utils/error';
 import { getPointCoordinates } from 'utils/geometry';
 
 import type { ManageTrainSchedulePathProperties } from '../types';
+import { useManageTrainScheduleContext } from './useManageTrainScheduleContext';
 import { useScenarioContext } from './useScenarioContext';
 
 type ItineraryForTrainUpdate = {
@@ -62,11 +63,9 @@ export function updatePathStepsFromOperationalPoints(
   return updatedPathSteps;
 }
 
-const useSetupItineraryForTrainUpdate = (
-  setPathProperties: (pathProperties: ManageTrainSchedulePathProperties) => void,
-  trainIdToEdit: number
-) => {
+const useSetupItineraryForTrainUpdate = (trainIdToEdit: number) => {
   const dispatch = useAppDispatch();
+  const { setPathProperties } = useManageTrainScheduleContext();
 
   const { infraId, getTrackSectionsByIds } = useScenarioContext();
   const { updatePathSteps } = useOsrdConfActions();

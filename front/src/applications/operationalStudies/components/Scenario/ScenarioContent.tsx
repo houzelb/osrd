@@ -10,6 +10,7 @@ import MicroMacroSwitch from 'applications/operationalStudies/components/MicroMa
 import NGE from 'applications/operationalStudies/components/NGE/NGE';
 import type { NetzgrafikDto, NGEEvent } from 'applications/operationalStudies/components/NGE/types';
 import { MANAGE_TRAIN_SCHEDULE_TYPES } from 'applications/operationalStudies/consts';
+import { ManageTrainScheduleContextProvider } from 'applications/operationalStudies/hooks/useManageTrainScheduleContext';
 import useScenarioData from 'applications/operationalStudies/hooks/useScenarioData';
 import ImportTrainSchedule from 'applications/operationalStudies/views/ImportTrainSchedule';
 import ManageTrainSchedule from 'applications/operationalStudies/views/ManageTrainSchedule';
@@ -169,7 +170,9 @@ const ScenarioContent = ({
             {(displayTrainScheduleManagement === MANAGE_TRAIN_SCHEDULE_TYPES.add ||
               displayTrainScheduleManagement === MANAGE_TRAIN_SCHEDULE_TYPES.edit) && (
               <div className="scenario-managetrainschedule">
-                <ManageTrainSchedule trainIdToEdit={trainIdToEdit} />
+                <ManageTrainScheduleContextProvider>
+                  <ManageTrainSchedule trainIdToEdit={trainIdToEdit} />
+                </ManageTrainScheduleContextProvider>
               </div>
             )}
             {displayTrainScheduleManagement === MANAGE_TRAIN_SCHEDULE_TYPES.import && (
