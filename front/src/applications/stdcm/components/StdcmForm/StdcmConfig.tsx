@@ -58,6 +58,7 @@ const StdcmConfig = ({
     updateGridMarginBefore,
     updateStdcmStandardAllowance,
     updateStdcmPathStep,
+    resetStdcmConfig,
   } = useOsrdConfActions() as StdcmConfSliceActions;
 
   const {
@@ -138,6 +139,10 @@ const StdcmConfig = ({
       setFormErrors({ errorType: StdcmConfigErrorTypes.INFRA_NOT_LOADED });
     }
   }, [infra]);
+
+  useEffect(() => {
+    dispatch(resetStdcmConfig());
+  }, []);
 
   return (
     <div className="stdcm__body">
