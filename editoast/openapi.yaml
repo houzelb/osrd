@@ -10072,7 +10072,7 @@ components:
               enum:
               - pathfinding_not_found
       - type: object
-        description: An error has occured during pathfinding
+        description: An error has occurred during pathfinding
         required:
         - core_error
         - status
@@ -10084,7 +10084,7 @@ components:
             enum:
             - pathfinding_failure
       - type: object
-        description: An error has occured during computing
+        description: An error has occurred during computing
         required:
         - error_type
         - status
