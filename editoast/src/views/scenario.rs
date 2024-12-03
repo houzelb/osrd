@@ -28,7 +28,7 @@ use crate::models::Study;
 use crate::models::Tags;
 use crate::views::operational_studies::OperationalStudiesOrderingParam;
 use crate::views::pagination::PaginatedList as _;
-use crate::views::pagination::PaginationQueryParam;
+use crate::views::pagination::PaginationQueryParams;
 use crate::views::pagination::PaginationStats;
 use crate::views::projects::ProjectError;
 use crate::views::projects::ProjectIdParam;
@@ -474,7 +474,7 @@ struct ListScenariosResponse {
 #[utoipa::path(
     get, path = "",
     tag = "scenarios",
-    params(ProjectIdParam, StudyIdParam, PaginationQueryParam, OperationalStudiesOrderingParam),
+    params(ProjectIdParam, StudyIdParam, PaginationQueryParams, OperationalStudiesOrderingParam),
     responses(
         (status = 200, description = "A paginated list of scenarios", body = inline(ListScenariosResponse)),
         (status = 404, description = "Project or study doesn't exist")
@@ -484,7 +484,7 @@ async fn list(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
     Path((project_id, study_id)): Path<(i64, i64)>,
-    Query(pagination_params): Query<PaginationQueryParam>,
+    Query(pagination_params): Query<PaginationQueryParams>,
     Query(OperationalStudiesOrderingParam { ordering }): Query<OperationalStudiesOrderingParam>,
 ) -> Result<Json<ListScenariosResponse>> {
     let authorized = auth

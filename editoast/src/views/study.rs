@@ -29,7 +29,7 @@ use crate::models::Project;
 use crate::models::Study;
 use crate::models::Tags;
 use crate::views::pagination::PaginatedList as _;
-use crate::views::pagination::PaginationQueryParam;
+use crate::views::pagination::PaginationQueryParams;
 use crate::views::projects::ProjectError;
 use crate::views::projects::ProjectIdParam;
 
@@ -396,7 +396,7 @@ struct StudyListResponse {
 #[utoipa::path(
     get, path = "",
     tag = "studies",
-    params(ProjectIdParam, PaginationQueryParam, OperationalStudiesOrderingParam),
+    params(ProjectIdParam, PaginationQueryParams, OperationalStudiesOrderingParam),
     responses(
         (status = 200, body = inline(StudyListResponse), description = "The list of studies"),
     )
@@ -405,7 +405,7 @@ async fn list(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
     Path(project_id): Path<i64>,
-    Query(pagination_params): Query<PaginationQueryParam>,
+    Query(pagination_params): Query<PaginationQueryParams>,
     Query(ordering_params): Query<OperationalStudiesOrderingParam>,
 ) -> Result<Json<StudyListResponse>> {
     let authorized = auth

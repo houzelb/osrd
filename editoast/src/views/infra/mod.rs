@@ -39,7 +39,7 @@ use crate::map;
 use crate::models::prelude::*;
 use crate::models::Infra;
 use crate::views::pagination::PaginatedList as _;
-use crate::views::pagination::PaginationQueryParam;
+use crate::views::pagination::PaginationQueryParams;
 use crate::views::AuthorizationError;
 use crate::AppState;
 use editoast_models::DbConnectionPoolV2;
@@ -195,7 +195,7 @@ struct InfraListResponse {
 #[utoipa::path(
     get, path = "",
     tag = "infra",
-    params(PaginationQueryParam),
+    params(PaginationQueryParams),
     responses(
         (status = 200, description = "All infras, paginated", body = inline(InfraListResponse))
     ),
@@ -203,7 +203,7 @@ struct InfraListResponse {
 async fn list(
     app_state: State<AppState>,
     Extension(auth): AuthenticationExt,
-    pagination_params: Query<PaginationQueryParam>,
+    pagination_params: Query<PaginationQueryParams>,
 ) -> Result<Json<InfraListResponse>> {
     let authorized = auth
         .check_roles([BuiltinRole::InfraRead].into())

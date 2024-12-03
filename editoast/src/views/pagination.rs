@@ -105,7 +105,7 @@ pub trait PaginatedList: ListAndCount + 'static {
     ///    before this function is called (e.g.: non-null page size).
     /// 2. Panics if the limit or the offset of the `settings` are not set, so be
     ///    sure to call [SelectionSettings::from_pagination_settings] or [SelectionSettings::limit]
-    ///    and [SelectionSettings::offset] beforehand. [PaginationQueryParam::into_selection_settings]
+    ///    and [SelectionSettings::offset] beforehand. [PaginationQueryParams::into_selection_settings]
     ///    works as well.
     async fn list_paginated(
         conn: &mut DbConnection,
@@ -124,7 +124,7 @@ impl<T> PaginatedList for T where T: ListAndCount + 'static {}
 
 #[derive(Debug, Clone, Copy, Deserialize, IntoParams)]
 #[into_params(parameter_in = Query)]
-pub struct PaginationQueryParam {
+pub struct PaginationQueryParams {
     #[serde(default = "default_page")]
     #[param(minimum = 1, default = 1)]
     pub page: u64,
@@ -136,14 +136,14 @@ const fn default_page() -> u64 {
     1
 }
 
-impl PaginationQueryParam {
+impl PaginationQueryParams {
     /// Returns a pre-filled [SelectionSettings] from the pagination settings
     /// that can then be used to list or count models
     pub fn into_selection_settings<M: Model + 'static>(self) -> SelectionSettings<M> {
         self.into()
     }
 
-    pub fn validate(self, max_page_size: i64) -> Result<PaginationQueryParam> {
+    pub fn validate(self, max_page_size: i64) -> Result<PaginationQueryParams> {
         let (page, page_size) = self.unpack();
         if page_size > max_page_size || page_size < 1 || page < 1 {
             return Err(PaginationError::InvalidPageSize {
@@ -155,7 +155,7 @@ impl PaginationQueryParam {
         Ok(self)
     }
 
-    pub fn warn_page_size(self, warn_page_size: i64) -> PaginationQueryParam {
+    pub fn warn_page_size(self, warn_page_size: i64) -> PaginationQueryParams {
         let (_, page_size) = self.unpack();
         if page_size > warn_page_size {
             warn!(
@@ -172,8 +172,8 @@ impl PaginationQueryParam {
     }
 }
 
-impl<M: Model + 'static> From<PaginationQueryParam> for SelectionSettings<M> {
-    fn from(PaginationQueryParam { page, page_size }: PaginationQueryParam) -> Self {
+impl<M: Model + 'static> From<PaginationQueryParams> for SelectionSettings<M> {
+    fn from(PaginationQueryParams { page, page_size }: PaginationQueryParams) -> Self {
         let page_size = page_size.unwrap_or(DEFAULT_PAGE_SIZE);
         SelectionSettings::from_pagination_settings(page, page_size)
     }

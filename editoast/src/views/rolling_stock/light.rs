@@ -28,7 +28,7 @@ use crate::models::rolling_stock_livery::RollingStockLiveryModel;
 use crate::models::Retrieve;
 use crate::models::RollingStockModel;
 use crate::views::pagination::PaginatedList;
-use crate::views::pagination::PaginationQueryParam;
+use crate::views::pagination::PaginationQueryParams;
 use crate::views::pagination::PaginationStats;
 use crate::List;
 use crate::SelectionSettings;
@@ -98,7 +98,7 @@ struct LightRollingStockWithLiveriesCountList {
 #[utoipa::path(
     get, path = "",
     tag = "rolling_stock",
-    params(PaginationQueryParam),
+    params(PaginationQueryParams),
     responses(
         (status = 200, body = inline(LightRollingStockWithLiveriesCountList)),
     )
@@ -106,7 +106,7 @@ struct LightRollingStockWithLiveriesCountList {
 async fn list(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
-    Query(page_settings): Query<PaginationQueryParam>,
+    Query(page_settings): Query<PaginationQueryParams>,
 ) -> Result<Json<LightRollingStockWithLiveriesCountList>> {
     let authorized = auth
         .check_roles([BuiltinRole::RollingStockCollectionRead].into())

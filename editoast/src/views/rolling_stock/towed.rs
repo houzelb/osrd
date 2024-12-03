@@ -3,7 +3,7 @@ use crate::error::Result;
 use crate::models::prelude::*;
 use crate::models::towed_rolling_stock::TowedRollingStockModel;
 use crate::views::pagination::PaginatedList;
-use crate::views::pagination::PaginationQueryParam;
+use crate::views::pagination::PaginationQueryParams;
 use crate::views::pagination::PaginationStats;
 use crate::views::AuthenticationExt;
 use crate::views::AuthorizationError;
@@ -166,7 +166,7 @@ struct TowedRollingStockCountList {
 #[utoipa::path(
     get, path = "",
     tag = "rolling_stock",
-    params(PaginationQueryParam),
+    params(PaginationQueryParams),
     responses(
         (status = 200, body = inline(TowedRollingStockCountList)),
     )
@@ -174,7 +174,7 @@ struct TowedRollingStockCountList {
 async fn get_list(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
-    Query(page_settings): Query<PaginationQueryParam>,
+    Query(page_settings): Query<PaginationQueryParams>,
 ) -> Result<Json<TowedRollingStockCountList>> {
     let authorized = auth
         .check_roles([BuiltinRole::RollingStockCollectionRead].into())
