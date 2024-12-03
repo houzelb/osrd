@@ -407,111 +407,42 @@ mod tests {
         );
     }
 
-    #[test]
-    fn get_boundaries_case_1() {
-        let path = vec![
-            TrackRange::new("A", 50, 100, Direction::StartToStop),
-            TrackRange::new("B", 0, 200, Direction::StopToStart),
-            TrackRange::new("C", 0, 300, Direction::StartToStop),
-            TrackRange::new("D", 120, 250, Direction::StopToStart),
-        ];
+    #[rstest]
+    // One track on the path
+    #[case::one_path_different_track(&["A+0-100"], &["B+0-100"], &[])]
+    #[case::one_path_no_overlap(&["A+0-100"], &["A+100-200"], &[])]
+    // Complex paths with complex track ranges
+    #[case::complex_path_one_intersection(
+        &["A+50-100", "B+200-0", "C+0-300", "D+250-120"],
+        &["A+0-100", "B+200-0", "C+0-300", "D+250-0", "E+0-100"],
+        &[(50, 730)]
+    )]
+    #[case::complex_path_two_intersections(
+        &["A+50-100", "B+200-0", "C+0-300", "D+250-0", "E+100-25"],
+        &["X+0-100", "B+0-200", "C+200-150", "E+30-100", "Z+0-100"],
+        &[(100, 350), (350, 420)]
+    )]
+    #[case::complex_path_three_intersections(
+        &["A+50-100", "B+200-0", "C+0-300", "D+250-0", "E+100-25"],
+        &["A+0-100", "B+0-200", "X+0-100", "C+200-150", "Z+0-100", "E+30-100"],
+        &[(50, 300), (400, 450), (550, 620)]
+    )]
+    fn get_intersections(
+        #[case] path: &[&str],
+        #[case] track_ranges: &[&str],
+        #[case] expected_intersections: &[(u64, u64)],
+    ) {
+        let path: Vec<TrackRange> = path.iter().map(|s| s.parse().unwrap()).collect();
         let projection = PathProjection::new(&path);
 
-        let track_ranges = vec![
-            TrackRange::new("A", 0, 100, Direction::StartToStop),
-            TrackRange::new("B", 0, 200, Direction::StopToStart),
-            TrackRange::new("C", 0, 300, Direction::StartToStop),
-            TrackRange::new("D", 0, 250, Direction::StopToStart),
-            TrackRange::new("E", 0, 100, Direction::StartToStop),
-        ];
+        let track_ranges: Vec<TrackRange> =
+            track_ranges.iter().map(|s| s.parse().unwrap()).collect();
+        let intersections = projection.get_intersections(&track_ranges);
+        let expected_intersections: Vec<Intersection> = expected_intersections
+            .iter()
+            .map(|tuple| Intersection::from(*tuple))
+            .collect::<Vec<_>>();
 
-        let boundaries = projection.get_intersections(&track_ranges);
-        let expected: Vec<Intersection> = vec![Intersection::from((50, 730))];
-
-        assert_eq!(boundaries, expected);
-    }
-
-    #[test]
-    fn get_boundaries_case_2() {
-        let path = vec![
-            TrackRange::new("A", 50, 100, Direction::StartToStop),
-            TrackRange::new("B", 0, 200, Direction::StopToStart),
-            TrackRange::new("C", 0, 300, Direction::StartToStop),
-            TrackRange::new("D", 0, 250, Direction::StopToStart),
-            TrackRange::new("E", 25, 100, Direction::StopToStart),
-        ];
-        let projection = PathProjection::new(&path);
-
-        let track_ranges = vec![
-            TrackRange::new("X", 0, 100, Direction::StartToStop),
-            TrackRange::new("B", 0, 200, Direction::StartToStop),
-            TrackRange::new("C", 150, 200, Direction::StopToStart),
-            TrackRange::new("E", 30, 100, Direction::StartToStop),
-            TrackRange::new("Z", 0, 100, Direction::StartToStop),
-        ];
-
-        let boundaries = projection.get_intersections(&track_ranges);
-        let expected: Vec<Intersection> = vec![
-            Intersection::from((100, 350)),
-            Intersection::from((350, 420)),
-        ];
-
-        assert_eq!(boundaries, expected);
-    }
-
-    #[test]
-    fn get_boundaries_case_3() {
-        let path = vec![
-            TrackRange::new("A", 50, 100, Direction::StartToStop),
-            TrackRange::new("B", 0, 200, Direction::StopToStart),
-            TrackRange::new("C", 0, 300, Direction::StartToStop),
-            TrackRange::new("D", 0, 250, Direction::StopToStart),
-            TrackRange::new("E", 25, 100, Direction::StopToStart),
-        ];
-        let projection = PathProjection::new(&path);
-
-        let track_ranges = vec![
-            TrackRange::new("A", 0, 100, Direction::StartToStop),
-            TrackRange::new("B", 0, 200, Direction::StartToStop),
-            TrackRange::new("X", 0, 100, Direction::StartToStop),
-            TrackRange::new("C", 150, 200, Direction::StopToStart),
-            TrackRange::new("Z", 0, 100, Direction::StartToStop),
-            TrackRange::new("E", 30, 100, Direction::StartToStop),
-        ];
-
-        let boundaries = projection.get_intersections(&track_ranges);
-        let expected: Vec<Intersection> = vec![
-            Intersection::from((50, 300)),
-            Intersection::from((400, 450)),
-            Intersection::from((550, 620)),
-        ];
-
-        assert_eq!(boundaries, expected);
-    }
-
-    #[test]
-    fn get_boundaries_case_4() {
-        let path = vec![TrackRange::new("A", 0, 100, Direction::StartToStop)];
-        let projection = PathProjection::new(&path);
-
-        let track_ranges = vec![TrackRange::new("B", 0, 100, Direction::StartToStop)];
-
-        let boundaries = projection.get_intersections(&track_ranges);
-
-        let expected: Vec<Intersection> = vec![];
-        assert_eq!(boundaries, expected);
-    }
-
-    #[test]
-    fn get_boundaries_case_5() {
-        let path = vec![TrackRange::new("A", 0, 100, Direction::StartToStop)];
-        let projection = PathProjection::new(&path);
-
-        let track_ranges = vec![TrackRange::new("A", 100, 200, Direction::StartToStop)];
-
-        let boundaries = projection.get_intersections(&track_ranges);
-
-        let expected: Vec<Intersection> = vec![];
-        assert_eq!(boundaries, expected);
+        assert_eq!(intersections, expected_intersections);
     }
 }
