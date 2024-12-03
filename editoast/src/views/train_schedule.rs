@@ -179,7 +179,7 @@ async fn get(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let train_schedule_id = train_schedule_id.id;
     let conn = &mut db_pool.get().await?;
 
@@ -217,7 +217,7 @@ async fn get_batch(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let conn = &mut db_pool.get().await?;
     let train_schedules: Vec<TrainSchedule> =
         TrainSchedule::retrieve_batch_or_fail(conn, train_ids, |missing| {
@@ -251,7 +251,7 @@ async fn delete(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
 
     use crate::models::DeleteBatch;
     let conn = &mut db_pool.get().await?;
@@ -339,7 +339,7 @@ async fn simulation(
 
     let valkey_client = app_state.valkey.clone();
     let core_client = app_state.core_client.clone();
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
 
     let infra_id = infra_id_query.infra_id;
     let electrical_profile_set_id = electrical_profile_set_id_query.electrical_profile_set_id;
@@ -673,7 +673,7 @@ async fn simulation_summary(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let conn = &mut db_pool.get().await?;
     let valkey_client = app_state.valkey.clone();
     let core = app_state.core_client.clone();
@@ -774,7 +774,7 @@ async fn get_path(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let valkey_client = app_state.valkey.clone();
     let core = app_state.core_client.clone();
 

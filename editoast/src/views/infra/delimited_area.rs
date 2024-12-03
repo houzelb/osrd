@@ -129,7 +129,7 @@ async fn delimited_area(
     Extension(auth): AuthenticationExt,
     State(AppState {
         infra_caches,
-        db_pool_v2: db_pool,
+        db_pool,
         ..
     }): State<AppState>,
     Path(InfraIdParam { infra_id }): Path<InfraIdParam>,

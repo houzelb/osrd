@@ -179,7 +179,7 @@ struct TileParams {
 async fn cache_and_get_mvt_tile(
     State(AppState {
         map_layers,
-        db_pool_v2: db_pool,
+        db_pool,
         valkey,
         ..
     }): State<AppState>,

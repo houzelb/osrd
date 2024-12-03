@@ -135,7 +135,7 @@ async fn refresh(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let valkey_client = app_state.valkey.clone();
     let infra_caches = app_state.infra_caches.clone();
     let map_layers = app_state.map_layers.clone();
@@ -212,7 +212,7 @@ async fn list(
     if !authorized {
         return Err(AuthorizationError::Unauthorized.into());
     }
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let osrdyne_client = app_state.osrdyne_client.clone();
 
     let settings = pagination_params
@@ -307,7 +307,7 @@ async fn get(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let osrdyne_client = app_state.osrdyne_client.clone();
 
     let infra_id = infra.infra_id;
@@ -433,7 +433,7 @@ async fn delete(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let infra_caches = app_state.infra_caches.clone();
     let infra_id = infra.infra_id;
     if Infra::fast_delete_static(db_pool.get().await?, infra_id).await? {
@@ -513,7 +513,7 @@ async fn get_switch_types(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let conn = &mut db_pool.get().await?;
     let infra_caches = app_state.infra_caches.clone();
 
@@ -724,7 +724,7 @@ async fn load(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let core_client = app_state.core_client.clone();
 
     let infra_id = path.infra_id;

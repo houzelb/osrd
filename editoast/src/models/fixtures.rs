@@ -4,7 +4,7 @@ use std::ops::DerefMut;
 
 use chrono::Utc;
 use editoast_models::DbConnection;
-use editoast_models::DbConnectionPool;
+
 use editoast_models::DbConnectionPoolV2;
 use editoast_schemas::infra::Direction;
 use editoast_schemas::infra::DirectionalTrackRange;

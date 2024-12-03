@@ -134,7 +134,7 @@ async fn stdcm(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let conn = &mut db_pool.get().await?;
 
     let valkey_client = app_state.valkey.clone();

@@ -118,7 +118,7 @@ async fn overwrite(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let conn = &mut db_pool.get().await?;
 
     let changeset: Changeset<StdcmSearchEnvironment> = form.into();
@@ -146,7 +146,7 @@ async fn retrieve_latest(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let conn = &mut db_pool.get().await?;
 
     let search_env = StdcmSearchEnvironment::retrieve_latest(conn).await;
