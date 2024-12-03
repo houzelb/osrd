@@ -14,6 +14,8 @@ test.use({
 test.describe('Verify train schedule elements and filters', () => {
   test.slow(); // Mark test as slow due to multiple steps
 
+  test.use({ viewport: { width: 1920, height: 1080 } });
+
   let infra: Infra;
   let OSRDLanguage: string;
 
