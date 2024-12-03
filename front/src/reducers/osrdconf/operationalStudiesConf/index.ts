@@ -31,6 +31,7 @@ export const operationalStudiesConfSlice = createSlice({
         labels,
         power_restrictions,
         path,
+        constraint_distribution,
       } = action.payload;
 
       state.rollingStockID = rollingStock?.id;
@@ -44,6 +45,7 @@ export const operationalStudiesConfSlice = createSlice({
       state.labels = labels;
       state.speedLimitByTag = speedLimitTag || undefined;
       state.powerRestriction = power_restrictions || [];
+      state.constraintDistribution = constraint_distribution || 'STANDARD';
     },
   },
 });
