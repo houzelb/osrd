@@ -74,7 +74,7 @@ tempfile = "3.14.0"
 thiserror = "2.0.3"
 tokio = { version = "1.41.1", features = ["fs", "macros", "rt-multi-thread"] }
 tokio-postgres = "0.7.12"
-tracing = { version = "0.1.40", default-features = false, features = [
+tracing = { version = "0.1.41", default-features = false, features = [
   "attributes",
   "log",
 ] }
