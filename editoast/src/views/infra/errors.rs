@@ -19,7 +19,7 @@ use crate::models::infra::errors::Level;
 use crate::models::prelude::*;
 use crate::models::Infra;
 use crate::views::infra::InfraIdParam;
-use crate::views::pagination::PaginationQueryParam;
+use crate::views::pagination::PaginationQueryParams;
 use crate::views::pagination::PaginationStats;
 use crate::views::AuthenticationExt;
 use crate::views::AuthorizationError;
@@ -65,7 +65,7 @@ pub(in crate::views) struct InfraErrorResponse {
 #[utoipa::path(
     get, path = "",
      tag = "infra",
-     params(InfraIdParam, PaginationQueryParam, ErrorListQueryParams),
+     params(InfraIdParam, PaginationQueryParams, ErrorListQueryParams),
      responses(
          (status = 200, body = inline(ErrorListResponse), description = "A paginated list of errors"),
      ),
@@ -74,7 +74,7 @@ async fn list_errors(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
     Path(InfraIdParam { infra_id }): Path<InfraIdParam>,
-    Query(pagination_params): Query<PaginationQueryParam>,
+    Query(pagination_params): Query<PaginationQueryParams>,
     Query(ErrorListQueryParams {
         level,
         error_type,

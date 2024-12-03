@@ -232,7 +232,7 @@ use std::collections::HashSet;
 use utoipa::ToSchema;
 
 use crate::error::Result;
-use crate::views::pagination::PaginationQueryParam;
+use crate::views::pagination::PaginationQueryParams;
 use crate::views::AuthenticationExt;
 use crate::views::AuthorizationError;
 use editoast_models::DbConnectionPoolV2;
@@ -338,7 +338,7 @@ struct SearchDBResult {
 #[utoipa::path(
     post, path = "",
     tag = "search",
-    params(PaginationQueryParam),
+    params(PaginationQueryParams),
     request_body = SearchPayload,
     responses(
         (status = 200, body = Vec<SearchResultItem>, description = "The search results"),
@@ -347,7 +347,7 @@ struct SearchDBResult {
 async fn search(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
-    Query(query_params): Query<PaginationQueryParam>,
+    Query(query_params): Query<PaginationQueryParams>,
     Json(SearchPayload { object, query, dry }): Json<SearchPayload>,
 ) -> Result<Json<serde_json::Value>> {
     let roles: HashSet<BuiltinRole> = match object.as_str() {

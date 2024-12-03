@@ -29,7 +29,7 @@ use crate::models::Document;
 use crate::models::Model;
 use crate::models::Project;
 use crate::models::Retrieve;
-use crate::views::pagination::PaginationQueryParam;
+use crate::views::pagination::PaginationQueryParams;
 use crate::views::AuthorizationError;
 
 crate::routes! {
@@ -181,7 +181,7 @@ struct ProjectWithStudyCountList {
 #[utoipa::path(
     get, path = "",
     tag = "projects",
-    params(PaginationQueryParam, OperationalStudiesOrderingParam),
+    params(PaginationQueryParams, OperationalStudiesOrderingParam),
     responses(
         (status = 200, body = inline(ProjectWithStudyCountList), description = "The list of projects"),
     )
@@ -189,7 +189,7 @@ struct ProjectWithStudyCountList {
 async fn list(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
-    Query(pagination_params): Query<PaginationQueryParam>,
+    Query(pagination_params): Query<PaginationQueryParams>,
     Query(ordering_params): Query<OperationalStudiesOrderingParam>,
 ) -> Result<Json<ProjectWithStudyCountList>> {
     let authorized = auth
