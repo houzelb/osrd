@@ -57,8 +57,8 @@ const Pathfinding = () => {
       {infra && infra.state === 'ERROR' && <InfraHardError />}
 
       {!pathfindingState.error &&
-        !pathfindingState.running &&
-        pathfindingState.done &&
+        !pathfindingState.isRunning &&
+        pathfindingState.isDone &&
         origin &&
         destination &&
         !hasInvalidPathStep && (
@@ -93,13 +93,13 @@ const Pathfinding = () => {
                 <Stop />
               </span>
               <span className="flex-grow-1">
-                {hasInvalidPathStep
-                  ? t('InvalidTrainScheduleStep')
-                  : t('pathfindingError', { errorMessage: t(pathfindingState.error) })}
+                {pathfindingState.error
+                  ? t('pathfindingError', { errorMessage: t(pathfindingState.error) })
+                  : t('InvalidTrainScheduleStep')}
               </span>
             </div>
           )}
-          {pathfindingState.missingParam && (
+          {pathfindingState.isMissingParam && (
             <div className="content missing-params">
               <span className="lead">
                 <Alert />
@@ -109,7 +109,7 @@ const Pathfinding = () => {
               </span>
             </div>
           )}
-          {pathfindingState.running && (
+          {pathfindingState.isRunning && (
             <div className="content pathfinding-loading">
               <span className="lead">
                 <Spinner />

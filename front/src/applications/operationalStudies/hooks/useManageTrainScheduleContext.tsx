@@ -3,7 +3,7 @@ import { createContext, useContext, useMemo, type ReactNode, useState } from 're
 import type { InfraWithState } from 'common/api/osrdEditoastApi';
 import type { RangedValue } from 'common/types';
 import getPathVoltages from 'modules/pathfinding/helpers/getPathVoltages';
-import { usePathfinding } from 'modules/pathfinding/hooks/usePathfinding';
+import usePathfinding from 'modules/pathfinding/hooks/usePathfinding';
 import type { PathfindingState } from 'modules/pathfinding/types';
 import type { PathStep } from 'reducers/osrdconf/types';
 
