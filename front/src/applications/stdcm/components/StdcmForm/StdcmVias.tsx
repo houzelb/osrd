@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 
 import { Location } from '@osrd-project/ui-icons';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +27,8 @@ const StdcmVias = ({ disabled = false }: StdcmConfigCardProps) => {
     useOsrdConfActions() as StdcmConfSliceActions;
   const pathSteps = useSelector(getStdcmPathSteps);
 
+  const [newIntermediateOpIndex, setNewIntermediateOpIndex] = useState<number>();
+
   const intermediatePoints = useMemo(() => pathSteps.slice(1, -1), [pathSteps]);
 
   const updateStopType = (newStopType: StdcmStopTypes, pathStep: StdcmPathStep) => {
@@ -44,6 +46,44 @@ const StdcmVias = ({ disabled = false }: StdcmConfigCardProps) => {
     );
   };
 
+  /**
+   * As the new intermediateOp block animates, we want to scroll to keep the box in the viewport.
+   * To do so, we install an animation frame listener (requestAnimationFrame) which updates the scroll position
+   * each time an animation frame is triggered.
+   * An animation end listener is also installed to cancel the animation frame listener.
+   * To properly clean up when the component is unmounted, we return a cleanup function that removes both listeners.
+   */
+  useLayoutEffect(() => {
+    if (!newIntermediateOpIndex) return undefined;
+
+    const newElement = document.querySelector(
+      `.stdcm-vias-bundle:nth-child(${newIntermediateOpIndex}) > :last-child`
+    );
+
+    if (!newElement) return undefined;
+
+    let requestId: number;
+
+    const scrollWithAnimation = () => {
+      newElement.scrollIntoView({
+        block: 'nearest',
+        behavior: 'auto',
+      });
+
+      requestId = requestAnimationFrame(scrollWithAnimation);
+    };
+
+    requestId = requestAnimationFrame(scrollWithAnimation);
+
+    const cancelListener = () => cancelAnimationFrame(requestId);
+
+    newElement.addEventListener('animationend', cancelListener);
+    return () => {
+      newElement.removeEventListener('animationend', cancelListener);
+      cancelListener();
+    };
+  }, [newIntermediateOpIndex]);
+
   const updateStopDuration = (stopTime: string, pathStep: StdcmPathStep) => {
     const stopFor = stopTime ? Number(stopTime) : undefined;
     dispatch(
@@ -60,6 +100,7 @@ const StdcmVias = ({ disabled = false }: StdcmConfigCardProps) => {
 
   const addViaOnClick = (pathStepIndex: number) => {
     dispatch(addStdcmVia(pathStepIndex));
+    setNewIntermediateOpIndex(pathStepIndex);
   };
 
   return (

@@ -390,6 +390,7 @@ class STDCMPage {
     const fillVia = async (selectedSuggestion: Locator) => {
       await this.addViaButton.nth(viaNumber - 1).click();
       expect(await this.addViaButton.count()).toBe(viaNumber + 1);
+      await expect(this.getViaCi(viaNumber)).toBeVisible();
       await this.getViaCi(viaNumber).fill(viaSearch);
       await selectedSuggestion.click();
       await expect(this.getViaCh(viaNumber)).toHaveValue('BV');
@@ -496,7 +497,7 @@ class STDCMPage {
     // Wait for the download event
     await this.page.waitForTimeout(500);
     const downloadPromise = this.page.waitForEvent('download', { timeout: 120000 });
-    await this.downloadSimulationButton.click({ force: true });
+    await this.downloadSimulationButton.dispatchEvent('click');
     const download = await downloadPromise.catch(() => {
       throw new Error('Download event was not triggered.');
     });
@@ -510,7 +511,7 @@ class STDCMPage {
   }
 
   async clickOnStartNewQueryButton() {
-    await this.startNewQueryButton.click();
+    await this.startNewQueryButton.dispatchEvent('click');
   }
 
   async mapMarkerVisibility() {

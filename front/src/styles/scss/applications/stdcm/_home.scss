@@ -106,6 +106,28 @@
           gap: 16px;
         }
 
+        .stdcm-vias-bundle {
+          animation: bouncin-in 0.75s cubic-bezier(0.567, -0.475, 0, 1);
+
+          .stdcm-card {
+            scroll-margin-bottom: 15px;
+          }
+        }
+
+        @keyframes bouncin-in {
+          0% {
+            opacity: 0;
+            height: 0;
+            // To make the new block poping from above the clicked button
+            transform: translateY(-45px);
+            margin-bottom: -30px; // To make the button clicked bounce top
+          }
+          100% {
+            opacity: 1;
+            height: 296px; // height of add OP button + intermedita OP card
+          }
+        }
+
         .stdcm-vias-list {
           margin-block: 16px;
 
