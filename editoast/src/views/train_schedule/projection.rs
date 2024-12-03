@@ -288,11 +288,11 @@ async fn project_path(
         let cached_value = CachedProjectPathTrainResult {
             space_time_curves: space_time_curves
                 .get(id)
-                .expect("Space time curves not availabe for train")
+                .expect("Space time curves not available for train")
                 .clone(),
             signal_updates: signal_updates
                 .get(id)
-                .expect("Signal update not availabe for train")
+                .expect("Signal update not available for train")
                 .clone(),
         };
         hit_cache.insert(*id, cached_value.clone());

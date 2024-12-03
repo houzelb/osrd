@@ -207,7 +207,7 @@ async fn list(
         ..
     }): State<AppState>,
     Extension(auth): AuthenticationExt,
-    pagination_params: Query<PaginationQueryParams>,
+    Query(pagination_params): Query<PaginationQueryParams>,
 ) -> Result<Json<InfraListResponse>> {
     let authorized = auth
         .check_roles([BuiltinRole::InfraRead].into())
@@ -430,7 +430,7 @@ async fn delete(
         ..
     }): State<AppState>,
     Extension(auth): AuthenticationExt,
-    infra: Path<InfraIdParam>,
+    Path(InfraIdParam { infra_id }): Path<InfraIdParam>,
 ) -> Result<impl IntoResponse> {
     let authorized = auth
         .check_roles([BuiltinRole::InfraWrite].into())
@@ -440,7 +440,6 @@ async fn delete(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let infra_id = infra.infra_id;
     if Infra::fast_delete_static(db_pool.get().await?, infra_id).await? {
         infra_caches.remove(&infra_id);
         Ok(StatusCode::NO_CONTENT)

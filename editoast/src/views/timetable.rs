@@ -122,7 +122,7 @@ struct TimetableIdParam {
 async fn get(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
-    Path(timetable_id): Path<TimetableIdParam>,
+    Path(TimetableIdParam { id: timetable_id }): Path<TimetableIdParam>,
 ) -> Result<Json<TimetableDetailedResult>> {
     let authorized = auth
         .check_roles([BuiltinRole::TimetableRead].into())
@@ -132,15 +132,11 @@ async fn get(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let timetable_id = timetable_id.id;
-    // Return the timetable
-
     let conn = &mut db_pool.get().await?;
     let timetable = TimetableWithTrains::retrieve_or_fail(conn, timetable_id, || {
         TimetableError::NotFound { timetable_id }
     })
     .await?;
-
     Ok(Json(timetable.into()))
 }
 
@@ -185,7 +181,7 @@ async fn post(
 async fn delete(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
-    timetable_id: Path<TimetableIdParam>,
+    Path(TimetableIdParam { id: timetable_id }): Path<TimetableIdParam>,
 ) -> Result<impl IntoResponse> {
     let authorized = auth
         .check_roles([BuiltinRole::TimetableWrite].into())
@@ -195,7 +191,6 @@ async fn delete(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let timetable_id = timetable_id.id;
     let conn = &mut db_pool.get().await?;
     Timetable::delete_static_or_fail(conn, timetable_id, || TimetableError::NotFound {
         timetable_id,
@@ -217,7 +212,7 @@ async fn delete(
 async fn train_schedule(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
-    Path(timetable_id): Path<TimetableIdParam>,
+    Path(TimetableIdParam { id: timetable_id }): Path<TimetableIdParam>,
     Json(train_schedules): Json<Vec<TrainScheduleBase>>,
 ) -> Result<Json<Vec<TrainScheduleResult>>> {
     let authorized = auth
@@ -230,7 +225,6 @@ async fn train_schedule(
 
     let conn = &mut db_pool.get().await?;
 
-    let timetable_id = timetable_id.id;
     TimetableWithTrains::retrieve_or_fail(conn, timetable_id, || TimetableError::NotFound {
         timetable_id,
     })
@@ -278,9 +272,11 @@ async fn conflicts(
         ..
     }): State<AppState>,
     Extension(auth): AuthenticationExt,
-    Path(timetable_id): Path<TimetableIdParam>,
-    Query(infra_id_query): Query<InfraIdQueryParam>,
-    Query(electrical_profile_set_id_query): Query<ElectricalProfileSetIdQueryParam>,
+    Path(TimetableIdParam { id: timetable_id }): Path<TimetableIdParam>,
+    Query(InfraIdQueryParam { infra_id }): Query<InfraIdQueryParam>,
+    Query(ElectricalProfileSetIdQueryParam {
+        electrical_profile_set_id,
+    }): Query<ElectricalProfileSetIdQueryParam>,
 ) -> Result<Json<Vec<Conflict>>> {
     let authorized = auth
         .check_roles([BuiltinRole::InfraRead, BuiltinRole::TimetableRead].into())
@@ -289,10 +285,6 @@ async fn conflicts(
     if !authorized {
         return Err(AuthorizationError::Unauthorized.into());
     }
-
-    let timetable_id = timetable_id.id;
-    let infra_id = infra_id_query.infra_id;
-    let electrical_profile_set_id = electrical_profile_set_id_query.electrical_profile_set_id;
 
     // 1. Retrieve Timetable / Infra / Trains / Simultion
     let timetable_trains =

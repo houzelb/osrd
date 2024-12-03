@@ -169,7 +169,9 @@ impl From<TrainScheduleForm> for TrainScheduleChangeset {
 async fn get(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
-    train_schedule_id: Path<TrainScheduleIdParam>,
+    Path(TrainScheduleIdParam {
+        id: train_schedule_id,
+    }): Path<TrainScheduleIdParam>,
 ) -> Result<Json<TrainScheduleResult>> {
     let authorized = auth
         .check_roles([BuiltinRole::InfraRead, BuiltinRole::TimetableRead].into())
@@ -179,9 +181,7 @@ async fn get(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let train_schedule_id = train_schedule_id.id;
     let conn = &mut db_pool.get().await?;
-
     let train_schedule = TrainSchedule::retrieve_or_fail(conn, train_schedule_id, || {
         TrainScheduleError::NotFound { train_schedule_id }
     })
@@ -272,7 +272,9 @@ async fn delete(
 async fn put(
     State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
-    train_schedule_id: Path<TrainScheduleIdParam>,
+    Path(TrainScheduleIdParam {
+        id: train_schedule_id,
+    }): Path<TrainScheduleIdParam>,
     Json(train_schedule_form): Json<TrainScheduleForm>,
 ) -> Result<Json<TrainScheduleResult>> {
     let authorized = auth
@@ -284,10 +286,7 @@ async fn put(
     }
 
     let conn = &mut db_pool.get().await?;
-
-    let train_schedule_id = train_schedule_id.id;
     let ts_changeset: TrainScheduleChangeset = train_schedule_form.into();
-
     let ts_result = ts_changeset
         .update_or_fail(conn, train_schedule_id, || TrainScheduleError::NotFound {
             train_schedule_id,
@@ -326,9 +325,13 @@ async fn simulation(
         ..
     }): State<AppState>,
     Extension(auth): AuthenticationExt,
-    Path(train_schedule_id): Path<TrainScheduleIdParam>,
-    Query(infra_id_query): Query<InfraIdQueryParam>,
-    Query(electrical_profile_set_id_query): Query<ElectricalProfileSetIdQueryParam>,
+    Path(TrainScheduleIdParam {
+        id: train_schedule_id,
+    }): Path<TrainScheduleIdParam>,
+    Query(InfraIdQueryParam { infra_id }): Query<InfraIdQueryParam>,
+    Query(ElectricalProfileSetIdQueryParam {
+        electrical_profile_set_id,
+    }): Query<ElectricalProfileSetIdQueryParam>,
 ) -> Result<Json<SimulationResponse>> {
     let authorized = auth
         .check_roles([BuiltinRole::InfraRead, BuiltinRole::TimetableRead].into())
@@ -337,10 +340,6 @@ async fn simulation(
     if !authorized {
         return Err(AuthorizationError::Unauthorized.into());
     }
-
-    let infra_id = infra_id_query.infra_id;
-    let electrical_profile_set_id = electrical_profile_set_id_query.electrical_profile_set_id;
-    let train_schedule_id = train_schedule_id.id;
 
     // Retrieve infra or fail
     let infra = Infra::retrieve_or_fail(&mut db_pool.get().await?, infra_id, || {
@@ -635,9 +634,9 @@ enum SimulationSummaryResult {
     },
     /// Pathfinding not found
     PathfindingNotFound(PathfindingNotFound),
-    /// An error has occured during pathfinding
+    /// An error has occurred during pathfinding
     PathfindingFailure { core_error: InternalError },
-    /// An error has occured during computing
+    /// An error has occurred during computing
     SimulationFailed { error_type: String },
     /// InputError
     PathfindingInputError(PathfindingInputError),
