@@ -227,7 +227,7 @@ describe('updateDaySinceDeparture', () => {
           arrival: { time: '10:00:00' },
         },
       ] as TimesStopsInputRow[];
-      const startTime = '2024-08-13T10:00:00';
+      const startTime = new Date('2024-08-13T10:00:00');
       const result = updateDaySinceDeparture(TimesStopsInputRows, startTime, {
         keepFirstIndexArrival: true,
       });
@@ -261,7 +261,7 @@ describe('updateDaySinceDeparture', () => {
           stopFor: '1800',
         },
       ] as TimesStopsInputRow[];
-      const startTime = '2024-08-13T10:00:00';
+      const startTime = new Date('2024-08-13T10:00:00');
       const result = updateDaySinceDeparture(TimesStopsInputRows, startTime, {
         keepFirstIndexArrival: true,
       });
@@ -303,7 +303,7 @@ describe('updateDaySinceDeparture', () => {
           arrival: { time: '01:00:00' },
         },
       ] as TimesStopsInputRow[];
-      const startTime = '2024-08-13T00:00:00';
+      const startTime = new Date('2024-08-13T00:00:00');
       const result = updateDaySinceDeparture(pathWaypointRows, startTime, {
         keepFirstIndexArrival: true,
       });
@@ -346,7 +346,7 @@ describe('updateDaySinceDeparture', () => {
           arrival: { time: '00:30:00' },
         },
       ] as TimesStopsInputRow[];
-      const startTime = '2024-08-13T23:50:00';
+      const startTime = new Date('2024-08-13T23:50:00');
       const result = updateDaySinceDeparture(TimesStopsInputRows, startTime, {
         keepFirstIndexArrival: true,
       });
@@ -387,7 +387,7 @@ describe('updateDaySinceDeparture', () => {
           arrival: { time: '00:00:00' },
         },
       ] as TimesStopsInputRow[];
-      const startTime = '2024-08-13T23:50:00';
+      const startTime = new Date('2024-08-13T23:50:00');
       const result = updateDaySinceDeparture(pathWaypointRows, startTime, {
         keepFirstIndexArrival: true,
       });
@@ -435,7 +435,7 @@ describe('updateDaySinceDeparture', () => {
           arrival: { time: '01:30:00' },
         },
       ] as TimesStopsInputRow[];
-      const startTime = '2024-08-13T23:45:00';
+      const startTime = new Date('2024-08-13T23:45:00');
       const result = updateDaySinceDeparture(pathWaypointRows, startTime, {
         keepFirstIndexArrival: true,
       });
@@ -498,7 +498,7 @@ describe('updateDaySinceDeparture', () => {
           arrival: { time: '00:50:00' },
         },
       ] as TimesStopsInputRow[];
-      const startTime = '2024-08-13T23:50:00';
+      const startTime = new Date('2024-08-13T23:50:00');
       const result = updateDaySinceDeparture(TimesStopsInputRows, startTime, {
         keepFirstIndexArrival: true,
       });
@@ -563,7 +563,7 @@ describe('updateDaySinceDeparture', () => {
           arrival: { time: '00:56:00' },
         },
       ] as TimesStopsInputRow[];
-      const startTime = '2024-08-13T23:50:00';
+      const startTime = new Date('2024-08-13T23:50:00');
       const result = updateDaySinceDeparture(TimesStopsInputRows, startTime, {
         keepFirstIndexArrival: true,
       });
@@ -643,7 +643,7 @@ describe('updateDaySinceDeparture', () => {
           stopFor: '3600',
         },
       ] as TimesStopsInputRow[];
-      const startTime = '2024-08-13T23:50:00';
+      const startTime = new Date('2024-08-13T23:50:00');
       const result = updateDaySinceDeparture(TimesStopsInputRows, startTime, {
         keepFirstIndexArrival: true,
       });
@@ -750,7 +750,7 @@ describe('updateDaySinceDeparture', () => {
         },
       ] as TimesStopsInputRow[];
 
-      const startTime = '2024-08-13T23:45:00';
+      const startTime = new Date('2024-08-13T23:45:00');
       const result = updateDaySinceDeparture(pathWaypointRows, startTime, {
         keepFirstIndexArrival: true,
       });
@@ -812,7 +812,7 @@ describe('updateDaySinceDeparture', () => {
 
 describe('durationSinceStartTime', () => {
   it('should return the correct duration', () => {
-    const startTime = '2023-09-01T10:00:00Z';
+    const startTime = new Date('2023-09-01T10:00:00Z');
     const stepTimeDays = {
       time: '20:00:00',
       daySinceDeparture: 0,
@@ -824,7 +824,7 @@ describe('durationSinceStartTime', () => {
   });
 
   it('should return the correct duration. daySinceDeparture 1', () => {
-    const startTime = '2023-09-01T10:00:00Z';
+    const startTime = new Date('2023-09-01T10:00:00Z');
     const stepTimeDays = {
       time: '11:00:00',
       daySinceDeparture: 1,
@@ -838,7 +838,7 @@ describe('durationSinceStartTime', () => {
 
 describe('calculateStepTimeDays', () => {
   it('should return correct time and daySinceDeparture', () => {
-    const startTime = '2023-09-01T10:00:00Z';
+    const startTime = new Date('2023-09-01T10:00:00Z');
     const isoDuration = 'PT36000S'; // 10 hours
 
     const result = calculateStepTimeAndDays(startTime, isoDuration);
@@ -850,7 +850,7 @@ describe('calculateStepTimeDays', () => {
   });
 
   it('should return correct time and daySinceDeparture, daySinceDeparture 1', () => {
-    const startTime = '2023-09-01T10:00:00Z';
+    const startTime = new Date('2023-09-01T10:00:00Z');
     const isoDuration = 'PT122400S'; // 1 day 10 hours
 
     const result = calculateStepTimeAndDays(startTime, isoDuration);

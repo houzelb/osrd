@@ -40,7 +40,8 @@ const ManageTrainSchedule = ({ trainIdToEdit }: ManageTrainScheduleProps) => {
   const destination = useSelector(getDestination);
   const pathSteps = useSelector(getPathSteps);
   const constraintDistribution = useSelector(getConstraintDistribution);
-  const startTime = useSelector(getStartTime);
+  const rawStartTime = useSelector(getStartTime);
+  const startTime = useMemo(() => new Date(rawStartTime), [rawStartTime]);
 
   const [pathProperties, setPathProperties] = useState<ManageTrainSchedulePathProperties>();
 
