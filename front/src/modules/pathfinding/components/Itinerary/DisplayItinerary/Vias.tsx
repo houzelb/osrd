@@ -7,9 +7,10 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
-import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
+import { useManageTrainScheduleContext } from 'applications/operationalStudies/hooks/useManageTrainScheduleContext';
+import { useOsrdConfSelectors } from 'common/osrdContext';
 import { isPathStepInvalid } from 'modules/pathfinding/utils';
-import { useAppDispatch } from 'store';
+import { moveElement, removeElementAtIndex } from 'utils/array';
 import { formatUicToCi } from 'utils/strings';
 
 import ViaStopDurationSelector from './ViaStopDurationSelector';
@@ -21,17 +22,20 @@ type ViasProps = {
 
 const Vias = ({ zoomToFeaturePoint, shouldManageStopDuration }: ViasProps) => {
   const { t } = useTranslation('operationalStudies/manageTrainSchedule');
-  const { getVias } = useOsrdConfSelectors();
-  const dispatch = useAppDispatch();
+  const { getVias, getPathSteps } = useOsrdConfSelectors();
   const vias = useSelector(getVias());
-  const { moveVia, deleteVia } = useOsrdConfActions();
+  const pathSteps = useSelector(getPathSteps);
+  const { launchPathfinding } = useManageTrainScheduleContext();
   const [focusedViaId, setFocusedViaId] = useState<string>();
 
   return (
     <DragDropContext
       onDragEnd={({ destination, source }) => {
         if (destination && source.index !== destination.index) {
-          dispatch(moveVia(vias, source.index, destination.index));
+          const from = source.index + 1;
+          const to = destination.index + 1;
+          const newPathSteps = moveElement(pathSteps, from, to);
+          launchPathfinding(newPathSteps);
         }
       }}
     >
@@ -87,7 +91,10 @@ const Vias = ({ zoomToFeaturePoint, shouldManageStopDuration }: ViasProps) => {
                         data-testid="delete-via-button"
                         className="btn btn-sm btn-only-icon btn-white ml-auto"
                         type="button"
-                        onClick={() => dispatch(deleteVia(index))}
+                        onClick={() => {
+                          const newPathSteps = removeElementAtIndex(pathSteps, index + 1);
+                          launchPathfinding(newPathSteps);
+                        }}
                       >
                         <XCircle variant="fill" />
                         <span className="sr-only" aria-hidden="true">

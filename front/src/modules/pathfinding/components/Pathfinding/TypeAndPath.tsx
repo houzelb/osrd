@@ -7,14 +7,14 @@ import { useTranslation } from 'react-i18next';
 import nextId from 'react-id-generator';
 import { useSelector } from 'react-redux';
 
+import { useManageTrainScheduleContext } from 'applications/operationalStudies/hooks/useManageTrainScheduleContext';
 import type {
   PostSearchApiArg,
   SearchResultItemOperationalPoint,
 } from 'common/api/osrdEditoastApi';
 import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import { MAIN_OP_CH_CODES } from 'common/Map/Search/useSearchOperationalPoint';
-import { useInfraID, useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
-import { useAppDispatch } from 'store';
+import { useInfraID, useOsrdConfSelectors } from 'common/osrdContext';
 import { useDebounce } from 'utils/helpers';
 import {
   isCursorSurroundedBySpace,
@@ -59,7 +59,8 @@ type TypeAndPathProps = {
 };
 
 const TypeAndPath = ({ setDisplayTypeAndPath }: TypeAndPathProps) => {
-  const dispatch = useAppDispatch();
+  const { launchPathfinding } = useManageTrainScheduleContext();
+
   const [inputText, setInputText] = useState('');
   const [opList, setOpList] = useState<SearchResultItemOperationalPoint[]>([]);
   const infraId = useInfraID();
@@ -70,8 +71,6 @@ const TypeAndPath = ({ setDisplayTypeAndPath }: TypeAndPathProps) => {
 
   const { getRollingStockID } = useOsrdConfSelectors();
   const rollingStockId = useSelector(getRollingStockID);
-
-  const { replaceItinerary } = useOsrdConfActions();
 
   const [searchResults, setSearchResults] = useState<SearchResultItemOperationalPoint[]>([]);
   const [searchState, setSearch] = useState('');
@@ -171,8 +170,8 @@ const TypeAndPath = ({ setDisplayTypeAndPath }: TypeAndPathProps) => {
           id: nextId(),
         }));
 
-      dispatch(replaceItinerary(pathSteps));
       setDisplayTypeAndPath(false);
+      launchPathfinding(pathSteps);
     }
   };
 

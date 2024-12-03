@@ -3,9 +3,10 @@ import cx from 'classnames';
 import type { Position } from 'geojson';
 import { useTranslation } from 'react-i18next';
 import { IoFlag } from 'react-icons/io5';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
-import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
+import { useManageTrainScheduleContext } from 'applications/operationalStudies/hooks/useManageTrainScheduleContext';
+import { useOsrdConfSelectors } from 'common/osrdContext';
 import { isPathStepInvalid } from 'modules/pathfinding/utils';
 
 type DestinationProps = {
@@ -13,11 +14,12 @@ type DestinationProps = {
 };
 
 const Destination = ({ zoomToFeaturePoint }: DestinationProps) => {
-  const { getDestination } = useOsrdConfSelectors();
-  const { updateDestination } = useOsrdConfActions();
-  const destination = useSelector(getDestination);
+  const { launchPathfinding } = useManageTrainScheduleContext();
 
-  const dispatch = useDispatch();
+  const { getDestination, getPathSteps } = useOsrdConfSelectors();
+  const destination = useSelector(getDestination);
+  const pathSteps = useSelector(getPathSteps);
+
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
   if (!destination)
     return (
@@ -55,7 +57,7 @@ const Destination = ({ zoomToFeaturePoint }: DestinationProps) => {
           className="btn btn-sm btn-only-icon btn-white ml-auto"
           type="button"
           onClick={() => {
-            dispatch(updateDestination(null));
+            launchPathfinding([...pathSteps.slice(0, -1), null]);
           }}
         >
           <XCircle variant="fill" />

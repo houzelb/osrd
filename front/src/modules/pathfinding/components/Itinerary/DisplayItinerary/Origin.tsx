@@ -3,9 +3,10 @@ import cx from 'classnames';
 import type { Position } from 'geojson';
 import { useTranslation } from 'react-i18next';
 import { RiMapPin2Fill } from 'react-icons/ri';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
-import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
+import { useManageTrainScheduleContext } from 'applications/operationalStudies/hooks/useManageTrainScheduleContext';
+import { useOsrdConfSelectors } from 'common/osrdContext';
 import { isPathStepInvalid } from 'modules/pathfinding/utils';
 
 type OriginProps = {
@@ -13,13 +14,12 @@ type OriginProps = {
 };
 
 const Origin = ({ zoomToFeaturePoint }: OriginProps) => {
-  const { getOrigin } = useOsrdConfSelectors();
-
-  const { updateOrigin } = useOsrdConfActions();
-
-  const origin = useSelector(getOrigin);
-  const dispatch = useDispatch();
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
+  const { launchPathfinding } = useManageTrainScheduleContext();
+
+  const { getOrigin, getPathSteps } = useOsrdConfSelectors();
+  const origin = useSelector(getOrigin);
+  const pathSteps = useSelector(getPathSteps);
 
   const originPointName = (
     <div
@@ -61,7 +61,7 @@ const Origin = ({ zoomToFeaturePoint }: OriginProps) => {
           className="btn btn-sm btn-only-icon btn-white"
           type="button"
           onClick={() => {
-            dispatch(updateOrigin(null));
+            launchPathfinding([null, ...pathSteps.slice(1)]);
           }}
         >
           <XCircle variant="fill" />

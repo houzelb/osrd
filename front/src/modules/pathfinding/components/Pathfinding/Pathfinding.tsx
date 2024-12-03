@@ -5,22 +5,16 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
 import InfraLoadingState from 'applications/operationalStudies/components/Scenario/InfraLoadingState';
-import type { ManageTrainSchedulePathProperties } from 'applications/operationalStudies/types';
+import { useManageTrainScheduleContext } from 'applications/operationalStudies/hooks/useManageTrainScheduleContext';
 import infraLogo from 'assets/pictures/components/tracks.svg';
 import { Spinner } from 'common/Loaders';
 import { useOsrdConfSelectors } from 'common/osrdContext';
-import { usePathfinding } from 'modules/pathfinding/hooks/usePathfinding';
 import { isPathStepInvalid } from 'modules/pathfinding/utils';
 import { conditionalStringConcat, formatKmValue } from 'utils/strings';
 
 import { InfraHardError, InfraSoftError } from './InfraError';
 
-type PathfindingProps = {
-  pathProperties?: ManageTrainSchedulePathProperties;
-  setPathProperties: (pathProperties?: ManageTrainSchedulePathProperties) => void;
-};
-
-const Pathfinding = ({ pathProperties, setPathProperties }: PathfindingProps) => {
+const Pathfinding = () => {
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
 
   const { getOrigin, getDestination, getPathSteps } = useOsrdConfSelectors();
@@ -33,9 +27,10 @@ const Pathfinding = ({ pathProperties, setPathProperties }: PathfindingProps) =>
   const rollingStockId = useSelector(getRollingStockID);
 
   const {
+    pathProperties,
     pathfindingState,
-    infraInfos: { infra, reloadCount },
-  } = usePathfinding(setPathProperties, pathProperties);
+    infraInfo: { infra, reloadCount },
+  } = useManageTrainScheduleContext();
 
   const missingElements = conditionalStringConcat([
     [!origin, t('origin')],

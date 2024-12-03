@@ -31,7 +31,7 @@ type ManageTrainScheduleProps = {
 
 const ManageTrainSchedule = ({ trainIdToEdit }: ManageTrainScheduleProps) => {
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
-  const { pathProperties, setPathProperties, voltageRanges } = useManageTrainScheduleContext();
+  const { pathProperties, voltageRanges } = useManageTrainScheduleContext();
 
   const { getOrigin, getDestination, getPathSteps, getConstraintDistribution, getStartTime } =
     useOsrdConfSelectors();
@@ -43,7 +43,6 @@ const ManageTrainSchedule = ({ trainIdToEdit }: ManageTrainScheduleProps) => {
 
   const { speedLimitByTag, speedLimitsByTags, dispatchUpdateSpeedLimitByTag } =
     useStoreDataForSpeedLimitByTagSelector();
-
   const { rollingStockId, rollingStockComfort, rollingStock } =
     useStoreDataForRollingStockSelector();
 
@@ -73,8 +72,6 @@ const ManageTrainSchedule = ({ trainIdToEdit }: ManageTrainScheduleProps) => {
       <RollingStockSelector
         rollingStockSelected={rollingStock}
         rollingStockComfort={rollingStockComfort}
-        pathProperties={pathProperties}
-        setPathProperties={setPathProperties}
       />
     ),
   };
@@ -99,7 +96,7 @@ const ManageTrainSchedule = ({ trainIdToEdit }: ManageTrainScheduleProps) => {
     content: (
       <div className="osrd-config-item-container-map" data-testid="map">
         <div className="floating-itinerary">
-          <Itinerary pathProperties={pathProperties} setPathProperties={setPathProperties} />
+          <Itinerary />
         </div>
         <Map pathProperties={pathProperties} simulationPathSteps={compact(pathSteps)}>
           <IncompatibleConstraints pathProperties={pathProperties} />

@@ -390,7 +390,7 @@ const Map = ({
               layerOrder={LAYER_GROUPS_ORDER[LAYERS.LINE_SEARCH.GROUP]}
               infraID={infraID}
             />
-            <RenderPopup pathProperties={pathProperties} />
+            {!showStdcmAssets && <RenderPopup pathProperties={pathProperties} />}
           </>
         )}
         <ItineraryLayer

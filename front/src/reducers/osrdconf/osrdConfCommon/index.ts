@@ -1,18 +1,11 @@
-import type { CaseReducer, PayloadAction, PrepareAction } from '@reduxjs/toolkit';
+import type { CaseReducer, PayloadAction } from '@reduxjs/toolkit';
 import type { Draft } from 'immer';
 import { omit } from 'lodash';
 
-import type { ManageTrainSchedulePathProperties } from 'applications/operationalStudies/types';
-import { ArrivalTimeTypes, type StdcmStopTypes } from 'applications/stdcm/types';
-import { matchPathStepAndOp } from 'modules/pathfinding/utils';
+import { type StdcmStopTypes } from 'applications/stdcm/types';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import { type InfraStateReducers, buildInfraStateReducers, infraState } from 'reducers/infra';
-import {
-  insertViaFromMap,
-  updateDestinationPathStep,
-  updateOriginPathStep,
-  upsertPathStep,
-} from 'reducers/osrdconf/helpers';
+import { upsertPathStep } from 'reducers/osrdconf/helpers';
 import type {
   OperationalStudiesConfSlice,
   OperationalStudiesConfSliceActions,
@@ -21,8 +14,6 @@ import type { OperationalStudiesConfSelectors } from 'reducers/osrdconf/operatio
 import type { StdcmConfSlice, StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
 import type { OsrdConfState, PathStep } from 'reducers/osrdconf/types';
-import { removeElementAtIndex } from 'utils/array';
-import type { ArrayElement } from 'utils/types';
 
 export const defaultCommonConf: OsrdConfState = {
   constraintDistribution: 'MARECO',
@@ -76,25 +67,11 @@ interface CommonConfReducers<S extends OsrdConfState> extends InfraStateReducers
   ['updateFeatureInfoClick']: CaseReducer<S, PayloadAction<S['featureInfoClick']>>;
   ['updatePathSteps']: CaseReducer<S, PayloadAction<S['pathSteps']>>;
   ['replaceItinerary']: CaseReducer<S, PayloadAction<S['pathSteps']>>;
-  ['reverseItinerary']: CaseReducer<S>;
   ['deleteItinerary']: CaseReducer<S>;
-  ['clearVias']: CaseReducer<S>;
-  ['deleteVia']: CaseReducer<S, PayloadAction<number>>;
-  ['addVia']: CaseReducer<
-    S,
-    PayloadAction<{ newVia: PathStep; pathProperties: ManageTrainSchedulePathProperties }>
-  >;
-  ['moveVia']: {
-    reducer: CaseReducer<S, PayloadAction<S['pathSteps']>>;
-    prepare: PrepareAction<S['pathSteps']>;
-  };
-  ['removeVia']: CaseReducer<S, PayloadAction<SuggestedOP>>;
   ['upsertViaFromSuggestedOP']: CaseReducer<S, PayloadAction<SuggestedOP>>;
   ['upsertSeveralViasFromSuggestedOP']: CaseReducer<S, PayloadAction<SuggestedOP[]>>;
   ['updateRollingStockComfort']: CaseReducer<S, PayloadAction<S['rollingStockComfort']>>;
   ['updateStartTime']: CaseReducer<S, PayloadAction<S['startTime']>>;
-  ['updateOrigin']: CaseReducer<S, PayloadAction<ArrayElement<S['pathSteps']>>>;
-  ['updateDestination']: CaseReducer<S, PayloadAction<ArrayElement<S['pathSteps']>>>;
 }
 
 export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfReducers<S> {
@@ -190,57 +167,6 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
       state.pathSteps = action.payload;
       state.powerRestriction = [];
     },
-    reverseItinerary(state: Draft<S>) {
-      state.pathSteps = [...state.pathSteps].reverse();
-      state.powerRestriction = [];
-    },
-    clearVias(state: Draft<S>) {
-      state.pathSteps = [state.pathSteps[0], state.pathSteps[state.pathSteps.length - 1]];
-      state.powerRestriction = [];
-    },
-    // Use this action in the suggested ops list, not the via list
-    removeVia(state: Draft<S>, action: PayloadAction<SuggestedOP>) {
-      // Index takes count of the origin in the array
-      state.pathSteps = state.pathSteps.filter(
-        (step) => !step || matchPathStepAndOp(step, action.payload)
-      );
-      state.powerRestriction = [];
-    },
-    // Use this action in the via list, not the suggested op list
-    deleteVia(state: Draft<S>, action: PayloadAction<number>) {
-      // Index takes count of the origin in the array
-      state.pathSteps = removeElementAtIndex(state.pathSteps, action.payload + 1);
-      state.powerRestriction = [];
-    },
-    // Use this action only to via added by click on map
-    addVia(
-      state: Draft<S>,
-      action: PayloadAction<{
-        newVia: PathStep;
-        pathProperties: ManageTrainSchedulePathProperties;
-      }>
-    ) {
-      state.pathSteps = insertViaFromMap(
-        state.pathSteps,
-        action.payload.newVia,
-        action.payload.pathProperties
-      );
-      state.powerRestriction = [];
-    },
-    moveVia: {
-      reducer: (state: Draft<S>, action: PayloadAction<S['pathSteps']>) => {
-        state.pathSteps = action.payload;
-        state.powerRestriction = [];
-      },
-      prepare: (vias: S['pathSteps'], from: number, to: number) => {
-        const newVias = Array.from(vias);
-        // Index takes count of the origin in the array
-        const itemToPermute = newVias.slice(from + 1, from + 2);
-        newVias.splice(from + 1, 1); // Remove it from array
-        newVias.splice(to + 1, 0, itemToPermute[0]); // Replace to right position
-        return { payload: newVias };
-      },
-    },
     // Use this action to transform an op to via from times and stop table or
     // from the suggested via modal
     upsertViaFromSuggestedOP(state: Draft<S>, action: PayloadAction<SuggestedOP>) {
@@ -256,30 +182,6 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
     },
     updateStartTime(state: Draft<S>, action: PayloadAction<S['startTime']>) {
       state.startTime = action.payload;
-    },
-    updateOrigin(state: Draft<S>, action: PayloadAction<ArrayElement<S['pathSteps']>>) {
-      const prevOriginArrivalType = state.pathSteps.at(0)?.arrivalType;
-      const newPoint = action.payload
-        ? {
-            ...action.payload,
-            arrivalType:
-              action.payload.arrivalType || prevOriginArrivalType || ArrivalTimeTypes.PRECISE_TIME,
-          }
-        : null;
-      state.pathSteps = updateOriginPathStep(state.pathSteps, newPoint, true);
-      state.powerRestriction = [];
-    },
-    updateDestination(state: Draft<S>, action: PayloadAction<ArrayElement<S['pathSteps']>>) {
-      const prevDestinationArrivalType = state.pathSteps.at(-1)?.arrivalType;
-      const newPoint = action.payload
-        ? {
-            ...action.payload,
-            arrivalType:
-              action.payload.arrivalType || prevDestinationArrivalType || ArrivalTimeTypes.ASAP,
-          }
-        : null;
-      state.pathSteps = updateDestinationPathStep(state.pathSteps, newPoint, true);
-      state.powerRestriction = [];
     },
   };
 }
