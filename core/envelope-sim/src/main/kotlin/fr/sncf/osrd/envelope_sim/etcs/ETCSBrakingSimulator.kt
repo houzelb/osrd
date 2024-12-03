@@ -1,14 +1,14 @@
-package fr.sncf.osrd.ertms.etcs
+package fr.sncf.osrd.envelope_sim.etcs
 
 import fr.sncf.osrd.envelope.Envelope
+import fr.sncf.osrd.envelope_sim.PhysicsRollingStock
 import fr.sncf.osrd.sim_infra.api.Path
 import fr.sncf.osrd.sim_infra.api.PathProperties
-import fr.sncf.osrd.train.RollingStock
 import fr.sncf.osrd.utils.units.Offset
 
 interface ETCSBrakingSimulator {
     val trainPath: PathProperties
-    val rollingStock: RollingStock
+    val rollingStock: PhysicsRollingStock
     val timeStep: Double
 
     /** Compute the ETCS braking envelope from the MRSP, for each LOA and EOA. */
@@ -39,7 +39,7 @@ data class EndOfAuthority(
 
 class ETCSBrakingSimulatorImpl(
     override val trainPath: PathProperties,
-    override val rollingStock: RollingStock,
+    override val rollingStock: PhysicsRollingStock,
     override val timeStep: Double
 ) : ETCSBrakingSimulator {
 
