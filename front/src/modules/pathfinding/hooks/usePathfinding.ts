@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useReducer } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { compact, isEqual, isObject } from 'lodash';
+import { compact, isObject } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
@@ -11,12 +11,9 @@ import type {
   PathfindingInputError,
   PathfindingResultSuccess,
   PostInfraByInfraIdPathPropertiesApiArg,
-  RollingStockWithLiveries,
 } from 'common/api/osrdEditoastApi';
 import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
-import { initialState } from 'modules/pathfinding/consts';
-import type { PathfindingAction, PathfindingState } from 'modules/pathfinding/types';
 import {
   formatSuggestedOperationalPoints,
   getPathfindingQuery,
@@ -32,142 +29,27 @@ import { isEmptyArray } from 'utils/array';
 import { castErrorToFailure } from 'utils/error';
 
 import useInfraStatus from './useInfraStatus';
+import type { PathfindingState } from '../types';
 
-export function reducer(state: PathfindingState, action: PathfindingAction): PathfindingState {
-  switch (action.type) {
-    case 'PATHFINDING_STARTED': {
-      return {
-        ...state,
-        running: true,
-        done: false,
-        error: '',
-        mustBeLaunched: false,
-        cancelled: false,
-      };
-    }
-    case 'PATHFINDING_CANCELLED': {
-      return {
-        ...state,
-        running: false,
-        done: false,
-        error: '',
-        mustBeLaunched: false,
-        cancelled: true,
-      };
-    }
-    case 'PATHFINDING_FINISHED': {
-      if (state.cancelled) {
-        return {
-          ...state,
-          running: false,
-          done: false,
-          error: '',
-          mustBeLaunched: false,
-          mustBeLaunchedManually: false,
-        };
-      }
-      return {
-        ...state,
-        running: false,
-        done: true,
-        error: '',
-        mustBeLaunched: false,
-        mustBeLaunchedManually: false,
-      };
-    }
-    case 'PATHFINDING_ERROR': {
-      return {
-        ...state,
-        running: false,
-        done: false,
-        error: action.message || '',
-        mustBeLaunched: false,
-      };
-    }
-    case 'PATHFINDING_INCOMPATIBLE_CONSTRAINTS': {
-      return {
-        ...state,
-        running: false,
-        done: false,
-        error: action.message || '',
-        mustBeLaunched: false,
-      };
-    }
-    case 'PATHFINDING_PARAM_CHANGED':
-    case 'VIAS_CHANGED': {
-      if (
-        !action.params ||
-        state.running ||
-        (!action.params.origin && !action.params.destination)
-      ) {
-        return { ...state };
-      }
-      const { origin, destination, rollingStock } = action.params;
-      if (!origin || !destination || !rollingStock) {
-        return {
-          ...state,
-          running: false,
-          error: '',
-          done: false,
-          missingParam: true,
-        };
-      }
-      return {
-        ...state,
-        error: '',
-        mustBeLaunched: true,
-        missingParam: false,
-      };
-    }
-    default:
-      throw new Error('Pathfinding action doesn’t exist');
-  }
-}
+const initialPathfindingState = {
+  isRunning: false,
+  isDone: false,
+  isMissingParam: false,
+};
 
-function init({
-  origin,
-  destination,
-  rollingStock,
-  pathSteps,
-  pathProperties,
-}: {
-  origin: PathStep | null;
-  destination: PathStep | null;
-  rollingStock?: RollingStockWithLiveries;
-  pathSteps: (PathStep | null)[];
-  pathProperties?: ManageTrainSchedulePathProperties;
-}): PathfindingState {
-  if (compact(pathSteps).length === 0 || !pathProperties?.geometry) {
-    return {
-      ...initialState,
-      mustBeLaunched: Boolean(origin) && Boolean(destination) && Boolean(rollingStock),
-    };
-  }
-  return initialState;
-}
-
-export const usePathfinding = (
-  setPathProperties: (pathProperties?: ManageTrainSchedulePathProperties) => void | null,
-  pathProperties?: ManageTrainSchedulePathProperties
+const usePathfinding = (
+  setPathProperties: (pathProperties?: ManageTrainSchedulePathProperties) => void
 ) => {
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
   const dispatch = useAppDispatch();
-  const { getOrigin, getDestination, getPathSteps, getPowerRestriction } = useOsrdConfSelectors();
-  const origin = useSelector(getOrigin, isEqual);
-  const destination = useSelector(getDestination, isEqual);
+  const { getPathSteps, getPowerRestriction } = useOsrdConfSelectors();
   const pathSteps = useSelector(getPathSteps);
   const powerRestrictions = useSelector(getPowerRestriction);
   const { infra, reloadCount, setIsInfraError } = useInfraStatus();
   const { rollingStock } = useStoreDataForRollingStockSelector();
 
-  const initializerArgs = {
-    origin,
-    destination,
-    rollingStock,
-    pathSteps,
-    pathProperties,
-  };
-  const [pathfindingState, pathfindingDispatch] = useReducer(reducer, initializerArgs, init);
+  const [pathfindingState, setPathfindingState] =
+    useState<PathfindingState>(initialPathfindingState);
 
   const [postPathfindingBlocks] =
     osrdEditoastApi.endpoints.postInfraByInfraIdPathfindingBlocks.useLazyQuery();
@@ -176,6 +58,12 @@ export const usePathfinding = (
 
   const { updatePathSteps, replaceItinerary } = useOsrdConfActions();
   const { infraId } = useScenarioContext();
+
+  const setIsMissingParam = () =>
+    setPathfindingState({ ...initialPathfindingState, isMissingParam: true });
+  const setIsRunning = () => setPathfindingState({ ...initialPathfindingState, isRunning: true });
+  const setIsDone = () => setPathfindingState({ ...initialPathfindingState, isDone: true });
+  const setError = (error?: string) => setPathfindingState({ ...initialPathfindingState, error });
 
   const handleInvalidPathItems = (
     steps: (PathStep | null)[],
@@ -201,6 +89,7 @@ export const usePathfinding = (
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       launchPathfinding(updatedPathSteps);
     } else {
+      setError(t('missingPathSteps'));
       dispatch(setFailure({ name: t('pathfindingError'), message: t('missingPathSteps') }));
     }
   };
@@ -290,7 +179,7 @@ export const usePathfinding = (
       setPathProperties(undefined);
 
       if (steps.some((step) => step === null)) {
-        dispatch(setFailure({ name: t('pathfindingError'), message: t('missingPathSteps') }));
+        setIsMissingParam();
         return;
       }
 
@@ -298,7 +187,7 @@ export const usePathfinding = (
         return;
       }
 
-      pathfindingDispatch({ type: 'PATHFINDING_STARTED' });
+      setIsRunning();
       const pathfindingInput = getPathfindingQuery({
         infraId,
         rollingStock,
@@ -306,6 +195,7 @@ export const usePathfinding = (
       });
 
       if (!pathfindingInput) {
+        setIsMissingParam();
         return;
       }
 
@@ -317,7 +207,7 @@ export const usePathfinding = (
             steps.map((step) => step!),
             pathfindingResult
           );
-          pathfindingDispatch({ type: 'PATHFINDING_FINISHED' });
+          setIsDone();
           return;
         }
 
@@ -331,10 +221,7 @@ export const usePathfinding = (
             pathfindingResult.relaxed_constraints_path,
             pathfindingResult.incompatible_constraints
           );
-          pathfindingDispatch({
-            type: 'PATHFINDING_INCOMPATIBLE_CONSTRAINTS',
-            message: t(`pathfindingErrors.${pathfindingResult.error_type}`),
-          });
+          setError(t(`pathfindingErrors.${pathfindingResult.error_type}`));
           return;
         }
 
@@ -358,10 +245,7 @@ export const usePathfinding = (
         } else {
           error = t(`pathfindingErrors.${pathfindingResult.error_type}`);
         }
-        pathfindingDispatch({
-          type: 'PATHFINDING_ERROR',
-          message: error,
-        });
+        setError(error);
       } catch (e) {
         if (isObject(e)) {
           let error;
@@ -374,7 +258,7 @@ export const usePathfinding = (
               setIsInfraError(true);
             }
           }
-          pathfindingDispatch({ type: 'PATHFINDING_ERROR', message: error });
+          setError(error);
         }
       }
     },
@@ -400,3 +284,5 @@ export const usePathfinding = (
     },
   };
 };
+
+export default usePathfinding;
