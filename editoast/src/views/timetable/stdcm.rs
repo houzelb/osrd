@@ -120,7 +120,12 @@ struct InfraIdQueryParam {
     )
 )]
 async fn stdcm(
-    app_state: State<AppState>,
+    State(AppState {
+        db_pool,
+        valkey: valkey_client,
+        core_client,
+        ..
+    }): State<AppState>,
     Extension(auth): AuthenticationExt,
     Path(id): Path<i64>,
     Query(query): Query<InfraIdQueryParam>,
@@ -134,11 +139,8 @@ async fn stdcm(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool.clone();
     let conn = &mut db_pool.get().await?;
 
-    let valkey_client = app_state.valkey.clone();
-    let core_client = app_state.core_client.clone();
     let timetable_id = id;
     let infra_id = query.infra;
 

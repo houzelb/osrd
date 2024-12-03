@@ -96,7 +96,11 @@ struct QueryParam {
     )
 )]
 async fn pathfinding_view(
-    app_state: State<AppState>,
+    State(AppState {
+        db_pool,
+        infra_caches,
+        ..
+    }): State<AppState>,
     Extension(auth): AuthenticationExt,
     Path(infra): Path<InfraIdParam>,
     Query(params): Query<QueryParam>,
@@ -109,9 +113,6 @@ async fn pathfinding_view(
     if !authorized {
         return Err(AuthorizationError::Unauthorized.into());
     }
-
-    let db_pool = app_state.db_pool.clone();
-    let infra_caches = app_state.infra_caches.clone();
 
     // Parse and check input
     let infra_id = infra.infra_id;

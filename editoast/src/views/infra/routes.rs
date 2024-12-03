@@ -67,7 +67,7 @@ struct RoutesResponse {
 )]
 async fn get_routes_from_waypoint(
     Path(path): Path<RoutesFromWaypointParams>,
-    db_pool: State<DbConnectionPoolV2>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
 ) -> Result<Json<RoutesResponse>> {
     let authorized = auth
@@ -145,7 +145,11 @@ struct RoutesFromNodesPositions {
     ),
 )]
 async fn get_routes_track_ranges(
-    app_state: State<AppState>,
+    State(AppState {
+        db_pool,
+        infra_caches,
+        ..
+    }): State<AppState>,
     Extension(auth): AuthenticationExt,
     Path(infra): Path<i64>,
     Query(params): Query<RouteTrackRangesParams>,
@@ -158,8 +162,8 @@ async fn get_routes_track_ranges(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool.clone();
-    let infra_caches = app_state.infra_caches.clone();
+    let db_pool = db_pool.clone();
+    let infra_caches = infra_caches.clone();
     let infra_id = infra;
     let infra = Infra::retrieve_or_fail(&mut db_pool.get().await?, infra_id, || {
         InfraApiError::NotFound { infra_id }
@@ -206,7 +210,11 @@ async fn get_routes_track_ranges(
     ),
 )]
 async fn get_routes_nodes(
-    app_state: State<AppState>,
+    State(AppState {
+        db_pool,
+        infra_caches,
+        ..
+    }): State<AppState>,
     Extension(auth): AuthenticationExt,
     Path(params): Path<InfraIdParam>,
     Json(node_states): Json<HashMap<String, Option<String>>>,
@@ -218,9 +226,6 @@ async fn get_routes_nodes(
     if !authorized {
         return Err(AuthorizationError::Unauthorized.into());
     }
-
-    let db_pool = app_state.db_pool.clone();
-    let infra_caches = app_state.infra_caches.clone();
 
     let infra = Infra::retrieve_or_fail(&mut db_pool.get().await?, params.infra_id, || {
         InfraApiError::NotFound {

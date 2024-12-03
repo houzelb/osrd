@@ -55,7 +55,7 @@ enum ListErrorsRailjson {
 )]
 async fn get_railjson(
     Path(infra): Path<InfraIdParam>,
-    db_pool: State<DbConnectionPoolV2>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
 ) -> Result<impl IntoResponse> {
     let authorized = auth
@@ -168,7 +168,11 @@ struct PostRailjsonResponse {
     )
 )]
 async fn post_railjson(
-    app_state: State<AppState>,
+    State(AppState {
+        db_pool,
+        infra_caches,
+        ..
+    }): State<AppState>,
     Extension(auth): AuthenticationExt,
     Query(params): Query<PostRailjsonQueryParams>,
     Json(railjson): Json<RailJson>,
@@ -181,8 +185,6 @@ async fn post_railjson(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool.clone();
-    let infra_caches = app_state.infra_caches.clone();
     if railjson.version != RAILJSON_VERSION {
         return Err(ListErrorsRailjson::WrongRailjsonVersionProvided.into());
     }
