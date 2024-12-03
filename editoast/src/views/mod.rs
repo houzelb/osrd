@@ -334,8 +334,11 @@ async fn version() -> Json<Version> {
         (status = 200, description = "Return the core service version", body = Version),
     ),
 )]
-async fn core_version(app_state: State<AppState>) -> Json<Version> {
-    let core = app_state.core_client.clone();
+async fn core_version(
+    State(AppState {
+        core_client: core, ..
+    }): State<AppState>,
+) -> Json<Version> {
     let response = CoreVersionRequest {}.fetch(&core).await;
     let response = response.unwrap_or(Version { git_describe: None });
     Json(response)

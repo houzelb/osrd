@@ -123,7 +123,13 @@ struct RefreshResponse {
     )
 )]
 async fn refresh(
-    app_state: State<AppState>,
+    State(AppState {
+        db_pool,
+        valkey: valkey_client,
+        infra_caches,
+        map_layers,
+        ..
+    }): State<AppState>,
     Extension(auth): AuthenticationExt,
     Query(query_params): Query<RefreshQueryParams>,
 ) -> Result<Json<RefreshResponse>> {
@@ -134,11 +140,6 @@ async fn refresh(
     if !authorized {
         return Err(AuthorizationError::Unauthorized.into());
     }
-
-    let db_pool = app_state.db_pool.clone();
-    let valkey_client = app_state.valkey.clone();
-    let infra_caches = app_state.infra_caches.clone();
-    let map_layers = app_state.map_layers.clone();
 
     // Use a transaction to give scope to infra list lock
     let RefreshQueryParams {
@@ -160,7 +161,6 @@ async fn refresh(
     };
 
     // Refresh each infras
-    let db_pool = db_pool;
     let mut infra_refreshed = vec![];
 
     for mut infra in infras_list {
@@ -201,7 +201,11 @@ struct InfraListResponse {
     ),
 )]
 async fn list(
-    app_state: State<AppState>,
+    State(AppState {
+        db_pool,
+        osrdyne_client,
+        ..
+    }): State<AppState>,
     Extension(auth): AuthenticationExt,
     pagination_params: Query<PaginationQueryParams>,
 ) -> Result<Json<InfraListResponse>> {
@@ -212,8 +216,6 @@ async fn list(
     if !authorized {
         return Err(AuthorizationError::Unauthorized.into());
     }
-    let db_pool = app_state.db_pool.clone();
-    let osrdyne_client = app_state.osrdyne_client.clone();
 
     let settings = pagination_params
         .validate(1000)?
@@ -295,7 +297,11 @@ struct InfraIdParam {
     ),
 )]
 async fn get(
-    app_state: State<AppState>,
+    State(AppState {
+        db_pool,
+        osrdyne_client,
+        ..
+    }): State<AppState>,
     Extension(auth): AuthenticationExt,
     Path(infra): Path<InfraIdParam>,
 ) -> Result<Json<InfraWithState>> {
@@ -306,9 +312,6 @@ async fn get(
     if !authorized {
         return Err(AuthorizationError::Unauthorized.into());
     }
-
-    let db_pool = app_state.db_pool.clone();
-    let osrdyne_client = app_state.osrdyne_client.clone();
 
     let infra_id = infra.infra_id;
     let infra = Infra::retrieve_or_fail(&mut db_pool.get().await?, infra_id, || {
@@ -344,7 +347,7 @@ impl From<InfraCreateForm> for Changeset<Infra> {
     ),
 )]
 async fn create(
-    db_pool: State<DbConnectionPoolV2>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
     Json(infra_form): Json<InfraCreateForm>,
 ) -> Result<impl IntoResponse> {
@@ -381,7 +384,7 @@ struct CloneQuery {
 async fn clone(
     Extension(auth): AuthenticationExt,
     Path(params): Path<InfraIdParam>,
-    db_pool: State<DbConnectionPoolV2>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Query(CloneQuery { name }): Query<CloneQuery>,
 ) -> Result<Json<i64>> {
     let authorized = auth
@@ -421,7 +424,11 @@ async fn clone(
     ),
 )]
 async fn delete(
-    app_state: State<AppState>,
+    State(AppState {
+        db_pool,
+        infra_caches,
+        ..
+    }): State<AppState>,
     Extension(auth): AuthenticationExt,
     infra: Path<InfraIdParam>,
 ) -> Result<impl IntoResponse> {
@@ -433,8 +440,6 @@ async fn delete(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool.clone();
-    let infra_caches = app_state.infra_caches.clone();
     let infra_id = infra.infra_id;
     if Infra::fast_delete_static(db_pool.get().await?, infra_id).await? {
         infra_caches.remove(&infra_id);
@@ -468,7 +473,7 @@ impl From<InfraPatchForm> for Changeset<Infra> {
     ),
 )]
 async fn put(
-    db_pool: State<DbConnectionPoolV2>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
     Path(infra): Path<i64>,
     Json(patch): Json<InfraPatchForm>,
@@ -501,7 +506,11 @@ async fn put(
     )
 )]
 async fn get_switch_types(
-    app_state: State<AppState>,
+    State(AppState {
+        db_pool,
+        infra_caches,
+        ..
+    }): State<AppState>,
     Extension(auth): AuthenticationExt,
     Path(infra): Path<InfraIdParam>,
 ) -> Result<Json<Vec<SwitchType>>> {
@@ -513,9 +522,7 @@ async fn get_switch_types(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool.clone();
     let conn = &mut db_pool.get().await?;
-    let infra_caches = app_state.infra_caches.clone();
 
     let infra = Infra::retrieve_or_fail(conn, infra.infra_id, || InfraApiError::NotFound {
         infra_id: infra.infra_id,
@@ -546,7 +553,7 @@ async fn get_switch_types(
 async fn get_speed_limit_tags(
     Extension(auth): AuthenticationExt,
     Path(infra): Path<InfraIdParam>,
-    db_pool: State<DbConnectionPoolV2>,
+    State(db_pool): State<DbConnectionPoolV2>,
 ) -> Result<Json<Vec<String>>> {
     let authorized = auth
         .check_roles([BuiltinRole::InfraRead].into())
@@ -590,7 +597,7 @@ async fn get_voltages(
     Extension(auth): AuthenticationExt,
     Path(infra): Path<InfraIdParam>,
     Query(param): Query<GetVoltagesQueryParams>,
-    db_pool: State<DbConnectionPoolV2>,
+    State(db_pool): State<DbConnectionPoolV2>,
 ) -> Result<Json<Vec<String>>> {
     let authorized = auth
         .check_roles([BuiltinRole::InfraRead].into())
@@ -623,7 +630,7 @@ async fn get_voltages(
     )
 )]
 async fn get_all_voltages(
-    db_pool: State<DbConnectionPoolV2>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
 ) -> Result<Json<Vec<String>>> {
     let authorized = auth
@@ -712,7 +719,11 @@ async fn unlock(
     )
 )]
 async fn load(
-    app_state: State<AppState>,
+    State(AppState {
+        db_pool,
+        core_client,
+        ..
+    }): State<AppState>,
     Extension(auth): AuthenticationExt,
     Path(path): Path<InfraIdParam>,
 ) -> Result<impl IntoResponse> {
@@ -723,9 +734,6 @@ async fn load(
     if !authorized {
         return Err(AuthorizationError::Unauthorized.into());
     }
-
-    let db_pool = app_state.db_pool.clone();
-    let core_client = app_state.core_client.clone();
 
     let infra_id = path.infra_id;
     let infra = Infra::retrieve_or_fail(&mut db_pool.get().await?, infra_id, || {

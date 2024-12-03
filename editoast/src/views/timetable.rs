@@ -120,7 +120,7 @@ struct TimetableIdParam {
     ),
 )]
 async fn get(
-    db_pool: State<DbConnectionPoolV2>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
     Path(timetable_id): Path<TimetableIdParam>,
 ) -> Result<Json<TimetableDetailedResult>> {
@@ -154,7 +154,7 @@ async fn get(
     ),
 )]
 async fn post(
-    db_pool: State<DbConnectionPoolV2>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
 ) -> Result<Json<TimetableResult>> {
     let authorized = auth
@@ -183,7 +183,7 @@ async fn post(
     ),
 )]
 async fn delete(
-    db_pool: State<DbConnectionPoolV2>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
     timetable_id: Path<TimetableIdParam>,
 ) -> Result<impl IntoResponse> {
@@ -215,7 +215,7 @@ async fn delete(
     )
 )]
 async fn train_schedule(
-    db_pool: State<DbConnectionPoolV2>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
     Path(timetable_id): Path<TimetableIdParam>,
     Json(train_schedules): Json<Vec<TrainScheduleBase>>,
@@ -271,7 +271,12 @@ pub struct ElectricalProfileSetIdQueryParam {
     ),
 )]
 async fn conflicts(
-    app_state: State<AppState>,
+    State(AppState {
+        db_pool,
+        valkey: valkey_client,
+        core_client,
+        ..
+    }): State<AppState>,
     Extension(auth): AuthenticationExt,
     Path(timetable_id): Path<TimetableIdParam>,
     Query(infra_id_query): Query<InfraIdQueryParam>,
@@ -284,10 +289,6 @@ async fn conflicts(
     if !authorized {
         return Err(AuthorizationError::Unauthorized.into());
     }
-
-    let db_pool = app_state.db_pool.clone();
-    let valkey_client = app_state.valkey.clone();
-    let core_client = app_state.core_client.clone();
 
     let timetable_id = timetable_id.id;
     let infra_id = infra_id_query.infra_id;

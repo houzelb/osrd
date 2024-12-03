@@ -126,7 +126,12 @@ struct CachedProjectPathTrainResult {
     ),
 )]
 async fn project_path(
-    app_state: State<AppState>,
+    State(AppState {
+        db_pool,
+        valkey: valkey_client,
+        core_client,
+        ..
+    }): State<AppState>,
     Extension(auth): AuthenticationExt,
     Json(ProjectPathForm {
         infra_id,
@@ -149,10 +154,6 @@ async fn project_path(
     if !authorized {
         return Err(AuthorizationError::Unauthorized.into());
     }
-
-    let db_pool = app_state.db_pool.clone();
-    let valkey_client = app_state.valkey.clone();
-    let core_client = app_state.core_client.clone();
 
     let ProjectPathInput {
         track_section_ranges: path_track_ranges,

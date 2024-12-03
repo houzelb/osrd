@@ -6,6 +6,7 @@ use axum::response::Response;
 use axum::Extension;
 use chrono::NaiveDateTime;
 use editoast_authz::BuiltinRole;
+use editoast_models::DbConnectionPoolV2;
 use serde::de::Error as SerdeError;
 use serde::Deserialize;
 use std::result::Result as StdResult;
@@ -19,7 +20,6 @@ use crate::models::stdcm_search_environment::StdcmSearchEnvironment;
 use crate::models::Changeset;
 use crate::views::AuthenticationExt;
 use crate::views::AuthorizationError;
-use crate::AppState;
 use crate::Model;
 
 crate::routes! {
@@ -106,7 +106,7 @@ impl From<StdcmSearchEnvironmentCreateForm> for Changeset<StdcmSearchEnvironment
     )
 )]
 async fn overwrite(
-    State(app_state): State<AppState>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
     Json(form): Json<StdcmSearchEnvironmentCreateForm>,
 ) -> Result<impl IntoResponse> {
@@ -118,11 +118,8 @@ async fn overwrite(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool.clone();
     let conn = &mut db_pool.get().await?;
-
     let changeset: Changeset<StdcmSearchEnvironment> = form.into();
-
     Ok((StatusCode::CREATED, Json(changeset.overwrite(conn).await?)))
 }
 
@@ -135,7 +132,7 @@ async fn overwrite(
     )
 )]
 async fn retrieve_latest(
-    State(app_state): State<AppState>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
 ) -> Result<Response> {
     let authorized = auth
@@ -146,9 +143,7 @@ async fn retrieve_latest(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool.clone();
     let conn = &mut db_pool.get().await?;
-
     let search_env = StdcmSearchEnvironment::retrieve_latest(conn).await;
     if let Some(search_env) = search_env {
         Ok(Json(search_env).into_response())

@@ -167,7 +167,7 @@ impl From<TrainScheduleForm> for TrainScheduleChangeset {
     )
 )]
 async fn get(
-    app_state: State<AppState>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
     train_schedule_id: Path<TrainScheduleIdParam>,
 ) -> Result<Json<TrainScheduleResult>> {
@@ -179,7 +179,6 @@ async fn get(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool.clone();
     let train_schedule_id = train_schedule_id.id;
     let conn = &mut db_pool.get().await?;
 
@@ -205,7 +204,7 @@ struct BatchRequest {
     )
 )]
 async fn get_batch(
-    app_state: State<AppState>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
     Json(BatchRequest { ids: train_ids }): Json<BatchRequest>,
 ) -> Result<Json<Vec<TrainScheduleResult>>> {
@@ -217,7 +216,6 @@ async fn get_batch(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool.clone();
     let conn = &mut db_pool.get().await?;
     let train_schedules: Vec<TrainSchedule> =
         TrainSchedule::retrieve_batch_or_fail(conn, train_ids, |missing| {
@@ -239,7 +237,7 @@ async fn get_batch(
     )
 )]
 async fn delete(
-    app_state: State<AppState>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
     Json(BatchRequest { ids: train_ids }): Json<BatchRequest>,
 ) -> Result<impl IntoResponse> {
@@ -250,8 +248,6 @@ async fn delete(
     if !authorized {
         return Err(AuthorizationError::Unauthorized.into());
     }
-
-    let db_pool = app_state.db_pool.clone();
 
     use crate::models::DeleteBatch;
     let conn = &mut db_pool.get().await?;
@@ -274,7 +270,7 @@ async fn delete(
     )
 )]
 async fn put(
-    db_pool: State<DbConnectionPoolV2>,
+    State(db_pool): State<DbConnectionPoolV2>,
     Extension(auth): AuthenticationExt,
     train_schedule_id: Path<TrainScheduleIdParam>,
     Json(train_schedule_form): Json<TrainScheduleForm>,
@@ -323,7 +319,12 @@ pub struct ElectricalProfileSetIdQueryParam {
     ),
 )]
 async fn simulation(
-    app_state: State<AppState>,
+    State(AppState {
+        valkey: valkey_client,
+        core_client,
+        db_pool,
+        ..
+    }): State<AppState>,
     Extension(auth): AuthenticationExt,
     Path(train_schedule_id): Path<TrainScheduleIdParam>,
     Query(infra_id_query): Query<InfraIdQueryParam>,
@@ -336,10 +337,6 @@ async fn simulation(
     if !authorized {
         return Err(AuthorizationError::Unauthorized.into());
     }
-
-    let valkey_client = app_state.valkey.clone();
-    let core_client = app_state.core_client.clone();
-    let db_pool = app_state.db_pool.clone();
 
     let infra_id = infra_id_query.infra_id;
     let electrical_profile_set_id = electrical_profile_set_id_query.electrical_profile_set_id;
@@ -657,7 +654,12 @@ enum SimulationSummaryResult {
     ),
 )]
 async fn simulation_summary(
-    app_state: State<AppState>,
+    State(AppState {
+        db_pool,
+        valkey: valkey_client,
+        core_client: core,
+        ..
+    }): State<AppState>,
     Extension(auth): AuthenticationExt,
     Json(SimulationBatchForm {
         infra_id,
@@ -673,10 +675,7 @@ async fn simulation_summary(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool.clone();
     let conn = &mut db_pool.get().await?;
-    let valkey_client = app_state.valkey.clone();
-    let core = app_state.core_client.clone();
 
     let infra = Infra::retrieve_or_fail(conn, infra_id, || TrainScheduleError::InfraNotFound {
         infra_id,
@@ -759,7 +758,12 @@ async fn simulation_summary(
     )
 )]
 async fn get_path(
-    app_state: State<AppState>,
+    State(AppState {
+        db_pool,
+        valkey: valkey_client,
+        core_client: core,
+        ..
+    }): State<AppState>,
     Extension(auth): AuthenticationExt,
     Path(TrainScheduleIdParam {
         id: train_schedule_id,
@@ -773,10 +777,6 @@ async fn get_path(
     if !authorized {
         return Err(AuthorizationError::Unauthorized.into());
     }
-
-    let db_pool = app_state.db_pool.clone();
-    let valkey_client = app_state.valkey.clone();
-    let core = app_state.core_client.clone();
 
     let conn = &mut db_pool.get().await?;
     let mut valkey_conn = valkey_client.get_connection().await?;
