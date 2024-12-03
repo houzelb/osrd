@@ -150,7 +150,7 @@ async fn project_path(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let valkey_client = app_state.valkey.clone();
     let core_client = app_state.core_client.clone();
 

@@ -41,7 +41,7 @@ use dashmap::DashMap;
 use editoast_authz::authorizer::Authorizer;
 use editoast_authz::authorizer::UserInfo;
 use editoast_authz::BuiltinRole;
-use editoast_models::DbConnectionPool;
+
 use editoast_osrdyne_client::OsrdyneClient;
 use futures::TryFutureExt;
 pub use openapi::OpenApiRoot;
@@ -225,7 +225,7 @@ async fn authenticate(
 
 async fn authentication_middleware(
     State(AppState {
-        db_pool_v2: db_pool,
+        db_pool,
         disable_authorization,
         ..
     }): State<AppState>,
@@ -278,7 +278,7 @@ pub enum AppHealthError {
 )]
 async fn health(
     State(AppState {
-        db_pool_v2: db_pool,
+        db_pool,
         valkey,
         health_check_timeout,
         core_client,
@@ -384,8 +384,7 @@ pub struct Server {
 pub struct AppState {
     pub config: Arc<ServerConfig>,
 
-    pub db_pool_v1: Arc<DbConnectionPool>,
-    pub db_pool_v2: Arc<DbConnectionPoolV2>,
+    pub db_pool: Arc<DbConnectionPoolV2>,
     pub valkey: Arc<ValkeyClient>,
     pub infra_caches: Arc<DashMap<i64, InfraCache>>,
     pub map_layers: Arc<MapLayers>,
@@ -398,7 +397,7 @@ pub struct AppState {
 
 impl FromRef<AppState> for DbConnectionPoolV2 {
     fn from_ref(input: &AppState) -> Self {
-        (*input.db_pool_v2).clone()
+        (*input.db_pool).clone()
     }
 }
 
@@ -409,16 +408,15 @@ impl AppState {
         // Config database
         let valkey = ValkeyClient::new(config.valkey_config.clone())?.into();
 
-        // Create both database pools
-        let db_pool_v2 = {
+        // Create database pool
+        let db_pool = {
             let PostgresConfig {
                 database_url,
                 pool_size,
             } = config.postgres_config.clone();
-            DbConnectionPoolV2::try_initialize(database_url, pool_size).await?
+            let pool = DbConnectionPoolV2::try_initialize(database_url, pool_size).await?;
+            Arc::new(pool)
         };
-        let db_pool_v1 = db_pool_v2.pool_v1();
-        let db_pool_v2 = Arc::new(db_pool_v2);
 
         // Setup infra cache map
         let infra_caches = DashMap::<i64, InfraCache>::default().into();
@@ -449,8 +447,7 @@ impl AppState {
 
         Ok(Self {
             valkey,
-            db_pool_v1,
-            db_pool_v2,
+            db_pool,
             infra_caches,
             core_client,
             osrdyne_client,

@@ -27,9 +27,6 @@ use url::Url;
 use tokio::sync::OwnedRwLockWriteGuard;
 use tokio::sync::RwLock;
 
-use super::DbConnectionPool;
-use super::DieselConnection;
-
 pub type DbConnectionConfig = AsyncDieselConnectionManager<AsyncPgConnection>;
 
 #[derive(Clone)]
@@ -110,7 +107,7 @@ impl DerefMut for WriteHandle {
 ///
 /// # Testing pool
 ///
-/// In test mode, the [DbConnectionPool::get] function will always return the same connection that has
+/// In test mode, the [Pool::<AsyncPgConnection>::get] function will always return the same connection that has
 /// been setup to drop all modification once the test ends.
 /// Since this connection will not commit any changes to the database, we ensure the isolation of each test.
 ///
@@ -423,17 +420,17 @@ pub async fn ping_database(conn: &mut DbConnection) -> Result<(), PingError> {
     Ok(())
 }
 
-pub fn create_connection_pool(
+fn create_connection_pool(
     url: Url,
     max_size: usize,
-) -> Result<DbConnectionPool, DatabasePoolBuildError> {
+) -> Result<Pool<AsyncPgConnection>, DatabasePoolBuildError> {
     let mut manager_config = ManagerConfig::default();
     manager_config.custom_setup = Box::new(establish_connection);
     let manager = DbConnectionConfig::new_with_config(url, manager_config);
     Ok(Pool::builder(manager).max_size(max_size).build()?)
 }
 
-fn establish_connection(config: &str) -> BoxFuture<ConnectionResult<DieselConnection>> {
+fn establish_connection(config: &str) -> BoxFuture<ConnectionResult<AsyncPgConnection>> {
     let fut = async {
         let mut connector_builder = SslConnector::builder(SslMethod::tls()).unwrap();
         connector_builder.set_verify(SslVerifyMode::NONE);
@@ -448,7 +445,7 @@ fn establish_connection(config: &str) -> BoxFuture<ConnectionResult<DieselConnec
                 tracing::error!("connection error: {}", e);
             }
         });
-        DieselConnection::try_from(client).await
+        AsyncPgConnection::try_from(client).await
     };
     fut.boxed()
 }

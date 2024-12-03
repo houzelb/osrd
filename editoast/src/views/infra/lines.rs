@@ -45,7 +45,7 @@ async fn get_line_bbox(
     Path((infra_id, line_code)): Path<(i64, i64)>,
     State(AppState {
         infra_caches,
-        db_pool_v2: db_pool,
+        db_pool,
         ..
     }): State<AppState>,
     Extension(auth): AuthenticationExt,

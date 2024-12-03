@@ -71,7 +71,7 @@ crate::routes! {
 async fn edit<'a>(
     Path(InfraIdParam { infra_id }): Path<InfraIdParam>,
     State(AppState {
-        db_pool_v2: db_pool,
+        db_pool,
         infra_caches,
         valkey,
         map_layers,
@@ -126,7 +126,7 @@ async fn edit<'a>(
 pub async fn split_track_section<'a>(
     Path(InfraIdParam { infra_id }): Path<InfraIdParam>,
     State(AppState {
-        db_pool_v2: db_pool,
+        db_pool,
         infra_caches,
         valkey,
         map_layers,

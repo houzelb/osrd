@@ -158,7 +158,7 @@ async fn get_routes_track_ranges(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let infra_caches = app_state.infra_caches.clone();
     let infra_id = infra;
     let infra = Infra::retrieve_or_fail(&mut db_pool.get().await?, infra_id, || {
@@ -219,7 +219,7 @@ async fn get_routes_nodes(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let infra_caches = app_state.infra_caches.clone();
 
     let infra = Infra::retrieve_or_fail(&mut db_pool.get().await?, params.infra_id, || {

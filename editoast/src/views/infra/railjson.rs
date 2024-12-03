@@ -181,7 +181,7 @@ async fn post_railjson(
         return Err(AuthorizationError::Unauthorized.into());
     }
 
-    let db_pool = app_state.db_pool_v2.clone();
+    let db_pool = app_state.db_pool.clone();
     let infra_caches = app_state.infra_caches.clone();
     if railjson.version != RAILJSON_VERSION {
         return Err(ListErrorsRailjson::WrongRailjsonVersionProvided.into());

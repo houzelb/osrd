@@ -158,7 +158,7 @@ pub enum PathfindingFailure {
 )]
 async fn post(
     State(AppState {
-        db_pool_v2: db_pool,
+        db_pool,
         valkey,
         core_client,
         ..

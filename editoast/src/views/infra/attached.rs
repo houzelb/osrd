@@ -67,7 +67,7 @@ async fn attached(
     Path(InfraAttachedParams { infra_id, track_id }): Path<InfraAttachedParams>,
     State(AppState {
         infra_caches,
-        db_pool_v2: db_pool,
+        db_pool,
         ..
     }): State<AppState>,
     Extension(auth): AuthenticationExt,

@@ -7,7 +7,6 @@ use std::sync::Arc;
 use axum::Router;
 use axum_tracing_opentelemetry::middleware::OtelAxumLayer;
 use dashmap::DashMap;
-use editoast_models::db_connection_pool::create_connection_pool;
 use editoast_models::DbConnectionPoolV2;
 use editoast_osrdyne_client::OsrdyneClient;
 use serde::de::DeserializeOwned;
@@ -40,7 +39,6 @@ pub(crate) struct TestAppBuilder {
     db_pool: Option<DbConnectionPoolV2>,
     core_client: Option<CoreClient>,
     osrdyne_client: Option<OsrdyneClient>,
-    db_pool_v1: bool,
 }
 
 impl TestAppBuilder {
@@ -49,13 +47,11 @@ impl TestAppBuilder {
             db_pool: None,
             core_client: None,
             osrdyne_client: None,
-            db_pool_v1: false,
         }
     }
 
     pub fn db_pool(mut self, db_pool: DbConnectionPoolV2) -> Self {
         assert!(self.db_pool.is_none());
-        assert!(!self.db_pool_v1);
         self.db_pool = Some(db_pool);
         self
     }
@@ -126,24 +122,10 @@ impl TestAppBuilder {
             .expect("Could not build Valkey client")
             .into();
 
-        // Create both database pools
-        let (db_pool_v2, db_pool_v1) = if self.db_pool_v1 {
-            let PostgresConfig {
-                database_url,
-                pool_size,
-            } = config.postgres_config.clone();
-            let pool = create_connection_pool(database_url, pool_size)
-                .expect("could not create connection pool for tests");
-            let v1 = Arc::new(pool);
-            let v2 = futures::executor::block_on(DbConnectionPoolV2::from_pool(v1.clone()));
-            (Arc::new(v2), v1)
-        } else {
-            let db_pool_v2 = self.db_pool.expect(
-                "No database pool provided to TestAppBuilder, use Default or provide a database pool"
-            );
-            let db_pool_v1 = db_pool_v2.pool_v1();
-            (Arc::new(db_pool_v2), db_pool_v1)
-        };
+        // Create database pool
+        let db_pool_v2 = Arc::new(self.db_pool.expect(
+            "No database pool provided to TestAppBuilder, use Default or provide a database pool",
+        ));
 
         // Setup infra cache map
         let infra_caches = DashMap::<i64, InfraCache>::default().into();
@@ -163,8 +145,7 @@ impl TestAppBuilder {
         let osrdyne_client = Arc::new(osrdyne_client);
 
         let app_state = AppState {
-            db_pool_v1,
-            db_pool_v2: db_pool_v2.clone(),
+            db_pool: db_pool_v2.clone(),
             core_client: core_client.clone(),
             osrdyne_client,
             valkey,
