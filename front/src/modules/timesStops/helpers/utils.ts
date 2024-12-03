@@ -5,7 +5,7 @@ import { round, isEqual, isNil } from 'lodash';
 import { keyColumn, createTextColumn } from 'react-datasheet-grid';
 
 import type { ReceptionSignal } from 'common/api/osrdEditoastApi';
-import type { IsoDateTimeString, IsoDurationString, TimeString } from 'common/types';
+import type { IsoDurationString, TimeString } from 'common/types';
 import { matchPathStepAndOp } from 'modules/pathfinding/utils';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import type { PathStep } from 'reducers/osrdconf/types';
@@ -42,7 +42,7 @@ export const formatSuggestedViasToRowVias = (
   operationalPoints: (SuggestedOP & { isWaypoint?: boolean })[],
   pathSteps: PathStep[],
   t: TFunction<'timesStops', undefined>,
-  startTime?: IsoDateTimeString,
+  startTime?: Date,
   tableType?: TableType
 ): TimesStopsInputRow[] => {
   const formattedOps = [...operationalPoints];
@@ -221,11 +221,11 @@ export function normalizeNullablesInRow(row: TimesStopsInputRow): TimesStopsInpu
  */
 export function updateDaySinceDeparture(
   pathWaypointRows: TimesStopsInputRow[],
-  startTime?: IsoDateTimeString,
+  startTime?: Date,
   { keepFirstIndexArrival = false } = {}
 ): TimesStopsInputRow[] {
   let currentDaySinceDeparture = 0;
-  let previousTime = startTime ? datetime2sec(new Date(startTime)) : Number.NEGATIVE_INFINITY;
+  let previousTime = startTime ? datetime2sec(startTime) : Number.NEGATIVE_INFINITY;
 
   return pathWaypointRows.map((pathWaypoint, index) => {
     const { arrival, stopFor } = pathWaypoint;
@@ -282,14 +282,14 @@ export function updateDaySinceDeparture(
 }
 
 export function durationSinceStartTime(
-  startTime?: IsoDateTimeString,
+  startTime?: Date,
   stepTimeDays?: TimeExtraDays
 ): IsoDurationString | null {
   if (!startTime || !stepTimeDays?.time || stepTimeDays?.daySinceDeparture === undefined) {
     return null;
   }
   const start = dayjs(startTime);
-  const step = dayjs(`${startTime.split('T')[0]}T${stepTimeDays.time}`).add(
+  const step = dayjs(`${start.format('YYYY-MM-DD')}T${stepTimeDays.time}`).add(
     stepTimeDays.daySinceDeparture,
     'day'
   );
@@ -299,7 +299,7 @@ export function durationSinceStartTime(
 }
 
 export function calculateStepTimeAndDays(
-  startTime?: IsoDateTimeString | null,
+  startTime?: Date | null,
   isoDuration?: IsoDurationString | null
 ): TimeExtraDays | undefined {
   if (!startTime || !isoDuration) {

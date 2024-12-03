@@ -59,7 +59,7 @@ const createClearViaButton = ({
 
 type TimesStopsInputProps = {
   allWaypoints?: SuggestedOP[];
-  startTime: string;
+  startTime: Date;
   pathSteps: PathStep[];
 };
 
