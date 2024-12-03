@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux';
 import { editoastToEditorEntity } from 'applications/editor/data/api';
 import type { TrackSectionEntity } from 'applications/editor/tools/trackEdition/types';
 import { calculateDistanceAlongTrack } from 'applications/editor/tools/utils';
+import { useManageTrainScheduleContext } from 'applications/operationalStudies/hooks/useManageTrainScheduleContext';
 import type { ManageTrainSchedulePathProperties } from 'applications/operationalStudies/types';
 import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
@@ -30,6 +31,7 @@ type RenderPopupProps = {
 
 function RenderPopup({ pathProperties }: RenderPopupProps) {
   const { getFeatureInfoClick, getInfraID, getOrigin, getDestination } = useOsrdConfSelectors();
+  const { launchPathfinding } = useManageTrainScheduleContext();
   const osrdConfActions = useOsrdConfActions();
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
   const featureInfoClick: FeatureInfoClickType = useSelector(getFeatureInfoClick);
@@ -124,7 +126,9 @@ function RenderPopup({ pathProperties }: RenderPopupProps) {
           data-testid="map-origin-button"
           className="btn btn-sm btn-success"
           type="button"
-          onClick={() => setPointIti('origin', pathStepProperties, osrdConfActions)}
+          onClick={() =>
+            setPointIti('origin', pathStepProperties, osrdConfActions, launchPathfinding)
+          }
         >
           <RiMapPin2Fill />
           <span className="d-none">{t('origin')}</span>
@@ -133,7 +137,15 @@ function RenderPopup({ pathProperties }: RenderPopupProps) {
           <button
             className="btn btn-sm btn-info"
             type="button"
-            onClick={() => setPointIti('via', pathStepProperties, osrdConfActions, pathProperties)}
+            onClick={() =>
+              setPointIti(
+                'via',
+                pathStepProperties,
+                osrdConfActions,
+                launchPathfinding,
+                pathProperties
+              )
+            }
           >
             <RiMapPin3Fill />
             <span className="d-none">{t('via')}</span>
@@ -143,7 +155,9 @@ function RenderPopup({ pathProperties }: RenderPopupProps) {
           data-testid="map-destination-button"
           className="btn btn-sm btn-warning"
           type="button"
-          onClick={() => setPointIti('destination', pathStepProperties, osrdConfActions)}
+          onClick={() =>
+            setPointIti('destination', pathStepProperties, osrdConfActions, launchPathfinding)
+          }
         >
           <IoFlag />
           <span className="d-none">{t('destination')}</span>

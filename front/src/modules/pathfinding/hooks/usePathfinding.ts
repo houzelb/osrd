@@ -1,4 +1,4 @@
-import { useState, useEffect, useReducer } from 'react';
+import { useCallback, useEffect, useReducer } from 'react';
 
 import { compact, isEqual, isObject } from 'lodash';
 import { useTranslation } from 'react-i18next';
@@ -152,11 +152,9 @@ export const usePathfinding = (
 ) => {
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
   const dispatch = useAppDispatch();
-  const { getOrigin, getDestination, getVias, getPathSteps, getPowerRestriction } =
-    useOsrdConfSelectors();
+  const { getOrigin, getDestination, getPathSteps, getPowerRestriction } = useOsrdConfSelectors();
   const origin = useSelector(getOrigin, isEqual);
   const destination = useSelector(getDestination, isEqual);
-  const vias = useSelector(getVias(), isEqual);
   const pathSteps = useSelector(getPathSteps);
   const powerRestrictions = useSelector(getPowerRestriction);
   const { infra, reloadCount, setIsInfraError } = useInfraStatus();
@@ -171,41 +169,13 @@ export const usePathfinding = (
   };
   const [pathfindingState, pathfindingDispatch] = useReducer(reducer, initializerArgs, init);
 
-  const [isPathfindingInitialized, setIsPathfindingInitialized] = useState(false);
-
   const [postPathfindingBlocks] =
     osrdEditoastApi.endpoints.postInfraByInfraIdPathfindingBlocks.useLazyQuery();
   const [postPathProperties] =
     osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useLazyQuery();
 
-  const { updatePathSteps } = useOsrdConfActions();
+  const { updatePathSteps, replaceItinerary } = useOsrdConfActions();
   const { infraId } = useScenarioContext();
-
-  useEffect(() => {
-    if (isPathfindingInitialized) {
-      pathfindingDispatch({
-        type: 'VIAS_CHANGED',
-        params: {
-          origin,
-          destination,
-          rollingStock,
-        },
-      });
-    }
-  }, [vias]);
-
-  useEffect(() => {
-    if (isPathfindingInitialized) {
-      pathfindingDispatch({
-        type: 'PATHFINDING_PARAM_CHANGED',
-        params: {
-          origin,
-          destination,
-          rollingStock,
-        },
-      });
-    }
-  }, [origin, destination, rollingStock]);
 
   const handleInvalidPathItems = (
     steps: (PathStep | null)[],
@@ -228,96 +198,103 @@ export const usePathfinding = (
         return step;
       });
 
-      dispatch(updatePathSteps(updatedPathSteps));
-      pathfindingDispatch({ type: 'PATHFINDING_FINISHED' });
-      pathfindingDispatch({ type: 'PATHFINDING_PARAM_CHANGED' });
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      launchPathfinding(updatedPathSteps);
     } else {
       dispatch(setFailure({ name: t('pathfindingError'), message: t('missingPathSteps') }));
     }
   };
 
-  useEffect(() => {
-    const populateStoreWithPathfinding = async (
-      pathResult: PathfindingResultSuccess,
-      incompatibleConstraints?: IncompatibleConstraints
-    ) => {
-      const pathPropertiesParams: PostInfraByInfraIdPathPropertiesApiArg = {
-        infraId,
-        props: ['electrifications', 'geometry', 'operational_points'],
-        pathPropertiesInput: {
-          track_section_ranges: pathResult.track_section_ranges,
-        },
-      };
-      const { electrifications, geometry, operational_points } =
-        await postPathProperties(pathPropertiesParams).unwrap();
+  const populateStoreWithPathfinding = async (
+    pathStepsInput: PathStep[],
+    pathResult: PathfindingResultSuccess,
+    incompatibleConstraints?: IncompatibleConstraints
+  ) => {
+    const pathPropertiesParams: PostInfraByInfraIdPathPropertiesApiArg = {
+      infraId,
+      props: ['electrifications', 'geometry', 'operational_points'],
+      pathPropertiesInput: {
+        track_section_ranges: pathResult.track_section_ranges,
+      },
+    };
+    const { electrifications, geometry, operational_points } =
+      await postPathProperties(pathPropertiesParams).unwrap();
 
-      if (!electrifications || !geometry || !operational_points) {
+    if (!electrifications || !geometry || !operational_points) {
+      return;
+    }
+
+    const suggestedOperationalPoints: SuggestedOP[] = formatSuggestedOperationalPoints(
+      operational_points,
+      geometry,
+      pathResult.length
+    );
+
+    // We update existing pathsteps with coordinates, positionOnPath and kp corresponding to the new pathfinding result
+    const updatedPathSteps: (PathStep | null)[] = pathStepsInput.map((step, i) => {
+      if (!step) return step;
+      const correspondingOp = suggestedOperationalPoints.find((suggestedOp) =>
+        matchPathStepAndOp(step, suggestedOp)
+      );
+
+      const theoreticalMargin = i === 0 ? step.theoreticalMargin || '0%' : step.theoreticalMargin;
+
+      const stopFor = i === pathStepsInput.length - 1 && !step.stopFor ? '0' : step.stopFor;
+      const stopType = i === pathStepsInput.length - 1 && !step.stopFor ? undefined : step.stopType;
+
+      return {
+        ...step,
+        positionOnPath: pathResult.path_item_positions[i],
+        stopFor,
+        stopType,
+        theoreticalMargin,
+        ...(correspondingOp && {
+          name: correspondingOp.name,
+          uic: correspondingOp.uic,
+          secondary_code: correspondingOp.ch,
+          kp: correspondingOp.kp,
+          coordinates: correspondingOp.coordinates,
+        }),
+      };
+    });
+
+    if (!isEmptyArray(powerRestrictions)) {
+      dispatch(
+        setWarning({
+          title: t('warningMessages.pathfindingChange'),
+          text: t('warningMessages.powerRestrictionsReset'),
+        })
+      );
+    }
+    dispatch(updatePathSteps(updatedPathSteps));
+
+    const allWaypoints = upsertPathStepsInOPs(
+      suggestedOperationalPoints,
+      compact(updatedPathSteps)
+    );
+
+    setPathProperties({
+      electrifications,
+      geometry,
+      suggestedOperationalPoints,
+      allWaypoints,
+      length: pathResult.length,
+      trackSectionRanges: pathResult.track_section_ranges,
+      incompatibleConstraints,
+    });
+  };
+
+  const launchPathfinding = useCallback(
+    async (steps: (PathStep | null)[]) => {
+      dispatch(replaceItinerary(steps));
+      setPathProperties(undefined);
+
+      if (steps.some((step) => step === null)) {
+        dispatch(setFailure({ name: t('pathfindingError'), message: t('missingPathSteps') }));
         return;
       }
 
-      const suggestedOperationalPoints: SuggestedOP[] = formatSuggestedOperationalPoints(
-        operational_points,
-        geometry,
-        pathResult.length
-      );
-
-      // We update existing pathsteps with coordinates, positionOnPath and kp corresponding to the new pathfinding result
-      const updatedPathSteps: (PathStep | null)[] = pathSteps.map((step, i) => {
-        if (!step) return step;
-        const correspondingOp = suggestedOperationalPoints.find((suggestedOp) =>
-          matchPathStepAndOp(step, suggestedOp)
-        );
-
-        const theoreticalMargin = i === 0 ? step.theoreticalMargin || '0%' : step.theoreticalMargin;
-
-        const stopFor = i === pathSteps.length - 1 && !step.stopFor ? '0' : step.stopFor;
-        const stopType = i === pathSteps.length - 1 && !step.stopFor ? undefined : step.stopType;
-
-        return {
-          ...step,
-          positionOnPath: pathResult.path_item_positions[i],
-          stopFor,
-          stopType,
-          theoreticalMargin,
-          ...(correspondingOp && {
-            name: correspondingOp.name,
-            uic: correspondingOp.uic,
-            secondary_code: correspondingOp.ch,
-            kp: correspondingOp.kp,
-            coordinates: correspondingOp.coordinates,
-          }),
-        };
-      });
-
-      if (!isEmptyArray(powerRestrictions)) {
-        dispatch(
-          setWarning({
-            title: t('warningMessages.pathfindingChange'),
-            text: t('warningMessages.powerRestrictionsReset'),
-          })
-        );
-      }
-      dispatch(updatePathSteps(updatedPathSteps));
-
-      const allWaypoints = upsertPathStepsInOPs(
-        suggestedOperationalPoints,
-        compact(updatedPathSteps)
-      );
-
-      setPathProperties({
-        electrifications,
-        geometry,
-        suggestedOperationalPoints,
-        allWaypoints,
-        length: pathResult.length,
-        trackSectionRanges: pathResult.track_section_ranges,
-        incompatibleConstraints,
-      });
-    };
-
-    const startPathFinding = async () => {
-      setPathProperties(undefined);
-      if (pathfindingState.running) {
+      if (infra?.state !== 'CACHED') {
         return;
       }
 
@@ -325,16 +302,10 @@ export const usePathfinding = (
       const pathfindingInput = getPathfindingQuery({
         infraId,
         rollingStock,
-        pathSteps: pathSteps.filter((step) => step !== null && !step.isInvalid),
+        pathSteps: steps.filter((step) => step !== null && !step.isInvalid),
       });
 
       if (!pathfindingInput) {
-        dispatch(
-          setFailure({
-            name: t('pathfinding'),
-            message: t('pathfindingMissingParamsSimple'),
-          })
-        );
         return;
       }
 
@@ -342,7 +313,10 @@ export const usePathfinding = (
         const pathfindingResult = await postPathfindingBlocks(pathfindingInput).unwrap();
 
         if (pathfindingResult.status === 'success') {
-          await populateStoreWithPathfinding(pathfindingResult);
+          await populateStoreWithPathfinding(
+            steps.map((step) => step!),
+            pathfindingResult
+          );
           pathfindingDispatch({ type: 'PATHFINDING_FINISHED' });
           return;
         }
@@ -353,6 +327,7 @@ export const usePathfinding = (
 
         if (incompatibleConstraintsCheck) {
           await populateStoreWithPathfinding(
+            steps.map((step) => step!),
             pathfindingResult.relaxed_constraints_path,
             pathfindingResult.incompatible_constraints
           );
@@ -368,7 +343,7 @@ export const usePathfinding = (
           pathfindingResult.error_type === 'invalid_path_items';
 
         if (hasInvalidPathItems) {
-          handleInvalidPathItems(pathSteps, pathfindingResult.items);
+          handleInvalidPathItems(steps, pathfindingResult.items);
           return;
         }
 
@@ -402,19 +377,24 @@ export const usePathfinding = (
           pathfindingDispatch({ type: 'PATHFINDING_ERROR', message: error });
         }
       }
-    };
+    },
+    [rollingStock, infra]
+  );
 
-    if (infra && infra.state === 'CACHED' && pathfindingState.mustBeLaunched) {
-      startPathFinding();
+  useEffect(() => {
+    if (infra?.state === 'CACHED') {
+      launchPathfinding(pathSteps);
     }
-  }, [pathfindingState.mustBeLaunched, infra]);
+  }, [infra?.state]);
 
-  useEffect(() => setIsPathfindingInitialized(true), []);
+  useEffect(() => {
+    launchPathfinding(pathSteps);
+  }, [rollingStock]);
 
   return {
-    isPathfindingInitialized,
+    launchPathfinding,
     pathfindingState,
-    infraInfos: {
+    infraInfo: {
       infra,
       reloadCount,
     },

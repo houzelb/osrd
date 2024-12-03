@@ -1,7 +1,7 @@
-import { compact, last, omit } from 'lodash';
+import { omit } from 'lodash';
 import { describe, beforeEach, it, expect } from 'vitest';
 
-import { ArrivalTimeTypes, StdcmStopTypes } from 'applications/stdcm/types';
+import { StdcmStopTypes } from 'applications/stdcm/types';
 import type { Distribution, Infra, TrainScheduleBase } from 'common/api/osrdEditoastApi';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import type { OperationalStudiesConfSlice } from 'reducers/osrdconf/operationalStudiesConf';
@@ -10,7 +10,6 @@ import commonConfBuilder from 'reducers/osrdconf/osrdConfCommon/__tests__/common
 import type { StdcmConfSlice } from 'reducers/osrdconf/stdcmConf';
 import type { OsrdConfState, PathStep } from 'reducers/osrdconf/types';
 import { createStoreWithoutMiddleware } from 'store';
-import { removeElementAtIndex } from 'utils/array';
 
 function createStore(
   slice: OperationalStudiesConfSlice | StdcmConfSlice,
@@ -239,24 +238,6 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
     expect(state.pathSteps).toEqual(pathSteps);
   });
 
-  it('should handle updateOrigin', () => {
-    const newOrigin = {
-      ...testDataBuilder.buildPathSteps()[0],
-      arrivalType: ArrivalTimeTypes.PRECISE_TIME,
-    };
-    defaultStore.dispatch(slice.actions.updateOrigin(newOrigin));
-    const state = defaultStore.getState()[slice.name];
-    expect(state.pathSteps[0]).toEqual(newOrigin);
-  });
-
-  it('should handle updateDestination', () => {
-    const lastPathStep = last(testDataBuilder.buildPathSteps());
-    const newDestination = { ...lastPathStep!, arrivalType: ArrivalTimeTypes.ASAP };
-    defaultStore.dispatch(slice.actions.updateDestination(newDestination));
-    const state = defaultStore.getState()[slice.name];
-    expect(last(state.pathSteps)).toEqual(newDestination);
-  });
-
   it('should handle deleteItinerary', () => {
     const pathSteps = testDataBuilder.buildPathSteps();
     const store = createStore(slice, {
@@ -265,113 +246,6 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
     store.dispatch(slice.actions.deleteItinerary());
     const state = store.getState()[slice.name];
     expect(state.pathSteps).toEqual([null, null]);
-  });
-
-  it('should handle clearVias', () => {
-    const pathSteps = testDataBuilder.buildPathSteps();
-    const store = createStore(slice, {
-      pathSteps,
-    });
-    store.dispatch(slice.actions.clearVias());
-    const state = store.getState()[slice.name];
-    expect(state.pathSteps).toEqual([pathSteps[0], last(pathSteps)]);
-  });
-
-  it('should handle deleteVia', () => {
-    const pathSteps = testDataBuilder.buildPathSteps();
-    const store = createStore(slice, {
-      pathSteps,
-    });
-    store.dispatch(slice.actions.deleteVia(0));
-    const state = store.getState()[slice.name];
-    expect(state.pathSteps).toEqual(removeElementAtIndex(pathSteps, 1));
-  });
-
-  describe('should handle addVia', () => {
-    const pathStepsData = testDataBuilder.buildPathSteps();
-    const [brest, rennes, lemans, paris, strasbourg] = compact(pathStepsData);
-    const pathProperties = testDataBuilder.buildPathProperties();
-    // Those are not supposed to have the position on path, its calculated by the helper
-    const [rennesNoPosition, lemansNoPosition, parisNoPosition] = [rennes, lemans, paris].map(
-      (step) => omit(step, ['positionOnPath'])
-    );
-
-    it('should handle insertion for a route with no existing via and no origin', () => {
-      const pathSteps = [null, strasbourg];
-      const store = createStore(slice, {
-        pathSteps,
-      });
-
-      store.dispatch(slice.actions.addVia({ newVia: paris, pathProperties }));
-      const state = store.getState()[slice.name];
-      expect(state.pathSteps).toStrictEqual([null, parisNoPosition, strasbourg]);
-    });
-
-    it('should handle insertion for a route with no existing via and no destination', () => {
-      const pathSteps = [brest, null];
-      const store = createStore(slice, {
-        pathSteps,
-      });
-
-      store.dispatch(slice.actions.addVia({ newVia: rennes, pathProperties }));
-      const state = store.getState()[slice.name];
-      expect(state.pathSteps).toStrictEqual([brest, rennesNoPosition, null]);
-    });
-
-    it('should handle insertion for a route with no existing via', () => {
-      const pathSteps = [brest, strasbourg];
-      const store = createStore(slice, {
-        pathSteps,
-      });
-
-      store.dispatch(slice.actions.addVia({ newVia: lemans, pathProperties }));
-      const state = store.getState()[slice.name];
-      expect(state.pathSteps).toStrictEqual([brest, lemansNoPosition, strasbourg]);
-    });
-
-    it('should correctly append a new via point when the existing via is closer to the origin', () => {
-      const pathSteps = [brest, rennes, strasbourg];
-      const store = createStore(slice, {
-        pathSteps,
-      });
-
-      store.dispatch(slice.actions.addVia({ newVia: lemans, pathProperties }));
-      const state = store.getState()[slice.name];
-      expect(state.pathSteps).toStrictEqual([brest, rennes, lemansNoPosition, strasbourg]);
-    });
-
-    it('should insert a via between two existing ones based on distance from origin', () => {
-      const pathSteps = [brest, rennes, paris, strasbourg];
-      const store = createStore(slice, {
-        pathSteps,
-      });
-
-      store.dispatch(slice.actions.addVia({ newVia: lemans, pathProperties }));
-      const state = store.getState()[slice.name];
-      expect(state.pathSteps).toStrictEqual([brest, rennes, lemansNoPosition, paris, strasbourg]);
-    });
-
-    it('should insert a via at the end of the route', () => {
-      const pathSteps = [brest, rennes, lemans, strasbourg];
-      const store = createStore(slice, {
-        pathSteps,
-      });
-
-      store.dispatch(slice.actions.addVia({ newVia: paris, pathProperties }));
-      const state = store.getState()[slice.name];
-      expect(state.pathSteps).toStrictEqual([brest, rennes, lemans, parisNoPosition, strasbourg]);
-    });
-  });
-
-  it('should handle moveVia', () => {
-    const pathSteps = testDataBuilder.buildPathSteps();
-    const [brest, rennes, lemans, paris, strasbourg] = pathSteps;
-
-    const store = createStore(slice, { pathSteps: [brest, rennes, lemans, paris, strasbourg] });
-
-    store.dispatch(slice.actions.moveVia(pathSteps, 0, 2));
-    const state = store.getState()[slice.name];
-    expect(state.pathSteps).toStrictEqual([brest, lemans, paris, rennes, strasbourg]);
   });
 
   describe('should handle upsertViaFromSuggestedOP', () => {

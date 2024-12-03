@@ -9,21 +9,24 @@ import ModalBodySNCF from 'common/BootstrapSNCF/ModalSNCF/ModalBodySNCF';
 import ModalFooterSNCF from 'common/BootstrapSNCF/ModalSNCF/ModalFooterSNCF';
 import ModalHeaderSNCF from 'common/BootstrapSNCF/ModalSNCF/ModalHeaderSNCF';
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
-import { isVia } from 'modules/pathfinding/utils';
+import { isVia, matchPathStepAndOp } from 'modules/pathfinding/utils';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
+import type { PathStep } from 'reducers/osrdconf/types';
 import { useAppDispatch } from 'store';
 import { formatUicToCi } from 'utils/strings';
 
 type ModalSuggestedViasProps = {
   suggestedVias: SuggestedOP[];
+  launchPathfinding: (pathSteps: (PathStep | null)[]) => void;
 };
 
-const ModalSuggestedVias = ({ suggestedVias }: ModalSuggestedViasProps) => {
-  const { upsertViaFromSuggestedOP, clearVias, removeVia } = useOsrdConfActions();
-  const { getVias, getDestination } = useOsrdConfSelectors();
+const ModalSuggestedVias = ({ suggestedVias, launchPathfinding }: ModalSuggestedViasProps) => {
+  const { upsertViaFromSuggestedOP } = useOsrdConfActions();
+  const { getVias, getDestination, getPathSteps } = useOsrdConfSelectors();
   const dispatch = useAppDispatch();
   const vias = useSelector(getVias());
   const destination = useSelector(getDestination);
+  const pathSteps = useSelector(getPathSteps) as PathStep[]; // this modal can't be open if we miss origin or destination;
   const { t } = useTranslation('operationalStudies/manageTrainSchedule');
 
   const isOriginOrDestination = useCallback(
@@ -32,7 +35,10 @@ const ModalSuggestedVias = ({ suggestedVias }: ModalSuggestedViasProps) => {
     [destination]
   );
 
-  const removeViaFromPath = (op: SuggestedOP) => dispatch(removeVia(op));
+  const removeViaFromPath = (op: SuggestedOP) => {
+    const newPathSteps = pathSteps.filter((step) => !matchPathStepAndOp(step, op));
+    launchPathfinding(newPathSteps);
+  };
 
   const formatOP = (op: SuggestedOP, idx: number, idxTrueVia: number) => {
     const isInVias = isVia(vias, op);
@@ -110,7 +116,10 @@ const ModalSuggestedVias = ({ suggestedVias }: ModalSuggestedViasProps) => {
           <button
             className="btn btn-danger btn-sm btn-block mb-1"
             type="button"
-            onClick={() => dispatch(clearVias())}
+            onClick={() => {
+              const newPathSteps = [pathSteps.at(0)!, pathSteps.at(-1)!];
+              launchPathfinding(newPathSteps);
+            }}
           >
             <Trash />
             <span className="ml-2">{t('deleteVias')}</span>

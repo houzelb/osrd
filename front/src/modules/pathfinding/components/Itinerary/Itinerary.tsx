@@ -7,10 +7,10 @@ import { isNil } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
-import type { ManageTrainSchedulePathProperties } from 'applications/operationalStudies/types';
+import { useManageTrainScheduleContext } from 'applications/operationalStudies/hooks/useManageTrainScheduleContext';
 import { useModal } from 'common/BootstrapSNCF/ModalSNCF';
 import { computeBBoxViewport } from 'common/Map/WarpedMap/core/helpers';
-import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
+import { useOsrdConfSelectors } from 'common/osrdContext';
 import Tipped from 'common/Tipped';
 import Pathfinding from 'modules/pathfinding/components/Pathfinding/Pathfinding';
 import TypeAndPath from 'modules/pathfinding/components/Pathfinding/TypeAndPath';
@@ -26,18 +26,11 @@ import Vias from './DisplayItinerary/Vias';
 import ModalSuggestedVias from './ModalSuggestedVias';
 
 type ItineraryProps = {
-  pathProperties?: ManageTrainSchedulePathProperties;
-  setPathProperties: (pathProperties?: ManageTrainSchedulePathProperties) => void;
   shouldManageStopDuration?: boolean;
 };
 
-const Itinerary = ({
-  pathProperties,
-  setPathProperties,
-  shouldManageStopDuration,
-}: ItineraryProps) => {
+const Itinerary = ({ shouldManageStopDuration }: ItineraryProps) => {
   const { getPathSteps, getOrigin, getDestination, getPowerRestriction } = useOsrdConfSelectors();
-  const { reverseItinerary, deleteItinerary } = useOsrdConfActions();
   const origin = useSelector(getOrigin);
   const destination = useSelector(getDestination);
   const pathSteps = useSelector(getPathSteps);
@@ -48,6 +41,8 @@ const Itinerary = ({
   const map = useSelector(getMap);
   const { t } = useTranslation('operationalStudies/manageTrainSchedule');
   const { openModal } = useModal();
+
+  const { pathProperties, setPathProperties, launchPathfinding } = useManageTrainScheduleContext();
 
   const zoomToFeaturePoint = (lngLat?: Position) => {
     if (lngLat) {
@@ -81,13 +76,14 @@ const Itinerary = ({
 
   const inverseOD = () => {
     notifyRestrictionResetWarning();
-    dispatch(reverseItinerary());
+    const newPathSteps = [...pathSteps].reverse();
+    launchPathfinding(newPathSteps);
   };
 
   const resetPathfinding = () => {
     setPathProperties(undefined);
     notifyRestrictionResetWarning();
-    dispatch(deleteItinerary());
+    launchPathfinding([null, null]);
   };
 
   useEffect(() => {
@@ -97,7 +93,7 @@ const Itinerary = ({
   return (
     <div className="osrd-config-item">
       <div className="mb-2 d-flex">
-        <Pathfinding pathProperties={pathProperties} setPathProperties={setPathProperties} />
+        <Pathfinding />
         <button
           type="button"
           className="btn btn-sm btn-only-icon btn-white px-3 ml-2"
@@ -132,7 +128,12 @@ const Itinerary = ({
               className="col ml-1 my-1 text-white btn bg-info btn-sm"
               type="button"
               onClick={() =>
-                openModal(<ModalSuggestedVias suggestedVias={pathProperties.allWaypoints} />)
+                openModal(
+                  <ModalSuggestedVias
+                    suggestedVias={pathProperties.allWaypoints}
+                    launchPathfinding={launchPathfinding}
+                  />
+                )
               }
             >
               <span className="mr-1">{t('addVias')}</span>
