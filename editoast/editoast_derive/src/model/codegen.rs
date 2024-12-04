@@ -457,3 +457,86 @@ trait TokensIf: Sized {
 }
 
 impl<T: ToTokens> TokensIf for T {}
+
+/// Generates an expression that splits a query into chunks to accommodate libpq's maximum number of binded parameters
+///
+/// This is a hack around a libpq limitation (cf. <https://github.com/diesel-rs/diesel/issues/2414>).
+/// The rows to process are split into chunks for which at most `2^16 - 1` parameters are sent to libpq.
+/// Therefore we need to know how many parameters are sent per row.
+/// The result collection can be parametrized.
+///
+/// # On concurrency
+///
+/// There seem to be a problem with concurrent queries using deadpool, panicking with
+/// 'Cannot access shared transaction state'. So this macro do not run each chunk's query concurrently.
+/// While AsyncPgConnection supports pipelining, each query will be sent one after the other.
+/// (But hey, it's still better than just making one query per row :p)
+#[derive(Clone)]
+struct LibpqChunkedIteration {
+    /// The number of binded values per row
+    parameters_per_row: usize,
+    /// The maximum number of rows per chunk (actual chunk size may be smaller, but never bigger)
+    chunk_size_limit: usize,
+    /// The identifier of the values to iterate over (must implement `IntoIterator<Item = ParameterType>`)
+    values_ident: syn::Ident,
+    /// How to collect the results
+    collector: LibpqChunkedIterationCollector,
+    /// The identifier of the chunk iteration variable
+    chunk_iteration_ident: syn::Ident,
+    /// The body of the chunk iteration
+    chunk_iteration_body: proc_macro2::TokenStream,
+}
+
+/// Describes how to collect the results of a chunked iteration
+#[derive(Clone)]
+enum LibpqChunkedIterationCollector {
+    /// All results are pushed into a Vec (item type has to be inferable)
+    VecPush,
+    /// Extends an existing collection. It's initialization expression must be provided.
+    ///
+    /// The initialized collection must implement `Extend<Model>`.
+    Extend { collection_init: syn::Expr },
+}
+
+impl LibpqChunkedIteration {
+    fn with_iteration_body(&self, body: proc_macro2::TokenStream) -> Self {
+        Self {
+            chunk_iteration_body: body,
+            ..self.clone()
+        }
+    }
+}
+
+impl ToTokens for LibpqChunkedIteration {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let Self {
+            parameters_per_row,
+            chunk_size_limit,
+            values_ident,
+            chunk_iteration_ident,
+            chunk_iteration_body,
+            collector,
+        } = self;
+        let (init, extend) = match collector {
+            LibpqChunkedIterationCollector::VecPush => {
+                (syn::parse_quote! { Vec::new() }, quote::quote! { push })
+            }
+            LibpqChunkedIterationCollector::Extend { collection_init } => {
+                (collection_init.clone(), quote::quote! { extend })
+            }
+        };
+        tokens.extend(quote::quote! {
+            const LIBPQ_MAX_PARAMETERS: usize = 2_usize.pow(16) - 1;
+            // We need to divide further because of AsyncPgConnection, maybe it is related to connection pipelining
+            const ASYNC_SUBDIVISION: usize = 2_usize;
+            const CHUNK_SIZE: usize = LIBPQ_MAX_PARAMETERS / ASYNC_SUBDIVISION / #parameters_per_row;
+            let mut result = #init;
+            let chunks = #values_ident.chunks(CHUNK_SIZE.min(#chunk_size_limit));
+            for #chunk_iteration_ident in chunks {
+                let chunk_result = { #chunk_iteration_body };
+                result.#extend(chunk_result);
+            }
+            result
+        });
+    }
+}

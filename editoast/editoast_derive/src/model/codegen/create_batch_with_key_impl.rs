@@ -3,6 +3,8 @@ use quote::ToTokens;
 
 use crate::model::identifier::Identifier;
 
+use super::LibpqChunkedIteration;
+
 pub(crate) struct CreateBatchWithKeyImpl {
     pub(super) model: syn::Ident,
     pub(super) table_name: syn::Ident,
@@ -31,6 +33,31 @@ impl ToTokens for CreateBatchWithKeyImpl {
         let ty = identifier.get_type();
         let span_name = format!("model:create_batch_with_key<{}>", model);
 
+        let create_loop = LibpqChunkedIteration {
+            parameters_per_row: *field_count,
+            chunk_size_limit: *chunk_size_limit,
+            values_ident: syn::parse_quote! { values },
+            chunk_iteration_ident: syn::parse_quote! { chunk },
+            collector: super::LibpqChunkedIterationCollector::Extend {
+                collection_init: syn::parse_quote! { C::default() },
+            },
+            chunk_iteration_body: quote! {
+                diesel::insert_into(dsl::#table_name)
+                    .values(chunk)
+                    .returning((#(dsl::#columns,)*))
+                    .load_stream::<#row>(conn.write().await.deref_mut())
+                    .await
+                    .map(|s| {
+                        s.map_ok(|row| {
+                            let model = <#model as Model>::from_row(row);
+                            (model.get_id(), model)
+                        })
+                        .try_collect::<Vec<_>>()
+                    })?
+                    .await?
+            },
+        };
+
         tokens.extend(quote! {
             #[automatically_derived]
             #[async_trait::async_trait]
@@ -51,27 +78,7 @@ impl ToTokens for CreateBatchWithKeyImpl {
                     use diesel_async::RunQueryDsl;
                     use futures_util::stream::TryStreamExt;
                     let values = values.into_iter().collect::<Vec<_>>();
-                    Ok(crate::chunked_for_libpq! {
-                        #field_count,
-                        #chunk_size_limit,
-                        values,
-                        C::default(),
-                        chunk => {
-                            diesel::insert_into(dsl::#table_name)
-                                .values(chunk)
-                                .returning((#(dsl::#columns,)*))
-                                .load_stream::<#row>(conn.write().await.deref_mut())
-                                .await
-                                .map(|s| {
-                                    s.map_ok(|row| {
-                                        let model = <#model as Model>::from_row(row);
-                                        (model.get_id(), model)
-                                    })
-                                    .try_collect::<Vec<_>>()
-                                })?
-                                .await?
-                        }
-                    })
+                    Ok({ #create_loop })
                 }
             }
         });
