@@ -1,8 +1,4 @@
-import {
-  extractDateAndTimefromISO,
-  addDurationToIsoDate,
-  substractDurationToIsoDate,
-} from 'utils/date';
+import { extractDateAndTimefromISO, addDurationToDate, subtractDurationFromDate } from 'utils/date';
 
 /**
  * Computes the operation schedules for a given start time and duration.
@@ -18,14 +14,14 @@ import {
  * Note: A margin of 1800 seconds (30 minutes) is applied to the departure and arrival times to allow for necessary
  * activities such as preparation for the next departure.
  */
-const computeOpSchedules = (startTime: string, msFromStartTime: number) => {
+const computeOpSchedules = (startTime: Date, msFromStartTime: number) => {
   const { arrivalDate: originDate, arrivalTime: originTime } = extractDateAndTimefromISO(
-    startTime,
+    startTime.toISOString(),
     'DD/MM/YY'
   );
-  const destinationArrivalTime = addDurationToIsoDate(startTime, msFromStartTime, 'millisecond');
+  const destinationArrivalTime = addDurationToDate(startTime, msFromStartTime, 'millisecond');
   const { arrivalDate: destinationDate, arrivalTime: destinationTime } = extractDateAndTimefromISO(
-    destinationArrivalTime,
+    destinationArrivalTime.toISOString(),
     'DD/MM/YY'
   );
 
@@ -33,12 +29,12 @@ const computeOpSchedules = (startTime: string, msFromStartTime: number) => {
     origin: {
       date: originDate,
       time: originTime,
-      isoArrivalTime: substractDurationToIsoDate(startTime, 1800),
+      isoArrivalTime: subtractDurationFromDate(startTime, 1800).toISOString(),
     },
     destination: {
       date: destinationDate,
       time: destinationTime,
-      isoArrivalTime: addDurationToIsoDate(destinationArrivalTime, 1800),
+      isoArrivalTime: addDurationToDate(destinationArrivalTime, 1800).toISOString(),
     },
   };
 };
