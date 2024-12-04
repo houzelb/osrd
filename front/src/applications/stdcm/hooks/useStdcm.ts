@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import nextId from 'react-id-generator';
@@ -52,6 +52,7 @@ const useStdcm = ({
   const { getConf, getTimetableID } = useOsrdConfSelectors();
   const osrdconf = useSelector(getConf) as OsrdStdcmConfState;
   const timetableId = useSelector(getTimetableID);
+  const requestPromise = useRef<ReturnType<typeof postTimetableByIdStdcm>>();
 
   const stdcmResults = useStdcmResults(stdcmResponse, stdcmTrainResult, setPathProperties);
 
@@ -64,9 +65,6 @@ const useStdcm = ({
       },
       { skip: !osrdconf.rollingStockID }
     );
-
-  // https://developer.mozilla.org/en-US/docs/Web/API/AbortController
-  const controller = new AbortController();
 
   const { speedLimitByTag } = useStoreDataForSpeedLimitByTagSelector({ isStdcm: true });
 
@@ -85,7 +83,10 @@ const useStdcm = ({
     if (validConfig) {
       const payload = formatStdcmPayload(validConfig);
       try {
-        const response = await postTimetableByIdStdcm(payload).unwrap();
+        const promise = postTimetableByIdStdcm(payload);
+        requestPromise.current = promise;
+
+        const response = await promise.unwrap();
 
         if (
           response.status === 'success' &&
@@ -132,28 +133,30 @@ const useStdcm = ({
           });
         }
       } catch (e) {
-        setCurrentStdcmRequestStatus(STDCM_REQUEST_STATUS.rejected);
-        triggerShowFailureNotification(
-          castErrorToFailure(e, {
-            name: t('stdcm:stdcmErrors.requestFailed'),
-            message: t('translation:common.error'),
-          })
-        );
+        if ((e as Error).name !== 'AbortError') {
+          setCurrentStdcmRequestStatus(STDCM_REQUEST_STATUS.rejected);
+          triggerShowFailureNotification(
+            castErrorToFailure(e, {
+              name: t('stdcm:stdcmErrors.requestFailed'),
+              message: t('translation:common.error'),
+            })
+          );
+        }
       }
-    } else {
-      setCurrentStdcmRequestStatus(STDCM_REQUEST_STATUS.rejected);
     }
   };
 
   const cancelStdcmRequest = () => {
-    // when http ready https://axios-http.com/docs/cancellation
-
-    controller.abort();
+    if (typeof requestPromise.current?.abort === 'function') {
+      requestPromise.current.abort();
+    }
+    requestPromise.current = undefined;
     setCurrentStdcmRequestStatus(STDCM_REQUEST_STATUS.canceled);
   };
 
   const isPending = currentStdcmRequestStatus === STDCM_REQUEST_STATUS.pending;
   const isRejected = currentStdcmRequestStatus === STDCM_REQUEST_STATUS.rejected;
+  const isCanceled = currentStdcmRequestStatus === STDCM_REQUEST_STATUS.canceled;
   const hasConflicts = (stdcmTrainConflicts?.length ?? 0) > 0;
 
   return {
@@ -164,6 +167,7 @@ const useStdcm = ({
     setPathProperties,
     isPending,
     isRejected,
+    isCanceled,
     stdcmTrainConflicts,
     hasConflicts,
     isCalculationFailed: isRejected,
