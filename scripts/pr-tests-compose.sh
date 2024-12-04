@@ -74,10 +74,20 @@ elif [ "$1" = "down" ]; then
 
 else
 
-    # Shutdown and clean the docker instance
+    # Shutdown and clean the docker instance (remove "osrd" images too)
+    osrd_images=$(docker compose \
+        -p "osrd-pr-tests" \
+        -f "docker/docker-compose.pr-tests.yml" \
+        images --format json \
+        core editoast osrdyne gateway front \
+        | jq --raw-output '.[].ID')
+
     docker compose \
         -p "osrd-pr-tests" \
         -f "docker/docker-compose.pr-tests.yml" \
         down -v
+
+    # shellcheck disable=SC2086
+    docker rmi ${osrd_images}
 
 fi
