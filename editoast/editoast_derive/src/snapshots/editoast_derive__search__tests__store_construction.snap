@@ -61,18 +61,36 @@ impl editoast_search::SearchConfigStore for SearchStore {
         }
     }
     fn all() -> Vec<(&'static str, editoast_search::SearchConfig)> {
-        vec![
-            ("track", < SearchResultItemTrack as editoast_search::SearchObject >
-            ::search_config()), ("operationalpoint", < SearchResultItemOperationalPoint
-            as editoast_search::SearchObject > ::search_config()), ("signal", <
-            SearchResultItemSignal as editoast_search::SearchObject > ::search_config()),
-            ("project", < SearchResultItemProject as editoast_search::SearchObject >
-            ::search_config()), ("study", < SearchResultItemStudy as
-            editoast_search::SearchObject > ::search_config()), ("scenario", <
-            SearchResultItemScenario as editoast_search::SearchObject >
-            ::search_config()), ("trainschedule", < SearchResultItemTrainSchedule as
-            editoast_search::SearchObject > ::search_config())
-        ]
+        Vec::from([
+            (
+                "track",
+                <SearchResultItemTrack as editoast_search::SearchObject>::search_config(),
+            ),
+            (
+                "operationalpoint",
+                <SearchResultItemOperationalPoint as editoast_search::SearchObject>::search_config(),
+            ),
+            (
+                "signal",
+                <SearchResultItemSignal as editoast_search::SearchObject>::search_config(),
+            ),
+            (
+                "project",
+                <SearchResultItemProject as editoast_search::SearchObject>::search_config(),
+            ),
+            (
+                "study",
+                <SearchResultItemStudy as editoast_search::SearchObject>::search_config(),
+            ),
+            (
+                "scenario",
+                <SearchResultItemScenario as editoast_search::SearchObject>::search_config(),
+            ),
+            (
+                "trainschedule",
+                <SearchResultItemTrainSchedule as editoast_search::SearchObject>::search_config(),
+            ),
+        ])
     }
 }
 #[derive(Serialize, ToSchema)]
