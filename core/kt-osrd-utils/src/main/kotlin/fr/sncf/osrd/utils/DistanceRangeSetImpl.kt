@@ -36,6 +36,10 @@ class DistanceRangeSetImpl : DistanceRangeSet {
         map.shiftPositions(offset)
     }
 
+    override fun contains(offset: Distance): Boolean {
+        return map.get(offset) ?: false
+    }
+
     override fun iterator(): Iterator<DistanceRangeSet.RangeSetEntry> {
         return asList().iterator()
     }

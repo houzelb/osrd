@@ -48,6 +48,7 @@ class ETCSBrakingSimulatorImpl(
         limitsOfAuthority: Collection<LimitOfAuthority>,
         endsOfAuthority: Collection<EndOfAuthority>
     ): Envelope {
+        if (limitsOfAuthority.isEmpty() && endsOfAuthority.isEmpty()) return mrsp
         TODO("Not yet implemented")
     }
 }
