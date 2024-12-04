@@ -27,7 +27,7 @@ impl Instrumentation for TracingInstrumentation {
         match event {
             InstrumentationEvent::StartEstablishConnection { url, .. } => {
                 let url = Url::parse(url).unwrap();
-                let span = tracing::info_span!(
+                let span = tracing::trace_span!(
                     "connection",
                     // opentelemetry_semantic_conventions::attribute::DB_SYSTEM
                     "db.system" = "postgresql",
@@ -40,7 +40,7 @@ impl Instrumentation for TracingInstrumentation {
                 );
                 {
                     let _guard = span.enter();
-                    tracing::debug!("establishing a connection");
+                    tracing::trace!("establishing a connection");
                 }
                 self.connection_span = span;
             }
@@ -54,7 +54,7 @@ impl Instrumentation for TracingInstrumentation {
                         );
                         tracing::warn!("failed to establish a connection");
                     } else {
-                        tracing::debug!("connection established");
+                        tracing::trace!("connection established");
                     }
                 }
                 self.connection_span = tracing::Span::none();
@@ -69,7 +69,7 @@ impl Instrumentation for TracingInstrumentation {
                 );
                 {
                     let _guard = span.enter();
-                    tracing::debug!("starting query");
+                    tracing::trace!("starting query");
                 }
                 if let Some(_existing_span) = self.query_spans.take() {
                     tracing::warn!("a query was already started: are you pipelining queries on the same connection?");
@@ -77,7 +77,7 @@ impl Instrumentation for TracingInstrumentation {
                 self.query_spans = Some(span);
             }
             InstrumentationEvent::CacheQuery { .. } => {
-                tracing::debug!("caching query");
+                tracing::trace!("caching query");
             }
             InstrumentationEvent::FinishQuery { query, error, .. } => {
                 let span = self
@@ -96,7 +96,7 @@ impl Instrumentation for TracingInstrumentation {
                     );
                     tracing::warn!("failed to execute the query");
                 } else {
-                    tracing::debug!("query finished");
+                    tracing::trace!("query finished");
                 }
             }
             InstrumentationEvent::BeginTransaction { depth, .. } => {
@@ -110,7 +110,7 @@ impl Instrumentation for TracingInstrumentation {
                 );
                 {
                     let _guard = span.enter();
-                    tracing::debug!("beginning transaction");
+                    tracing::trace!("beginning transaction");
                 }
                 self.transaction_spans.push_back(span);
             }
@@ -125,7 +125,7 @@ impl Instrumentation for TracingInstrumentation {
                     opentelemetry_semantic_conventions::attribute::DB_OPERATION_NAME,
                     "commit_transaction",
                 );
-                tracing::debug!("committing transaction");
+                tracing::trace!("committing transaction");
             }
             InstrumentationEvent::RollbackTransaction { depth, .. } => {
                 debug_assert_eq!(self.transaction_spans.len(), depth.get() as usize);
@@ -138,7 +138,7 @@ impl Instrumentation for TracingInstrumentation {
                     opentelemetry_semantic_conventions::attribute::DB_OPERATION_NAME,
                     "rollback_transaction",
                 );
-                tracing::debug!("rollbacking transaction");
+                tracing::trace!("rollbacking transaction");
             }
             _ => {
                 tracing::warn!("unknown instrumentation event, maybe 'InstrumentationEvent' evolved since last time this code was updated?");
