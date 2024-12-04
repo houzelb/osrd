@@ -1,13 +1,13 @@
 package fr.sncf.osrd.envelope_sim.etcs
 
 import fr.sncf.osrd.envelope.Envelope
+import fr.sncf.osrd.envelope_sim.PhysicsPath
 import fr.sncf.osrd.envelope_sim.PhysicsRollingStock
 import fr.sncf.osrd.sim_infra.api.Path
-import fr.sncf.osrd.sim_infra.api.PathProperties
 import fr.sncf.osrd.utils.units.Offset
 
 interface ETCSBrakingSimulator {
-    val trainPath: PathProperties
+    val path: PhysicsPath
     val rollingStock: PhysicsRollingStock
     val timeStep: Double
 
@@ -38,7 +38,7 @@ data class EndOfAuthority(
 }
 
 class ETCSBrakingSimulatorImpl(
-    override val trainPath: PathProperties,
+    override val path: PhysicsPath,
     override val rollingStock: PhysicsRollingStock,
     override val timeStep: Double
 ) : ETCSBrakingSimulator {
