@@ -35,6 +35,7 @@ const StdcmView = () => {
     cancelStdcmRequest,
     isPending,
     isRejected,
+    isCanceled,
     stdcmResults,
     pathProperties,
     stdcmTrainConflicts,
@@ -106,6 +107,12 @@ const StdcmView = () => {
       setShowBtnToLaunchSimulation(true);
     }
   }, [isDebugMode]);
+
+  useEffect(() => {
+    if (isCanceled) {
+      setShowBtnToLaunchSimulation(true);
+    }
+  }, [isCanceled]);
 
   useEffect(() => {
     /*
