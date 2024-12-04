@@ -167,7 +167,7 @@ export function serializeDateTimeWithoutYear(date: Date): string {
  * @param {string} arrivalTime - Arrival time at which the train should arrive at the location. (Format: 'YYYY-MM-DDTHH:mm:ss+HH:mm')
  * @returns {object} An object containing the parsed date and time.
  */
-export function extractDateAndTimefromISO(arrivalTime: string, dateFormat: string = 'YYYY-MM-DD') {
+export function extractDateAndTime(arrivalTime: Date, dateFormat: string = 'YYYY-MM-DD') {
   const dayjsDate = dayjs(arrivalTime);
   return {
     arrivalDate: dayjsDate.format(dateFormat), // ISO date part
