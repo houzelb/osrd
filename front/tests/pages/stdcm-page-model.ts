@@ -379,7 +379,8 @@ class STDCMPage {
     await toleranceField.click();
     await this.page.getByRole('button', { name: minusValue, exact: true }).click();
     await this.page.getByRole('button', { name: plusValue, exact: true }).click();
-    // TODO : Add a click on the close button when #693 is done
+    // TODO : Add a click on the close button instead of clicking on the map when #693 is done
+    await this.mapContainer.click();
   }
 
   async fillAndVerifyViaDetails(viaNumber: number, viaSearch: string, selectedLanguage?: string) {
