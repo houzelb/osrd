@@ -334,11 +334,7 @@ async fn version() -> Json<Version> {
         (status = 200, description = "Return the core service version", body = Version),
     ),
 )]
-async fn core_version(
-    State(AppState {
-        core_client: core, ..
-    }): State<AppState>,
-) -> Json<Version> {
+async fn core_version(State(core): State<Arc<CoreClient>>) -> Json<Version> {
     let response = CoreVersionRequest {}.fetch(&core).await;
     let response = response.unwrap_or(Version { git_describe: None });
     Json(response)
@@ -401,6 +397,12 @@ pub struct AppState {
 impl FromRef<AppState> for DbConnectionPoolV2 {
     fn from_ref(input: &AppState) -> Self {
         (*input.db_pool).clone()
+    }
+}
+
+impl FromRef<AppState> for Arc<CoreClient> {
+    fn from_ref(input: &AppState) -> Self {
+        input.core_client.clone()
     }
 }
 
