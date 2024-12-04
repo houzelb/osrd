@@ -1,0 +1,23 @@
+name: interface_change
+on:
+  pull_request:
+    paths:
+      - python/osrd_schemas
+      - editoast/openapi.yml
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ This PR changes OSRD's interface (`osrd_schemas` or/and editoast's `openapi`).
+                  Please check the following:
+
+                  - [ ] If `osrd_schemas` interface changed, please [bump its version](../python/osrd_schemas/README.md#Version)
+                  - [ ] If you know any repository using changed interface(s), please notify or even prepare a dedicated PR.'
+            })
