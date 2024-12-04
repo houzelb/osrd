@@ -237,3 +237,35 @@ pub fn model(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
         .unwrap_or_else(darling::Error::write_errors)
         .into()
 }
+
+#[cfg(test)]
+mod test_utils {
+    pub(crate) fn pretty_tokens(tokens: &proc_macro2::TokenStream) -> String {
+        let file = syn::parse_file(tokens.to_string().as_str()).unwrap();
+        prettyplease::unparse(&file)
+    }
+
+    macro_rules! assert_macro_expansion {
+        ($expansion:path, $derive_input:expr) => {
+            let input: syn::DeriveInput = $derive_input;
+            let source = crate::test_utils::pretty_tokens(&<syn::DeriveInput as quote::ToTokens>::to_token_stream(&input));
+            let expansion = $expansion(&input).expect("macro should expand faultlessly");
+            let expected = crate::test_utils::pretty_tokens(&expansion);
+
+            // HACK: sadly insta doesn't let us print multiline strings in the snapshot description
+            // or info sections. So we have to incorporate the source input into the snapshot content
+            // in order to keep it pretty printed and next to its expansion.
+            insta::with_settings!({
+                omit_expression => true,
+            }, {
+                let sep = "-".repeat(77);
+                insta::assert_snapshot!(format!("// Source\n// {sep}\n\n{source}\n// Macro expansion\n// {sep}\n\n{expected}"));
+            });
+        };
+    }
+
+    pub(crate) use assert_macro_expansion;
+}
+
+#[cfg(test)]
+use test_utils::assert_macro_expansion;

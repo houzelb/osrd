@@ -1,0 +1,1029 @@
+---
+source: editoast_derive/src/model.rs
+---
+// Source
+// -----------------------------------------------------------------------------
+
+#[derive(Clone, Model)]
+#[model(table = editoast_models::tables::osrd_infra_document)]
+#[model(row(type_name = "DocumentRow", derive(Debug)))]
+#[model(changeset(type_name = "DocumentChangeset", public, derive(Debug)))]
+#[model(gen(ops = crud, batch_ops = crud, list))]
+struct Document {
+    #[model(column = "id", preferred, primary)]
+    id_: i64,
+    #[model(identifier, json)]
+    content_type: String,
+    data: Vec<u8>,
+}
+
+// Macro expansion
+// -----------------------------------------------------------------------------
+
+#[automatically_derived]
+impl crate::models::Model for Document {
+    type Row = DocumentRow;
+    type Changeset = DocumentChangeset;
+    type Table = editoast_models::tables::osrd_infra_document::table;
+}
+paste::paste! {
+    impl Document { pub const [< id_ : snake : upper >] : crate ::models::ModelField <
+    Document, i64, id > = crate ::models::ModelField::new(); pub const [< content_type :
+    snake : upper >] : crate ::models::ModelField < Document, String,
+    editoast_models::tables::osrd_infra_document::content_type > = crate
+    ::models::ModelField::new(); pub const [< data : snake : upper >] : crate
+    ::models::ModelField < Document, Vec < u8 >,
+    editoast_models::tables::osrd_infra_document::data > = crate
+    ::models::ModelField::new(); }
+}
+impl crate::models::prelude::ModelField<Document, i64, id> {
+    pub fn eq(&self, value: i64) -> crate::models::prelude::FilterSetting<Document> {
+        use diesel::ExpressionMethods;
+        crate::models::prelude::FilterSetting::new(id.eq(value))
+    }
+    pub fn eq_any(
+        &self,
+        values: Vec<i64>,
+    ) -> crate::models::prelude::FilterSetting<Document> {
+        use diesel::ExpressionMethods;
+        crate::models::prelude::FilterSetting::new(id.eq_any(values))
+    }
+    pub fn asc(&self) -> crate::models::prelude::SortSetting<Document> {
+        use diesel::ExpressionMethods;
+        crate::models::prelude::SortSetting(Box::new(id.asc()))
+    }
+    pub fn desc(&self) -> crate::models::prelude::SortSetting<Document> {
+        use diesel::ExpressionMethods;
+        crate::models::prelude::SortSetting(Box::new(id.desc()))
+    }
+}
+impl crate::models::prelude::ModelField<
+    Document,
+    String,
+    editoast_models::tables::osrd_infra_document::content_type,
+> {
+    pub fn eq(&self, value: String) -> crate::models::prelude::FilterSetting<Document> {
+        use diesel::ExpressionMethods;
+        let value: diesel_json::Json<String> = diesel_json::Json(value);
+        crate::models::prelude::FilterSetting::new(
+            editoast_models::tables::osrd_infra_document::content_type.eq(value),
+        )
+    }
+    pub fn eq_any(
+        &self,
+        values: Vec<String>,
+    ) -> crate::models::prelude::FilterSetting<Document> {
+        use diesel::ExpressionMethods;
+        let values: Vec<diesel_json::Json<String>> = values
+            .into_iter()
+            .map(|value| diesel_json::Json(value))
+            .collect();
+        crate::models::prelude::FilterSetting::new(
+            editoast_models::tables::osrd_infra_document::content_type.eq_any(values),
+        )
+    }
+    pub fn asc(&self) -> crate::models::prelude::SortSetting<Document> {
+        use diesel::ExpressionMethods;
+        crate::models::prelude::SortSetting(
+            Box::new(editoast_models::tables::osrd_infra_document::content_type.asc()),
+        )
+    }
+    pub fn desc(&self) -> crate::models::prelude::SortSetting<Document> {
+        use diesel::ExpressionMethods;
+        crate::models::prelude::SortSetting(
+            Box::new(editoast_models::tables::osrd_infra_document::content_type.desc()),
+        )
+    }
+}
+impl crate::models::prelude::ModelField<
+    Document,
+    Vec<u8>,
+    editoast_models::tables::osrd_infra_document::data,
+> {
+    pub fn eq(&self, value: Vec<u8>) -> crate::models::prelude::FilterSetting<Document> {
+        use diesel::ExpressionMethods;
+        crate::models::prelude::FilterSetting::new(
+            editoast_models::tables::osrd_infra_document::data.eq(value),
+        )
+    }
+    pub fn eq_any(
+        &self,
+        values: Vec<Vec<u8>>,
+    ) -> crate::models::prelude::FilterSetting<Document> {
+        use diesel::ExpressionMethods;
+        crate::models::prelude::FilterSetting::new(
+            editoast_models::tables::osrd_infra_document::data.eq_any(values),
+        )
+    }
+    pub fn asc(&self) -> crate::models::prelude::SortSetting<Document> {
+        use diesel::ExpressionMethods;
+        crate::models::prelude::SortSetting(
+            Box::new(editoast_models::tables::osrd_infra_document::data.asc()),
+        )
+    }
+    pub fn desc(&self) -> crate::models::prelude::SortSetting<Document> {
+        use diesel::ExpressionMethods;
+        crate::models::prelude::SortSetting(
+            Box::new(editoast_models::tables::osrd_infra_document::data.desc()),
+        )
+    }
+}
+#[derive(Queryable, Debug)]
+#[diesel(table_name = editoast_models::tables::osrd_infra_document)]
+struct DocumentRow {
+    #[diesel(column_name = "id")]
+    id_: i64,
+    #[diesel(column_name = "content_type")]
+    content_type: diesel_json::Json<String>,
+    #[diesel(column_name = "data")]
+    data: Vec<u8>,
+}
+#[derive(Debug, Default, Queryable, AsChangeset, Insertable, Debug)]
+#[diesel(table_name = editoast_models::tables::osrd_infra_document)]
+struct DocumentChangeset {
+    #[diesel(deserialize_as = diesel_json::Json<String>, column_name = "content_type")]
+    pub content_type: Option<diesel_json::Json<String>>,
+    #[diesel(deserialize_as = Vec<u8>, column_name = "data")]
+    pub data: Option<Vec<u8>>,
+}
+#[automatically_derived]
+impl crate::models::Identifiable<(String)> for Document {
+    fn get_id(&self) -> (String) {
+        (self.content_type.clone())
+    }
+}
+#[automatically_derived]
+impl crate::models::Identifiable<(i64)> for Document {
+    fn get_id(&self) -> (i64) {
+        (self.id_.clone())
+    }
+}
+#[automatically_derived]
+impl crate::models::PreferredId<(i64)> for Document {}
+#[automatically_derived]
+impl From<DocumentRow> for Document {
+    fn from(row: DocumentRow) -> Self {
+        Self {
+            id_: row.id_,
+            content_type: row.content_type.0,
+            data: row.data,
+        }
+    }
+}
+#[automatically_derived]
+impl From<Document> for DocumentChangeset {
+    fn from(model: Document) -> Self {
+        Self {
+            content_type: Some(diesel_json::Json(model.content_type)),
+            data: Some(model.data),
+        }
+    }
+}
+#[automatically_derived]
+impl DocumentChangeset {
+    #[allow(unused)]
+    #[must_use = "builder methods are intended to be chained"]
+    pub fn content_type(mut self, content_type: String) -> Self {
+        self.content_type = Some(diesel_json::Json(content_type));
+        self
+    }
+    #[allow(unused)]
+    #[must_use = "builder methods are intended to be chained"]
+    pub fn data(mut self, data: Vec<u8>) -> Self {
+        self.data = Some(data);
+        self
+    }
+    #[allow(unused)]
+    #[must_use = "builder methods are intended to be chained"]
+    pub fn flat_content_type(mut self, content_type: Option<String>) -> Self {
+        self.content_type = content_type
+            .map(|content_type| diesel_json::Json(content_type));
+        self
+    }
+    #[allow(unused)]
+    #[must_use = "builder methods are intended to be chained"]
+    pub fn flat_data(mut self, data: Option<Vec<u8>>) -> Self {
+        self.data = data.map(|data| data);
+        self
+    }
+}
+#[automatically_derived]
+impl<'a> crate::models::Patch<'a, Document> {
+    #[allow(unused)]
+    #[must_use = "builder methods are intended to be chained"]
+    pub fn content_type(mut self, content_type: String) -> Self {
+        self.changeset.content_type = Some(diesel_json::Json(content_type));
+        self
+    }
+    #[allow(unused)]
+    #[must_use = "builder methods are intended to be chained"]
+    pub fn data(mut self, data: Vec<u8>) -> Self {
+        self.changeset.data = Some(data);
+        self
+    }
+    #[allow(unused)]
+    #[must_use = "builder methods are intended to be chained"]
+    pub fn flat_content_type(mut self, content_type: Option<String>) -> Self {
+        self.changeset.content_type = content_type
+            .map(|content_type| diesel_json::Json(content_type));
+        self
+    }
+    #[allow(unused)]
+    #[must_use = "builder methods are intended to be chained"]
+    pub fn flat_data(mut self, data: Option<Vec<u8>>) -> Self {
+        self.changeset.data = data.map(|data| data);
+        self
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::Exists<(String)> for Document {
+    #[tracing::instrument(
+        name = "model:exists<Document>",
+        skip_all,
+        ret,
+        err,
+        fields(query_id)
+    )]
+    async fn exists(
+        conn: &mut editoast_models::DbConnection,
+        content_type: (String),
+    ) -> crate::error::Result<bool> {
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use std::ops::DerefMut;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        tracing::Span::current()
+            .record("query_id", tracing::field::debug(&content_type));
+        diesel::select(
+                diesel::dsl::exists(
+                    dsl::osrd_infra_document.filter(dsl::content_type.eq(content_type)),
+                ),
+            )
+            .get_result(conn.write().await.deref_mut())
+            .await
+            .map_err(Into::into)
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::Exists<(i64)> for Document {
+    #[tracing::instrument(
+        name = "model:exists<Document>",
+        skip_all,
+        ret,
+        err,
+        fields(query_id)
+    )]
+    async fn exists(
+        conn: &mut editoast_models::DbConnection,
+        id_: (i64),
+    ) -> crate::error::Result<bool> {
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use std::ops::DerefMut;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        tracing::Span::current().record("query_id", tracing::field::debug(&id_));
+        diesel::select(
+                diesel::dsl::exists(dsl::osrd_infra_document.filter(dsl::id.eq(id_))),
+            )
+            .get_result(conn.write().await.deref_mut())
+            .await
+            .map_err(Into::into)
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::Retrieve<(String)> for Document {
+    #[tracing::instrument(
+        name = "model:retrieve<Document>",
+        skip_all,
+        err,
+        fields(query_id)
+    )]
+    async fn retrieve(
+        conn: &mut editoast_models::DbConnection,
+        content_type: (String),
+    ) -> crate::error::Result<Option<Document>> {
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use std::ops::DerefMut;
+        tracing::Span::current()
+            .record("query_id", tracing::field::debug(&content_type));
+        dsl::osrd_infra_document
+            .filter(dsl::content_type.eq(content_type))
+            .select((dsl::id, dsl::content_type, dsl::data))
+            .first::<DocumentRow>(conn.write().await.deref_mut())
+            .await
+            .map(Into::into)
+            .optional()
+            .map_err(Into::into)
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::Retrieve<(i64)> for Document {
+    #[tracing::instrument(
+        name = "model:retrieve<Document>",
+        skip_all,
+        err,
+        fields(query_id)
+    )]
+    async fn retrieve(
+        conn: &mut editoast_models::DbConnection,
+        id_: (i64),
+    ) -> crate::error::Result<Option<Document>> {
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use std::ops::DerefMut;
+        tracing::Span::current().record("query_id", tracing::field::debug(&id_));
+        dsl::osrd_infra_document
+            .filter(dsl::id.eq(id_))
+            .select((dsl::id, dsl::content_type, dsl::data))
+            .first::<DocumentRow>(conn.write().await.deref_mut())
+            .await
+            .map(Into::into)
+            .optional()
+            .map_err(Into::into)
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::Update<(String), Document> for DocumentChangeset {
+    #[tracing::instrument(
+        name = "model:update<Document>",
+        skip_all,
+        err,
+        fields(query_id)
+    )]
+    async fn update(
+        self,
+        conn: &mut editoast_models::DbConnection,
+        content_type: (String),
+    ) -> crate::error::Result<Option<Document>> {
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use std::ops::DerefMut;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        tracing::Span::current()
+            .record("query_id", tracing::field::debug(&content_type));
+        diesel::update(
+                dsl::osrd_infra_document.filter(dsl::content_type.eq(content_type)),
+            )
+            .set(&self)
+            .returning((dsl::id, dsl::content_type, dsl::data))
+            .get_result::<DocumentRow>(conn.write().await.deref_mut())
+            .await
+            .map(Into::into)
+            .optional()
+            .map_err(Into::into)
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::Update<(i64), Document> for DocumentChangeset {
+    #[tracing::instrument(
+        name = "model:update<Document>",
+        skip_all,
+        err,
+        fields(query_id)
+    )]
+    async fn update(
+        self,
+        conn: &mut editoast_models::DbConnection,
+        id_: (i64),
+    ) -> crate::error::Result<Option<Document>> {
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use std::ops::DerefMut;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        tracing::Span::current().record("query_id", tracing::field::debug(&id_));
+        diesel::update(dsl::osrd_infra_document.filter(dsl::id.eq(id_)))
+            .set(&self)
+            .returning((dsl::id, dsl::content_type, dsl::data))
+            .get_result::<DocumentRow>(conn.write().await.deref_mut())
+            .await
+            .map(Into::into)
+            .optional()
+            .map_err(Into::into)
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::DeleteStatic<(String)> for Document {
+    #[tracing::instrument(
+        name = "model:delete_static<Document>",
+        skip_all,
+        ret,
+        err,
+        fields(query_id)
+    )]
+    async fn delete_static(
+        conn: &mut editoast_models::DbConnection,
+        content_type: (String),
+    ) -> crate::error::Result<bool> {
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use std::ops::DerefMut;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        tracing::Span::current()
+            .record("query_id", tracing::field::debug(&content_type));
+        diesel::delete(
+                dsl::osrd_infra_document.filter(dsl::content_type.eq(content_type)),
+            )
+            .execute(conn.write().await.deref_mut())
+            .await
+            .map(|n| n == 1)
+            .map_err(Into::into)
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::DeleteStatic<(i64)> for Document {
+    #[tracing::instrument(
+        name = "model:delete_static<Document>",
+        skip_all,
+        ret,
+        err,
+        fields(query_id)
+    )]
+    async fn delete_static(
+        conn: &mut editoast_models::DbConnection,
+        id_: (i64),
+    ) -> crate::error::Result<bool> {
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use std::ops::DerefMut;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        tracing::Span::current().record("query_id", tracing::field::debug(&id_));
+        diesel::delete(dsl::osrd_infra_document.filter(dsl::id.eq(id_)))
+            .execute(conn.write().await.deref_mut())
+            .await
+            .map(|n| n == 1)
+            .map_err(Into::into)
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::Create<Document> for DocumentChangeset {
+    #[tracing::instrument(name = "model:create<Document>", skip_all, err)]
+    async fn create(
+        self,
+        conn: &mut editoast_models::DbConnection,
+    ) -> crate::error::Result<Document> {
+        use diesel_async::RunQueryDsl;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use std::ops::DerefMut;
+        diesel::insert_into(editoast_models::tables::osrd_infra_document::table)
+            .values(&self)
+            .returning((dsl::id, dsl::content_type, dsl::data))
+            .get_result::<DocumentRow>(conn.write().await.deref_mut())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::Delete for Document {
+    #[tracing::instrument(
+        name = "model:delete<Document>",
+        skip_all,
+        ret,
+        err,
+        fields(query_id = ?self.id_)
+    )]
+    async fn delete(
+        &self,
+        conn: &mut editoast_models::DbConnection,
+    ) -> crate::error::Result<bool> {
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use std::ops::DerefMut;
+        let id = self.id_;
+        diesel::delete(editoast_models::tables::osrd_infra_document::table.find(id))
+            .execute(conn.write().await.deref_mut())
+            .await
+            .map(|n| n == 1)
+            .map_err(Into::into)
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::prelude::List for Document {
+    #[tracing::instrument(
+        name = "model:list<Document>",
+        skip_all,
+        err,
+        fields(
+            nb_filters = settings.filters.len(),
+            nb_sorts = settings.sorts.len(),
+            paginate_counting = settings.paginate_counting,
+            limit,
+            offset,
+        )
+    )]
+    async fn list(
+        conn: &'async_trait mut editoast_models::DbConnection,
+        settings: crate::models::prelude::SelectionSettings<Self>,
+    ) -> crate::error::Result<Vec<Self>> {
+        use diesel::QueryDsl;
+        use diesel_async::RunQueryDsl;
+        use futures_util::stream::TryStreamExt;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use std::ops::DerefMut;
+        let mut query = editoast_models::tables::osrd_infra_document::table.into_boxed();
+        for filter_fun in settings.filters {
+            let crate::models::prelude::FilterSetting(filter) = (*filter_fun)();
+            query = query.filter(filter);
+        }
+        for sort_fun in settings.sorts {
+            let crate::models::prelude::SortSetting(sort) = (*sort_fun)();
+            query = query.order_by(sort);
+        }
+        if let Some(limit) = settings.limit {
+            tracing::Span::current().record("limit", limit);
+            query = query.limit(limit);
+        }
+        if let Some(offset) = settings.offset {
+            tracing::Span::current().record("offset", offset);
+            query = query.offset(offset);
+        }
+        let results: Vec<Document> = query
+            .select((dsl::id, dsl::content_type, dsl::data))
+            .load_stream::<DocumentRow>(conn.write().await.deref_mut())
+            .await?
+            .map_ok(<Document as crate::models::prelude::Model>::from_row)
+            .try_collect()
+            .await?;
+        Ok(results)
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::prelude::Count for Document {
+    #[tracing::instrument(
+        name = "model:count<Document>",
+        skip_all,
+        ret,
+        err,
+        fields(
+            nb_filters = settings.filters.len(),
+            paginate_counting = settings.paginate_counting,
+            limit,
+            offset,
+        )
+    )]
+    async fn count(
+        conn: &'async_trait mut editoast_models::DbConnection,
+        settings: crate::models::prelude::SelectionSettings<Self>,
+    ) -> crate::error::Result<u64> {
+        use diesel::QueryDsl;
+        use diesel_async::RunQueryDsl;
+        use futures_util::stream::TryStreamExt;
+        use std::ops::DerefMut;
+        let mut query = editoast_models::tables::osrd_infra_document::table
+            .select(diesel::dsl::count_star())
+            .into_boxed();
+        for filter_fun in settings.filters {
+            let crate::models::prelude::FilterSetting(filter) = (*filter_fun)();
+            query = query.filter(filter);
+        }
+        if settings.paginate_counting {
+            if let Some(limit) = settings.limit {
+                tracing::Span::current().record("limit", limit);
+                query = query.limit(limit);
+            }
+            if let Some(offset) = settings.offset {
+                tracing::Span::current().record("offset", offset);
+                query = query.offset(offset);
+            }
+        }
+        Ok(query.get_result::<i64>(conn.write().await.deref_mut()).await? as u64)
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::CreateBatch<DocumentChangeset> for Document {
+    #[tracing::instrument(name = "model:create_batch<Document>", skip_all, err)]
+    async fn create_batch<
+        I: std::iter::IntoIterator<Item = DocumentChangeset> + Send + 'async_trait,
+        C: Default + std::iter::Extend<Self> + Send + std::fmt::Debug,
+    >(conn: &mut editoast_models::DbConnection, values: I) -> crate::error::Result<C> {
+        use crate::models::Model;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use std::ops::DerefMut;
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use futures_util::stream::TryStreamExt;
+        let values = values.into_iter().collect::<Vec<_>>();
+        Ok(
+            crate::chunked_for_libpq! {
+                2usize, 2048usize, values, C::default(), chunk => {
+                diesel::insert_into(dsl::osrd_infra_document).values(chunk)
+                .returning((dsl::id, dsl::content_type, dsl::data,)).load_stream:: <
+                DocumentRow > (conn.write(). await .deref_mut()). await .map(| s | s
+                .map_ok(< Document as Model > ::from_row).try_collect:: < Vec < _ >> ())
+                ? . await ? }
+            },
+        )
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::CreateBatchWithKey<DocumentChangeset, (String)> for Document {
+    #[tracing::instrument(name = "model:create_batch_with_key<Document>", skip_all, err)]
+    async fn create_batch_with_key<
+        I: std::iter::IntoIterator<Item = DocumentChangeset> + Send + 'async_trait,
+        C: Default + std::iter::Extend<((String), Self)> + Send + std::fmt::Debug,
+    >(conn: &mut editoast_models::DbConnection, values: I) -> crate::error::Result<C> {
+        use crate::models::Identifiable;
+        use crate::models::Model;
+        use std::ops::DerefMut;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use futures_util::stream::TryStreamExt;
+        let values = values.into_iter().collect::<Vec<_>>();
+        Ok(
+            crate::chunked_for_libpq! {
+                2usize, 2048usize, values, C::default(), chunk => {
+                diesel::insert_into(dsl::osrd_infra_document).values(chunk)
+                .returning((dsl::id, dsl::content_type, dsl::data,)).load_stream:: <
+                DocumentRow > (conn.write(). await .deref_mut()). await .map(| s | { s
+                .map_ok(| row | { let model = < Document as Model > ::from_row(row);
+                (model.get_id(), model) }).try_collect:: < Vec < _ >> () }) ? . await ? }
+            },
+        )
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::CreateBatchWithKey<DocumentChangeset, (i64)> for Document {
+    #[tracing::instrument(name = "model:create_batch_with_key<Document>", skip_all, err)]
+    async fn create_batch_with_key<
+        I: std::iter::IntoIterator<Item = DocumentChangeset> + Send + 'async_trait,
+        C: Default + std::iter::Extend<((i64), Self)> + Send + std::fmt::Debug,
+    >(conn: &mut editoast_models::DbConnection, values: I) -> crate::error::Result<C> {
+        use crate::models::Identifiable;
+        use crate::models::Model;
+        use std::ops::DerefMut;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use futures_util::stream::TryStreamExt;
+        let values = values.into_iter().collect::<Vec<_>>();
+        Ok(
+            crate::chunked_for_libpq! {
+                2usize, 2048usize, values, C::default(), chunk => {
+                diesel::insert_into(dsl::osrd_infra_document).values(chunk)
+                .returning((dsl::id, dsl::content_type, dsl::data,)).load_stream:: <
+                DocumentRow > (conn.write(). await .deref_mut()). await .map(| s | { s
+                .map_ok(| row | { let model = < Document as Model > ::from_row(row);
+                (model.get_id(), model) }).try_collect:: < Vec < _ >> () }) ? . await ? }
+            },
+        )
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::RetrieveBatchUnchecked<(String)> for Document {
+    #[tracing::instrument(
+        name = "model:retrieve_batch_unchecked<Document>",
+        skip_all,
+        err,
+        fields(query_id)
+    )]
+    async fn retrieve_batch_unchecked<
+        I: std::iter::IntoIterator<Item = (String)> + Send + 'async_trait,
+        C: Default + std::iter::Extend<Document> + Send + std::fmt::Debug,
+    >(conn: &mut editoast_models::DbConnection, ids: I) -> crate::error::Result<C> {
+        use crate::models::Model;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use futures_util::stream::TryStreamExt;
+        use std::ops::DerefMut;
+        let ids = ids.into_iter().collect::<Vec<_>>();
+        tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
+        Ok(
+            crate::chunked_for_libpq! {
+                1usize, 2048usize, ids, C::default(), chunk => { let mut query =
+                dsl::osrd_infra_document.into_boxed(); for content_type in chunk
+                .into_iter() { query = query.or_filter(dsl::content_type
+                .eq(content_type)); } query.select((dsl::id, dsl::content_type,
+                dsl::data,)).load_stream:: < DocumentRow > (conn.write(). await
+                .deref_mut()). await .map(| s | s.map_ok(< Document as Model >
+                ::from_row).try_collect:: < Vec < _ >> ()) ? . await ? }
+            },
+        )
+    }
+    #[tracing::instrument(
+        name = "model:retrieve_batch_with_key_unchecked<Document>",
+        skip_all,
+        err,
+        fields(query_id)
+    )]
+    async fn retrieve_batch_with_key_unchecked<
+        I: std::iter::IntoIterator<Item = (String)> + Send + 'async_trait,
+        C: Default + std::iter::Extend<((String), Document)> + Send + std::fmt::Debug,
+    >(conn: &mut editoast_models::DbConnection, ids: I) -> crate::error::Result<C> {
+        use crate::models::Identifiable;
+        use crate::models::Model;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use futures_util::stream::TryStreamExt;
+        use std::ops::DerefMut;
+        let ids = ids.into_iter().collect::<Vec<_>>();
+        tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
+        Ok(
+            crate::chunked_for_libpq! {
+                1usize, 2048usize, ids, C::default(), chunk => { let mut query =
+                dsl::osrd_infra_document.into_boxed(); for content_type in chunk
+                .into_iter() { query = query.or_filter(dsl::content_type
+                .eq(content_type)); } query.select((dsl::id, dsl::content_type,
+                dsl::data,)).load_stream:: < DocumentRow > (conn.write(). await
+                .deref_mut()). await .map(| s | { s.map_ok(| row | { let model = <
+                Document as Model > ::from_row(row); (model.get_id(), model) })
+                .try_collect:: < Vec < _ >> () }) ? . await ? }
+            },
+        )
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::RetrieveBatchUnchecked<(i64)> for Document {
+    #[tracing::instrument(
+        name = "model:retrieve_batch_unchecked<Document>",
+        skip_all,
+        err,
+        fields(query_id)
+    )]
+    async fn retrieve_batch_unchecked<
+        I: std::iter::IntoIterator<Item = (i64)> + Send + 'async_trait,
+        C: Default + std::iter::Extend<Document> + Send + std::fmt::Debug,
+    >(conn: &mut editoast_models::DbConnection, ids: I) -> crate::error::Result<C> {
+        use crate::models::Model;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use futures_util::stream::TryStreamExt;
+        use std::ops::DerefMut;
+        let ids = ids.into_iter().collect::<Vec<_>>();
+        tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
+        Ok(
+            crate::chunked_for_libpq! {
+                1usize, 2048usize, ids, C::default(), chunk => { let mut query =
+                dsl::osrd_infra_document.into_boxed(); for id_ in chunk.into_iter() {
+                query = query.or_filter(dsl::id.eq(id_)); } query.select((dsl::id,
+                dsl::content_type, dsl::data,)).load_stream:: < DocumentRow > (conn
+                .write(). await .deref_mut()). await .map(| s | s.map_ok(< Document as
+                Model > ::from_row).try_collect:: < Vec < _ >> ()) ? . await ? }
+            },
+        )
+    }
+    #[tracing::instrument(
+        name = "model:retrieve_batch_with_key_unchecked<Document>",
+        skip_all,
+        err,
+        fields(query_id)
+    )]
+    async fn retrieve_batch_with_key_unchecked<
+        I: std::iter::IntoIterator<Item = (i64)> + Send + 'async_trait,
+        C: Default + std::iter::Extend<((i64), Document)> + Send + std::fmt::Debug,
+    >(conn: &mut editoast_models::DbConnection, ids: I) -> crate::error::Result<C> {
+        use crate::models::Identifiable;
+        use crate::models::Model;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use futures_util::stream::TryStreamExt;
+        use std::ops::DerefMut;
+        let ids = ids.into_iter().collect::<Vec<_>>();
+        tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
+        Ok(
+            crate::chunked_for_libpq! {
+                1usize, 2048usize, ids, C::default(), chunk => { let mut query =
+                dsl::osrd_infra_document.into_boxed(); for id_ in chunk.into_iter() {
+                query = query.or_filter(dsl::id.eq(id_)); } query.select((dsl::id,
+                dsl::content_type, dsl::data,)).load_stream:: < DocumentRow > (conn
+                .write(). await .deref_mut()). await .map(| s | { s.map_ok(| row | { let
+                model = < Document as Model > ::from_row(row); (model.get_id(), model) })
+                .try_collect:: < Vec < _ >> () }) ? . await ? }
+            },
+        )
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::UpdateBatchUnchecked<Document, (String)> for DocumentChangeset {
+    #[tracing::instrument(
+        name = "model:update_batch_unchecked<Document>",
+        skip_all,
+        err,
+        fields(query_ids)
+    )]
+    async fn update_batch_unchecked<
+        I: std::iter::IntoIterator<Item = (String)> + Send + 'async_trait,
+        C: Default + std::iter::Extend<Document> + Send + std::fmt::Debug,
+    >(
+        self,
+        conn: &mut editoast_models::DbConnection,
+        ids: I,
+    ) -> crate::error::Result<C> {
+        use crate::models::Model;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use futures_util::stream::TryStreamExt;
+        use std::ops::DerefMut;
+        let ids = ids.into_iter().collect::<Vec<_>>();
+        tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
+        Ok(
+            crate::chunked_for_libpq! {
+                1usize, 2048usize, ids, C::default(), chunk => { let mut query =
+                dsl::osrd_infra_document.select(dsl::id).into_boxed(); for content_type
+                in chunk.into_iter() { query = query.or_filter(dsl::content_type
+                .eq(content_type)); } diesel::update(dsl::osrd_infra_document)
+                .filter(dsl::id.eq_any(query)).set(& self).returning((dsl::id,
+                dsl::content_type, dsl::data,)).load_stream:: < DocumentRow > (conn
+                .write(). await .deref_mut()). await .map(| s | s.map_ok(< Document as
+                Model > ::from_row).try_collect:: < Vec < _ >> ()) ? . await ? }
+            },
+        )
+    }
+    #[tracing::instrument(
+        name = "model:update_batch_unchecked<Document>",
+        skip_all,
+        err,
+        fields(query_ids)
+    )]
+    async fn update_batch_with_key_unchecked<
+        I: std::iter::IntoIterator<Item = (String)> + Send + 'async_trait,
+        C: Default + std::iter::Extend<((String), Document)> + Send,
+    >(
+        self,
+        conn: &mut editoast_models::DbConnection,
+        ids: I,
+    ) -> crate::error::Result<C> {
+        use crate::models::Identifiable;
+        use crate::models::Model;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use std::ops::DerefMut;
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use futures_util::stream::TryStreamExt;
+        let ids = ids.into_iter().collect::<Vec<_>>();
+        tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
+        Ok(
+            crate::chunked_for_libpq! {
+                1usize, 2048usize, ids, C::default(), chunk => { let mut query =
+                dsl::osrd_infra_document.select(dsl::id).into_boxed(); for content_type
+                in chunk.into_iter() { query = query.or_filter(dsl::content_type
+                .eq(content_type)); } diesel::update(dsl::osrd_infra_document)
+                .filter(dsl::id.eq_any(query)).set(& self).returning((dsl::id,
+                dsl::content_type, dsl::data,)).load_stream:: < DocumentRow > (conn
+                .write(). await .deref_mut()). await .map(| s | { s.map_ok(| row | { let
+                model = < Document as Model > ::from_row(row); (model.get_id(), model) })
+                .try_collect:: < Vec < _ >> () }) ? . await ? }
+            },
+        )
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::UpdateBatchUnchecked<Document, (i64)> for DocumentChangeset {
+    #[tracing::instrument(
+        name = "model:update_batch_unchecked<Document>",
+        skip_all,
+        err,
+        fields(query_ids)
+    )]
+    async fn update_batch_unchecked<
+        I: std::iter::IntoIterator<Item = (i64)> + Send + 'async_trait,
+        C: Default + std::iter::Extend<Document> + Send + std::fmt::Debug,
+    >(
+        self,
+        conn: &mut editoast_models::DbConnection,
+        ids: I,
+    ) -> crate::error::Result<C> {
+        use crate::models::Model;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use futures_util::stream::TryStreamExt;
+        use std::ops::DerefMut;
+        let ids = ids.into_iter().collect::<Vec<_>>();
+        tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
+        Ok(
+            crate::chunked_for_libpq! {
+                1usize, 2048usize, ids, C::default(), chunk => { let mut query =
+                dsl::osrd_infra_document.select(dsl::id).into_boxed(); for id_ in chunk
+                .into_iter() { query = query.or_filter(dsl::id.eq(id_)); }
+                diesel::update(dsl::osrd_infra_document).filter(dsl::id.eq_any(query))
+                .set(& self).returning((dsl::id, dsl::content_type, dsl::data,))
+                .load_stream:: < DocumentRow > (conn.write(). await .deref_mut()). await
+                .map(| s | s.map_ok(< Document as Model > ::from_row).try_collect:: < Vec
+                < _ >> ()) ? . await ? }
+            },
+        )
+    }
+    #[tracing::instrument(
+        name = "model:update_batch_unchecked<Document>",
+        skip_all,
+        err,
+        fields(query_ids)
+    )]
+    async fn update_batch_with_key_unchecked<
+        I: std::iter::IntoIterator<Item = (i64)> + Send + 'async_trait,
+        C: Default + std::iter::Extend<((i64), Document)> + Send,
+    >(
+        self,
+        conn: &mut editoast_models::DbConnection,
+        ids: I,
+    ) -> crate::error::Result<C> {
+        use crate::models::Identifiable;
+        use crate::models::Model;
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use std::ops::DerefMut;
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use futures_util::stream::TryStreamExt;
+        let ids = ids.into_iter().collect::<Vec<_>>();
+        tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
+        Ok(
+            crate::chunked_for_libpq! {
+                1usize, 2048usize, ids, C::default(), chunk => { let mut query =
+                dsl::osrd_infra_document.select(dsl::id).into_boxed(); for id_ in chunk
+                .into_iter() { query = query.or_filter(dsl::id.eq(id_)); }
+                diesel::update(dsl::osrd_infra_document).filter(dsl::id.eq_any(query))
+                .set(& self).returning((dsl::id, dsl::content_type, dsl::data,))
+                .load_stream:: < DocumentRow > (conn.write(). await .deref_mut()). await
+                .map(| s | { s.map_ok(| row | { let model = < Document as Model >
+                ::from_row(row); (model.get_id(), model) }).try_collect:: < Vec < _ >> ()
+                }) ? . await ? }
+            },
+        )
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::DeleteBatch<(String)> for Document {
+    #[tracing::instrument(
+        name = "model:delete_batch<Document>",
+        skip_all,
+        ret,
+        err,
+        fields(query_ids)
+    )]
+    async fn delete_batch<
+        I: std::iter::IntoIterator<Item = (String)> + Send + 'async_trait,
+    >(conn: &mut editoast_models::DbConnection, ids: I) -> crate::error::Result<usize> {
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use std::ops::DerefMut;
+        let ids = ids.into_iter().collect::<Vec<_>>();
+        tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
+        let counts = crate::chunked_for_libpq! {
+            1usize, 2048usize, ids, chunk => { let mut query =
+            diesel::delete(dsl::osrd_infra_document).into_boxed(); for content_type in
+            chunk.into_iter() { query = query.or_filter(dsl::content_type
+            .eq(content_type)); } query.execute(conn.write(). await .deref_mut()). await
+            ? }
+        };
+        Ok(counts.into_iter().sum())
+    }
+}
+#[automatically_derived]
+#[async_trait::async_trait]
+impl crate::models::DeleteBatch<(i64)> for Document {
+    #[tracing::instrument(
+        name = "model:delete_batch<Document>",
+        skip_all,
+        ret,
+        err,
+        fields(query_ids)
+    )]
+    async fn delete_batch<
+        I: std::iter::IntoIterator<Item = (i64)> + Send + 'async_trait,
+    >(conn: &mut editoast_models::DbConnection, ids: I) -> crate::error::Result<usize> {
+        use editoast_models::tables::osrd_infra_document::dsl;
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use std::ops::DerefMut;
+        let ids = ids.into_iter().collect::<Vec<_>>();
+        tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
+        let counts = crate::chunked_for_libpq! {
+            1usize, 2048usize, ids, chunk => { let mut query =
+            diesel::delete(dsl::osrd_infra_document).into_boxed(); for id_ in chunk
+            .into_iter() { query = query.or_filter(dsl::id.eq(id_)); } query.execute(conn
+            .write(). await .deref_mut()). await ? }
+        };
+        Ok(counts.into_iter().sum())
+    }
+}

@@ -85,6 +85,30 @@ impl darling::FromMeta for RawIdentifier {
     }
 }
 
+impl PartialOrd for RawIdentifier {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for RawIdentifier {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.get_idents().cmp(&other.get_idents())
+    }
+}
+
+impl PartialOrd for Identifier {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.raw.cmp(&other.raw))
+    }
+}
+
+impl Ord for Identifier {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.raw.cmp(&other.raw)
+    }
+}
+
 fn extract_ident_of_path(path: &syn::Path) -> darling::Result<syn::Ident> {
     let mut segments = path.segments.iter();
     let first = segments.next().unwrap();

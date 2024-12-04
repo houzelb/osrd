@@ -96,3 +96,20 @@ OpenApi when a change has been made to an endpoint, run the following command:
 ```sh
 cargo run openapi > openapi.yaml
 ```
+
+## Working with `editoast_derive`
+
+We define some custom procedural macros in the `editoast_derive` crate. These rely on snapshot testing library [`insta`](https://insta.rs/). It basically works like this:
+
+1. Change the output of a macro
+2. Run the tests using `cargo test`
+3. Since the output has changed, the test will fail, showing a diff of the old vs. new snapshot content. The new snapshot will be saved to disk with the extension `*.snap.new`.
+4. If the new snapshot is correct, rename it to `*.snap` and commit it.
+
+> [!TIP]
+> You can use [`cargo-insta`](https://insta.rs/docs/cli/) to review pending snapshots and accept them conveniently.
+> ```sh
+> $ cargo insta review
+> ```
+
+For more information, visit the [`insta` documentation](https://insta.rs/docs/).

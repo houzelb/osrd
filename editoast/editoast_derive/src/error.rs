@@ -235,3 +235,26 @@ fn extract_type(ty: &syn::Type) -> Option<String> {
         _ => None,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_construction() {
+        crate::assert_macro_expansion!(
+            expand_editoast_error,
+            syn::parse_quote! {
+                #[derive(EditoastError)]
+                #[editoast_error(base_id = "infra", default_status = 500)]
+                pub enum InfraApiError {
+                    #[editoast_error(status = 404, no_context)]
+                    NotFound { infra_id: i64 },
+                    #[editoast_error(status = 400)]
+                    BadRequest { message: String },
+                    InternalError,
+                }
+            }
+        );
+    }
+}

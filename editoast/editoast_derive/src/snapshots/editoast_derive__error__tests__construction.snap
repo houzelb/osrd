@@ -1,0 +1,71 @@
+---
+source: editoast_derive/src/error.rs
+---
+// Source
+// -----------------------------------------------------------------------------
+
+#[derive(EditoastError)]
+#[editoast_error(base_id = "infra", default_status = 500)]
+pub enum InfraApiError {
+    #[editoast_error(status = 404, no_context)]
+    NotFound { infra_id: i64 },
+    #[editoast_error(status = 400)]
+    BadRequest { message: String },
+    InternalError,
+}
+
+// Macro expansion
+// -----------------------------------------------------------------------------
+
+inventory::submit! {
+    crate ::error::ErrorDefinition::new("editoast:infra:NotFound", "NotFound",
+    "InfraApiError", 404u16, "{\"infra_id\":\"i64\"}")
+}
+inventory::submit! {
+    crate ::error::ErrorDefinition::new("editoast:infra:BadRequest", "BadRequest",
+    "InfraApiError", 400u16, "{\"message\":\"String\"}")
+}
+inventory::submit! {
+    crate ::error::ErrorDefinition::new("editoast:infra:InternalError", "InternalError",
+    "InfraApiError", 500u16, "{}")
+}
+impl crate::error::EditoastError for InfraApiError {
+    fn get_status(&self) -> axum::http::StatusCode {
+        match self {
+            #[allow(unused)]
+            Self::NotFound { infra_id } => {
+                axum::http::StatusCode::try_from(404)
+                    .expect("EditoastError: invalid status expression")
+            }
+            #[allow(unused)]
+            Self::BadRequest { message } => {
+                axum::http::StatusCode::try_from(400)
+                    .expect("EditoastError: invalid status expression")
+            }
+            #[allow(unused)]
+            Self::InternalError => axum::http::StatusCode::from_u16(500u16).unwrap(),
+        }
+    }
+    fn get_type(&self) -> &'static str {
+        match self {
+            Self::NotFound { .. } => "editoast:infra:NotFound",
+            Self::BadRequest { .. } => "editoast:infra:BadRequest",
+            Self::InternalError { .. } => "editoast:infra:InternalError",
+        }
+    }
+    fn context(&self) -> std::collections::HashMap<String, serde_json::Value> {
+        match self {
+            Self::NotFound { .. } => Default::default(),
+            Self::BadRequest { message } => {
+                [
+                    (
+                        stringify!(message).to_string(),
+                        serde_json::to_value(message).unwrap(),
+                    ),
+                ]
+                    .into()
+            }
+            Self::InternalError { .. } => Default::default(),
+        }
+    }
+}

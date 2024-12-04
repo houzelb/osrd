@@ -213,3 +213,10 @@ debug = "limited"
 [profile.dev-for-debug]
 inherits = "dev"
 debug = "full"
+
+# Makes snapshot diffs faster to compute.
+# insta is used in editast_derive to track changes made to proc-macros.
+# Cf. https://insta.rs/docs/quickstart/#optional-faster-runs
+[profile.dev.package]
+insta.opt-level = 3
+similar.opt-level = 3
