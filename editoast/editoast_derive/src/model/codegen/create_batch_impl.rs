@@ -1,6 +1,8 @@
 use quote::quote;
 use quote::ToTokens;
 
+use super::LibpqChunkedIteration;
+
 pub(crate) struct CreateBatchImpl {
     pub(super) model: syn::Ident,
     pub(super) table_name: syn::Ident,
@@ -26,6 +28,25 @@ impl ToTokens for CreateBatchImpl {
         } = self;
         let span_name = format!("model:create_batch<{}>", model);
 
+        let create_loop = LibpqChunkedIteration {
+            parameters_per_row: *field_count,
+            chunk_size_limit: *chunk_size_limit,
+            values_ident: syn::parse_quote! { values },
+            collector: super::LibpqChunkedIterationCollector::Extend {
+                collection_init: syn::parse_quote! { C::default() },
+            },
+            chunk_iteration_ident: syn::parse_quote! { chunk },
+            chunk_iteration_body: quote! {
+                diesel::insert_into(dsl::#table_name)
+                    .values(chunk)
+                    .returning((#(dsl::#columns,)*))
+                    .load_stream::<#row>(conn.write().await.deref_mut())
+                    .await
+                    .map(|s| s.map_ok(<#model as Model>::from_row).try_collect::<Vec<_>>())?
+                    .await?
+            },
+        };
+
         tokens.extend(quote! {
             #[automatically_derived]
             #[async_trait::async_trait]
@@ -45,21 +66,7 @@ impl ToTokens for CreateBatchImpl {
                     use diesel_async::RunQueryDsl;
                     use futures_util::stream::TryStreamExt;
                     let values = values.into_iter().collect::<Vec<_>>();
-                    Ok(crate::chunked_for_libpq! {
-                        #field_count,
-                        #chunk_size_limit,
-                        values,
-                        C::default(),
-                        chunk => {
-                            diesel::insert_into(dsl::#table_name)
-                                .values(chunk)
-                                .returning((#(dsl::#columns,)*))
-                                .load_stream::<#row>(conn.write().await.deref_mut())
-                                .await
-                                .map(|s| s.map_ok(<#model as Model>::from_row).try_collect::<Vec<_>>())?
-                                .await?
-                        }
-                    })
+                    Ok({ #create_loop })
                 }
             }
         });

@@ -620,16 +620,30 @@ impl crate::models::CreateBatch<DocumentChangeset> for Document {
         use diesel_async::RunQueryDsl;
         use futures_util::stream::TryStreamExt;
         let values = values.into_iter().collect::<Vec<_>>();
-        Ok(
-            crate::chunked_for_libpq! {
-                2usize, 2048usize, values, C::default(), chunk => {
-                diesel::insert_into(dsl::osrd_infra_document).values(chunk)
-                .returning((dsl::id, dsl::content_type, dsl::data,)).load_stream:: <
-                DocumentRow > (conn.write(). await .deref_mut()). await .map(| s | s
-                .map_ok(< Document as Model > ::from_row).try_collect:: < Vec < _ >> ())
-                ? . await ? }
-            },
-        )
+        Ok({
+            const LIBPQ_MAX_PARAMETERS: usize = 2_usize.pow(16) - 1;
+            const ASYNC_SUBDIVISION: usize = 2_usize;
+            const CHUNK_SIZE: usize = LIBPQ_MAX_PARAMETERS / ASYNC_SUBDIVISION / 2usize;
+            let mut result = C::default();
+            let chunks = values.chunks(CHUNK_SIZE.min(2048usize));
+            for chunk in chunks {
+                let chunk_result = {
+                    diesel::insert_into(dsl::osrd_infra_document)
+                        .values(chunk)
+                        .returning((dsl::id, dsl::content_type, dsl::data))
+                        .load_stream::<DocumentRow>(conn.write().await.deref_mut())
+                        .await
+                        .map(|s| {
+                            s
+                                .map_ok(<Document as Model>::from_row)
+                                .try_collect::<Vec<_>>()
+                        })?
+                        .await?
+                };
+                result.extend(chunk_result);
+            }
+            result
+        })
     }
 }
 #[automatically_derived]
@@ -648,16 +662,32 @@ impl crate::models::CreateBatchWithKey<DocumentChangeset, (String)> for Document
         use diesel_async::RunQueryDsl;
         use futures_util::stream::TryStreamExt;
         let values = values.into_iter().collect::<Vec<_>>();
-        Ok(
-            crate::chunked_for_libpq! {
-                2usize, 2048usize, values, C::default(), chunk => {
-                diesel::insert_into(dsl::osrd_infra_document).values(chunk)
-                .returning((dsl::id, dsl::content_type, dsl::data,)).load_stream:: <
-                DocumentRow > (conn.write(). await .deref_mut()). await .map(| s | { s
-                .map_ok(| row | { let model = < Document as Model > ::from_row(row);
-                (model.get_id(), model) }).try_collect:: < Vec < _ >> () }) ? . await ? }
-            },
-        )
+        Ok({
+            const LIBPQ_MAX_PARAMETERS: usize = 2_usize.pow(16) - 1;
+            const ASYNC_SUBDIVISION: usize = 2_usize;
+            const CHUNK_SIZE: usize = LIBPQ_MAX_PARAMETERS / ASYNC_SUBDIVISION / 2usize;
+            let mut result = C::default();
+            let chunks = values.chunks(CHUNK_SIZE.min(2048usize));
+            for chunk in chunks {
+                let chunk_result = {
+                    diesel::insert_into(dsl::osrd_infra_document)
+                        .values(chunk)
+                        .returning((dsl::id, dsl::content_type, dsl::data))
+                        .load_stream::<DocumentRow>(conn.write().await.deref_mut())
+                        .await
+                        .map(|s| {
+                            s.map_ok(|row| {
+                                    let model = <Document as Model>::from_row(row);
+                                    (model.get_id(), model)
+                                })
+                                .try_collect::<Vec<_>>()
+                        })?
+                        .await?
+                };
+                result.extend(chunk_result);
+            }
+            result
+        })
     }
 }
 #[automatically_derived]
@@ -676,16 +706,32 @@ impl crate::models::CreateBatchWithKey<DocumentChangeset, (i64)> for Document {
         use diesel_async::RunQueryDsl;
         use futures_util::stream::TryStreamExt;
         let values = values.into_iter().collect::<Vec<_>>();
-        Ok(
-            crate::chunked_for_libpq! {
-                2usize, 2048usize, values, C::default(), chunk => {
-                diesel::insert_into(dsl::osrd_infra_document).values(chunk)
-                .returning((dsl::id, dsl::content_type, dsl::data,)).load_stream:: <
-                DocumentRow > (conn.write(). await .deref_mut()). await .map(| s | { s
-                .map_ok(| row | { let model = < Document as Model > ::from_row(row);
-                (model.get_id(), model) }).try_collect:: < Vec < _ >> () }) ? . await ? }
-            },
-        )
+        Ok({
+            const LIBPQ_MAX_PARAMETERS: usize = 2_usize.pow(16) - 1;
+            const ASYNC_SUBDIVISION: usize = 2_usize;
+            const CHUNK_SIZE: usize = LIBPQ_MAX_PARAMETERS / ASYNC_SUBDIVISION / 2usize;
+            let mut result = C::default();
+            let chunks = values.chunks(CHUNK_SIZE.min(2048usize));
+            for chunk in chunks {
+                let chunk_result = {
+                    diesel::insert_into(dsl::osrd_infra_document)
+                        .values(chunk)
+                        .returning((dsl::id, dsl::content_type, dsl::data))
+                        .load_stream::<DocumentRow>(conn.write().await.deref_mut())
+                        .await
+                        .map(|s| {
+                            s.map_ok(|row| {
+                                    let model = <Document as Model>::from_row(row);
+                                    (model.get_id(), model)
+                                })
+                                .try_collect::<Vec<_>>()
+                        })?
+                        .await?
+                };
+                result.extend(chunk_result);
+            }
+            result
+        })
     }
 }
 #[automatically_derived]
@@ -709,17 +755,33 @@ impl crate::models::RetrieveBatchUnchecked<(String)> for Document {
         use std::ops::DerefMut;
         let ids = ids.into_iter().collect::<Vec<_>>();
         tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
-        Ok(
-            crate::chunked_for_libpq! {
-                1usize, 2048usize, ids, C::default(), chunk => { let mut query =
-                dsl::osrd_infra_document.into_boxed(); for content_type in chunk
-                .into_iter() { query = query.or_filter(dsl::content_type
-                .eq(content_type)); } query.select((dsl::id, dsl::content_type,
-                dsl::data,)).load_stream:: < DocumentRow > (conn.write(). await
-                .deref_mut()). await .map(| s | s.map_ok(< Document as Model >
-                ::from_row).try_collect:: < Vec < _ >> ()) ? . await ? }
-            },
-        )
+        Ok({
+            const LIBPQ_MAX_PARAMETERS: usize = 2_usize.pow(16) - 1;
+            const ASYNC_SUBDIVISION: usize = 2_usize;
+            const CHUNK_SIZE: usize = LIBPQ_MAX_PARAMETERS / ASYNC_SUBDIVISION / 1usize;
+            let mut result = C::default();
+            let chunks = ids.chunks(CHUNK_SIZE.min(2048usize));
+            for chunk in chunks {
+                let chunk_result = {
+                    let mut query = dsl::osrd_infra_document.into_boxed();
+                    for content_type in chunk.into_iter() {
+                        query = query.or_filter(dsl::content_type.eq(content_type));
+                    }
+                    query
+                        .select((dsl::id, dsl::content_type, dsl::data))
+                        .load_stream::<DocumentRow>(conn.write().await.deref_mut())
+                        .await
+                        .map(|s| {
+                            s
+                                .map_ok(<Document as Model>::from_row)
+                                .try_collect::<Vec<_>>()
+                        })?
+                        .await?
+                };
+                result.extend(chunk_result);
+            }
+            result
+        })
     }
     #[tracing::instrument(
         name = "model:retrieve_batch_with_key_unchecked<Document>",
@@ -740,18 +802,35 @@ impl crate::models::RetrieveBatchUnchecked<(String)> for Document {
         use std::ops::DerefMut;
         let ids = ids.into_iter().collect::<Vec<_>>();
         tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
-        Ok(
-            crate::chunked_for_libpq! {
-                1usize, 2048usize, ids, C::default(), chunk => { let mut query =
-                dsl::osrd_infra_document.into_boxed(); for content_type in chunk
-                .into_iter() { query = query.or_filter(dsl::content_type
-                .eq(content_type)); } query.select((dsl::id, dsl::content_type,
-                dsl::data,)).load_stream:: < DocumentRow > (conn.write(). await
-                .deref_mut()). await .map(| s | { s.map_ok(| row | { let model = <
-                Document as Model > ::from_row(row); (model.get_id(), model) })
-                .try_collect:: < Vec < _ >> () }) ? . await ? }
-            },
-        )
+        Ok({
+            const LIBPQ_MAX_PARAMETERS: usize = 2_usize.pow(16) - 1;
+            const ASYNC_SUBDIVISION: usize = 2_usize;
+            const CHUNK_SIZE: usize = LIBPQ_MAX_PARAMETERS / ASYNC_SUBDIVISION / 1usize;
+            let mut result = C::default();
+            let chunks = ids.chunks(CHUNK_SIZE.min(2048usize));
+            for chunk in chunks {
+                let chunk_result = {
+                    let mut query = dsl::osrd_infra_document.into_boxed();
+                    for content_type in chunk.into_iter() {
+                        query = query.or_filter(dsl::content_type.eq(content_type));
+                    }
+                    query
+                        .select((dsl::id, dsl::content_type, dsl::data))
+                        .load_stream::<DocumentRow>(conn.write().await.deref_mut())
+                        .await
+                        .map(|s| {
+                            s.map_ok(|row| {
+                                    let model = <Document as Model>::from_row(row);
+                                    (model.get_id(), model)
+                                })
+                                .try_collect::<Vec<_>>()
+                        })?
+                        .await?
+                };
+                result.extend(chunk_result);
+            }
+            result
+        })
     }
 }
 #[automatically_derived]
@@ -775,16 +854,33 @@ impl crate::models::RetrieveBatchUnchecked<(i64)> for Document {
         use std::ops::DerefMut;
         let ids = ids.into_iter().collect::<Vec<_>>();
         tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
-        Ok(
-            crate::chunked_for_libpq! {
-                1usize, 2048usize, ids, C::default(), chunk => { let mut query =
-                dsl::osrd_infra_document.into_boxed(); for id_ in chunk.into_iter() {
-                query = query.or_filter(dsl::id.eq(id_)); } query.select((dsl::id,
-                dsl::content_type, dsl::data,)).load_stream:: < DocumentRow > (conn
-                .write(). await .deref_mut()). await .map(| s | s.map_ok(< Document as
-                Model > ::from_row).try_collect:: < Vec < _ >> ()) ? . await ? }
-            },
-        )
+        Ok({
+            const LIBPQ_MAX_PARAMETERS: usize = 2_usize.pow(16) - 1;
+            const ASYNC_SUBDIVISION: usize = 2_usize;
+            const CHUNK_SIZE: usize = LIBPQ_MAX_PARAMETERS / ASYNC_SUBDIVISION / 1usize;
+            let mut result = C::default();
+            let chunks = ids.chunks(CHUNK_SIZE.min(2048usize));
+            for chunk in chunks {
+                let chunk_result = {
+                    let mut query = dsl::osrd_infra_document.into_boxed();
+                    for id_ in chunk.into_iter() {
+                        query = query.or_filter(dsl::id.eq(id_));
+                    }
+                    query
+                        .select((dsl::id, dsl::content_type, dsl::data))
+                        .load_stream::<DocumentRow>(conn.write().await.deref_mut())
+                        .await
+                        .map(|s| {
+                            s
+                                .map_ok(<Document as Model>::from_row)
+                                .try_collect::<Vec<_>>()
+                        })?
+                        .await?
+                };
+                result.extend(chunk_result);
+            }
+            result
+        })
     }
     #[tracing::instrument(
         name = "model:retrieve_batch_with_key_unchecked<Document>",
@@ -805,17 +901,35 @@ impl crate::models::RetrieveBatchUnchecked<(i64)> for Document {
         use std::ops::DerefMut;
         let ids = ids.into_iter().collect::<Vec<_>>();
         tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
-        Ok(
-            crate::chunked_for_libpq! {
-                1usize, 2048usize, ids, C::default(), chunk => { let mut query =
-                dsl::osrd_infra_document.into_boxed(); for id_ in chunk.into_iter() {
-                query = query.or_filter(dsl::id.eq(id_)); } query.select((dsl::id,
-                dsl::content_type, dsl::data,)).load_stream:: < DocumentRow > (conn
-                .write(). await .deref_mut()). await .map(| s | { s.map_ok(| row | { let
-                model = < Document as Model > ::from_row(row); (model.get_id(), model) })
-                .try_collect:: < Vec < _ >> () }) ? . await ? }
-            },
-        )
+        Ok({
+            const LIBPQ_MAX_PARAMETERS: usize = 2_usize.pow(16) - 1;
+            const ASYNC_SUBDIVISION: usize = 2_usize;
+            const CHUNK_SIZE: usize = LIBPQ_MAX_PARAMETERS / ASYNC_SUBDIVISION / 1usize;
+            let mut result = C::default();
+            let chunks = ids.chunks(CHUNK_SIZE.min(2048usize));
+            for chunk in chunks {
+                let chunk_result = {
+                    let mut query = dsl::osrd_infra_document.into_boxed();
+                    for id_ in chunk.into_iter() {
+                        query = query.or_filter(dsl::id.eq(id_));
+                    }
+                    query
+                        .select((dsl::id, dsl::content_type, dsl::data))
+                        .load_stream::<DocumentRow>(conn.write().await.deref_mut())
+                        .await
+                        .map(|s| {
+                            s.map_ok(|row| {
+                                    let model = <Document as Model>::from_row(row);
+                                    (model.get_id(), model)
+                                })
+                                .try_collect::<Vec<_>>()
+                        })?
+                        .await?
+                };
+                result.extend(chunk_result);
+            }
+            result
+        })
     }
 }
 #[automatically_derived]
@@ -843,18 +957,37 @@ impl crate::models::UpdateBatchUnchecked<Document, (String)> for DocumentChanges
         use std::ops::DerefMut;
         let ids = ids.into_iter().collect::<Vec<_>>();
         tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
-        Ok(
-            crate::chunked_for_libpq! {
-                1usize, 2048usize, ids, C::default(), chunk => { let mut query =
-                dsl::osrd_infra_document.select(dsl::id).into_boxed(); for content_type
-                in chunk.into_iter() { query = query.or_filter(dsl::content_type
-                .eq(content_type)); } diesel::update(dsl::osrd_infra_document)
-                .filter(dsl::id.eq_any(query)).set(& self).returning((dsl::id,
-                dsl::content_type, dsl::data,)).load_stream:: < DocumentRow > (conn
-                .write(). await .deref_mut()). await .map(| s | s.map_ok(< Document as
-                Model > ::from_row).try_collect:: < Vec < _ >> ()) ? . await ? }
-            },
-        )
+        Ok({
+            const LIBPQ_MAX_PARAMETERS: usize = 2_usize.pow(16) - 1;
+            const ASYNC_SUBDIVISION: usize = 2_usize;
+            const CHUNK_SIZE: usize = LIBPQ_MAX_PARAMETERS / ASYNC_SUBDIVISION / 1usize;
+            let mut result = C::default();
+            let chunks = ids.chunks(CHUNK_SIZE.min(2048usize));
+            for chunk in chunks {
+                let chunk_result = {
+                    let mut query = dsl::osrd_infra_document
+                        .select(dsl::id)
+                        .into_boxed();
+                    for content_type in chunk.into_iter() {
+                        query = query.or_filter(dsl::content_type.eq(content_type));
+                    }
+                    diesel::update(dsl::osrd_infra_document)
+                        .filter(dsl::id.eq_any(query))
+                        .set(&self)
+                        .returning((dsl::id, dsl::content_type, dsl::data))
+                        .load_stream::<DocumentRow>(conn.write().await.deref_mut())
+                        .await
+                        .map(|s| {
+                            s
+                                .map_ok(<Document as Model>::from_row)
+                                .try_collect::<Vec<_>>()
+                        })?
+                        .await?
+                };
+                result.extend(chunk_result);
+            }
+            result
+        })
     }
     #[tracing::instrument(
         name = "model:update_batch_unchecked<Document>",
@@ -879,19 +1012,39 @@ impl crate::models::UpdateBatchUnchecked<Document, (String)> for DocumentChanges
         use futures_util::stream::TryStreamExt;
         let ids = ids.into_iter().collect::<Vec<_>>();
         tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
-        Ok(
-            crate::chunked_for_libpq! {
-                1usize, 2048usize, ids, C::default(), chunk => { let mut query =
-                dsl::osrd_infra_document.select(dsl::id).into_boxed(); for content_type
-                in chunk.into_iter() { query = query.or_filter(dsl::content_type
-                .eq(content_type)); } diesel::update(dsl::osrd_infra_document)
-                .filter(dsl::id.eq_any(query)).set(& self).returning((dsl::id,
-                dsl::content_type, dsl::data,)).load_stream:: < DocumentRow > (conn
-                .write(). await .deref_mut()). await .map(| s | { s.map_ok(| row | { let
-                model = < Document as Model > ::from_row(row); (model.get_id(), model) })
-                .try_collect:: < Vec < _ >> () }) ? . await ? }
-            },
-        )
+        Ok({
+            const LIBPQ_MAX_PARAMETERS: usize = 2_usize.pow(16) - 1;
+            const ASYNC_SUBDIVISION: usize = 2_usize;
+            const CHUNK_SIZE: usize = LIBPQ_MAX_PARAMETERS / ASYNC_SUBDIVISION / 1usize;
+            let mut result = C::default();
+            let chunks = ids.chunks(CHUNK_SIZE.min(2048usize));
+            for chunk in chunks {
+                let chunk_result = {
+                    let mut query = dsl::osrd_infra_document
+                        .select(dsl::id)
+                        .into_boxed();
+                    for content_type in chunk.into_iter() {
+                        query = query.or_filter(dsl::content_type.eq(content_type));
+                    }
+                    diesel::update(dsl::osrd_infra_document)
+                        .filter(dsl::id.eq_any(query))
+                        .set(&self)
+                        .returning((dsl::id, dsl::content_type, dsl::data))
+                        .load_stream::<DocumentRow>(conn.write().await.deref_mut())
+                        .await
+                        .map(|s| {
+                            s.map_ok(|row| {
+                                    let model = <Document as Model>::from_row(row);
+                                    (model.get_id(), model)
+                                })
+                                .try_collect::<Vec<_>>()
+                        })?
+                        .await?
+                };
+                result.extend(chunk_result);
+            }
+            result
+        })
     }
 }
 #[automatically_derived]
@@ -919,18 +1072,37 @@ impl crate::models::UpdateBatchUnchecked<Document, (i64)> for DocumentChangeset 
         use std::ops::DerefMut;
         let ids = ids.into_iter().collect::<Vec<_>>();
         tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
-        Ok(
-            crate::chunked_for_libpq! {
-                1usize, 2048usize, ids, C::default(), chunk => { let mut query =
-                dsl::osrd_infra_document.select(dsl::id).into_boxed(); for id_ in chunk
-                .into_iter() { query = query.or_filter(dsl::id.eq(id_)); }
-                diesel::update(dsl::osrd_infra_document).filter(dsl::id.eq_any(query))
-                .set(& self).returning((dsl::id, dsl::content_type, dsl::data,))
-                .load_stream:: < DocumentRow > (conn.write(). await .deref_mut()). await
-                .map(| s | s.map_ok(< Document as Model > ::from_row).try_collect:: < Vec
-                < _ >> ()) ? . await ? }
-            },
-        )
+        Ok({
+            const LIBPQ_MAX_PARAMETERS: usize = 2_usize.pow(16) - 1;
+            const ASYNC_SUBDIVISION: usize = 2_usize;
+            const CHUNK_SIZE: usize = LIBPQ_MAX_PARAMETERS / ASYNC_SUBDIVISION / 1usize;
+            let mut result = C::default();
+            let chunks = ids.chunks(CHUNK_SIZE.min(2048usize));
+            for chunk in chunks {
+                let chunk_result = {
+                    let mut query = dsl::osrd_infra_document
+                        .select(dsl::id)
+                        .into_boxed();
+                    for id_ in chunk.into_iter() {
+                        query = query.or_filter(dsl::id.eq(id_));
+                    }
+                    diesel::update(dsl::osrd_infra_document)
+                        .filter(dsl::id.eq_any(query))
+                        .set(&self)
+                        .returning((dsl::id, dsl::content_type, dsl::data))
+                        .load_stream::<DocumentRow>(conn.write().await.deref_mut())
+                        .await
+                        .map(|s| {
+                            s
+                                .map_ok(<Document as Model>::from_row)
+                                .try_collect::<Vec<_>>()
+                        })?
+                        .await?
+                };
+                result.extend(chunk_result);
+            }
+            result
+        })
     }
     #[tracing::instrument(
         name = "model:update_batch_unchecked<Document>",
@@ -955,19 +1127,39 @@ impl crate::models::UpdateBatchUnchecked<Document, (i64)> for DocumentChangeset 
         use futures_util::stream::TryStreamExt;
         let ids = ids.into_iter().collect::<Vec<_>>();
         tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
-        Ok(
-            crate::chunked_for_libpq! {
-                1usize, 2048usize, ids, C::default(), chunk => { let mut query =
-                dsl::osrd_infra_document.select(dsl::id).into_boxed(); for id_ in chunk
-                .into_iter() { query = query.or_filter(dsl::id.eq(id_)); }
-                diesel::update(dsl::osrd_infra_document).filter(dsl::id.eq_any(query))
-                .set(& self).returning((dsl::id, dsl::content_type, dsl::data,))
-                .load_stream:: < DocumentRow > (conn.write(). await .deref_mut()). await
-                .map(| s | { s.map_ok(| row | { let model = < Document as Model >
-                ::from_row(row); (model.get_id(), model) }).try_collect:: < Vec < _ >> ()
-                }) ? . await ? }
-            },
-        )
+        Ok({
+            const LIBPQ_MAX_PARAMETERS: usize = 2_usize.pow(16) - 1;
+            const ASYNC_SUBDIVISION: usize = 2_usize;
+            const CHUNK_SIZE: usize = LIBPQ_MAX_PARAMETERS / ASYNC_SUBDIVISION / 1usize;
+            let mut result = C::default();
+            let chunks = ids.chunks(CHUNK_SIZE.min(2048usize));
+            for chunk in chunks {
+                let chunk_result = {
+                    let mut query = dsl::osrd_infra_document
+                        .select(dsl::id)
+                        .into_boxed();
+                    for id_ in chunk.into_iter() {
+                        query = query.or_filter(dsl::id.eq(id_));
+                    }
+                    diesel::update(dsl::osrd_infra_document)
+                        .filter(dsl::id.eq_any(query))
+                        .set(&self)
+                        .returning((dsl::id, dsl::content_type, dsl::data))
+                        .load_stream::<DocumentRow>(conn.write().await.deref_mut())
+                        .await
+                        .map(|s| {
+                            s.map_ok(|row| {
+                                    let model = <Document as Model>::from_row(row);
+                                    (model.get_id(), model)
+                                })
+                                .try_collect::<Vec<_>>()
+                        })?
+                        .await?
+                };
+                result.extend(chunk_result);
+            }
+            result
+        })
     }
 }
 #[automatically_derived]
@@ -989,12 +1181,24 @@ impl crate::models::DeleteBatch<(String)> for Document {
         use std::ops::DerefMut;
         let ids = ids.into_iter().collect::<Vec<_>>();
         tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
-        let counts = crate::chunked_for_libpq! {
-            1usize, 2048usize, ids, chunk => { let mut query =
-            diesel::delete(dsl::osrd_infra_document).into_boxed(); for content_type in
-            chunk.into_iter() { query = query.or_filter(dsl::content_type
-            .eq(content_type)); } query.execute(conn.write(). await .deref_mut()). await
-            ? }
+        let counts = {
+            const LIBPQ_MAX_PARAMETERS: usize = 2_usize.pow(16) - 1;
+            const ASYNC_SUBDIVISION: usize = 2_usize;
+            const CHUNK_SIZE: usize = LIBPQ_MAX_PARAMETERS / ASYNC_SUBDIVISION / 1usize;
+            let mut result = Vec::new();
+            let chunks = ids.chunks(CHUNK_SIZE.min(2048usize));
+            for chunk in chunks {
+                let chunk_result = {
+                    let mut query = diesel::delete(dsl::osrd_infra_document)
+                        .into_boxed();
+                    for content_type in chunk.into_iter() {
+                        query = query.or_filter(dsl::content_type.eq(content_type));
+                    }
+                    query.execute(conn.write().await.deref_mut()).await?
+                };
+                result.push(chunk_result);
+            }
+            result
         };
         Ok(counts.into_iter().sum())
     }
@@ -1018,11 +1222,24 @@ impl crate::models::DeleteBatch<(i64)> for Document {
         use std::ops::DerefMut;
         let ids = ids.into_iter().collect::<Vec<_>>();
         tracing::Span::current().record("query_ids", tracing::field::debug(&ids));
-        let counts = crate::chunked_for_libpq! {
-            1usize, 2048usize, ids, chunk => { let mut query =
-            diesel::delete(dsl::osrd_infra_document).into_boxed(); for id_ in chunk
-            .into_iter() { query = query.or_filter(dsl::id.eq(id_)); } query.execute(conn
-            .write(). await .deref_mut()). await ? }
+        let counts = {
+            const LIBPQ_MAX_PARAMETERS: usize = 2_usize.pow(16) - 1;
+            const ASYNC_SUBDIVISION: usize = 2_usize;
+            const CHUNK_SIZE: usize = LIBPQ_MAX_PARAMETERS / ASYNC_SUBDIVISION / 1usize;
+            let mut result = Vec::new();
+            let chunks = ids.chunks(CHUNK_SIZE.min(2048usize));
+            for chunk in chunks {
+                let chunk_result = {
+                    let mut query = diesel::delete(dsl::osrd_infra_document)
+                        .into_boxed();
+                    for id_ in chunk.into_iter() {
+                        query = query.or_filter(dsl::id.eq(id_));
+                    }
+                    query.execute(conn.write().await.deref_mut()).await?
+                };
+                result.push(chunk_result);
+            }
+            result
         };
         Ok(counts.into_iter().sum())
     }
