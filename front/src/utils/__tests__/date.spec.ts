@@ -5,7 +5,7 @@ import {
   isoDateToMs,
   formatToIsoDate,
   serializeDateTimeWithoutYear,
-  extractDateAndTimefromISO,
+  extractDateAndTime,
   isArrivalDateInSearchTimeWindow,
 } from 'utils/date';
 
@@ -65,10 +65,10 @@ describe('serializeDateTimeWithoutYear', () => {
   });
 });
 
-describe('extractDateAndTimefromISO', () => {
+describe('extractDateAndTime', () => {
   it('should correctly parse the date and time from an ISO string', () => {
-    const arrivalTime = '2024-10-05T14:30:00+00:00';
-    const result = extractDateAndTimefromISO(arrivalTime);
+    const arrivalTime = new Date('2024-10-05T14:30:00+00:00');
+    const result = extractDateAndTime(arrivalTime);
 
     expect(result).toEqual({
       arrivalDate: '2024-10-05',
@@ -79,8 +79,8 @@ describe('extractDateAndTimefromISO', () => {
   });
 
   it('should handle single digit hours and minutes correctly', () => {
-    const arrivalTime = '2024-10-05T09:05:00+00:00';
-    const result = extractDateAndTimefromISO(arrivalTime);
+    const arrivalTime = new Date('2024-10-05T09:05:00+00:00');
+    const result = extractDateAndTime(arrivalTime);
 
     expect(result).toEqual({
       arrivalDate: '2024-10-05',

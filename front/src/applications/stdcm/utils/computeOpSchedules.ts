@@ -1,4 +1,4 @@
-import { extractDateAndTimefromISO, addDurationToDate, subtractDurationFromDate } from 'utils/date';
+import { extractDateAndTime, addDurationToDate, subtractDurationFromDate } from 'utils/date';
 
 /**
  * Computes the operation schedules for a given start time and duration.
@@ -15,13 +15,13 @@ import { extractDateAndTimefromISO, addDurationToDate, subtractDurationFromDate 
  * activities such as preparation for the next departure.
  */
 const computeOpSchedules = (startTime: Date, msFromStartTime: number) => {
-  const { arrivalDate: originDate, arrivalTime: originTime } = extractDateAndTimefromISO(
-    startTime.toISOString(),
+  const { arrivalDate: originDate, arrivalTime: originTime } = extractDateAndTime(
+    startTime,
     'DD/MM/YY'
   );
   const destinationArrivalTime = addDurationToDate(startTime, msFromStartTime, 'millisecond');
-  const { arrivalDate: destinationDate, arrivalTime: destinationTime } = extractDateAndTimefromISO(
-    destinationArrivalTime.toISOString(),
+  const { arrivalDate: destinationDate, arrivalTime: destinationTime } = extractDateAndTime(
+    destinationArrivalTime,
     'DD/MM/YY'
   );
 
