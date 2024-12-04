@@ -123,7 +123,10 @@ const useLinkedTrainSearch = () => {
 
           const originDetails = await getExtremityDetails(result.path.at(0)!);
           const destinationDetails = await getExtremityDetails(result.path.at(-1)!);
-          const computedOpSchedules = computeOpSchedules(result.start_time, msFromStartTime);
+          const computedOpSchedules = computeOpSchedules(
+            new Date(result.start_time),
+            msFromStartTime
+          );
 
           if (!originDetails || !destinationDetails) return undefined;
           return {

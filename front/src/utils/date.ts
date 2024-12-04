@@ -136,20 +136,20 @@ export function convertIsoUtcToLocalTime(isoUtcString: IsoDateTimeString): strin
   return dayjs(isoUtcString).local().format();
 }
 
-export function addDurationToIsoDate(
-  startTime: IsoDateTimeString,
+export function addDurationToDate(
+  startTime: Date,
   duration: number,
   durationUnit: ManipulateType = 'second'
-): IsoDateTimeString {
-  return dayjs(startTime).add(duration, durationUnit).format();
+): Date {
+  return dayjs(startTime).add(duration, durationUnit).toDate();
 }
 
-export function substractDurationToIsoDate(
-  startTime: IsoDateTimeString,
+export function subtractDurationFromDate(
+  startTime: Date,
   duration: number,
   durationUnit: ManipulateType = 'second'
-): IsoDateTimeString {
-  return dayjs(startTime).subtract(duration, durationUnit).format();
+): Date {
+  return dayjs(startTime).subtract(duration, durationUnit).toDate();
 }
 
 /**
