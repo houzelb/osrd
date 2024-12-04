@@ -17,7 +17,6 @@ use editoast_schemas::train_schedule::Margins;
 use editoast_schemas::train_schedule::ReceptionSignal;
 use editoast_schemas::train_schedule::ScheduleItem;
 use failure_handler::SimulationFailureHandler;
-use opentelemetry::trace::TraceContextExt;
 use request::convert_steps;
 use request::Request;
 use serde::Deserialize;
@@ -26,7 +25,6 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::Instrument;
-use tracing_opentelemetry::OpenTelemetrySpanExt;
 use utoipa::IntoParams;
 use utoipa::ToSchema;
 
@@ -260,35 +258,8 @@ async fn stdcm(
 
     // 6. Check if the current tracing level is debug or greater, and if so, log STDCM request and response
     if tracing::level_filters::LevelFilter::current() >= tracing::Level::DEBUG {
-        let user_id = auth.authorizer().map_or_else(
-            |e| {
-                tracing::error!("Authorization failed: {e}. Unable to retrieve user ID.");
-                None
-            },
-            |auth| Some(auth.user_id()),
-        );
-        let stdcm_response_for_spawn = stdcm_response.clone();
-        let trace_id = tracing::Span::current()
-            .context()
-            .span()
-            .span_context()
-            .trace_id();
-        let stdcm_log_changeset = StdcmLog::changeset()
-            .trace_id(trace_id.to_string())
-            .request(stdcm_request)
-            .response(stdcm_response_for_spawn)
-            .user_id(user_id);
         let _ = tokio::spawn(
-            // We just don't await the creation of the log entry since we want
-            // the endpoint to return as soon as possible, and because failing
-            // to persist a log entry is not a very important error here.
-            async move {
-                let _ = stdcm_log_changeset
-                    .create(&mut conn)
-                    .await
-                    .map_err(|e| tracing::error!("Failed during log operation: {e}"));
-            }
-            .in_current_span(),
+            StdcmLog::log(auth, conn, stdcm_request, stdcm_response.clone()).in_current_span(),
         )
         .await;
     }
