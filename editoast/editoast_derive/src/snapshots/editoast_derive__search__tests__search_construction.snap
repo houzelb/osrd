@@ -1,0 +1,53 @@
+---
+source: editoast_derive/src/search.rs
+---
+// Source
+// -----------------------------------------------------------------------------
+
+#[search(
+    table = "search_track",
+    column(name = "infra_id", data_type = "INT"),
+    column(name = "line_code", data_type = "INT"),
+    column(name = "line_name", data_type = "TEXT")
+)]
+pub struct Track {
+    #[search(sql = "search_track.infra_id")]
+    infra_id: i64,
+    #[search(sql = "search_track.unprocessed_line_name")]
+    line_name: std::string::String,
+    #[search(sql = "search_track.line_code", rename = "code")]
+    line_code: i64,
+}
+
+// Macro expansion
+// -----------------------------------------------------------------------------
+
+impl editoast_search::SearchObject for Track {
+    fn search_config() -> editoast_search::SearchConfig {
+        editoast_search::SearchConfig {
+            table: "search_track".to_owned(),
+            joins: None,
+            criterias: vec![
+                editoast_search::Criteria { name : "infra_id".to_owned(), data_type :
+                editoast_search::TypeSpec::Type(editoast_search::AstType::Integer),
+                migration : None, }, editoast_search::Criteria { name : "line_code"
+                .to_owned(), data_type :
+                editoast_search::TypeSpec::Type(editoast_search::AstType::Integer),
+                migration : None, }, editoast_search::Criteria { name : "line_name"
+                .to_owned(), data_type :
+                editoast_search::TypeSpec::Type(editoast_search::AstType::String),
+                migration : None, }
+            ],
+            properties: vec![
+                editoast_search::Property { name : "infra_id".to_owned(), sql :
+                "search_track.infra_id".to_owned(), data_type : None, },
+                editoast_search::Property { name : "line_name".to_owned(), sql :
+                "search_track.unprocessed_line_name".to_owned(), data_type :
+                Some(editoast_search::TypeSpec::Type(editoast_search::AstType::String)),
+                }, editoast_search::Property { name : "code".to_owned(), sql :
+                "search_track.line_code".to_owned(), data_type : None, }
+            ],
+            migration: None,
+        }
+    }
+}

@@ -1,5 +1,5 @@
 use std::{
-    collections::HashSet,
+    collections::BTreeSet,
     ops::{Deref, DerefMut},
 };
 
@@ -19,9 +19,9 @@ pub(crate) struct ModelConfig {
     pub(crate) fields: Fields,
     pub(crate) row: GeneratedTypeArgs,
     pub(crate) changeset: GeneratedTypeArgs,
-    pub(crate) identifiers: HashSet<Identifier>, // identifiers ⊆ fields
-    pub(crate) preferred_identifier: Identifier, // preferred_identifier ∈ identifiers
-    pub(crate) primary_identifier: Identifier,   // primary_identifier ∈ identifiers
+    pub(crate) identifiers: BTreeSet<Identifier>, // identifiers ⊆ fields
+    pub(crate) preferred_identifier: Identifier,  // preferred_identifier ∈ identifiers
+    pub(crate) primary_identifier: Identifier,    // primary_identifier ∈ identifiers
     pub(crate) impl_plan: ImplPlan,
 }
 

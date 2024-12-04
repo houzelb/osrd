@@ -1,0 +1,97 @@
+---
+source: editoast_derive/src/search.rs
+---
+// Source
+// -----------------------------------------------------------------------------
+
+#[derive(SearchConfigStore)]
+#[search_config_store(
+    object(name = "track", config = SearchResultItemTrack),
+    object(name = "operationalpoint", config = SearchResultItemOperationalPoint),
+    object(name = "signal", config = SearchResultItemSignal),
+    object(name = "project", config = SearchResultItemProject),
+    object(name = "study", config = SearchResultItemStudy),
+    object(name = "scenario", config = SearchResultItemScenario),
+    object(name = "trainschedule", config = SearchResultItemTrainSchedule),
+)]
+pub struct SearchStore;
+
+// Macro expansion
+// -----------------------------------------------------------------------------
+
+impl editoast_search::SearchConfigStore for SearchStore {
+    fn find<S: AsRef<str>>(object_name: S) -> Option<editoast_search::SearchConfig> {
+        match object_name.as_ref() {
+            "track" => {
+                Some(
+                    <SearchResultItemTrack as editoast_search::SearchObject>::search_config(),
+                )
+            }
+            "operationalpoint" => {
+                Some(
+                    <SearchResultItemOperationalPoint as editoast_search::SearchObject>::search_config(),
+                )
+            }
+            "signal" => {
+                Some(
+                    <SearchResultItemSignal as editoast_search::SearchObject>::search_config(),
+                )
+            }
+            "project" => {
+                Some(
+                    <SearchResultItemProject as editoast_search::SearchObject>::search_config(),
+                )
+            }
+            "study" => {
+                Some(
+                    <SearchResultItemStudy as editoast_search::SearchObject>::search_config(),
+                )
+            }
+            "scenario" => {
+                Some(
+                    <SearchResultItemScenario as editoast_search::SearchObject>::search_config(),
+                )
+            }
+            "trainschedule" => {
+                Some(
+                    <SearchResultItemTrainSchedule as editoast_search::SearchObject>::search_config(),
+                )
+            }
+            _ => None,
+        }
+    }
+    fn all() -> Vec<(&'static str, editoast_search::SearchConfig)> {
+        vec![
+            ("track", < SearchResultItemTrack as editoast_search::SearchObject >
+            ::search_config()), ("operationalpoint", < SearchResultItemOperationalPoint
+            as editoast_search::SearchObject > ::search_config()), ("signal", <
+            SearchResultItemSignal as editoast_search::SearchObject > ::search_config()),
+            ("project", < SearchResultItemProject as editoast_search::SearchObject >
+            ::search_config()), ("study", < SearchResultItemStudy as
+            editoast_search::SearchObject > ::search_config()), ("scenario", <
+            SearchResultItemScenario as editoast_search::SearchObject >
+            ::search_config()), ("trainschedule", < SearchResultItemTrainSchedule as
+            editoast_search::SearchObject > ::search_config())
+        ]
+    }
+}
+#[derive(Serialize, ToSchema)]
+#[serde(untagged)]
+#[allow(unused, clippy::enum_variant_names)]
+/// A search result item that depends on the query's `object`
+pub(super) enum SearchResultItem {
+    SearchResultItemTrack(SearchResultItemTrack),
+    SearchResultItemOperationalPoint(SearchResultItemOperationalPoint),
+    SearchResultItemSignal(SearchResultItemSignal),
+    SearchResultItemProject(SearchResultItemProject),
+    SearchResultItemStudy(SearchResultItemStudy),
+    SearchResultItemScenario(SearchResultItemScenario),
+    SearchResultItemTrainSchedule(SearchResultItemTrainSchedule),
+}
+impl SearchResultItem {
+    editoast_common::schemas! {
+        SearchResultItemTrack, SearchResultItemOperationalPoint, SearchResultItemSignal,
+        SearchResultItemProject, SearchResultItemStudy, SearchResultItemScenario,
+        SearchResultItemTrainSchedule, SearchResultItem,
+    }
+}

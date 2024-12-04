@@ -363,77 +363,48 @@ pub fn expand_store(input: &DeriveInput) -> Result<TokenStream> {
 
 #[cfg(test)]
 mod tests {
-    use darling::FromDeriveInput;
-    use pretty_assertions::assert_eq;
+    use super::*;
 
-    use crate::search::SearchParams;
-
-    use super::SearchField;
-
-    fn track() -> syn::DeriveInput {
-        syn::parse_quote! {
-            #[search(
-                table = "search_track",
-                column(name = "infra_id", data_type = "INT"),
-                column(name = "line_code", data_type = "INT"),
-                column(name = "line_name", data_type = "TEXT")
-            )]
-            pub struct Track {
-                #[search(sql = "search_track.infra_id")]
-                infra_id: i64,
-                #[search(sql = "search_track.unprocessed_line_name")]
-                line_name: std::string::String,
-                #[search(sql = "search_track.line_code", rename = "code")]
-                line_code: i64,
+    #[test]
+    fn test_search_construction() {
+        crate::assert_macro_expansion!(
+            expand_search,
+            syn::parse_quote! {
+                #[search(
+                    table = "search_track",
+                    column(name = "infra_id", data_type = "INT"),
+                    column(name = "line_code", data_type = "INT"),
+                    column(name = "line_name", data_type = "TEXT")
+                )]
+                pub struct Track {
+                    #[search(sql = "search_track.infra_id")]
+                    infra_id: i64,
+                    #[search(sql = "search_track.unprocessed_line_name")]
+                    line_name: std::string::String,
+                    #[search(sql = "search_track.line_code", rename = "code")]
+                    line_code: i64,
+                }
             }
-        }
-    }
-
-    impl SearchField {
-        fn to_tuple(&self) -> (String, String, String) {
-            (
-                self.ident_string().unwrap(),
-                self.type_string(),
-                self.sql.to_owned(),
-            )
-        }
+        );
     }
 
     #[test]
-    fn test_construction() {
-        let params = SearchParams::from_derive_input(&track()).unwrap();
-        assert_eq!(&params.table, "search_track");
-        assert!(&params.joins.is_empty());
-        assert_eq!(
-            params.columns.iter().map(|c| &c.name).collect::<Vec<_>>(),
-            vec!["infra_id", "line_code", "line_name"]
-        );
-        assert_eq!(
-            params
-                .columns
-                .iter()
-                .map(|c| &c.data_type)
-                .collect::<Vec<_>>(),
-            vec!["INT", "INT", "TEXT"]
-        );
-        let tuples = params
-            .data
-            .take_struct()
-            .unwrap()
-            .fields
-            .into_iter()
-            .map(|p| p.to_tuple())
-            .collect::<Vec<_>>();
-        assert_eq!(
-            tuples
-                .iter()
-                .map(|t| (t.0.as_ref(), t.1.as_ref(), t.2.as_ref()))
-                .collect::<Vec<_>>(),
-            vec![
-                ("infra_id", "i64", "search_track.infra_id"),
-                ("line_name", "String", "search_track.unprocessed_line_name"),
-                ("code", "i64", "search_track.line_code")
-            ]
+    fn test_store_construction() {
+        crate::assert_macro_expansion!(
+            expand_store,
+            syn::parse_quote! {
+                #[derive(SearchConfigStore)]
+                #[search_config_store(
+                    object(name = "track", config = SearchResultItemTrack),
+                    object(name = "operationalpoint", config = SearchResultItemOperationalPoint),
+                    object(name = "signal", config = SearchResultItemSignal),
+                    object(name = "project", config = SearchResultItemProject),
+                    object(name = "study", config = SearchResultItemStudy),
+                    object(name = "scenario", config = SearchResultItemScenario),
+                    object(name = "trainschedule", config = SearchResultItemTrainSchedule),
+                )]
+                pub struct SearchStore;
+            }
         );
     }
 }

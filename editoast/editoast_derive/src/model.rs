@@ -87,21 +87,27 @@ pub fn model(input: &DeriveInput) -> Result<TokenStream> {
 }
 
 #[cfg(test)]
-#[test]
-fn test_construction() {
-    let input = syn::parse_quote! {
-        #[derive(Clone, Model)]
-        #[model(table = editoast_models::tables::osrd_infra_document)]
-        #[model(row(type_name = "DocumentRow", derive(Debug)))]
-        #[model(changeset(type_name = "DocumentChangeset", public, derive(Debug)))] // fields are public
-        #[model(gen(ops = crud, batch_ops = crud, list))]
-        struct Document {
-            #[model(column = "id", preferred, primary)]
-            id_: i64,
-            #[model(identifier, json)]
-            content_type: String,
-            data: Vec<u8>,
-        }
-    };
-    let _ = model(&input).expect("should generate");
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_construction() {
+        crate::assert_macro_expansion!(
+            model,
+            syn::parse_quote! {
+                #[derive(Clone, Model)]
+                #[model(table = editoast_models::tables::osrd_infra_document)]
+                #[model(row(type_name = "DocumentRow", derive(Debug)))]
+                #[model(changeset(type_name = "DocumentChangeset", public, derive(Debug)))] // fields are public
+                #[model(gen(ops = crud, batch_ops = crud, list))]
+                struct Document {
+                    #[model(column = "id", preferred, primary)]
+                    id_: i64,
+                    #[model(identifier, json)]
+                    content_type: String,
+                    data: Vec<u8>,
+                }
+            }
+        );
+    }
 }
