@@ -22,8 +22,8 @@ use serde::Deserialize;
 use serde::Serialize;
 use serde_json::Value;
 use thiserror::Error;
-use tracing::debug;
 use tracing::error;
+use tracing::trace;
 
 #[cfg(test)]
 use crate::core::mocking::MockingError;
@@ -95,7 +95,7 @@ impl CoreClient {
         body: Option<&B>,
         infra_id: Option<i64>,
     ) -> Result<R::Response> {
-        debug!(
+        trace!(
             target: "editoast::coreclient",
             body = body.and_then(|b| serde_json::to_string_pretty(b).ok()).unwrap_or_default(),
             "Request content");
