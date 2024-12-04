@@ -287,8 +287,8 @@ pub fn expand_search(input: &DeriveInput) -> Result<TokenStream> {
                 editoast_search::SearchConfig {
                     table: #table.to_owned(),
                     joins: #joins,
-                    criterias: vec![#criterias],
-                    properties: vec![#properties],
+                    criterias: Vec::from([#criterias]),
+                    properties: Vec::from([#properties]),
                     migration: #migration,
                 }
             }
@@ -335,12 +335,12 @@ pub fn expand_store(input: &DeriveInput) -> Result<TokenStream> {
             }
 
             fn all() -> Vec<(&'static str, editoast_search::SearchConfig)> {
-                vec![#(
+                Vec::from([#(
                     (
                         #object_name,
                         < #ident as editoast_search::SearchObject > :: search_config()
                     )
-                ),*]
+                ),*])
             }
         }
 
