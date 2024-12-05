@@ -109,6 +109,7 @@ const useLinkedPathSearch = () => {
 
       if (!filteredResults.length) {
         setDisplaySearchButton(true);
+        setLinkedPathResults([]);
         return;
       }
 
