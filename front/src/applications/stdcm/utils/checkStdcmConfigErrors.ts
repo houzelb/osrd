@@ -34,6 +34,8 @@ const checkStdcmConfigErrors = (
   if (
     'uic' in origin &&
     'uic' in destination &&
+    'ch' in origin &&
+    'ch' in destination &&
     origin.uic === destination.uic &&
     origin.ch === destination.ch
   ) {

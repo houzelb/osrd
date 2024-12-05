@@ -54,7 +54,7 @@ editoast_common::schemas! {
 
 /// Path input is described by some rolling stock information
 /// and a list of path waypoints
-#[derive(Clone, Debug, Hash, ToSchema)]
+#[derive(Deserialize, Clone, Debug, Hash, ToSchema)]
 struct PathfindingInput {
     /// The loading gauge of the rolling stock
     rolling_stock_loading_gauge: LoadingGaugeType,
@@ -75,45 +75,6 @@ struct PathfindingInput {
     rolling_stock_length: OrderedFloat<f64>,
 }
 
-impl <'de> Deserialize<'de> for PathfindingInput {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-        where
-            D: serde::Deserializer<'de> {
-        #[derive(Deserialize)]
-        #[serde(deny_unknown_fields)]
-        struct Internal {
-            rolling_stock_loading_gauge: LoadingGaugeType,
-            rolling_stock_is_thermal: bool,
-            rolling_stock_supported_electrifications: Vec<String>,
-            rolling_stock_supported_signaling_systems: Vec<String>,
-            path_items: Vec<PathItemLocation>,
-            rolling_stock_maximum_speed: OrderedFloat<f64>,
-            rolling_stock_length: OrderedFloat<f64>,
-        }
-        let Internal {
-            rolling_stock_loading_gauge,
-            rolling_stock_is_thermal,
-            rolling_stock_supported_electrifications,
-            rolling_stock_supported_signaling_systems,
-            path_items,
-            rolling_stock_maximum_speed,
-            rolling_stock_length,
-        } = Internal::deserialize(deserializer)?;
-        if path_items.first() == path_items.last() {
-            return Err(serde::de::Error::custom("First and last path items cannot be the same"));
-        }
-        Ok(PathfindingInput {
-            rolling_stock_loading_gauge,
-            rolling_stock_is_thermal,
-            rolling_stock_supported_electrifications,
-            rolling_stock_supported_signaling_systems,
-            path_items,
-            rolling_stock_maximum_speed,
-            rolling_stock_length,
-        })
-    }
-}
-
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, ToSchema)]
 #[serde(tag = "status", rename_all = "snake_case")]
 pub enum PathfindingResult {
@@ -124,7 +85,12 @@ pub enum PathfindingResult {
 impl From<PathfindingCoreResult> for PathfindingResult {
     fn from(core_result: PathfindingCoreResult) -> Self {
         match core_result {
-            PathfindingCoreResult::Success(success) => PathfindingResult::Success(success),
+            PathfindingCoreResult::Success(success) => match success.length {
+                0 => PathfindingResult::Failure(PathfindingFailure::PathfindingInputError(
+                    PathfindingInputError::ZeroLengthPath,
+                )),
+                _ => PathfindingResult::Success(success),
+            },
             PathfindingCoreResult::NotFoundInBlocks {
                 track_section_ranges,
                 length,
@@ -493,18 +459,34 @@ pub mod tests {
     use crate::views::test_app::TestAppBuilder;
 
     #[rstest]
-    async fn pathfinding_with_same_origin_and_destination_fails() {
-        let app = TestAppBuilder::default_app();
-        let db_pool = app.db_pool();
+    async fn pathfinding_fails_when_core_responds_with_zero_length_path() {
+        let db_pool = DbConnectionPoolV2::for_tests();
+        let mut core = MockingClient::new();
+        core.stub("/v2/pathfinding/blocks")
+            .method(reqwest::Method::POST)
+            .response(StatusCode::OK)
+            .json(json!({
+                "blocks":[],
+                "routes": [],
+                "track_section_ranges": [],
+                "path_item_positions": [],
+                "length": 0,
+                "status": "success"
+            }))
+            .finish();
+        let app = TestAppBuilder::new()
+            .db_pool(db_pool.clone())
+            .core_client(core.into())
+            .build();
         let small_infra = create_small_infra(&mut db_pool.get_ok()).await;
 
         let request = app
             .post(format!("/infra/{}/pathfinding/blocks", small_infra.id).as_str())
             .json(&json!({
                 "path_items":[
-                    {"trigram":"WS","secondary_code":"BV"},
-                    {"trigram":"WS","secondary_code":"BV"},
-                ],
+                {"trigram":"WS","secondary_code":"BV"},
+                {"trigram":"SWS","secondary_code":"BV"}
+            ],
                 "rolling_stock_is_thermal":true,
                 "rolling_stock_loading_gauge":"G1",
                 "rolling_stock_supported_electrifications":[],
@@ -512,7 +494,15 @@ pub mod tests {
                 "rolling_stock_maximum_speed":22.00,
                 "rolling_stock_length":26.00
             }));
-            app.fetch(request).assert_status(StatusCode::UNPROCESSABLE_ENTITY);
+
+        let pathfinding_result: PathfindingResult =
+            app.fetch(request).assert_status(StatusCode::OK).json_into();
+        assert_eq!(
+            pathfinding_result,
+            PathfindingResult::Failure(PathfindingFailure::PathfindingInputError(
+                PathfindingInputError::ZeroLengthPath,
+            ))
+        );
     }
 
     #[rstest]
@@ -619,7 +609,7 @@ pub mod tests {
                 "routes": [],
                 "track_section_ranges": [],
                 "path_item_positions": [],
-                "length": 0,
+                "length": 1,
                 "status": "success"
             }))
             .finish();
@@ -652,7 +642,7 @@ pub mod tests {
                 blocks: vec![],
                 routes: vec![],
                 track_section_ranges: vec![],
-                length: 0,
+                length: 1,
                 path_item_positions: vec![]
             })
         );
