@@ -20,7 +20,7 @@ import {
 } from 'modules/pathfinding/utils';
 import { getSupportedElectrification, isThermal } from 'modules/rollingStock/helpers/electric';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
-import computeBasePathSteps from 'modules/trainschedule/helpers/computeBasePathSteps';
+import computeBasePathStep from 'modules/trainschedule/helpers/computeBasePathStep';
 import { setFailure } from 'reducers/main';
 import type { PathStep } from 'reducers/osrdconf/types';
 import { useAppDispatch } from 'store';
@@ -129,7 +129,9 @@ const useSetupItineraryForTrainUpdate = (
         pathfindingResult.length
       );
 
-      const computedpathSteps = computeBasePathSteps(trainSchedule);
+      const computedpathSteps = trainSchedule.path.map((_, index) =>
+        computeBasePathStep(trainSchedule, index)
+      );
       const updatedPathSteps: PathStep[] = updatePathStepsFromOperationalPoints(
         computedpathSteps,
         suggestedOperationalPoints,
