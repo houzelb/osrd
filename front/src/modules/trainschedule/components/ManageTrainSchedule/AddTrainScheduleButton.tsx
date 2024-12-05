@@ -13,7 +13,7 @@ import { useStoreDataForRollingStockSelector } from 'modules/rollingStock/compon
 import trainNameWithNum from 'modules/trainschedule/components/ManageTrainSchedule/helpers/trainNameHelper';
 import { setFailure, setSuccess } from 'reducers/main';
 import { useAppDispatch } from 'store';
-import { formatToIsoDate, isoDateToMs, isoDateWithTimezoneToSec } from 'utils/date';
+import { isoDateToMs, isoDateWithTimezoneToSec } from 'utils/date';
 import { castErrorToFailure } from 'utils/error';
 import { sec2time } from 'utils/timeManipulation';
 
@@ -58,16 +58,10 @@ const AddTrainScheduleButton = ({
       let actualTrainCount = 1;
 
       for (let nb = 1; nb <= trainCount; nb += 1) {
-        const newStartTimeString = formatToIsoDate(
-          formattedStartTimeMs + 1000 * 60 * trainDelta * (nb - 1)
-        );
+        const newStartTime = new Date(formattedStartTimeMs + 1000 * 60 * trainDelta * (nb - 1));
         const trainName = trainNameWithNum(baseTrainName, actualTrainCount, trainCount);
 
-        const trainSchedule = formatTrainSchedulePayload(
-          validTrainConfig,
-          trainName,
-          newStartTimeString
-        );
+        const trainSchedule = formatTrainSchedulePayload(validTrainConfig, trainName, newStartTime);
         trainScheduleParams.push({ ...trainSchedule });
         actualTrainCount += trainStep;
       }

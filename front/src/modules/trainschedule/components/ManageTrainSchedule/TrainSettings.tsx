@@ -11,7 +11,7 @@ import ChipsSNCF from 'common/BootstrapSNCF/ChipsSNCF';
 import InputSNCF from 'common/BootstrapSNCF/InputSNCF';
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import { useAppDispatch } from 'store';
-import { dateTimeToIso } from 'utils/date';
+import { parseLocalDateTime, formatLocalDateTime } from 'utils/date';
 import { useDebounce } from 'utils/helpers';
 import { isInvalidFloatNumber } from 'utils/numbers';
 
@@ -27,7 +27,7 @@ export default function TrainSettings() {
   const startTimeFromStore = useSelector(getStartTime);
 
   const [name, setName] = useState<string>(nameFromStore);
-  const [startTime, setStartTime] = useState(startTimeFromStore.substring(0, 19));
+  const [startTime, setStartTime] = useState(formatLocalDateTime(startTimeFromStore));
   const [initialSpeed, setInitialSpeed] = useState<number | undefined>(initialSpeedFromStore);
   const dispatch = useAppDispatch();
 
@@ -52,8 +52,8 @@ export default function TrainSettings() {
   }, [debouncedName]);
 
   useEffect(() => {
-    const formatedStartTime = dateTimeToIso(debouncedStartTime);
-    if (formatedStartTime) dispatch(updateStartTime(formatedStartTime));
+    const newStartTime = parseLocalDateTime(debouncedStartTime);
+    if (newStartTime) dispatch(updateStartTime(newStartTime));
   }, [debouncedStartTime]);
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function TrainSettings() {
   useEffect(() => {
     setName(nameFromStore);
     setInitialSpeed(initialSpeedFromStore);
-    setStartTime(startTimeFromStore.substring(0, 19));
+    setStartTime(formatLocalDateTime(startTimeFromStore));
   }, [nameFromStore, initialSpeedFromStore, startTimeFromStore]);
 
   const isInvalidTrainScheduleName = isInvalidName(name);

@@ -255,7 +255,7 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
   });
 
   it('should handle updateStartTime', () => {
-    const newStartTime = '2024-05-01T11:08:00.000+01:00';
+    const newStartTime = new Date('2024-05-01T11:08:00.000+01:00');
     defaultStore.dispatch(slice.actions.updateStartTime(newStartTime));
     const state = defaultStore.getState()[slice.name];
     expect(state.startTime).toBe(newStartTime);

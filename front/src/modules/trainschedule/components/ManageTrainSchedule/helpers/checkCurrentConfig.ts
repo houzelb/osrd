@@ -149,7 +149,7 @@ const checkCurrentConfig = (
     margins: formatMargin(compact(pathSteps)),
     schedule: formatSchedule(compact(pathSteps)),
     powerRestrictions: powerRestriction,
-    firstStartTime: startTime,
+    firstStartTime: startTime.toISOString(),
     speedLimitByTag,
   };
 };

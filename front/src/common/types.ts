@@ -16,15 +16,6 @@ export const DATA_TYPES = {
 export type TimeString = string;
 
 /**
- * A string with the complete iso format
- *
- * @example "2024-08-08T10:12:46.209Z"
- * @example "2024-08-08T10:12:46Z"
- * @example "2024-08-08T10:12:46+02:00"
- */
-export type IsoDateTimeString = string;
-
-/**
  * A ISO 8601 duration string
  * @example "PT3600S"
  */

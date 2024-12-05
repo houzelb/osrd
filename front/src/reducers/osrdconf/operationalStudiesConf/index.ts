@@ -5,7 +5,6 @@ import type { TrainScheduleWithDetails } from 'modules/trainschedule/components/
 import computeBasePathStep from 'modules/trainschedule/helpers/computeBasePathStep';
 import { defaultCommonConf, buildCommonConfReducers } from 'reducers/osrdconf/osrdConfCommon';
 import type { OsrdConfState } from 'reducers/osrdconf/types';
-import { convertIsoUtcToLocalTime } from 'utils/date';
 import { msToKmh } from 'utils/physics';
 
 import { builPowerRestrictionReducer } from './powerRestrictionReducer';
@@ -27,7 +26,7 @@ export const operationalStudiesConfSlice = createSlice({
         rollingStock,
         trainName,
         initial_speed,
-        start_time,
+        startTime,
         options,
         speedLimitTag,
         labels,
@@ -38,7 +37,7 @@ export const operationalStudiesConfSlice = createSlice({
 
       state.rollingStockID = rollingStock?.id;
       state.pathSteps = path.map((_, index) => computeBasePathStep(action.payload, index));
-      state.startTime = convertIsoUtcToLocalTime(start_time);
+      state.startTime = startTime;
 
       state.name = trainName;
       state.initialSpeed = initial_speed ? Math.floor(msToKmh(initial_speed) * 10) / 10 : 0;

@@ -6,7 +6,7 @@ import type { ValidConfig } from '../types';
 export default function formatTrainSchedulePayload(
   validConfig: ValidConfig,
   trainName: string,
-  startTime: string
+  startTime: Date
 ): TrainScheduleBase {
   const {
     constraintDistribution,
@@ -35,7 +35,7 @@ export default function formatTrainSchedulePayload(
     rolling_stock_name: rollingStockName,
     schedule: validConfig.schedule,
     speed_limit_tag: speedLimitByTag,
-    start_time: startTime,
+    start_time: startTime.toISOString(),
     train_name: trainName,
   };
 }
