@@ -1,7 +1,7 @@
 import { createSlice, type Draft, type PayloadAction } from '@reduxjs/toolkit';
 
 import type { TrainScheduleWithDetails } from 'modules/trainschedule/components/Timetable/types';
-import computeBasePathSteps from 'modules/trainschedule/helpers/computeBasePathSteps';
+import computeBasePathStep from 'modules/trainschedule/helpers/computeBasePathStep';
 import { defaultCommonConf, buildCommonConfReducers } from 'reducers/osrdconf/osrdConfCommon';
 import type { OsrdConfState } from 'reducers/osrdconf/types';
 import { convertIsoUtcToLocalTime } from 'utils/date';
@@ -30,10 +30,11 @@ export const operationalStudiesConfSlice = createSlice({
         speedLimitTag,
         labels,
         power_restrictions,
+        path,
       } = action.payload;
 
       state.rollingStockID = rollingStock?.id;
-      state.pathSteps = computeBasePathSteps(action.payload);
+      state.pathSteps = path.map((_, index) => computeBasePathStep(action.payload, index));
       state.startTime = convertIsoUtcToLocalTime(start_time);
 
       state.name = trainName;
