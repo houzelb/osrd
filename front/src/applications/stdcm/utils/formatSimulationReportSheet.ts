@@ -2,7 +2,7 @@ import type { SimulationResponse } from 'common/api/osrdEditoastApi';
 import { interpolateValue } from 'modules/simulationResult/SimulationResultExport/utils';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 
-import type { StdcmResultsOperationalPointsList } from '../types';
+import type { StdcmResultsOperationalPoint } from '../types';
 
 function generateRandomString(length: number): string {
   return Array.from({ length }, () => Math.floor(Math.random() * 10)).join('');
@@ -113,7 +113,7 @@ export function getOperationalPointsWithTimes(
   operationalPoints: SuggestedOP[],
   simulation: Extract<SimulationResponse, { status: 'success' }>,
   departureTime: string
-): StdcmResultsOperationalPointsList {
+): StdcmResultsOperationalPoint[] {
   const { positions, times } = simulation.final_output;
   const pathDepartureTime = new Date(departureTime).toLocaleTimeString().substring(0, 5);
 
