@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { SpeedSpaceChart } from '@osrd-project/ui-speedspacechart';
 import type {
@@ -45,7 +45,8 @@ const SpeedSpaceChartContainer = ({
   const [baseHeightOfSpeedSpaceChart, setBaseHeightOfSpeedSpaceChart] =
     useState(heightOfSpeedSpaceChart);
 
-  const containerWidth = document.getElementById('container-SpeedSpaceChart')?.clientWidth;
+  const root = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState<number>(root.current?.clientWidth || 0);
 
   const speedSpaceChartData = formatData(
     trainSimulation,
@@ -74,6 +75,25 @@ const SpeedSpaceChartContainer = ({
       speedLimitTags: t('speedSpaceSettings.speedLimitTags'),
     },
   };
+
+  useEffect(() => {
+    const updateCanvasSize = () => {
+      if (root.current) {
+        setContainerWidth(root.current.clientWidth);
+      }
+    };
+
+    const resizeObserver = new ResizeObserver(updateCanvasSize);
+    if (root.current) {
+      resizeObserver.observe(root.current);
+    }
+
+    return () => {
+      if (root.current) {
+        resizeObserver.unobserve(root.current);
+      }
+    };
+  }, []);
 
   return (
     <Rnd
@@ -105,6 +125,7 @@ const SpeedSpaceChartContainer = ({
       }}
     >
       <div
+        ref={root}
         id="container-SpeedSpaceChart"
         className="chart"
         style={{ height: `${heightOfSpeedSpaceChartContainer}px` }}
