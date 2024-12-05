@@ -29,6 +29,9 @@ const checkStdcmConfigErrors = (
 
   const isOriginRespectDestinationSchedule =
     origin.arrivalType === ArrivalTimeTypes.RESPECT_DESTINATION_SCHEDULE;
+  if (origin.name === destination.name && origin.ch === destination.ch) {
+    return { errorType: StdcmConfigErrorTypes.SAME_ORIGIN_AND_DESTINATION };
+  }
 
   const isDestinationASAP = destination.arrivalType === ArrivalTimeTypes.ASAP;
 

@@ -110,7 +110,8 @@
     "noResults": "No path found",
     "noScheduledPoint": "The calculation requires either the origin or destination schedule.",
     "pathfindingFailed": "No path have been found for these waypoints.",
-    "requestFailed": "Calculation error for last minute train path"
+    "requestFailed": "Calculation error for last minute train path",
+    "sameOriginAndDestination": "The origin and destination cannot be the same."
   },
   "stdcmResults": "Results",
   "stdcmSimulationReport": "Path simulation report",
