@@ -11,8 +11,10 @@ import {
   type RollingStockWithLiveries,
   type TrainScheduleResult,
   type PathfindingResult,
+  type SearchResultItemOperationalPoint,
 } from 'common/api/osrdEditoastApi';
 import { useOsrdConfActions } from 'common/osrdContext';
+import buildOpSearchQuery from 'modules/operationalPoint/helpers/buildOpSearchQuery';
 import {
   formatSuggestedOperationalPoints,
   matchPathStepAndOp,
@@ -66,6 +68,7 @@ const useSetupItineraryForTrainUpdate = (
 ) => {
   const dispatch = useAppDispatch();
 
+  const { infraId, getTrackSectionsByIds } = useScenarioContext();
   const { updatePathSteps } = useOsrdConfActions();
 
   const [getTrainScheduleById] = osrdEditoastApi.endpoints.getTrainScheduleById.useLazyQuery({});
@@ -75,9 +78,61 @@ const useSetupItineraryForTrainUpdate = (
     osrdEditoastApi.endpoints.postInfraByInfraIdPathfindingBlocks.useLazyQuery();
   const [postPathProperties] =
     osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useLazyQuery();
-  const { infraId } = useScenarioContext();
+  const [postSearch] = osrdEditoastApi.endpoints.postSearch.useMutation();
 
   useEffect(() => {
+    const fetchPathStepsCoordinates = async (trainSchedule: TrainScheduleResult) => {
+      // get track sections
+      const trackSectionIds: string[] = [];
+      trainSchedule.path.forEach((step) => {
+        if ('track' in step) {
+          trackSectionIds.push(step.track);
+        }
+      });
+      const tracks = await getTrackSectionsByIds(trackSectionIds);
+
+      // get operational points
+      const searchPayload = buildOpSearchQuery(infraId, [trainSchedule]);
+      const ops = searchPayload
+        ? ((await postSearch({
+            searchPayload,
+            pageSize: 1000,
+          }).unwrap()) as SearchResultItemOperationalPoint[])
+        : [];
+
+      // match path steps with track sections or operational points
+      const pathStepsWithCoordinates = trainSchedule.path.map((step, index) => {
+        let coordinates: Position | undefined;
+        let name: string | undefined;
+
+        if ('track' in step) {
+          const track = tracks[step.track];
+          if (track) {
+            coordinates = getPointCoordinates(track.geo, track.length, step.offset);
+          }
+        } else {
+          let op: SearchResultItemOperationalPoint | undefined;
+          if ('uic' in step) {
+            op = ops.find((o) => o.uic === step.uic);
+          } else if ('trigram' in step) {
+            op = ops.find((o) => o.trigram === step.trigram);
+          } else {
+            op = ops.find((o) => o.obj_id === step.operational_point);
+          }
+          coordinates = op?.geographic.coordinates;
+          name = `${op?.name}`;
+        }
+
+        return {
+          ...computeBasePathStep(trainSchedule, index),
+          coordinates,
+          name,
+        };
+      });
+
+      dispatch(updatePathSteps(pathStepsWithCoordinates));
+    };
+
     const computeItineraryForTrainUpdate = async (
       trainSchedule: TrainScheduleResult,
       rollingStock: RollingStockWithLiveries
@@ -106,6 +161,7 @@ const useSetupItineraryForTrainUpdate = (
       };
       const pathfindingResult = await postPathfindingBlocks(params).unwrap();
       if (pathfindingResult.status !== 'success') {
+        fetchPathStepsCoordinates(trainSchedule);
         return null;
       }
       const pathPropertiesParams: PostInfraByInfraIdPathPropertiesApiArg = {
