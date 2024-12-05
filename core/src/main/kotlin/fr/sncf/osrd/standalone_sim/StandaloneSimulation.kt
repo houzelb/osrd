@@ -90,7 +90,13 @@ fun runStandaloneSimulation(
     val electrificationRanges =
         ElectrificationRange.from(curvesAndConditions.conditions, electrificationMap)
     var context =
-        EnvelopeSimContext(rollingStock, envelopeSimPath, timeStep, curvesAndConditions.curves)
+        EnvelopeSimContext(
+            rollingStock,
+            envelopeSimPath,
+            timeStep,
+            curvesAndConditions.curves,
+            makeETCSContext(rollingStock, infra.rawInfra, chunkPath, routes)
+        )
 
     // Max speed envelope
     val stopPositions = getStopPositions(schedule)
