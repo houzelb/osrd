@@ -120,7 +120,9 @@
     height: var(--content-height);
     background-color: var(--black5);
     min-width: 392px;
-    max-width: 472px;
+    @media screen and (max-width: 1280px) {
+      max-width: 472px;
+    }
     padding: 14px 24px 0 24px;
     box-shadow: inset -1px 0 var(--black5);
 
