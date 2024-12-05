@@ -26,9 +26,7 @@ import { TableType, type TimeExtraDays, type TimesStopsInputRow } from '../types
 
 const matchPathStepAndOpWithKP = (step: PathStep, op: SuggestedOP) => {
   if (!matchPathStepAndOp(step, op)) {
-    // TODO: we abuse the PathStep.id field here, the backend also sets it to an
-    // ID which has nothing to do with OPs
-    return step.id === op.opId;
+    return step.id === op.pathStepId;
   }
   // We match the kp in case two OPs have the same uic+ch (can happen when the
   // infra is imported)
@@ -101,7 +99,7 @@ export const formatSuggestedViasToRowVias = (
       arrival: formattedArrival,
       departure: formattedDeparture,
       onStopSignal,
-      name: name || t('waypoint', { id: filteredOp.opId }),
+      name: name || t('waypoint', { id: filteredOp.pathStepId }),
       shortSlipDistance,
       stopFor,
       theoreticalMargin,

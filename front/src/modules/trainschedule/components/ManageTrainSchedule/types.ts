@@ -4,7 +4,8 @@ import type { ReceptionSignal, TrainScheduleBase } from 'common/api/osrdEditoast
 import type { IsoDurationString } from 'common/types';
 
 export type SuggestedOP = {
-  opId: string;
+  pathStepId?: string;
+  opId?: string;
   name?: string;
   uic?: number;
   ch?: string;

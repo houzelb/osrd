@@ -136,7 +136,7 @@ export function getOperationalPointsWithTimes(
     const stopEndTime = computeStopDepartureTime(formattedTime, durationToString);
 
     return {
-      opId: op.opId,
+      opId: op.opId!,
       positionOnPath: op.positionOnPath,
       time: formattedTime,
       name: op.name,
