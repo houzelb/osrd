@@ -90,6 +90,7 @@ const StdcmLinkedPathSearch = ({
               selectableSlot={selectableSlot}
               value={linkedPathDate}
               onDateChange={(date) => {
+                setDisplaySearchButton(true);
                 setLinkedPathDate(date);
               }}
             />
