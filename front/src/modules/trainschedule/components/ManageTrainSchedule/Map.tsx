@@ -2,6 +2,7 @@ import { type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useSta
 
 import bbox from '@turf/bbox';
 import type { Feature, Point } from 'geojson';
+import { compact } from 'lodash';
 import type { MapLayerMouseEvent } from 'maplibre-gl';
 import ReactMapGL, { AttributionControl, ScaleControl } from 'react-map-gl/maplibre';
 import type { MapRef } from 'react-map-gl/maplibre';
@@ -63,7 +64,7 @@ type MapProps = {
   hideItinerary?: boolean;
   preventPointSelection?: boolean;
   mapId?: string;
-  simulationPathSteps?: PathStep[];
+  simulationPathSteps: PathStep[];
   showStdcmAssets?: boolean;
   isFeasible?: boolean;
 };
@@ -218,11 +219,15 @@ const Map = ({
   }, []);
 
   useEffect(() => {
-    if (pathGeometry) {
-      const newViewport = computeBBoxViewport(bbox(pathGeometry), mapViewport);
+    const points = pathGeometry ?? {
+      coordinates: compact(simulationPathSteps.map((step) => step.coordinates)),
+      type: 'LineString',
+    };
+    if (points.coordinates.length > 2) {
+      const newViewport = computeBBoxViewport(bbox(points), mapViewport);
       dispatch(updateViewport(newViewport));
     }
-  }, [pathGeometry]);
+  }, [pathGeometry, simulationPathSteps]);
 
   return (
     <>

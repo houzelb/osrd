@@ -67,9 +67,7 @@ const StcdmResults = ({
     );
   }, [outputs]);
 
-  const simulationPathSteps = hasSimulationResults
-    ? outputs.results.simulationPathSteps
-    : undefined;
+  const simulationPathSteps = hasSimulationResults ? outputs.results.simulationPathSteps : [];
 
   return (
     <>
