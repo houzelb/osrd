@@ -47,32 +47,44 @@ object MaxSpeedEnvelope {
      * Generate braking curves overlay everywhere the mrsp decrease (increase backwards) with a
      * discontinuity
      */
-    private fun addBrakingCurves(
+    private fun addSlowdownBrakingCurves(
         etcsSimulator: ETCSBrakingSimulator,
         context: EnvelopeSimContext,
         mrsp: Envelope
     ): Envelope {
         var envelope = mrsp
-        envelope = addETCSBrakingCurves(etcsSimulator, context, envelope)
+        envelope = addETCSSlowdownBrakingCurves(etcsSimulator, context, envelope)
+        envelope = addConstSlowdownBrakingCurves(context, envelope)
+        return envelope
+    }
+
+    /**
+     * Generate braking curves overlay everywhere the mrsp decreases (increases backwards) with a
+     * discontinuity using constant deceleration (outside ETCS ranges).
+     */
+    private fun addConstSlowdownBrakingCurves(
+        context: EnvelopeSimContext,
+        envelope: Envelope
+    ): Envelope {
         val builder = OverlayEnvelopeBuilder.backward(envelope)
         val cursor = EnvelopeCursor.backward(envelope)
         var lastPosition = envelope.endPos
         while (cursor.findPartTransition(MaxSpeedEnvelope::increase)) {
-            if (cursor.getPosition() > lastPosition) {
+            if (cursor.position > lastPosition) {
                 // The next braking curve already covers this point, this braking curve is hidden
                 cursor.nextPart()
                 continue
             }
             val partBuilder = EnvelopePartBuilder()
-            partBuilder.setAttr<EnvelopeProfile>(EnvelopeProfile.BRAKING)
+            partBuilder.setAttr(EnvelopeProfile.BRAKING)
             val overlayBuilder =
                 ConstrainedEnvelopePartBuilder(
                     partBuilder,
                     SpeedConstraint(0.0, EnvelopePartConstraintType.FLOOR),
                     EnvelopeConstraint(envelope, EnvelopePartConstraintType.CEILING)
                 )
-            val startSpeed = cursor.getSpeed()
-            val startPosition = cursor.getPosition()
+            val startSpeed = cursor.speed
+            val startPosition = cursor.position
             // TODO: link directionSign to cursor boolean reverse
             EnvelopeDeceleration.decelerate(
                 context,
@@ -89,12 +101,12 @@ object MaxSpeedEnvelope {
     }
 
     /** Add braking curves following ETCS rules in relevant places */
-    private fun addETCSBrakingCurves(
+    private fun addETCSSlowdownBrakingCurves(
         etcsSimulator: ETCSBrakingSimulator,
         context: EnvelopeSimContext,
         envelope: Envelope
     ): Envelope {
-        val etcsRanges = context.etcsContext?.brakingRanges ?: return envelope
+        val etcsRanges = context.etcsContext?.applicationRanges ?: return envelope
         val cursor = EnvelopeCursor.backward(envelope)
         val limitsOfAuthority = mutableListOf<LimitOfAuthority>()
         while (cursor.findPartTransition(MaxSpeedEnvelope::increase)) {
@@ -120,12 +132,25 @@ object MaxSpeedEnvelope {
     ): Envelope {
         var envelope = curveWithDecelerations
         val stops = makeSimStops(context, stopPositions, envelope)
-        envelope = addETCSStops(etcsSimulator, context, envelope, stops)
+        envelope = addETCSStopBrakingCurves(etcsSimulator, context, envelope, stops)
+        envelope = addConstStopBrakingCurves(etcsSimulator, context, envelope, stops)
+        return envelope
+    }
+
+    /** Generate braking curves overlay at every stop position */
+    private fun addConstStopBrakingCurves(
+        etcsSimulator: ETCSBrakingSimulator,
+        context: EnvelopeSimContext,
+        curveWithDecelerations: Envelope,
+        stops: List<SimStop>,
+    ): Envelope {
+        var envelope = curveWithDecelerations
+        envelope = addETCSStopBrakingCurves(etcsSimulator, context, envelope, stops)
         for (stop in stops) {
             if (stop.isETCS) continue // Already handled
             val partBuilder = EnvelopePartBuilder()
-            partBuilder.setAttr<EnvelopeProfile>(EnvelopeProfile.BRAKING)
-            partBuilder.setAttr<StopMeta>(StopMeta(stop.index))
+            partBuilder.setAttr(EnvelopeProfile.BRAKING)
+            partBuilder.setAttr(StopMeta(stop.index))
             val overlayBuilder =
                 ConstrainedEnvelopePartBuilder(
                     partBuilder,
@@ -142,7 +167,7 @@ object MaxSpeedEnvelope {
     }
 
     /** Add braking parts for any ETCS flagged stop. */
-    private fun addETCSStops(
+    private fun addETCSStopBrakingCurves(
         simulator: ETCSBrakingSimulator,
         context: EnvelopeSimContext,
         envelope: Envelope,
@@ -175,7 +200,8 @@ object MaxSpeedEnvelope {
         val res = mutableListOf<SimStop>()
         for ((i, stopOffset) in stopOffsets.withIndex()) {
             if (stopOffset == 0.0) continue
-            val isETCS = context.etcsContext?.brakingRanges?.contains(stopOffset.meters) ?: false
+            val isETCS =
+                context.etcsContext?.applicationRanges?.contains(stopOffset.meters) ?: false
             var offset = stopOffset
             if (offset > envelope.endPos) {
                 if (TrainPhysicsIntegrator.arePositionsEqual(offset, envelope.endPos))
@@ -192,7 +218,7 @@ object MaxSpeedEnvelope {
     fun from(context: EnvelopeSimContext, stopPositions: DoubleArray, mrsp: Envelope): Envelope {
         val etcsSimulator =
             ETCSBrakingSimulatorImpl(context.path, context.rollingStock, context.timeStep)
-        var maxSpeedEnvelope = addBrakingCurves(etcsSimulator, context, mrsp)
+        var maxSpeedEnvelope = addSlowdownBrakingCurves(etcsSimulator, context, mrsp)
         maxSpeedEnvelope =
             addStopBrakingCurves(etcsSimulator, context, stopPositions, maxSpeedEnvelope)
         return maxSpeedEnvelope

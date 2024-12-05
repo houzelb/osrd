@@ -18,10 +18,13 @@ constructor(
 ) {
 
     data class ETCSContext(
-        /** Braking curves are computing using ETCS rules when they end in these ranges. */
-        val brakingRanges: DistanceRangeSet,
         /**
-         * List of switch and buffer stops offsets on the path, up to the first switch/buffer stop
+         * Ranges where ETCS rules are applied. Braking curves are computed using ETCS rules if they
+         * *end* in these ranges.
+         */
+        val applicationRanges: DistanceRangeSet,
+        /**
+         * List of switch and buffer stop offsets on the path, up to the first switch/buffer stop
          * *after* the end of the path (or right at the end).
          */
         val dangerPointOffsets: List<Offset<Path>>,
