@@ -42,8 +42,7 @@ export interface OsrdConfState extends InfraState {
   featureInfoClick: { displayPopup: boolean; feature?: Feature; coordinates?: number[] };
   pathSteps: (PathStep | null)[];
   rollingStockComfort: Comfort;
-  // Format ISO 8601
-  startTime: string;
+  startTime: Date;
 }
 
 export interface StandardAllowance {

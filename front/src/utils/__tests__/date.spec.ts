@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
 import {
-  dateTimeToIso,
+  parseLocalDateTime,
   isoDateToMs,
   formatToIsoDate,
   serializeDateTimeWithoutYear,
@@ -9,28 +9,28 @@ import {
   isArrivalDateInSearchTimeWindow,
 } from 'utils/date';
 
-describe('dateTimeToIso', () => {
+describe('parseLocalDateTime', () => {
   it('should return an iso date by passing a date without milliseconds', () => {
     const inputDate = '2024-04-25T08:20';
-    const isoDate = dateTimeToIso(inputDate);
-    expect(isoDate).toEqual('2024-04-25T08:20:00Z'); // Ends by Z because CI seems to be in UTC timezone
+    const isoDate = parseLocalDateTime(inputDate);
+    expect(isoDate?.toISOString()).toEqual('2024-04-25T08:20:00.000Z');
   });
 
   it('should return an iso date by passing a date with milliseconds', () => {
     const inputDate = '2024-04-25T08:20:10';
-    const isoDate = dateTimeToIso(inputDate);
-    expect(isoDate).toEqual('2024-04-25T08:20:10Z'); // Ends by Z because CI seems to be in UTC timezone
+    const isoDate = parseLocalDateTime(inputDate);
+    expect(isoDate?.toISOString()).toEqual('2024-04-25T08:20:10.000Z');
   });
 
   it('should return an iso date by passing a date with a space between date and time instead of a T', () => {
     const inputDate = '2024-04-25 08:20:10';
-    const isoDate = dateTimeToIso(inputDate);
-    expect(isoDate).toEqual('2024-04-25T08:20:10Z'); // Ends by Z because CI seems to be in UTC timezone
+    const isoDate = parseLocalDateTime(inputDate);
+    expect(isoDate?.toISOString()).toEqual('2024-04-25T08:20:10.000Z');
   });
 
   it('should return null by passing a date with the wrong format', () => {
     const inputDate = '04-25 08:20:10';
-    const isoDate = dateTimeToIso(inputDate);
+    const isoDate = parseLocalDateTime(inputDate);
     expect(isoDate).toBeNull();
   });
 });

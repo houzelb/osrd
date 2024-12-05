@@ -88,7 +88,7 @@ describe('simulationConfReducer', () => {
           receptionSignal: undefined,
         },
       ],
-      startTime: '2021-01-01T00:00:00+00:00',
+      startTime: new Date('2021-01-01T00:00:00+00:00'),
     });
   });
 

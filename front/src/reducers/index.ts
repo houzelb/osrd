@@ -58,7 +58,7 @@ const saveUserFilter = createFilter('user', userWhiteList);
 const saveMainFilter = createFilter('main', mainWhiteList);
 
 // Deserialize date strings coming from local storage
-const dateTransform = createTransform(
+const stdcmPathStepsDateTransform = createTransform(
   null,
   (outboundState: { arrival?: string }[]) =>
     outboundState.map(({ arrival, ...step }) => {
@@ -69,6 +69,14 @@ const dateTransform = createTransform(
     }),
   { whitelist: ['stdcmPathSteps'] }
 );
+const operationalStudiesDateTransform = createTransform(
+  null,
+  ({ startTime, ...outboundState }: { startTime: string }) => ({
+    ...outboundState,
+    startTime: new Date(startTime),
+  }),
+  { whitelist: ['operationalStudiesConf'] }
+);
 
 // Useful to only blacklist a sub-propertie of osrdconf
 const buildOsrdConfPersistConfig = <T extends OsrdConfState>(
@@ -76,7 +84,7 @@ const buildOsrdConfPersistConfig = <T extends OsrdConfState>(
 ): PersistConfig<T> => ({
   key: slice.name,
   storage,
-  transforms: [dateTransform],
+  transforms: [stdcmPathStepsDateTransform, operationalStudiesDateTransform],
   blacklist: ['featureInfoClick'],
 });
 

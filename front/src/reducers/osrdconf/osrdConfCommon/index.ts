@@ -37,7 +37,7 @@ export const defaultCommonConf: OsrdConfState = {
   // Corresponds to origin and destination not defined
   pathSteps: [null, null],
   rollingStockComfort: 'STANDARD' as const,
-  startTime: new Date().toISOString(),
+  startTime: new Date(),
 };
 
 interface CommonConfReducers<S extends OsrdConfState> extends InfraStateReducers<S> {

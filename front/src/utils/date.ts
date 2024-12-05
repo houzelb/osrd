@@ -6,7 +6,6 @@ import utc from 'dayjs/plugin/utc';
 import i18next from 'i18next';
 
 import type { ScheduleConstraint } from 'applications/stdcm/types';
-import type { IsoDateTimeString } from 'common/types';
 import i18n from 'i18n';
 
 dayjs.extend(utc);
@@ -43,14 +42,17 @@ export function dateTimeFormatting(date: Date, withoutTime: boolean = false) {
  * @param inputDate e.g. 2024-04-25T08:30
  * @return an ISO 8601 date (e.g. 2024-04-25T08:30:00+02:00) or null
  */
-export const dateTimeToIso = (inputDateTime: string) => {
+export const parseLocalDateTime = (inputDateTime: string) => {
   // Regex to check format 1234-56-78T12:00:00(:00)
   const inputDateTimeRegex = /^\d{4}-\d{2}-\d{2}[T\s]\d{2}:\d{2}(?::\d{2}){0,1}$/;
   if (inputDateTimeRegex.test(inputDateTime)) {
-    return dayjs.tz(inputDateTime, userTimeZone).format();
+    return dayjs.tz(inputDateTime, userTimeZone).toDate();
   }
   return null;
 };
+
+export const formatLocalDateTime = (date: Date) =>
+  dayjs(date).local().format('YYYY-MM-DDTHH:mm:ss');
 
 /**
  * Transform a milliseconds date to an ISO 8601 date with the user timezone
@@ -130,10 +132,6 @@ export function getEarliestDate(date1: string | null | undefined, dat2: string |
 export function convertUTCDateToLocalDate(date: number) {
   const timeDifferenceMinutes = new Date().getTimezoneOffset();
   return Math.abs(timeDifferenceMinutes) * 60 + date;
-}
-
-export function convertIsoUtcToLocalTime(isoUtcString: IsoDateTimeString): string {
-  return dayjs(isoUtcString).local().format();
 }
 
 export function addDurationToDate(
