@@ -4,7 +4,6 @@ import type { Position } from '@turf/helpers';
 import cx from 'classnames';
 import type { Map } from 'maplibre-gl';
 import { Marker } from 'react-map-gl/maplibre';
-import { useSelector } from 'react-redux';
 
 import destinationSVG from 'assets/pictures/destination.svg';
 import stdcmDestination from 'assets/pictures/mapMarkers/destination.svg';
@@ -12,7 +11,6 @@ import stdcmVia from 'assets/pictures/mapMarkers/intermediate-point.svg';
 import stdcmOrigin from 'assets/pictures/mapMarkers/start.svg';
 import originSVG from 'assets/pictures/origin.svg';
 import viaSVG from 'assets/pictures/via.svg';
-import { useOsrdConfSelectors } from 'common/osrdContext';
 import type { PathStep } from 'reducers/osrdconf/types';
 import { getNearestTrack } from 'utils/mapHelper';
 
@@ -38,7 +36,7 @@ type MarkerInformation = {
 
 type ItineraryMarkersProps = {
   map: Map;
-  simulationPathSteps?: PathStep[];
+  simulationPathSteps: PathStep[];
   showStdcmAssets: boolean;
 };
 
@@ -88,12 +86,9 @@ const extractMarkerInformation = (pathSteps: (PathStep | null)[], showStdcmAsset
   }, [] as MarkerInformation[]);
 
 const ItineraryMarkers = ({ map, simulationPathSteps, showStdcmAssets }: ItineraryMarkersProps) => {
-  const { getPathSteps } = useOsrdConfSelectors();
-  const pathSteps = useSelector(getPathSteps);
-
   const markersInformation = useMemo(
-    () => extractMarkerInformation(simulationPathSteps || pathSteps, showStdcmAssets),
-    [simulationPathSteps, pathSteps, showStdcmAssets]
+    () => extractMarkerInformation(simulationPathSteps, showStdcmAssets),
+    [simulationPathSteps, showStdcmAssets]
   );
 
   const getMarkerDisplayInformation = useCallback(
@@ -173,7 +168,7 @@ const ItineraryMarkers = ({ map, simulationPathSteps, showStdcmAssets }: Itinera
           </Marker>
         );
       }),
-    [simulationPathSteps, pathSteps, showStdcmAssets]
+    [markersInformation, showStdcmAssets]
   );
   return Markers;
 };
