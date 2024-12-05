@@ -84,7 +84,7 @@ const useOutputTableData = (
         : false;
 
       return {
-        opId: pathStep.id,
+        pathStepId: pathStep.id,
         name: t('waypoint', { id: pathStep.id }),
         ch: undefined,
         isWaypoint: true,

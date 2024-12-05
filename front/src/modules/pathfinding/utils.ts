@@ -94,7 +94,7 @@ export const upsertPathStepsInOPs = (ops: SuggestedOP[], pathSteps: PathStep[]):
     // We check only for pathSteps added by map click
     if ('track' in step) {
       const formattedStep: SuggestedOP = {
-        opId: step.id,
+        pathStepId: step.id,
         positionOnPath: step.positionOnPath!,
         offsetOnTrack: step.offset,
         track: step.track,
@@ -124,6 +124,7 @@ export const upsertPathStepsInOPs = (ops: SuggestedOP[], pathSteps: PathStep[]):
         if (matchPathStepAndOp(step, op) && op.kp === step.kp) {
           return {
             ...op,
+            pathStepId: step.id,
             stopFor,
             arrival,
             receptionSignal,
@@ -141,14 +142,12 @@ export const pathStepMatchesOp = (
   pathStep: PathStep,
   op: Pick<
     SuggestedOP,
-    'opId' | 'uic' | 'ch' | 'trigram' | 'track' | 'offsetOnTrack' | 'name' | 'kp'
+    'pathStepId' | 'opId' | 'uic' | 'ch' | 'trigram' | 'track' | 'offsetOnTrack' | 'name' | 'kp'
   >,
   withKP = false
 ) => {
   if (!matchPathStepAndOp(pathStep, op)) {
-    // TODO: we abuse the PathStep.id field here, the backend also sets it to an
-    // ID which has nothing to do with OPs
-    return pathStep.id === op.opId;
+    return pathStep.id === op.pathStepId;
   }
   if ('uic' in pathStep) {
     return withKP ? pathStep.kp === op.kp : pathStep.name === op.name;
@@ -168,7 +167,7 @@ export const isVia = (
   vias: PathStep[],
   op: Pick<
     SuggestedOP,
-    'opId' | 'uic' | 'ch' | 'trigram' | 'track' | 'offsetOnTrack' | 'name' | 'kp'
+    'pathStepId' | 'opId' | 'uic' | 'ch' | 'trigram' | 'track' | 'offsetOnTrack' | 'name' | 'kp'
   >,
   { withKP = false } = {}
 ) => vias.some((via) => pathStepMatchesOp(via, op, withKP));
