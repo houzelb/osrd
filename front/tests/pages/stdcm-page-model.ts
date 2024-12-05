@@ -348,7 +348,7 @@ class STDCMPage {
     await this.setMinuteLocator('35'); // Select minute 35
     await this.incrementButton.dblclick(); // Double-click the +1 minute button to reach 37
     await this.timeDestinationArrival.click();
-    await this.fillToleranceField('-1h15', '+45', false);
+    await this.fillToleranceField('-75', '+45', false);
     await expect(this.warningBox).not.toBeVisible();
   }
 
@@ -360,7 +360,7 @@ class STDCMPage {
     await expect(this.originArrival).toHaveValue('preciseTime');
     await this.dateOriginArrival.fill('17/10/24');
     await this.timeOriginArrival.fill('20:21');
-    await this.fillToleranceField('-1h00', '+15', true);
+    await this.fillToleranceField('-60', '+15', true);
   }
 
   // Fill origin section
