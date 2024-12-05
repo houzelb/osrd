@@ -8,7 +8,7 @@ import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import { type StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
 import { useAppDispatch } from 'store';
-import { kgToT } from 'utils/physics';
+import { kgToT, msToKmh } from 'utils/physics';
 
 const useStdcmConsist = () => {
   const dispatch = useAppDispatch();
@@ -59,7 +59,7 @@ const useStdcmConsist = () => {
 
     if (!maxSpeedChanged) {
       const consistMaxSpeed = min([rollingStock?.max_speed, towed?.max_speed]);
-      dispatch(updateMaxSpeed(consistMaxSpeed ? Math.floor(consistMaxSpeed) : undefined));
+      dispatch(updateMaxSpeed(consistMaxSpeed ? Math.floor(msToKmh(consistMaxSpeed)) : undefined));
     }
   };
 
