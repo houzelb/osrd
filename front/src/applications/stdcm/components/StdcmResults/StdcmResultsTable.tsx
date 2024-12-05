@@ -5,7 +5,7 @@ import cx from 'classnames';
 import { useTranslation } from 'react-i18next';
 
 import type {
-  StdcmResultsOperationalPointsList,
+  StdcmResultsOperationalPoint,
   StdcmSimulationInputs,
   StdcmSuccessResponse,
 } from 'applications/stdcm/types';
@@ -15,7 +15,7 @@ type SimulationTableProps = {
   stdcmData: StdcmSuccessResponse;
   consist: StdcmSimulationInputs['consist'];
   isSimulationRetained: boolean;
-  operationalPointsList: StdcmResultsOperationalPointsList;
+  operationalPointsList: StdcmResultsOperationalPoint[];
   onRetainSimulation: () => void;
 };
 

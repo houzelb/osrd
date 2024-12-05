@@ -57,12 +57,10 @@ export type SimulationReportSheetProps = {
   consist: StdcmSimulationInputs['consist'];
   simulationReportSheetNumber: string;
   mapCanvas?: string;
-  operationalPointsList: StdcmResultsOperationalPointsList;
+  operationalPointsList: StdcmResultsOperationalPoint[];
 };
 
-export type StdcmResultsOperationalPointsList = StdcmResultsOperationalPoint[];
-
-type StdcmResultsOperationalPoint = {
+export type StdcmResultsOperationalPoint = {
   opId: string;
   positionOnPath: number;
   time: string | null;
