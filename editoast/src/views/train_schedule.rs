@@ -796,6 +796,8 @@ async fn get_path(
 #[cfg(test)]
 mod tests {
     use axum::http::StatusCode;
+    use chrono::DateTime;
+    use chrono::Utc;
     use pretty_assertions::assert_eq;
     use rstest::rstest;
     use serde_json::json;
@@ -920,8 +922,7 @@ mod tests {
         )
     }
 
-    async fn app_infra_id_train_schedule_id_for_simulation_tests() -> (TestApp, i64, i64) {
-        let db_pool = DbConnectionPoolV2::for_tests();
+    fn mocked_core_pathfinding_sim_and_proj(train_id: i64) -> MockingClient {
         let mut core = MockingClient::new();
         core.stub("/v2/pathfinding/blocks")
             .method(reqwest::Method::POST)
@@ -975,10 +976,18 @@ mod tests {
                 }
             }))
             .finish();
-        let app = TestAppBuilder::new()
-            .db_pool(db_pool.clone())
-            .core_client(core.into())
-            .build();
+        core.stub("/v2/signal_projection")
+            .method(reqwest::Method::POST)
+            .response(StatusCode::OK)
+            .json(json!({
+                "signal_updates": {train_id.to_string(): [] },
+            }))
+            .finish();
+        core
+    }
+
+    async fn app_infra_id_train_schedule_id_for_simulation_tests() -> (TestApp, i64, i64) {
+        let db_pool = DbConnectionPoolV2::for_tests();
         let small_infra = create_small_infra(&mut db_pool.get_ok()).await;
         let rolling_stock =
             create_fast_rolling_stock(&mut db_pool.get_ok(), "simulation_rolling_stock").await;
@@ -997,6 +1006,11 @@ mod tests {
             .create(&mut db_pool.get_ok())
             .await
             .expect("Failed to create train schedule");
+        let core = mocked_core_pathfinding_sim_and_proj(train_schedule.id);
+        let app = TestAppBuilder::new()
+            .db_pool(db_pool.clone())
+            .core_client(core.into())
+            .build();
         (app, small_infra.id, train_schedule.id)
     }
 
@@ -1023,5 +1037,80 @@ mod tests {
             "ids": vec![train_schedule_id],
         }));
         app.fetch(request).assert_status(StatusCode::OK);
+    }
+
+    #[derive(Deserialize)]
+    struct PartialProjectPathTrainResult {
+        departure_time: DateTime<Utc>,
+        // Ignore the rest of the payload
+    }
+
+    #[rstest]
+    async fn train_schedule_project_path() {
+        // SETUP
+        let db_pool = DbConnectionPoolV2::for_tests();
+
+        let small_infra = create_small_infra(&mut db_pool.get_ok()).await;
+        let rolling_stock =
+            create_fast_rolling_stock(&mut db_pool.get_ok(), "simulation_rolling_stock").await;
+        let timetable = create_timetable(&mut db_pool.get_ok()).await;
+        let train_schedule_base: TrainScheduleBase = TrainScheduleBase {
+            rolling_stock_name: rolling_stock.name.clone(),
+            ..serde_json::from_str(include_str!("../tests/train_schedules/simple.json"))
+                .expect("Unable to parse")
+        };
+        let train_schedule: Changeset<TrainSchedule> = TrainScheduleForm {
+            timetable_id: Some(timetable.id),
+            train_schedule: train_schedule_base.clone(),
+        }
+        .into();
+        let train_schedule_valid = train_schedule
+            .create(&mut db_pool.get_ok())
+            .await
+            .expect("Failed to create train schedule");
+
+        let train_schedule_fail: Changeset<TrainSchedule> = TrainScheduleForm {
+            timetable_id: Some(timetable.id),
+            train_schedule: TrainScheduleBase {
+                rolling_stock_name: "fail".to_string(),
+                start_time: DateTime::from_timestamp(0, 0).unwrap(),
+                ..train_schedule_base.clone()
+            },
+        }
+        .into();
+
+        let train_schedule_fail = train_schedule_fail
+            .create(&mut db_pool.get_ok())
+            .await
+            .expect("Failed to create train schedule");
+
+        let core = mocked_core_pathfinding_sim_and_proj(train_schedule_valid.id);
+        let app = TestAppBuilder::new()
+            .db_pool(db_pool.clone())
+            .core_client(core.into())
+            .build();
+
+        // TEST
+        let request = app.post("/train_schedule/project_path").json(&json!({
+            "infra_id": small_infra.id,
+            "electrical_profile_set_id": null,
+            "ids": vec![train_schedule_fail.id, train_schedule_valid.id],
+            "path": {
+                "track_section_ranges": [
+                    {"track_section": "TA1", "begin": 0, "end": 100, "direction": "START_TO_STOP"}
+                ],
+                "routes": [],
+                "blocks": []
+            }
+        }));
+        let response: HashMap<i64, PartialProjectPathTrainResult> =
+            app.fetch(request).assert_status(StatusCode::OK).json_into();
+
+        // EXPECT
+        assert_eq!(response.len(), 1);
+        assert_eq!(
+            response[&train_schedule_valid.id].departure_time,
+            train_schedule_base.start_time
+        );
     }
 }
