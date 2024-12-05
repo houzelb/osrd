@@ -14,8 +14,10 @@ import fr.sncf.osrd.sim_infra.utils.getRouteBlocks
 import fr.sncf.osrd.sim_infra.utils.routesOnBlock
 import fr.sncf.osrd.utils.AppendOnlyLinkedList
 import fr.sncf.osrd.utils.AppendOnlyMap
+import fr.sncf.osrd.utils.AppendOnlySet
 import fr.sncf.osrd.utils.appendOnlyLinkedListOf
 import fr.sncf.osrd.utils.appendOnlyMapOf
+import fr.sncf.osrd.utils.appendOnlySetOf
 import fr.sncf.osrd.utils.indexing.StaticIdx
 import fr.sncf.osrd.utils.indexing.StaticIdxList
 import fr.sncf.osrd.utils.indexing.mutableStaticIdxArrayListOf
@@ -131,6 +133,8 @@ fun initInfraExplorer(
                 appendOnlyLinkedListOf(),
                 appendOnlyLinkedListOf(),
                 appendOnlyMapOf(),
+                appendOnlySetOf(),
+                null,
                 incrementalPath,
                 blockToPathProperties,
                 stops = stops,
@@ -148,6 +152,8 @@ private class InfraExplorerImpl(
     private var blocks: AppendOnlyLinkedList<BlockId>,
     private var routes: AppendOnlyLinkedList<RouteId>,
     private var blockRoutes: AppendOnlyMap<BlockId, RouteId>,
+    private var visitedTracks: AppendOnlySet<TrackSectionId>,
+    private var lastTrack: TrackSectionId?,
     private var incrementalPath: IncrementalPath,
     private var pathPropertiesCache: MutableMap<BlockId, PathProperties>,
     private var currentIndex: Int = 0,
@@ -254,6 +260,8 @@ private class InfraExplorerImpl(
             this.blocks.shallowCopy(),
             this.routes.shallowCopy(),
             this.blockRoutes.shallowCopy(),
+            this.visitedTracks.shallowCopy(),
+            this.lastTrack,
             this.incrementalPath.clone(),
             this.pathPropertiesCache,
             this.currentIndex,
@@ -281,7 +289,7 @@ private class InfraExplorerImpl(
         val addedBlocks = mutableListOf<BlockId>()
 
         for (block in routeBlocks) {
-            if (blockRoutes.containsKey(block)) return false // We already passed by this block
+            if (hasRepeatedElements(block)) return false
             addedBlocks.add(block)
             if (block == firstLocation?.edge) {
                 seenFirstBlock = true
@@ -343,6 +351,26 @@ private class InfraExplorerImpl(
         for (pathFragment in pathFragments) incrementalPath.extend(pathFragment)
 
         return true
+    }
+
+    /**
+     * Return true if parts of the new block have already been visited, otherwise mark tracks as
+     * visited.
+     */
+    private fun hasRepeatedElements(block: StaticIdx<Block>): Boolean {
+        if (blockRoutes.containsKey(block)) return true
+        val tracks =
+            blockInfra
+                .getBlockPath(block)
+                .flatMap { rawInfra.getZonePathChunks(it) }
+                .map { rawInfra.getTrackFromChunk(it.value) }
+        for (track in tracks) {
+            if (track == lastTrack) continue
+            if (visitedTracks.contains(track)) return true
+            visitedTracks.add(track)
+            lastTrack = track
+        }
+        return false
     }
 
     private fun findStopsInTravelledPathAndOnBlock(

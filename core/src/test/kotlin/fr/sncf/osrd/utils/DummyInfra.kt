@@ -391,7 +391,7 @@ class DummyInfra : RawInfra, BlockInfra {
     }
 
     override fun getTrackFromChunk(trackChunk: TrackChunkId): TrackSectionId {
-        TODO("Not yet implemented")
+        return convertId(trackChunk)
     }
 
     override fun getTrackChunkSlope(trackChunk: DirTrackChunkId): DistanceRangeMap<Double> {
