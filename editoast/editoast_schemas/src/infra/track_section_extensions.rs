@@ -9,7 +9,9 @@ use crate::infra::TrackSectionSourceExtension;
 #[serde(deny_unknown_fields)]
 pub struct TrackSectionExtensions {
     #[schema(inline)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub sncf: Option<TrackSectionSncfExtension>,
     #[schema(inline)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<TrackSectionSourceExtension>,
 }
