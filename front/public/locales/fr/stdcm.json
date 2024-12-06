@@ -111,7 +111,7 @@
     "noScheduledPoint": "Le calcul a besoin de l'horaire d'origine ou de celui de la destination.",
     "pathfindingFailed": "Aucun chemin n'a été trouvé pour ces points de jalonnement.",
     "requestFailed": "Erreur de calcul Sillon de dernière minute",
-    "sameOriginAndDestination": "L'origine et la destination ne peuvent pas être identiques."
+    "sameOriginAndDestination": "L'origine et la destination doivent être différentes."
   },
   "stdcmResults": "Résultats",
   "stdcmSimulationReport": "Fiche simulation",
