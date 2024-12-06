@@ -485,7 +485,7 @@ pub mod tests {
             .json(&json!({
                 "path_items":[
                 {"trigram":"WS","secondary_code":"BV"},
-                {"trigram":"SWS","secondary_code":"BV"}
+                {"trigram":"WS","secondary_code":"BV"}
             ],
                 "rolling_stock_is_thermal":true,
                 "rolling_stock_loading_gauge":"G1",
