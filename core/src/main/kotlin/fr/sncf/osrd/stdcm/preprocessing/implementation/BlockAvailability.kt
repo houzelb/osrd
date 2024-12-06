@@ -1,9 +1,6 @@
 package fr.sncf.osrd.stdcm.preprocessing.implementation
 
-import fr.sncf.osrd.conflicts.IncrementalConflictDetector
-import fr.sncf.osrd.conflicts.TrainRequirements
-import fr.sncf.osrd.conflicts.TravelledPath
-import fr.sncf.osrd.conflicts.incrementalConflictDetectorFromTrainReq
+import fr.sncf.osrd.conflicts.*
 import fr.sncf.osrd.envelope_utils.DoubleBinarySearch
 import fr.sncf.osrd.sim_infra.api.Path
 import fr.sncf.osrd.standalone_sim.result.ResultTrain.SpacingRequirement
@@ -262,22 +259,25 @@ data class BlockAvailability(
                 }
                 .filter { it.beginTime < it.endTime }
         val conflictProperties =
-            incrementalConflictDetector.analyseConflicts(shiftedSpacingRequirements, listOf())
-        if (!conflictProperties.hasConflict) {
-            return BlockAvailabilityInterface.Available(
-                conflictProperties.maxDelayWithoutConflicts,
-                conflictProperties.timeOfNextConflict
-            )
-        } else {
-            val firstConflictOffset =
-                getEnvelopeOffsetFromTime(
-                    infraExplorer,
-                    conflictProperties.firstConflictTime!! - pathStartTime
+            incrementalConflictDetector.analyseConflicts(shiftedSpacingRequirements)
+        when (conflictProperties) {
+            is NoConflictResponse -> {
+                return BlockAvailabilityInterface.Available(
+                    conflictProperties.maxDelayWithoutConflicts,
+                    conflictProperties.timeOfNextConflict
                 )
-            return BlockAvailabilityInterface.Unavailable(
-                conflictProperties.minDelayWithoutConflicts,
-                firstConflictOffset
-            )
+            }
+            is ConflictResponse -> {
+                val firstConflictOffset =
+                    getEnvelopeOffsetFromTime(
+                        infraExplorer,
+                        conflictProperties.firstConflictTime - pathStartTime
+                    )
+                return BlockAvailabilityInterface.Unavailable(
+                    conflictProperties.minDelayWithoutConflicts,
+                    firstConflictOffset
+                )
+            }
         }
     }
 
