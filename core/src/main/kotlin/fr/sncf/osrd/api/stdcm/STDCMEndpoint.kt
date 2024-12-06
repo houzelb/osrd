@@ -172,9 +172,8 @@ private fun checkForConflicts(
                     it.isComplete
                 )
             },
-            simResult.routingRequirements.map {
-                ResultTrain.RoutingRequirement(it.route, it.beginTime + departureTime, it.zones)
-            }
         )
-    assert(!conflicts.hasConflict) { "STDCM result is conflicting with the scheduled timetable" }
+    assert(conflicts is NoConflictResponse) {
+        "STDCM result is conflicting with the scheduled timetable"
+    }
 }
