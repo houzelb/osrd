@@ -545,7 +545,7 @@ def register_extension(object: Type[BaseModel], name):
             raise RuntimeError(f"Extension '{name}' already registered for {object.__name__}")
 
         extensions_field.annotation.model_fields[name] = FieldInfo(
-            annotation=extension,
+            annotation=Optional[extension],
             default=None,
         )
         return extension
