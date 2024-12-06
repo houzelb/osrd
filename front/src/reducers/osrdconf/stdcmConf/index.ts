@@ -13,11 +13,25 @@ import type { OsrdStdcmConfState, StdcmPathStep } from 'reducers/osrdconf/types'
 import { addElementAtIndex } from 'utils/array';
 import type { ArrayElement } from 'utils/types';
 
+const DEFAULT_TOLERANCE = 1800; // 30min
+
 export const stdcmConfInitialState: OsrdStdcmConfState = {
   // TODO: remove all the default uic values
   stdcmPathSteps: [
-    { id: nextId(), uic: -1, isVia: false, arrivalType: ArrivalTimeTypes.PRECISE_TIME },
-    { id: nextId(), uic: -1, isVia: false, arrivalType: ArrivalTimeTypes.ASAP },
+    {
+      id: nextId(),
+      uic: -1,
+      isVia: false,
+      arrivalType: ArrivalTimeTypes.PRECISE_TIME,
+      tolerances: { before: DEFAULT_TOLERANCE, after: DEFAULT_TOLERANCE },
+    },
+    {
+      id: nextId(),
+      uic: -1,
+      isVia: false,
+      arrivalType: ArrivalTimeTypes.ASAP,
+      tolerances: { before: DEFAULT_TOLERANCE, after: DEFAULT_TOLERANCE },
+    },
   ],
   standardStdcmAllowance: undefined,
   totalMass: undefined,
