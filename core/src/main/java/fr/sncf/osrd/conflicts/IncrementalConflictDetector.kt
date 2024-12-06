@@ -19,6 +19,8 @@ data class ConflictProperties(
     val maxDelayWithoutConflicts: Double,
     // If there are no conflicts, minimum begin time of the next requirement that could conflict
     val timeOfNextConflict: Double,
+    val hasConflict: Boolean,
+    val firstConflictTime: Double?,
 )
 
 fun incrementalConflictDetectorFromTrainReq(
@@ -34,11 +36,6 @@ fun incrementalConflictDetectorFromReq(
 }
 
 interface IncrementalConflictDetector {
-    fun checkConflicts(
-        spacingRequirements: List<SpacingRequirement>,
-        routingRequirements: List<RoutingRequirement>
-    ): List<Conflict>
-
     fun analyseConflicts(
         spacingRequirements: List<SpacingRequirement>,
         routingRequirements: List<RoutingRequirement>
@@ -115,7 +112,7 @@ class IncrementalConflictDetectorImpl(requirements: List<Requirements>) :
         }
     }
 
-    override fun checkConflicts(
+    private fun checkConflicts(
         spacingRequirements: List<SpacingRequirement>,
         routingRequirements: List<RoutingRequirement>
     ): List<Conflict> {
@@ -129,7 +126,7 @@ class IncrementalConflictDetectorImpl(requirements: List<Requirements>) :
         return res
     }
 
-    fun checkSpacingRequirement(req: SpacingRequirement): List<Conflict> {
+    private fun checkSpacingRequirement(req: SpacingRequirement): List<Conflict> {
         val requirements = spacingZoneRequirements[req.zone] ?: return listOf()
 
         val res = mutableListOf<Conflict>()
@@ -190,10 +187,17 @@ class IncrementalConflictDetectorImpl(requirements: List<Requirements>) :
         spacingRequirements: List<SpacingRequirement>,
         routingRequirements: List<RoutingRequirement>
     ): ConflictProperties {
+        val conflicts = checkConflicts(spacingRequirements, routingRequirements) // TODO remove this
         val minDelayWithoutConflicts =
             minDelayWithoutConflicts(spacingRequirements, routingRequirements)
         if (minDelayWithoutConflicts != 0.0) { // There are initial conflicts
-            return ConflictProperties(minDelayWithoutConflicts, 0.0, 0.0)
+            return ConflictProperties(
+                minDelayWithoutConflicts,
+                0.0,
+                0.0,
+                true,
+                conflicts.first().startTime,
+            )
         } else { // There are no initial conflicts
             var maxDelay = Double.POSITIVE_INFINITY
             var timeOfNextConflict = Double.POSITIVE_INFINITY
@@ -227,7 +231,13 @@ class IncrementalConflictDetectorImpl(requirements: List<Requirements>) :
                     }
                 }
             }
-            return ConflictProperties(minDelayWithoutConflicts, maxDelay, timeOfNextConflict)
+            return ConflictProperties(
+                minDelayWithoutConflicts,
+                maxDelay,
+                timeOfNextConflict,
+                false,
+                null,
+            )
         }
     }
 

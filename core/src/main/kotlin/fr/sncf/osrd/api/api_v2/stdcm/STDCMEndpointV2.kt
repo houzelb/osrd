@@ -355,8 +355,8 @@ private fun checkForConflicts(
         }
     val conflictDetector = incrementalConflictDetectorFromReq(timetableTrainRequirements)
     val spacingRequirements = parseSpacingRequirements(newTrainSpacingRequirement)
-    val conflicts = conflictDetector.checkConflicts(spacingRequirements, listOf())
-    assert(conflicts.isEmpty()) { "STDCM result is conflicting with the scheduled timetable" }
+    val conflicts = conflictDetector.analyseConflicts(spacingRequirements, listOf())
+    assert(!conflicts.hasConflict) { "STDCM result is conflicting with the scheduled timetable" }
 }
 
 private fun findWaypointBlocks(

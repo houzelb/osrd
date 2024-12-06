@@ -163,7 +163,7 @@ private fun checkForConflicts(
     val requirements = TrainRequirements(0, spacingRequirements, listOf())
     val conflictDetector = incrementalConflictDetectorFromTrainReq(listOf(requirements))
     val conflicts =
-        conflictDetector.checkConflicts(
+        conflictDetector.analyseConflicts(
             simResult.spacingRequirements.map {
                 ResultTrain.SpacingRequirement(
                     it.zone,
@@ -176,5 +176,5 @@ private fun checkForConflicts(
                 ResultTrain.RoutingRequirement(it.route, it.beginTime + departureTime, it.zones)
             }
         )
-    assert(conflicts.isEmpty()) { "STDCM result is conflicting with the scheduled timetable" }
+    assert(!conflicts.hasConflict) { "STDCM result is conflicting with the scheduled timetable" }
 }
