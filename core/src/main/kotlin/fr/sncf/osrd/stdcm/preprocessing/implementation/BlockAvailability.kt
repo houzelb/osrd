@@ -3,7 +3,7 @@ package fr.sncf.osrd.stdcm.preprocessing.implementation
 import fr.sncf.osrd.conflicts.IncrementalConflictDetector
 import fr.sncf.osrd.conflicts.TrainRequirements
 import fr.sncf.osrd.conflicts.TravelledPath
-import fr.sncf.osrd.conflicts.incrementalConflictDetector
+import fr.sncf.osrd.conflicts.incrementalConflictDetectorFromTrainReq
 import fr.sncf.osrd.envelope_utils.DoubleBinarySearch
 import fr.sncf.osrd.sim_infra.api.Path
 import fr.sncf.osrd.standalone_sim.result.ResultTrain.SpacingRequirement
@@ -372,7 +372,7 @@ fun makeBlockAvailability(
     // Only keep steps with planned timing data
     val plannedSteps = steps.filter { it.plannedTimingData != null }
     return BlockAvailability(
-        incrementalConflictDetector(trainRequirements),
+        incrementalConflictDetectorFromTrainReq(trainRequirements),
         plannedSteps,
         gridMarginBeforeTrain,
         gridMarginAfterTrain,

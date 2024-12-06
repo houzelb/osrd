@@ -49,7 +49,6 @@ import java.time.Duration.ofMillis
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.Throws
 import org.takes.Request
 import org.takes.Response
 import org.takes.Take
@@ -354,7 +353,7 @@ private fun checkForConflicts(
                 it.endTime + departureTime.seconds
             )
         }
-    val conflictDetector = incrementalConflictDetectorFromRequirements(timetableTrainRequirements)
+    val conflictDetector = incrementalConflictDetectorFromReq(timetableTrainRequirements)
     val spacingRequirements = parseSpacingRequirements(newTrainSpacingRequirement)
     val conflicts = conflictDetector.checkConflicts(spacingRequirements, listOf())
     assert(conflicts.isEmpty()) { "STDCM result is conflicting with the scheduled timetable" }
