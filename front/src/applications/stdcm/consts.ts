@@ -20,5 +20,3 @@ export const COMPOSITION_CODES = [
   'MV160',
   'MVGV',
 ];
-
-export const DEFAULT_TOLERANCE = 1800; // 30min
