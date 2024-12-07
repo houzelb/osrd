@@ -2,6 +2,7 @@ use std::collections::BTreeMap;
 use std::collections::HashMap;
 
 use editoast_schemas::rolling_stock::EffortCurves;
+use editoast_schemas::rolling_stock::EtcsBrakeParams;
 use editoast_schemas::rolling_stock::RollingResistance;
 use editoast_schemas::rolling_stock::RollingStock;
 use editoast_schemas::rolling_stock::TowedRollingStock;
@@ -55,6 +56,7 @@ pub struct PhysicsConsist {
     /// The constant gamma braking coefficient used when NOT circulating
     /// under ETCS/ERTMS signaling system in m/s^2
     pub const_gamma: f64,
+    pub etcs_brake_params: Option<EtcsBrakeParams>,
     #[derivative(Hash(hash_with = "editoast_common::hash_float::<5,_>"))]
     pub inertia_coefficient: f64,
     /// Mass of the rolling stock in kg
@@ -219,6 +221,21 @@ impl PhysicsConsistParameters {
             .map(|towed| f64::min(towed.const_gamma, self.traction_engine.const_gamma))
             .unwrap_or_else(|| self.traction_engine.const_gamma)
     }
+
+    pub fn compute_etcs_brake_params(&self) -> Option<EtcsBrakeParams> {
+        // TODO: handle towed rolling-stock when applying ERTMS to that case
+        assert!(
+            !self
+                .traction_engine
+                .supported_signaling_systems
+                .0
+                .contains(&"ETCS_LEVEL2".to_string())
+                || self.towed_rolling_stock.is_none(),
+            "ETCS is not handled (yet) for towed rolling-stock"
+        );
+
+        self.traction_engine.etcs_brake_params.clone()
+    }
 }
 
 impl From<PhysicsConsistParameters> for PhysicsConsist {
@@ -231,6 +248,7 @@ impl From<PhysicsConsistParameters> for PhysicsConsist {
         let mass = params.compute_mass();
         let rolling_resistance = params.compute_rolling_resistance();
         let const_gamma = params.compute_const_gamma();
+        let etcs_brake_params = params.compute_etcs_brake_params();
 
         let traction_engine = params.traction_engine;
 
@@ -244,6 +262,7 @@ impl From<PhysicsConsistParameters> for PhysicsConsist {
             startup_acceleration,
             comfort_acceleration,
             const_gamma,
+            etcs_brake_params,
             inertia_coefficient,
             rolling_resistance,
             power_restrictions: traction_engine.power_restrictions.into_iter().collect(),

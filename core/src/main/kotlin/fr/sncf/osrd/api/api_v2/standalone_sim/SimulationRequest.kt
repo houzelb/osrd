@@ -7,6 +7,7 @@ import fr.sncf.osrd.api.api_v2.RangeValues
 import fr.sncf.osrd.conflicts.TravelledPath
 import fr.sncf.osrd.railjson.schema.rollingstock.Comfort
 import fr.sncf.osrd.railjson.schema.rollingstock.RJSEffortCurves.RJSModeEffortCurve
+import fr.sncf.osrd.railjson.schema.rollingstock.RJSEtcsBrakeParams
 import fr.sncf.osrd.railjson.schema.rollingstock.RJSRollingResistance
 import fr.sncf.osrd.railjson.schema.schedule.RJSAllowanceDistribution
 import fr.sncf.osrd.railjson.schema.schedule.RJSTrainStop.RJSReceptionSignal
@@ -66,6 +67,7 @@ class PhysicsConsistModel(
     @Json(name = "startup_acceleration") val startupAcceleration: Double,
     @Json(name = "comfort_acceleration") val comfortAcceleration: Double,
     @Json(name = "const_gamma") val constGamma: Double,
+    @Json(name = "etcs_brake_params") val etcsBrakeParams: RJSEtcsBrakeParams?,
     @Json(name = "inertia_coefficient") val inertiaCoefficient: Double,
     val mass: Long, // kg
     @Json(name = "rolling_resistance") val rollingResistance: RJSRollingResistance,

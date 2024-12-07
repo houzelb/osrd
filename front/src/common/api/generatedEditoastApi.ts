@@ -2787,6 +2787,31 @@ export type EnergySource =
       max_input_power: SpeedDependantPower;
       max_output_power: SpeedDependantPower;
     };
+export type SpeedIntervalValueCurve = {
+  /** Speed in m/s (sorted ascending)
+    External bounds are implicit to [0, rolling_stock.max_speed] */
+  boundaries: number[];
+  /** Interval values, must be >= 0 (unit to be made explicit at use)
+    There must be one more value than boundaries */
+  values: number[];
+};
+export type EtcsBrakeParams = {
+  gamma_emergency: SpeedIntervalValueCurve;
+  gamma_normal_service: SpeedIntervalValueCurve;
+  gamma_service: SpeedIntervalValueCurve;
+  k_dry: SpeedIntervalValueCurve;
+  k_n_neg: SpeedIntervalValueCurve;
+  k_n_pos: SpeedIntervalValueCurve;
+  k_wet: SpeedIntervalValueCurve;
+  /** T_be: safe brake build up time in s */
+  t_be: number;
+  /** T_bs1: time service break in s used for SBI1 computation */
+  t_bs1: number;
+  /** T_bs2: time service break in s used for SBI2 computation */
+  t_bs2: number;
+  /** T_traction_cut_off: time delay in s from the traction cut-off command to the moment the acceleration due to traction is zero */
+  t_traction_cut_off: number;
+};
 export type RollingStockMetadata = {
   detail: string;
   family: string;
@@ -2814,6 +2839,7 @@ export type LightRollingStock = {
   const_gamma: number;
   effort_curves: LightEffortCurves;
   energy_sources: EnergySource[];
+  etcs_brake_params?: EtcsBrakeParams | null;
   id: number;
   inertia_coefficient: number;
   length: number;
@@ -3025,6 +3051,7 @@ export type RollingStock = {
   effort_curves: EffortCurves;
   electrical_power_startup_time: number | null;
   energy_sources: EnergySource[];
+  etcs_brake_params: EtcsBrakeParams | null;
   id: number;
   inertia_coefficient: number;
   length: number;

@@ -15,7 +15,12 @@ pub use energy_source::EnergyStorage;
 pub use energy_source::RefillLaw;
 pub use energy_source::SpeedDependantPower;
 
+mod etcs_brake_params;
+pub use etcs_brake_params::EtcsBrakeParams;
+
 mod supported_signaling_systems;
+use serde::Deserializer;
+use serde::Serializer;
 pub use supported_signaling_systems::RollingStockSupportedSignalingSystems;
 
 mod rolling_stock_metadata;
@@ -38,6 +43,7 @@ use std::collections::HashMap;
 editoast_common::schemas! {
     effort_curves::schemas(),
     energy_source::schemas(),
+    etcs_brake_params::schemas(),
     loading_gauge_type::schemas(),
     rolling_stock_metadata::schemas(),
     rolling_resistance::schemas(),
@@ -48,6 +54,7 @@ editoast_common::schemas! {
 pub const ROLLING_STOCK_RAILJSON_VERSION: &str = "3.2";
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(remote = "Self")]
 pub struct RollingStock {
     pub name: String,
     pub locked: bool,
@@ -65,6 +72,7 @@ pub struct RollingStock {
     // The constant gamma braking coefficient used when NOT circulating
     // under ETCS/ERTMS signaling system in m/s^2
     pub const_gamma: f64,
+    pub etcs_brake_params: Option<EtcsBrakeParams>,
     pub inertia_coefficient: f64,
     /// In kg
     pub mass: f64,
@@ -86,4 +94,34 @@ pub struct RollingStock {
     pub railjson_version: String,
     #[serde(default)]
     pub metadata: Option<RollingStockMetadata>,
+}
+
+impl<'de> Deserialize<'de> for RollingStock {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let rolling_stock = RollingStock::deserialize(deserializer)?;
+
+        if rolling_stock
+            .supported_signaling_systems
+            .0
+            .contains(&"ETCS_LEVEL2".to_string())
+            && rolling_stock.etcs_brake_params.is_none()
+        {
+            return Err(serde::de::Error::custom(
+                "invalid rolling-stock, supporting ETCS_LEVEL2 signaling system requires providing ETCS brake parameters.",
+            ));
+        }
+        Ok(rolling_stock)
+    }
+}
+
+impl Serialize for RollingStock {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        RollingStock::serialize(self, serializer)
+    }
 }
