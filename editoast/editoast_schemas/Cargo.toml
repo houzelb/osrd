@@ -8,6 +8,7 @@ edition.workspace = true
 chrono.workspace = true
 derivative.workspace = true
 editoast_common.workspace = true
+editoast_derive.workspace = true
 enum-map.workspace = true
 geojson.workspace = true
 iso8601 = "0.6.1"
@@ -16,6 +17,7 @@ serde.workspace = true
 serde_json.workspace = true
 strum.workspace = true
 thiserror.workspace = true
+uom.workspace = true
 utoipa.workspace = true
 uuid.workspace = true
 
