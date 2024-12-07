@@ -21,6 +21,8 @@ const IGNORE_MISSING: RegExp[] = [
   /translation:destinationTime/,
   /translation:leaveAt/,
   /stdcm:simulation.results/,
+  /stdcm-help-section:asu/,
+  /stdcm-help-section:sections/,
   /translation:remainingTrackConflicts/,
   /translation:remainingWorkConflicts/,
   /translation:trackConflict/,

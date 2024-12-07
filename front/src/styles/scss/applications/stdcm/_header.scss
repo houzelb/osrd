@@ -6,8 +6,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding-right: 50px;
 
-  .stdcm-header__title {
+  &__title {
     max-height: 48px;
     color: rgba(0, 0, 0, 1);
     font-size: 2rem;
@@ -18,7 +19,7 @@
     line-height: 40px;
   }
 
-  .stdcm-header__notification {
+  &__notification {
     max-height: 48px;
     border-radius: 2px;
     border: 4px solid rgba(112, 193, 229, 1);
@@ -42,36 +43,42 @@
     }
   }
 
-  .stdcm-header_debug {
-    margin-right: 48px;
+  &__debug {
     button:focus {
       outline: none;
     }
     button {
       height: 40px;
-      width: 40px;
       border-radius: 6px;
+      color: var(--primary50);
+      border: 1px solid var(--primary30);
+      &:hover {
+        color: var(--primary80);
+        border: 1px solid var(--primary80);
+        background-color: var(--white100);
+      }
+      &:focus {
+        outline: none;
+      }
       &:disabled {
         pointer-events: none;
         opacity: 0.5;
       }
-      &.debug-on {
-        box-shadow: 0 0 0 2px rgba(255, 255, 255) inset;
+      &.selected {
+        box-shadow: 0 0 0 2px var(--white100) inset;
         border: 1px solid rgba(92, 89, 85);
         background-color: rgba(255, 242, 179);
         &:hover {
-          border: 3px solid rgba(255, 255, 255);
-          border: 1px solid rgba(0, 0, 0);
-          background-color: rgba(0, 0, 0, 0.05);
+          border: 3px solid var(--white100);
+          border: 1px solid var(--black100);
+          background-color: var(--black5);
         }
       }
-      &.debug-off {
-        color: rgba(114, 168, 247, 1);
-        border: 1px solid rgba(114, 168, 247);
+      &.debug {
+        width: 40px;
+        color: var(--primary30);
         &:hover {
-          color: rgba(31, 15, 150);
-          border: 1px solid rgba(31, 15, 150);
-          background-color: rgba(255, 255, 255);
+          color: var(--primary80);
         }
       }
     }
