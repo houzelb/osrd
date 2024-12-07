@@ -1350,6 +1350,7 @@ dependencies = [
  "tracing",
  "tracing-opentelemetry",
  "tracing-subscriber",
+ "uom",
  "url",
  "utoipa",
  "uuid",
@@ -1384,6 +1385,7 @@ dependencies = [
  "tracing",
  "tracing-opentelemetry",
  "tracing-subscriber",
+ "uom",
  "url",
  "utoipa",
 ]
@@ -1445,6 +1447,7 @@ dependencies = [
  "chrono",
  "derivative",
  "editoast_common",
+ "editoast_derive",
  "enum-map",
  "geojson",
  "iso8601",
@@ -1453,6 +1456,7 @@ dependencies = [
  "serde_json",
  "strum",
  "thiserror 2.0.11",
+ "uom",
  "utoipa",
  "uuid",
 ]
@@ -4945,6 +4949,16 @@ name = "untrusted"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
+
+[[package]]
+name = "uom"
+version = "0.36.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ffd36e5350a65d112584053ee91843955826bf9e56ec0d1351214e01f6d7cd9c"
+dependencies = [
+ "num-traits",
+ "typenum",
+]
 
 [[package]]
 name = "url"
