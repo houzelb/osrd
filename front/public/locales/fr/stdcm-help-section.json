@@ -1,0 +1,354 @@
+{
+  "help": "Aide",
+  "backToIndex": "index de l'aide",
+  "asu": [
+    {
+      "title": "Nom de l'application",
+      "value": "OSRD"
+    },
+    {
+      "title": "Assistance",
+      "value": "Support applicatif ASU"
+    },
+    {
+      "title": "Téléphone",
+      "value": "70 70 70 (ou 09 72 72 12 70)"
+    },
+    {
+      "title": "Code Application (AVAYA)",
+      "value": "176"
+    }
+  ],
+  "asuLink": "Lien vers le support ASU",
+  "sections": {
+    "application": {
+      "title": "L'application",
+      "content": [
+        {
+          "type": "text",
+          "value": "Last Minute Request (LMR) est un outil qui permet aux exploitants ferroviaires fret clients de SNCF Réseau de simuler rapidement la faisabilité des demandes de création de sillon de dernière minute."
+        },
+        {
+          "type": "text",
+          "value": "LMR permet de :"
+        },
+        {
+          "type": "list",
+          "items": [
+            {
+              "value": "Réaliser des simulations de recherche de capacité de dernière minute en totale autonomie"
+            },
+            {
+              "value": "Joindre aux demandes de création de sillon de dernière minute dans GESICO, une fiche de simulation LMR permettant de simplifier les gestes métier des horairistes"
+            }
+          ]
+        }
+      ],
+      "subSections": [
+        {
+          "title": "Périmètre",
+          "content": [
+            {
+              "type": "text",
+              "value": "Mis en service au tout début de l’année 2025, Last Minute Request fait ses premiers pas dans un périmètre limité pour pouvoir l’évaluer et le corriger avec le moins d’impact sur votre opérationnel."
+            },
+            {
+              "type": "text",
+              "value": "Vos requêtes sont pour le moment possibles uniquement entre Perrigny et Miramas, entre J-7 et J-1 17 heures, et ne prennent pas en compte les ATEs, matières dangereuses, et gabarits GB."
+            }
+          ]
+        },
+        {
+          "title": "Améliorations",
+          "content": [
+            {
+              "type": "text",
+              "value": "Nous avons une belle feuille de route pour rendre Last Minute Request plus pertinent et utile pour vous. Vos retours sont très importants pour que nous apprenions de votre utilisation, et pour que nous puissions prioriser correctement ces efforts. N’hésitez surtout pas à communiquer vos idées et commentaires."
+            },
+            {
+              "type": "text",
+              "value": "<a href='mailto:supportclients.SI@sncf.fr' target=\"_blank\">Contactez-nous</a>"
+            }
+          ]
+        },
+        {
+          "title": "Conception",
+          "content": [
+            {
+              "type": "text",
+              "value": "Last Minute Request fait partie d’un programme plus large dédié à faciliter la planification de l’opérationnel ferroviaire : Open Source Railway Designer. Le moteur de simulation, OSRD, est nourri par une représentation du réseau ferré, des différents matériels roulants, et des calendriers de circulations et travaux. SNCF Réseau et d’autres gestionnaires d’infrastructures européens participent à cet effort porté par une équipe d’ingénieurs, de développeurs et d’encadrants passionnés par le train."
+            }
+          ]
+        }
+      ]
+    },
+    "convoy": {
+      "title": "Le convoi",
+      "content": [
+        {
+          "type": "text",
+          "value": "Définir le convoi permet d'obtenir une simulation au plus proche de la réalité. Plus les informations que vous indiquez sont conformes à la composition réelle de votre convoi, plus la vitesse du train simulé sera proche de l'opérationnel."
+        },
+        {
+          "type": "text",
+          "value": "L'outil ne permet pas encore de changer de composition en cours de route. Si vous avez ce besoin, indiquez le convoi le plus restrictif en termes de tonnage, longueur, et vitesse maximale."
+        }
+      ],
+      "subSections": [
+        {
+          "title": "Engin de traction",
+          "content": [
+            {
+              "type": "text",
+              "value": "Indiquez les premières lettres pour trouver la ou les locomotives de votre convoi dans le catalogue."
+            }
+          ]
+        },
+        {
+          "title": "Matériel remorqué",
+          "content": [
+            {
+              "type": "text",
+              "value": "De la même façon que pour l'engin de traction, indiquez les premières lettres pour retrouver le matériel qui composera votre convoi."
+            }
+          ]
+        },
+        {
+          "title": "Tonnage, longueur, vitesse max.",
+          "content": [
+            {
+              "type": "text",
+              "value": "Indiquez le tonnage total de votre convoi (en tonnes), la longueur totale (en mètres), et la vitesse maximale (en km/h)."
+            }
+          ]
+        },
+        {
+          "title": "Code de composition",
+          "content": [
+            {
+              "type": "text",
+              "value": "Sélectionnez le code de composition de votre convoi parmi la liste."
+            }
+          ]
+        }
+      ]
+    },
+    "path": {
+      "title": "Le parcours",
+      "content": [
+        {
+          "type": "text",
+          "value": "Indiquez l'origine, la destination, et les éventuels points de passage et arrêts de votre parcours (hors rebroussements) pour pouvoir obtenir une simulation. Ceux-ci sont limités à l'axe Perrigny-Miramas dans un premier temps."
+        },
+        {
+          "type": "text",
+          "value": "En cas de sillons liés, vous pouvez également renseigner un sillon antérieur ou postérieur."
+        },
+        {
+          "type": "text",
+          "value": "Les points que vous renseignez apparaissent sur la carte au fur et à mesure de la saisie."
+        },
+        {
+          "type": "text",
+          "value": "Si un message d'avertissement vous indique qu'aucun chemin n'a été trouvé pour ces points de jalonnement, vérifiez tous les CI et CH de votre parcours, ainsi que la compatibilité de votre convoi avec cet axe."
+        }
+      ],
+      "subSections": [
+        {
+          "title": "Sillon antérieur",
+          "content": [
+            {
+              "type": "text",
+              "value": "Optionnel, le sillon antérieur vous permet d'indiquer un sillon lié en amont de votre simulation. Recherchez simplement son numéro et sa date de circulation, puis cliquez sur \"Trouver\"."
+            },
+            {
+              "type": "text",
+              "value": "Si plusieurs sillons correspondent à votre recherche, indiquez celui que vous souhaitez parmi la liste proposée."
+            },
+            {
+              "type": "text",
+              "value": "Une fois votre sillon sélectionné, les informations de l'origine sont pré-remplies avec une marge de 30 minutes sur l'horaire de départ. Tous les champs restent néanmoins modifiables."
+            }
+          ]
+        },
+        {
+          "title": "Origine",
+          "content": [
+            {
+              "type": "text",
+              "value": "Renseignez le code CI avec une recherche textuelle sur le nom ou le trigramme de votre point d'origine souhaité. Un code chantier apparaît alors dans le sélecteur de CH. Sélectionnez le bon code CH parmi la liste proposée."
+            },
+            {
+              "type": "text",
+              "value": "Renseignez la date et l’heure de départ via la souris ou le clavier, puis indiquez la tolérance​ avant et après votre heure de départ (en minutes)."
+            },
+            {
+              "type": "text",
+              "value": "Si vous souhaitez imposer un horaire à la destination plutôt qu'à l'origine, remplacez \"horaire précis\" par \"respecter l'horaire de destination\", et indiquez les horaires dans le bloc de la destination."
+            }
+          ]
+        },
+        {
+          "title": "PR intermédiaire",
+          "content": [
+            {
+              "type": "text",
+              "value": "Optionnels, les PR intermédiaires vous permettent d'imposer un passage ou un arrêt à un endroit précis. Renseignez simplement les codes CI et CH comme pour l'origine, puis le type de jalonnement parmi les trois options : passage, relève conducteur, arrêt de service."
+            },
+            {
+              "type": "text",
+              "value": "Dans le cas de relève conducteur ou arrêt de service, indiquez le temps d'arrêt minimum souhaité, en minutes. Pour trouver davantage de solutions, l'outil peut rallonger ces arrêts dans la simulation."
+            },
+            {
+              "type": "text",
+              "value": "N.B. : Les rebroussements ne sont pas encore pris en compte dans l'outil."
+            }
+          ]
+        },
+        {
+          "title": "Destination",
+          "content": [
+            {
+              "type": "text",
+              "value": "Comme pour l'origine, renseignez les codes CI et CH."
+            },
+            {
+              "type": "text",
+              "value": "Si vous souhaitez imposer un horaire à la destination plutôt qu'à l'origine, remplacez \"dès que possible\" par \"horaire précis\". Les champs <code>Date</code>, <code>Heure</code>, et <code>Tolérance</code> apparaissent alors et peuvent être remplis comme pour l'origine."
+            },
+            {
+              "type": "text",
+              "value": "N.B. : Il faut renseigner soit un horaire d’origine soit un horaire de destination, pas les deux."
+            }
+          ]
+        },
+        {
+          "title": "Sillon postérieur",
+          "content": [
+            {
+              "type": "text",
+              "value": "Optionnel, il fonctionne de la même façon que le sillon antérieur mais agit sur la destination plutôt que sur l'origine."
+            }
+          ]
+        }
+      ]
+    },
+    "result": {
+      "title": "Le résultat du calcul",
+      "content": [
+        {
+          "type": "text",
+          "value": "En fonction de la capacité disponible pour votre convoi aux horaires demandés, l'outil vous proposera une simulation de sillon, ou vous informera des raisons qui la rendent impossible."
+        }
+      ],
+      "subSections": [
+        {
+          "title": "La simulation de sillon",
+          "content": [
+            {
+              "type": "text",
+              "value": "Dans le cas où un sillon a été trouvé, un tableau récapitulatif des horaires calculés vous est proposé. Initialement, seuls les jalons demandés sont présents mais vous pouvez étendre cette liste en cliquant sur \"Afficher tous les jalons\". Vous disposez également d'une représentation du parcours sur une carte."
+            },
+            {
+              "type": "text",
+              "value": "Si le sillon simulé vous convient, cliquez sur \"Retenir cette simulation\". Un nouveau bouton apparaît alors vous permettant de télécharger une fiche de simulation, à insérer en tant que pièce jointe dans la demande GESICO."
+            },
+            {
+              "type": "text",
+              "value": "Si le sillon simulé ne vous convient pas, remontez dans le formulaire et ajustez les paramètres de votre demande pour lancer une nouvelle simulation. Celle-ci apparaîtra alors à côté de la précédente une fois le calcul terminé."
+            }
+          ]
+        },
+        {
+          "title": "Pas de capacité",
+          "content": [
+            {
+              "type": "text",
+              "value": "Dans le cas où aucun sillon n'a pu être trouvé, vous êtes informés des différents conflits rencontrés avec d'autres sillons ou travaux. Vous pouvez là aussi remonter dans le formulaire pour ajuster les paramètres de votre demande et relancer une simulation."
+            }
+          ]
+        }
+      ]
+    },
+    "glossary": {
+      "title": "Glossaire",
+      "content": [
+        {
+          "type": "definitions",
+          "definitions": [
+            {
+              "term": "CI",
+              "definition": "Code Immuable"
+            },
+            {
+              "term": "CH",
+              "definition": "Code Chantier"
+            },
+            {
+              "term": "LMR",
+              "definition": "Last Minute Request"
+            },
+            {
+              "term": "PR",
+              "definition": "Point Remarquable"
+            },
+            {
+              "term": "SDM",
+              "definition": "Sillon de Dernière Minute"
+            }
+          ]
+        }
+      ]
+    },
+    "faq": {
+      "title": "Foire aux questions",
+      "content": [
+        {
+          "type": "faq",
+          "questions": [
+            {
+              "question": "Qu’est-ce qu’une fiche de simulation ?",
+              "answer": "Une fiche de simulation est un document présentant les informations de la simulation ainsi que le jalonnement horairisé de la proposition faite par LMR. La fiche peut être téléchargée par l’utilisateur et ensuite introduite dans une demande GESICO pour une prise en compte et vérification par l’horairiste."
+            },
+            {
+              "question": "J’ai joint une fiche de simulation et mon sillon est refusé, pourquoi ?",
+              "answer": "Une fois votre fiche de simulation jointe à la demande dans GESICO, l’horairiste procède à une étape de validation prenant en compte des paramètres tels que la capacité en gare, l’horodatage et autres règles d’exploitation. Si après vérification le sillon ne peut plus être attribué, il sera refusé."
+            },
+            {
+              "question": "LMR ne me propose pas de sillon, pourquoi ?",
+              "answer": "LMR ne créé pas de la capacité. L’outil ne vous propose un sillon qu’en fonction de votre besoin et de la capacité résiduelle disponible au moment de votre simulation."
+            },
+            {
+              "question": "Puis-je passer par LMR pour passer une commande de création de sillon ?",
+              "answer": "LMR est un outil de simulation. Il ne permet en aucun cas de faire des demandes de SDM mais uniquement des requêtes de simulation. Les demandes de SDM se font dans GESICO avec la possibilité de joindre une fiche de simulation issue de LMR."
+            },
+            {
+              "question": "Est-il possible de simuler une demande de sillon intégrant un ATE ?",
+              "answer": "Non, pour le moment les simulations se font uniquement pour des sillons simples, sans prescription de sécurité."
+            },
+            {
+              "question": "Quand j’ai fait ma simulation, est-ce que la capacité est bloquée ?",
+              "answer": "Une simulation LMR ne bloque pas la capacité. La simulation permet uniquement à l’utilisateur de savoir quelle est la capacité disponible et ensuite de faire une demande « éclairée » dans l’outil GESICO."
+            },
+            {
+              "question": "Est-ce possible de faire une simulation sur une Origine Destination en dehors de Perrigny-Miramas ?",
+              "answer": "Le périmètre du démonstrateur est limité uniquement à l’OD Perrigny-Miramas. Toutefois, des développements d’extension de l’OD sont prévus ultérieurement."
+            },
+            {
+              "question": "Est-ce possible de faire une simulation à J-10 ?",
+              "answer": "Le périmètre du démonstrateur est limité entre J-7 et J-1 17h, c’est-à-dire uniquement pour des sillons de dernière minute."
+            },
+            {
+              "question": "Existe-t-il une possibilité de faire des demandes de rebroussement dans l’outil ?",
+              "answer": "Dans le cadre du démonstrateur, l’outil LMR ne permet pas de faire des demandes de rebroussement. Ces développements sont néanmoins pris en compte pour de prochaines versions de l’outil."
+            },
+            {
+              "question": "L’outil prend-t-il en compte les voies d’évitement ?",
+              "answer": "Dans le cadre du démonstrateur, LMR ne prend pas en compte les voies d’évitement. Ces développements sont néanmoins pris en compte pour de prochaines versions de l’outil."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

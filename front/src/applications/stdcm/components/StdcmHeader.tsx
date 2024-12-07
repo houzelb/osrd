@@ -8,10 +8,17 @@ import { getIsSuperUser } from 'reducers/user/userSelectors';
 type StdcmHeaderProps = {
   isDebugMode: boolean;
   onDebugModeToggle: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleHelpModule: () => void;
+  showHelpModule: boolean;
 };
 
-const StdcmHeader = ({ isDebugMode, onDebugModeToggle }: StdcmHeaderProps) => {
-  const { t } = useTranslation('stdcm');
+const StdcmHeader = ({
+  isDebugMode,
+  onDebugModeToggle,
+  toggleHelpModule,
+  showHelpModule,
+}: StdcmHeaderProps) => {
+  const { t } = useTranslation(['stdcm', 'translation']);
   const isSuperUser = useSelector(getIsSuperUser);
 
   return (
@@ -19,19 +26,27 @@ const StdcmHeader = ({ isDebugMode, onDebugModeToggle }: StdcmHeaderProps) => {
       <span className="stdcm-header__title pl-5">ST DCM</span>
       <div className="flex-grow-1 d-flex justify-content-center">
         <span className="stdcm-header__notification " id="notification">
-          {t('notificationTitle')}
+          {t('stdcm:notificationTitle')}
         </span>
       </div>
       {isSuperUser && (
-        <div className="stdcm-header_debug">
+        <div className="stdcm-header__debug">
           <button
             data-testid="stdcm-debug-button"
             type="button"
             aria-label="stdcm-debug"
-            className={cx({ 'debug-on': isDebugMode, 'debug-off': !isDebugMode })}
+            className={cx('debug', { selected: isDebugMode })}
             onClick={() => onDebugModeToggle(!isDebugMode)}
           >
             <Bug />
+          </button>
+          <button
+            type="button"
+            aria-label="stdcm-help"
+            className={cx('ml-4 px-3', { selected: showHelpModule })}
+            onClick={() => toggleHelpModule()}
+          >
+            {t('translation:common.help')}
           </button>
         </div>
       )}

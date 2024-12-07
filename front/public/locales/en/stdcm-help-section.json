@@ -1,0 +1,321 @@
+{
+  "help": "Help",
+  "backToIndex": "help index",
+  "asu": [
+    {
+      "title": "Application name",
+      "value": "OSRD"
+    },
+    {
+      "title": "Assistance",
+      "value": "Support applicatif ASU"
+    },
+    {
+      "title": "Phone",
+      "value": "70 70 70 (ou 09 72 72 12 70)"
+    },
+    {
+      "title": "Application Code (AVAYA)",
+      "value": "176"
+    }
+  ],
+  "asuLink": "ASU support link",
+  "sections": {
+    "application": {
+      "title": "The application",
+      "content": [
+        {
+          "type": "text",
+          "value": "Last Minute Request (LMR) is a tool that allows freight train operators to quickly simulate the feasibility of last-minute path creation requests."
+        },
+        {
+          "type": "text",
+          "value": "LMR allows you to:"
+        },
+        {
+          "type": "list",
+          "items": [
+            {
+              "value": "Carry out fully independent last-minute capacity search simulations"
+            },
+            {
+              "value": "Download an LMR simulation sheet"
+            }
+          ]
+        }
+      ],
+      "subSections": [
+        {
+          "title": "Improvements",
+          "content": [
+            {
+              "type": "text",
+              "value": "We have a great roadmap for making Last Minute Request more relevant and useful to our users. Your feedback is very important for us to learn from your use, and to prioritise these efforts correctly."
+            },
+            {
+              "type": "text",
+              "value": "Please don't hesitate to share your ideas and comments."
+            },
+            {
+              "type": "text",
+              "value": "<a href='mailto:supportclients.SI@sncf.fr' target=\"_blank\">Contact us</a>"
+            }
+          ]
+        },
+        {
+          "title": "Design",
+          "content": [
+            {
+              "type": "text",
+              "value": "Last Minute Request is part of a wider programme dedicated to facilitating rail operations planning: Open Source Railway Designer. The simulation engine, OSRD, is fed by a representation of the rail network, the various types of rolling stocks, train schedules, and works schedules. SNCF Réseau and other European infrastructure managers are participating in this effort, which is being led by a team of engineers, developers and managers who are passionate about trains."
+            }
+          ]
+        }
+      ]
+    },
+    "convoy": {
+      "title": "The consist",
+      "content": [
+        {
+          "type": "text",
+          "value": "Defining the consist allows you to obtain a simulation that is as close as possible to reality. The more closely the information you enter matches the actual composition of your consist, the closer the speed of the simulated train will be to operational."
+        },
+        {
+          "type": "text",
+          "value": "The tool does not yet allow you to change the composition en route. If you need to do this, enter the most restrictive consist in terms of weight, length and maximum speed."
+        }
+      ],
+      "subSections": [
+        {
+          "title": "Traction unit",
+          "content": [
+            {
+              "type": "text",
+              "value": "Enter the first few letters to find the locomotive(s) for your consist in the catalogue."
+            }
+          ]
+        },
+        {
+          "title": "Towed rolling stock",
+          "content": [
+            {
+              "type": "text",
+              "value": "In the same way as for the traction unit, enter the first few letters to find the equipment that will make up your consist."
+            }
+          ]
+        },
+        {
+          "title": "Weight, length, max. speed",
+          "content": [
+            {
+              "type": "text",
+              "value": "Indicate the total weight of your consist (in tons), the total length (in meters) and the maximum speed (in km/h)."
+            }
+          ]
+        },
+        {
+          "title": "Composition code",
+          "content": [
+            {
+              "type": "text",
+              "value": "Select your consist's composition code from the list."
+            }
+          ]
+        }
+      ]
+    },
+    "path": {
+      "title": "The route",
+      "content": [
+        {
+          "type": "text",
+          "value": "Indicate the origin, destination and any stopping points on your route (excluding turn-offs) to obtain a simulation."
+        },
+        {
+          "type": "text",
+          "value": "In the case of linked paths, you can also enter an previous or posterior path."
+        },
+        {
+          "type": "text",
+          "value": "The points you enter appear on the map as you enter them."
+        },
+        {
+          "type": "text",
+          "value": "If a warning message tells you that no path has been found for these staking points, check all the CIs and CHs on your route, as well as the compatibility of your consist with this route."
+        }
+      ],
+      "subSections": [
+        {
+          "title": "Previous path",
+          "content": [
+            {
+              "type": "text",
+              "value": "As an option, the previous path allows you to indicate a path linked upstream of your simulation. Simply search for its number and date of circulation, then click on \"Find\"."
+            },
+            {
+              "type": "text",
+              "value": "If several paths match your search, select the one you want from the list."
+            },
+            {
+              "type": "text",
+              "value": "Once you have selected your train path, the origin information is pre-filled with a 30-minute margin on the departure time. All fields can still be modified."
+            }
+          ]
+        },
+        {
+          "title": "Origin",
+          "content": [
+            {
+              "type": "text",
+              "value": "Enter the CI code using a text search on the name or trigram of your desired point of origin. A CH will appear in the CH selector. Select the correct CH code from the list."
+            },
+            {
+              "type": "text",
+              "value": "Enter the start date and time using the mouse or keyboard, then specify the tolerance before and after your start time (in minutes)."
+            },
+            {
+              "type": "text",
+              "value": "If you want to impose a timetable on the destination rather than the origin, replace ‘precise timetable’ with ‘respect destination time’, and enter the times in the destination block."
+            }
+          ]
+        },
+        {
+          "title": "Intermediate OP",
+          "content": [
+            {
+              "type": "text",
+              "value": "Intermediate OPs are optional and allow you to impose a via or stop at a specific point. Simply enter the CI and CH codes as for the origin, then select the type of staking from the three options: via, driver changeover, service stop."
+            },
+            {
+              "type": "text",
+              "value": "In the case of driver changeover or service stop, enter the minimum stop time required, in minutes. To find more solutions, the tool can extend these stops in the simulation."
+            },
+            {
+              "type": "text",
+              "value": "N.B.: Turnarounds are not yet taken into account in the app."
+            }
+          ]
+        },
+        {
+          "title": "Destination",
+          "content": [
+            {
+              "type": "text",
+              "value": "As for the origin, enter the CI and CH codes."
+            },
+            {
+              "type": "text",
+              "value": "If you wish to impose a timetable on the destination rather than the origin, replace ‘as soon as possible’ with ‘precise timetable’. The <code>Date</code>, <code>Time</code> and <code>Tolerance</code> fields then appear and can be filled in as for the origin."
+            },
+            {
+              "type": "text",
+              "value": "N.B.: You must enter either an origin time or a destination timetable, not both."
+            }
+          ]
+        },
+        {
+          "title": "Posterior path",
+          "content": [
+            {
+              "type": "text",
+              "value": "Optional, it works in the same way as the previous path but acts on the destination rather than the origin."
+            }
+          ]
+        }
+      ]
+    },
+    "result": {
+      "title": "The result of the calculation",
+      "content": [
+        {
+          "type": "text",
+          "value": "Depending on the capacity available for your train at the times requested, the tool will suggest a simulated path, or inform you of the reasons why this is not possible."
+        }
+      ],
+      "subSections": [
+        {
+          "title": "Path simulation",
+          "content": [
+            {
+              "type": "text",
+              "value": "If a path has been found, a table summarising the calculated timetables is displayed. Initially, only the requested milestones are shown, but you can extend this list by clicking on ‘Show all milestones’. The route is also shown on a map."
+            },
+            {
+              "type": "text",
+              "value": "If you are happy with the simulated path, click on ‘Keep this simulation’. A new button will appear allowing you to download a simulation form."
+            },
+            {
+              "type": "text",
+              "value": "If the simulated path does not suit you, go back to the form and adjust the parameters of your request to run a new simulation. This will then appear next to the previous one once the calculation has been completed."
+            }
+          ]
+        },
+        {
+          "title": "No capacity",
+          "content": [
+            {
+              "type": "text",
+              "value": "If no train path has been found, you will be informed of the various conflicts encountered with other train paths or work. Here again, you can go back to the form to adjust the parameters of your request and run a simulation again."
+            }
+          ]
+        }
+      ]
+    },
+    "glossary": {
+      "title": "Glossary",
+      "content": [
+        {
+          "type": "definitions",
+          "definitions": [
+            {
+              "term": "CI",
+              "definition": "Permanent Code"
+            },
+            {
+              "term": "CH",
+              "definition": "Worksite Code"
+            },
+            {
+              "term": "LMR",
+              "definition": "Last Minute Request"
+            },
+            {
+              "term": "OP",
+              "definition": "Operational Point"
+            }
+          ]
+        }
+      ]
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "content": [
+        {
+          "type": "faq",
+          "questions": [
+            {
+              "question": "What is a simulation sheet?",
+              "answer": "A simulation sheet is a document presenting the simulation information as well as the timetable of the proposal made by LMR."
+            },
+            {
+              "question": "LMR is not offering me a train path, why?",
+              "answer": "LMR does not create capacity. The tool only proposes a path according to your needs and the residual capacity available at the time of your simulation."
+            },
+            {
+              "question": "When I run my simulation, is the capacity blocked?",
+              "answer": "An LMR simulation does not block capacity. The simulation only allows the user to know what capacity is available."
+            },
+            {
+              "question": "Is it possible to make requests for turnarounds in the app?",
+              "answer": "LMR does not allow requests for turnarounds. These developments will nevertheless be taken into account for future versions of the app."
+            },
+            {
+              "question": "Does the tool take side tracks into account?",
+              "answer": "LMR does not take side tracks into account yet. These developments will nevertheless be taken into account for future versions of the tool."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

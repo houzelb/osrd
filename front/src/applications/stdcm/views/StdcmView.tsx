@@ -12,6 +12,7 @@ import { replaceElementAtIndex } from 'utils/array';
 import StdcmEmptyConfigError from '../components/StdcmEmptyConfigError';
 import StdcmConfig from '../components/StdcmForm/StdcmConfig';
 import StdcmHeader from '../components/StdcmHeader';
+import StdcmHelpModule from '../components/StdcmHelpModule/StdcmHelpModule';
 import StdcmResults from '../components/StdcmResults';
 import StdcmStatusBanner from '../components/StdcmStatusBanner';
 import useStdcmEnvironment, { NO_CONFIG_FOUND_MSG } from '../hooks/useStdcmEnv';
@@ -27,6 +28,7 @@ const StdcmView = () => {
   const [retainedSimulationIndex, setRetainedSimulationIndex] = useState(-1);
   const [showBtnToLaunchSimulation, setShowBtnToLaunchSimulation] = useState(false);
   const [isDebugMode, setIsDebugMode] = useState(false);
+  const [showHelpModule, setShowHelpModule] = useState(false);
 
   const {
     launchStdcmRequest,
@@ -64,6 +66,8 @@ const StdcmView = () => {
     setRetainedSimulationIndex(-1);
     dispatch(resetStdcmConfig());
   };
+
+  const toggleHelpModule = () => setShowHelpModule((show) => !show);
 
   // reset config data with the selected simulation data
   useEffect(() => {
@@ -171,7 +175,12 @@ const StdcmView = () => {
 
   return (
     <div role="button" tabIndex={0} className="stdcm" onClick={() => setShowStatusBanner(false)}>
-      <StdcmHeader isDebugMode={isDebugMode} onDebugModeToggle={setIsDebugMode} />
+      <StdcmHeader
+        isDebugMode={isDebugMode}
+        onDebugModeToggle={setIsDebugMode}
+        toggleHelpModule={toggleHelpModule}
+        showHelpModule={showHelpModule}
+      />
 
       {!isNil(error) ? (
         <StdcmEmptyConfigError />
@@ -206,6 +215,7 @@ const StdcmView = () => {
               )}
             </div>
           )}
+          <StdcmHelpModule showHelpModule={showHelpModule} toggleHelpModule={toggleHelpModule} />
         </div>
       )}
       {loading && <LoaderFill />}
