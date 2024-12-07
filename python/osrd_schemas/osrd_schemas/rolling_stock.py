@@ -85,6 +85,62 @@ class EffortCurves(BaseModel, extra="forbid"):
         return self
 
 
+class SpeedIntervalValueCurve(BaseModel, extra="forbid"):
+    boundaries: List[NonNegativeFloat] = Field(
+        description="Speed in m/s (sorted ascending). External bounds are implicit to [0, rolling_stock.max_speed]"
+    )
+    values: List[NonNegativeFloat] = Field(
+        min_length=1,
+        description="Interval values (unit to be made explicit at use)\n"
+        "There must be one more value than boundaries",
+    )
+
+
+class EtcsBrakeParams(BaseModel, extra="forbid"):
+    """
+    Braking parameters for ERTMS ETCS Level 2
+    Commented with their names in ETCS specification document `SUBSET-026-3 v400.pdf` from the
+    file at https://www.era.europa.eu/system/files/2023-09/index004_-_SUBSET-026_v400.zip
+    """
+
+    gamma_emergency: SpeedIntervalValueCurve = Field(
+        description="A_brake_emergency: the emergency deceleration curve (values > 0 m/s²)"
+    )
+    gamma_service: SpeedIntervalValueCurve = Field(
+        description="A_brake_service: the full service deceleration curve (values > 0 m/s²)"
+    )
+    gamma_normal_service: SpeedIntervalValueCurve = Field(
+        description="A_brake_normal_service: the normal service deceleration curve used to "
+        "compute guidance curve (values > 0 m/s²)"
+    )
+    k_dry: SpeedIntervalValueCurve = Field(
+        description="Kdry_rst: the rolling stock deceleration correction factors for dry rails\n"
+        "Boundaries should be the same as gammaEmergency\n"
+        "Values (no unit) should be contained in [0, 1]"
+    )
+    k_wet: SpeedIntervalValueCurve = Field(
+        description="Kwet_rst: the rolling stock deceleration correction factors for wet rails\n"
+        "Boundaries should be the same as gammaEmergency\n"
+        "Values (no unit) should be contained in [0, 1]"
+    )
+    k_n_pos: SpeedIntervalValueCurve = Field(
+        description="Kn+: the correction acceleration factor on normal service deceleration in positive gradients\n"
+        "Values (in m/s²) should be contained in [0, 10]"
+    )
+    k_n_neg: SpeedIntervalValueCurve = Field(
+        description="Knn: the correction acceleration factor on normal service deceleration in negative gradients\n"
+        "Values (in m/s²) should be contained in [0, 10]"
+    )
+    t_traction_cut_off: float = Field(
+        ge=0,
+        description="T_traction_cut_off: time delay in s from the traction cut-off command to the moment the "
+        "acceleration due to traction is zero",
+    )
+    t_bs1: float = Field(ge=0, description="T_bs1: time service break in s used for SBI1 computation")
+    t_bs2: float = Field(ge=0, description="T_bs2: time service break in s used for SBI2 computation")
+    t_be: float = Field(ge=0, description="T_be: safe brake build up time in s")
+
+
 class RollingStockLivery(BaseModel):
     name: str = Field(max_length=255)
 
@@ -201,6 +257,7 @@ class RollingStock(BaseModel, extra="forbid"):
         description="The constant gamma braking coefficient used when NOT circulating under "
         "ETCS/ERTMS signaling system in m/s^2"
     )
+    etcs_brake_params: Optional[EtcsBrakeParams] = Field(description="Braking parameters for ERTMS ETCS Level 2")
     inertia_coefficient: NonNegativeFloat = Field(description="The coefficient of inertia")
     mass: NonNegativeFloat = Field(description="The mass of the train, in kg")
     rolling_resistance: RollingResistance = Field(description="The formula to use to compute rolling resistance")

@@ -5,6 +5,7 @@ use std::collections::HashMap;
 use editoast_derive::Model;
 use editoast_schemas::rolling_stock::EffortCurves;
 use editoast_schemas::rolling_stock::EnergySource;
+use editoast_schemas::rolling_stock::EtcsBrakeParams;
 use editoast_schemas::rolling_stock::LoadingGaugeType;
 use editoast_schemas::rolling_stock::RollingResistance;
 use editoast_schemas::rolling_stock::RollingStock;
@@ -49,6 +50,9 @@ pub struct RollingStockModel {
     pub startup_acceleration: f64,
     pub comfort_acceleration: f64,
     pub const_gamma: f64,
+    #[model(json)]
+    #[schema(required)]
+    pub etcs_brake_params: Option<EtcsBrakeParams>,
     pub inertia_coefficient: f64,
     #[schema(required)]
     pub base_power_class: Option<String>,
@@ -154,6 +158,7 @@ impl From<RollingStockModel> for RollingStock {
             startup_acceleration: rolling_stock_model.startup_acceleration,
             comfort_acceleration: rolling_stock_model.comfort_acceleration,
             const_gamma: rolling_stock_model.const_gamma,
+            etcs_brake_params: rolling_stock_model.etcs_brake_params,
             inertia_coefficient: rolling_stock_model.inertia_coefficient,
             mass: rolling_stock_model.mass,
             rolling_resistance: rolling_stock_model.rolling_resistance,
@@ -182,6 +187,7 @@ impl From<RollingStock> for RollingStockModelChangeset {
             .startup_acceleration(rolling_stock.startup_acceleration)
             .comfort_acceleration(rolling_stock.comfort_acceleration)
             .const_gamma(rolling_stock.const_gamma)
+            .etcs_brake_params(rolling_stock.etcs_brake_params)
             .inertia_coefficient(rolling_stock.inertia_coefficient)
             .mass(rolling_stock.mass)
             .rolling_resistance(rolling_stock.rolling_resistance)

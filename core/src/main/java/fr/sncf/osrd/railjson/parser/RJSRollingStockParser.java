@@ -98,6 +98,7 @@ public class RJSRollingStockParser {
                 rjsRollingStock.startUpAcceleration,
                 rjsRollingStock.comfortAcceleration,
                 rjsRollingStock.constGamma,
+                null,
                 rjsRollingStock.loadingGauge,
                 modes,
                 rjsRollingStock.effortCurves.defaultMode,

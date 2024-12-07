@@ -12,6 +12,7 @@ import fr.sncf.osrd.envelope_sim.electrification.Electrified;
 import fr.sncf.osrd.envelope_sim.electrification.Neutral;
 import fr.sncf.osrd.envelope_sim.electrification.NonElectrified;
 import fr.sncf.osrd.railjson.schema.rollingstock.Comfort;
+import fr.sncf.osrd.railjson.schema.rollingstock.RJSEtcsBrakeParams;
 import fr.sncf.osrd.railjson.schema.rollingstock.RJSLoadingGaugeType;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,8 @@ public final class RollingStock implements PhysicsRollingStock {
 
     /** the deceleration of the train, in m/s^2 */
     public final double constGamma;
+
+    public final RJSEtcsBrakeParams etcsBrakeParams;
 
     /** the length of the train, in meters. */
     public final double length;
@@ -275,6 +278,7 @@ public final class RollingStock implements PhysicsRollingStock {
             double startUpAcceleration,
             double comfortAcceleration,
             double constGamma,
+            RJSEtcsBrakeParams etcsBrakeParams,
             RJSLoadingGaugeType loadingGaugeType,
             Map<String, ModeEffortCurves> modes,
             String defaultMode,
@@ -293,6 +297,7 @@ public final class RollingStock implements PhysicsRollingStock {
                 startUpAcceleration,
                 comfortAcceleration,
                 constGamma,
+                etcsBrakeParams,
                 loadingGaugeType,
                 modes,
                 defaultMode,
@@ -317,6 +322,7 @@ public final class RollingStock implements PhysicsRollingStock {
             double startUpAcceleration,
             double comfortAcceleration,
             double constGamma,
+            RJSEtcsBrakeParams etcsBrakeParams,
             RJSLoadingGaugeType loadingGaugeType,
             Map<String, ModeEffortCurves> modes,
             String defaultMode,
@@ -335,6 +341,7 @@ public final class RollingStock implements PhysicsRollingStock {
         this.startUpAcceleration = startUpAcceleration;
         this.comfortAcceleration = comfortAcceleration;
         this.constGamma = constGamma;
+        this.etcsBrakeParams = etcsBrakeParams;
         this.mass = mass;
         this.inertiaCoefficient = inertiaCoefficient;
         this.modes = modes;

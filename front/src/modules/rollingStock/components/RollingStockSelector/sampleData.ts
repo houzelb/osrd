@@ -50,6 +50,7 @@ const ROLLING_STOCK_SAMPLE_DATA: RollingStockWithLiveries = {
   startup_acceleration: 0.03,
   comfort_acceleration: 0.08,
   const_gamma: 0.5,
+  etcs_brake_params: null,
   inertia_coefficient: 1.2,
   mass: 132000,
   rolling_resistance: {

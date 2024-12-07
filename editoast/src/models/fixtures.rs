@@ -259,6 +259,7 @@ pub fn create_simple_rolling_stock() -> RollingStock {
         raise_pantograph_time: None,
         energy_sources: vec![],
         const_gamma: 1.0,
+        etcs_brake_params: None,
         locked: false,
         metadata: None,
         power_restrictions: HashMap::new(),

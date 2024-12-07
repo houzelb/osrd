@@ -6,7 +6,7 @@ import fr.sncf.osrd.railjson.schema.rollingstock.RJSLoadingGaugeType
 import fr.sncf.osrd.reporting.exceptions.ErrorType
 import fr.sncf.osrd.reporting.exceptions.OSRDError
 import fr.sncf.osrd.train.RollingStock
-import fr.sncf.osrd.train.RollingStock.*
+import fr.sncf.osrd.train.RollingStock.ModeEffortCurves
 
 /** Parse the rolling stock model into something the backend can work with */
 fun parseRawRollingStock(
@@ -44,6 +44,7 @@ fun parseRawRollingStock(
         rawPhysicsConsist.startupAcceleration,
         rawPhysicsConsist.comfortAcceleration,
         rawPhysicsConsist.constGamma,
+        rawPhysicsConsist.etcsBrakeParams,
         loadingGaugeType,
         modes,
         rawPhysicsConsist.effortCurves.defaultMode,

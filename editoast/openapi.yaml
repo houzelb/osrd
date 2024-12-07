@@ -6494,6 +6494,56 @@ components:
             default: -1.0
           distribution:
             $ref: '#/components/schemas/AllowanceDistribution'
+    EtcsBrakeParams:
+      type: object
+      description: |-
+        Braking parameters for ERTMS ETCS Level 2
+        Commented with their names in ETCS specification document `SUBSET-026-3 v400.pdf` from the
+        file at https://www.era.europa.eu/system/files/2023-09/index004_-_SUBSET-026_v400.zip
+      required:
+      - gamma_emergency
+      - gamma_service
+      - gamma_normal_service
+      - k_dry
+      - k_wet
+      - k_n_pos
+      - k_n_neg
+      - t_traction_cut_off
+      - t_bs1
+      - t_bs2
+      - t_be
+      properties:
+        gamma_emergency:
+          $ref: '#/components/schemas/SpeedIntervalValueCurve'
+        gamma_normal_service:
+          $ref: '#/components/schemas/SpeedIntervalValueCurve'
+        gamma_service:
+          $ref: '#/components/schemas/SpeedIntervalValueCurve'
+        k_dry:
+          $ref: '#/components/schemas/SpeedIntervalValueCurve'
+        k_n_neg:
+          $ref: '#/components/schemas/SpeedIntervalValueCurve'
+        k_n_pos:
+          $ref: '#/components/schemas/SpeedIntervalValueCurve'
+        k_wet:
+          $ref: '#/components/schemas/SpeedIntervalValueCurve'
+        t_be:
+          type: number
+          format: double
+          description: 'T_be: safe brake build up time in s'
+        t_bs1:
+          type: number
+          format: double
+          description: 'T_bs1: time service break in s used for SBI1 computation'
+        t_bs2:
+          type: number
+          format: double
+          description: 'T_bs2: time service break in s used for SBI2 computation'
+        t_traction_cut_off:
+          type: number
+          format: double
+          description: 'T_traction_cut_off: time delay in s from the traction cut-off command to the moment the acceleration due to traction is zero'
+      additionalProperties: false
     GeoJson:
       oneOf:
       - $ref: '#/components/schemas/GeoJsonPoint'
@@ -7206,6 +7256,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EnergySource'
+        etcs_brake_params:
+          allOf:
+          - $ref: '#/components/schemas/EtcsBrakeParams'
+          nullable: true
         id:
           type: integer
           format: int64
@@ -9089,6 +9143,7 @@ components:
       - startup_acceleration
       - comfort_acceleration
       - const_gamma
+      - etcs_brake_params
       - inertia_coefficient
       - base_power_class
       - mass
@@ -9121,6 +9176,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EnergySource'
+        etcs_brake_params:
+          allOf:
+          - $ref: '#/components/schemas/EtcsBrakeParams'
+          nullable: true
         id:
           type: integer
           format: int64
@@ -10541,6 +10600,38 @@ components:
           items:
             type: number
             format: double
+      additionalProperties: false
+    SpeedIntervalValueCurve:
+      type: object
+      required:
+      - boundaries
+      - values
+      properties:
+        boundaries:
+          type: array
+          items:
+            type: number
+            format: double
+          description: |-
+            Speed in m/s (sorted ascending)
+            External bounds are implicit to [0, rolling_stock.max_speed]
+          example:
+          - 8.333333
+          - 19.444444
+        values:
+          type: array
+          items:
+            type: number
+            format: double
+            minimum: 0
+          description: |-
+            Interval values, must be >= 0 (unit to be made explicit at use)
+            There must be one more value than boundaries
+          example:
+          - 0.5
+          - 0.6
+          - 0.5
+          minItems: 1
       additionalProperties: false
     SpeedSection:
       type: object
