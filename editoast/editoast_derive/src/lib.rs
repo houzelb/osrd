@@ -1,5 +1,6 @@
 extern crate proc_macro;
 
+mod annotate_units;
 mod error;
 mod model;
 mod search;
@@ -269,3 +270,20 @@ mod test_utils {
 
 #[cfg(test)]
 use test_utils::assert_macro_expansion;
+/// Annotates fields of a structs with documentation and value_type for a better utoipa schema
+///
+/// It must be used on structs that use #[derive(ToSchema)]
+///
+/// On every field that has an attribute such as #[serde(with="millimeter")]
+/// It will add:
+/// * #[schema(value_type = f64)]
+/// * /// Length in mm
+#[proc_macro_attribute]
+pub fn annotate_units(_attr: TokenStream, input: TokenStream) -> TokenStream {
+    // We are using a macro attribute to modify in place the attributes of fields to annotate
+    // This requires to mutate the input
+    let mut input = parse_macro_input!(input as DeriveInput);
+    annotate_units::annotate_units(&mut input)
+        .unwrap_or_else(darling::Error::write_errors)
+        .into()
+}
