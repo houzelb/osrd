@@ -37,7 +37,7 @@ class STDCMPage {
 
   readonly lengthField: Locator;
 
-  readonly codeCompoField: Locator;
+  readonly speedLimitTagField: Locator;
 
   readonly maxSpeedField: Locator;
 
@@ -136,7 +136,7 @@ class STDCMPage {
     this.tractionEngineField = page.locator('#tractionEngine');
     this.tonnageField = page.locator('#tonnage');
     this.lengthField = page.locator('#length');
-    this.codeCompoField = page.locator('#speed-limit-by-tag-selector');
+    this.speedLimitTagField = page.locator('#speed-limit-by-tag-selector');
     this.maxSpeedField = page.locator('#maxSpeed');
     this.addViaButton = page.locator('.stdcm-vias-list button .stdcm-card__body.add-via');
     this.launchSimulationButton = page.getByTestId('launch-simulation-button');
@@ -248,7 +248,8 @@ class STDCMPage {
   }
 
   // Verifies all input fields are empty
-  async verifyAllFieldsEmpty() {
+  // Except for speedLimitTags, which has a default value of 'MA100'
+  async verifyDefaultFieldsValue() {
     const emptyFields = [
       this.tractionEngineField,
       this.tonnageField,
@@ -260,7 +261,7 @@ class STDCMPage {
       this.destinationChField,
     ];
     for (const field of emptyFields) await expect(field).toHaveValue('');
-    await expect(this.codeCompoField).toHaveValue('__PLACEHOLDER__');
+    await expect(this.speedLimitTagField).toHaveValue('MA100');
   }
 
   // Adds a via card, verifies fields, and deletes it
@@ -301,7 +302,7 @@ class STDCMPage {
     await this.tractionEngineField.dispatchEvent('blur');
     await this.tonnageField.fill('400');
     await this.lengthField.fill('300');
-    await this.codeCompoField.selectOption('HLP');
+    await this.speedLimitTagField.selectOption('HLP');
     await this.maxSpeedField.fill('180');
   }
 

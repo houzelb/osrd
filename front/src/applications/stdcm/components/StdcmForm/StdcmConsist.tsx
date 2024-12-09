@@ -184,6 +184,7 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           selectedSpeedLimitByTag={speedLimitByTag}
           speedLimitsByTags={speedLimitsByTags}
           dispatchUpdateSpeedLimitByTag={onSpeedLimitByTagChange}
+          isStdcm
         />
         <Input
           id="maxSpeed"
