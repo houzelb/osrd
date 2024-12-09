@@ -125,8 +125,8 @@ const StdcmConfig = ({
 
   useEffect(() => {
     if (!isDebugMode) {
-      dispatch(updateGridMarginAfter(35));
-      dispatch(updateGridMarginBefore(35));
+      dispatch(updateGridMarginAfter(15));
+      dispatch(updateGridMarginBefore(15));
       dispatch(updateStdcmStandardAllowance({ type: 'time_per_distance', value: 4.5 }));
     }
   }, [isDebugMode]);
