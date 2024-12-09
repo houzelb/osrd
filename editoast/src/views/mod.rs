@@ -24,6 +24,7 @@ pub mod work_schedules;
 #[cfg(test)]
 mod test_app;
 
+use ::core::str;
 use std::collections::HashSet;
 use std::env;
 use std::sync::Arc;
@@ -201,14 +202,12 @@ async fn authenticate(
         }
         return Ok(Authentication::Unauthenticated);
     };
-    let identity = identity
-        .to_str()
+    let identity = str::from_utf8(identity.as_bytes())
         .expect("unexpected non-ascii characters in x-remote-user-identity");
 
     let name = match headers.get("x-remote-user-name") {
-        Some(name) => name
-            .to_str()
-            .expect("unexpected non-ascii characters in x-remote-user-name"),
+        Some(name) => str::from_utf8(name.as_bytes())
+            .expect("unexpected non-utf8 characters in x-remote-user-name"),
         None => "",
     };
 
