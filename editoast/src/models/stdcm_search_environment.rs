@@ -1,4 +1,5 @@
-use chrono::NaiveDateTime;
+use chrono::DateTime;
+use chrono::Utc;
 use diesel::ExpressionMethods;
 use diesel::QueryDsl;
 use diesel_async::RunQueryDsl;
@@ -28,8 +29,8 @@ pub struct StdcmSearchEnvironment {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub work_schedule_group_id: Option<i64>,
     pub timetable_id: i64,
-    pub search_window_begin: NaiveDateTime,
-    pub search_window_end: NaiveDateTime,
+    pub search_window_begin: DateTime<Utc>,
+    pub search_window_end: DateTime<Utc>,
     #[schema(nullable = false)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub temporary_speed_limit_group_id: Option<i64>,
@@ -65,7 +66,8 @@ impl StdcmSearchEnvironmentChangeset {
 
 #[cfg(test)]
 pub mod tests {
-    use chrono::NaiveDate;
+    use chrono::TimeZone;
+    use chrono::Utc;
     use pretty_assertions::assert_eq;
     use rstest::rstest;
 
@@ -127,11 +129,11 @@ pub mod tests {
             .work_schedule_group_id(Some(work_schedule_group.id))
             .temporary_speed_limit_group_id(Some(temporary_speed_limit_group.id))
             .timetable_id(timetable.id)
-            .search_window_begin(NaiveDate::from_ymd_opt(2024, 1, 1).unwrap().into())
-            .search_window_end(NaiveDate::from_ymd_opt(2024, 1, 15).unwrap().into());
+            .search_window_begin(Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap())
+            .search_window_end(Utc.with_ymd_and_hms(2024, 1, 15, 0, 0, 0).unwrap());
 
-        let begin = NaiveDate::from_ymd_opt(2024, 1, 16).unwrap().into();
-        let end = NaiveDate::from_ymd_opt(2024, 1, 31).unwrap().into();
+        let begin = Utc.with_ymd_and_hms(2024, 1, 16, 0, 0, 0).unwrap();
+        let end = Utc.with_ymd_and_hms(2024, 1, 13, 0, 0, 0).unwrap();
 
         let changeset_2 = changeset_1
             .clone()
@@ -190,16 +192,16 @@ pub mod tests {
             .work_schedule_group_id(Some(work_schedule_group.id))
             .temporary_speed_limit_group_id(Some(temporary_speed_limit_group.id))
             .timetable_id(timetable.id)
-            .search_window_begin(NaiveDate::from_ymd_opt(2024, 1, 1).unwrap().into())
-            .search_window_end(NaiveDate::from_ymd_opt(2024, 1, 15).unwrap().into());
+            .search_window_begin(Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap())
+            .search_window_end(Utc.with_ymd_and_hms(2024, 1, 15, 0, 0, 0).unwrap());
 
         let too_young = too_old
             .clone()
-            .search_window_begin(NaiveDate::from_ymd_opt(2024, 1, 16).unwrap().into())
-            .search_window_end(NaiveDate::from_ymd_opt(2024, 1, 31).unwrap().into());
+            .search_window_begin(Utc.with_ymd_and_hms(2024, 1, 16, 0, 0, 0).unwrap())
+            .search_window_end(Utc.with_ymd_and_hms(2024, 1, 31, 0, 0, 0).unwrap());
 
-        let begin = NaiveDate::from_ymd_opt(2024, 1, 7).unwrap().into();
-        let end = NaiveDate::from_ymd_opt(2024, 1, 31).unwrap().into();
+        let begin = Utc.with_ymd_and_hms(2024, 1, 7, 0, 0, 0).unwrap();
+        let end = Utc.with_ymd_and_hms(2024, 1, 31, 0, 0, 0).unwrap();
 
         let the_best = too_old
             .clone()

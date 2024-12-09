@@ -4,7 +4,8 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::response::Response;
 use axum::Extension;
-use chrono::NaiveDateTime;
+use chrono::DateTime;
+use chrono::Utc;
 use editoast_authz::BuiltinRole;
 use editoast_models::DbConnectionPoolV2;
 use serde::de::Error as SerdeError;
@@ -42,8 +43,8 @@ struct StdcmSearchEnvironmentCreateForm {
     work_schedule_group_id: Option<i64>,
     temporary_speed_limit_group_id: Option<i64>,
     timetable_id: i64,
-    search_window_begin: NaiveDateTime, // TODO: move to DateTime<Utc>
-    search_window_end: NaiveDateTime,
+    search_window_begin: DateTime<Utc>,
+    search_window_end: DateTime<Utc>,
 }
 
 impl<'de> Deserialize<'de> for StdcmSearchEnvironmentCreateForm {
@@ -59,8 +60,8 @@ impl<'de> Deserialize<'de> for StdcmSearchEnvironmentCreateForm {
             work_schedule_group_id: Option<i64>,
             temporary_speed_limit_group_id: Option<i64>,
             timetable_id: i64,
-            search_window_begin: NaiveDateTime,
-            search_window_end: NaiveDateTime,
+            search_window_begin: DateTime<Utc>,
+            search_window_end: DateTime<Utc>,
         }
         let internal = Internal::deserialize(deserializer)?;
 
@@ -156,7 +157,8 @@ async fn retrieve_latest(
 #[cfg(test)]
 pub mod tests {
     use axum::http::StatusCode;
-    use chrono::NaiveDate;
+    use chrono::TimeZone;
+    use chrono::Utc;
     use pretty_assertions::assert_eq;
     use rstest::rstest;
 
@@ -185,8 +187,8 @@ pub mod tests {
             work_schedule_group_id: Some(work_schedule_group.id),
             temporary_speed_limit_group_id: Some(temporary_speed_limit_group.id),
             timetable_id: timetable.id,
-            search_window_begin: NaiveDate::from_ymd_opt(2024, 1, 1).unwrap().into(),
-            search_window_end: NaiveDate::from_ymd_opt(2024, 1, 15).unwrap().into(),
+            search_window_begin: Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap(),
+            search_window_end: Utc.with_ymd_and_hms(2024, 1, 15, 0, 0, 0).unwrap(),
         };
 
         let request = app.post("/stdcm/search_environment").json(&form);
@@ -224,8 +226,8 @@ pub mod tests {
             electrical_profile_set,
         ) = stdcm_search_env_fixtures(&mut pool.get_ok()).await;
 
-        let begin = NaiveDate::from_ymd_opt(2024, 1, 1).unwrap().into();
-        let end = NaiveDate::from_ymd_opt(2024, 1, 15).unwrap().into();
+        let begin = Utc.with_ymd_and_hms(2024, 1, 1, 0, 0, 0).unwrap();
+        let end = Utc.with_ymd_and_hms(2024, 1, 15, 0, 0, 0).unwrap();
 
         let _ = StdcmSearchEnvironment::changeset()
             .infra_id(infra.id)

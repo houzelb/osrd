@@ -8,8 +8,9 @@ use crate::CliError;
 use crate::Exists;
 use crate::Model;
 use crate::Retrieve;
+use chrono::DateTime;
 use chrono::Duration;
-use chrono::NaiveDateTime;
+use chrono::Utc;
 use clap::Args;
 use clap::Subcommand;
 use editoast_models::DbConnection;
@@ -62,10 +63,10 @@ pub struct SetSTDCMSearchEnvFromScenarioArgs {
     pub work_schedule_group_id: Option<i64>,
     /// If omitted, set to the earliest train start time in the timetable
     #[arg(long)]
-    pub search_window_begin: Option<NaiveDateTime>,
+    pub search_window_begin: Option<DateTime<Utc>>,
     /// If omitted, set to the latest train start time in the timetable plus one day
     #[arg(long)]
-    pub search_window_end: Option<NaiveDateTime>,
+    pub search_window_end: Option<DateTime<Utc>>,
 }
 
 async fn set_stdcm_search_env_from_scenario(
@@ -126,10 +127,10 @@ pub struct SetSTDCMSearchEnvFromScratchArgs {
     #[arg(long)]
     /// If omitted, set to the earliest train start time in the timetable
     #[arg(long)]
-    pub search_window_begin: Option<NaiveDateTime>,
+    pub search_window_begin: Option<DateTime<Utc>>,
     /// If omitted, set to the latest train start time in the timetable plus one day
     #[arg(long)]
-    pub search_window_end: Option<NaiveDateTime>,
+    pub search_window_end: Option<DateTime<Utc>>,
 }
 
 async fn set_stdcm_search_env_from_scratch(
@@ -178,10 +179,10 @@ async fn set_stdcm_search_env_from_scratch(
 
 async fn resolve_search_window(
     timetable_id: i64,
-    search_window_begin: Option<NaiveDateTime>,
-    search_window_end: Option<NaiveDateTime>,
+    search_window_begin: Option<DateTime<Utc>>,
+    search_window_end: Option<DateTime<Utc>>,
     conn: &mut DbConnection,
-) -> Result<(NaiveDateTime, NaiveDateTime), Box<dyn Error + Send + Sync>> {
+) -> Result<(DateTime<Utc>, DateTime<Utc>), Box<dyn Error + Send + Sync>> {
     let (begin, end) = if let (Some(begin), Some(end)) = (search_window_begin, search_window_end) {
         (begin, end)
     } else {
@@ -193,8 +194,8 @@ async fn resolve_search_window(
             return Err(Box::new(CliError::new(1, error_msg)));
         };
 
-        let begin = search_window_begin.unwrap_or(min.naive_utc());
-        let end = search_window_end.unwrap_or(max.naive_utc() + Duration::days(1));
+        let begin = search_window_begin.unwrap_or(*min);
+        let end = search_window_end.unwrap_or(*max + Duration::days(1));
         (begin, end)
     };
 
@@ -235,22 +236,23 @@ mod tests {
     };
 
     use super::*;
-    use chrono::NaiveDateTime;
+    use chrono::DateTime;
+    use chrono::Utc;
     use editoast_models::{DbConnection, DbConnectionPoolV2};
     use rstest::rstest;
 
-    fn make_naive_datetime(s: &str) -> NaiveDateTime {
-        NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S").unwrap()
+    fn make_datetime(s: &str) -> DateTime<Utc> {
+        DateTime::parse_from_rfc3339(s).unwrap().to_utc()
     }
 
     async fn create_train_schedules_from_start_times(
-        start_times: Vec<NaiveDateTime>,
+        start_times: Vec<DateTime<Utc>>,
         timetable_id: i64,
         conn: &mut DbConnection,
     ) {
         for start_time in start_times {
             simple_train_schedule_changeset(timetable_id)
-                .start_time(start_time.and_utc())
+                .start_time(start_time)
                 .create(conn)
                 .await
                 .expect("Should be able to create train schedules");
@@ -261,32 +263,32 @@ mod tests {
     #[case::both_none(
         None,
         None,
-        make_naive_datetime("2000-01-01 11:59:59"),
-        make_naive_datetime("2000-02-03 00:00:01")
+        make_datetime("2000-01-01 11:59:59Z"),
+        make_datetime("2000-02-03 00:00:01Z")
     )]
     #[case::begin_none(
         None,
-        Some(make_naive_datetime("2000-02-01 00:00:00")),
-        make_naive_datetime("2000-01-01 11:59:59"),
-        make_naive_datetime("2000-02-01 00:00:00")
+        Some(make_datetime("2000-02-01 00:00:00Z")),
+        make_datetime("2000-01-01 11:59:59Z"),
+        make_datetime("2000-02-01 00:00:00Z")
     )]
     #[case::end_none(
-        Some(make_naive_datetime("2000-02-01 08:00:00")),
+        Some(make_datetime("2000-02-01 08:00:00Z")),
         None,
-        make_naive_datetime("2000-02-01 08:00:00"),
-        make_naive_datetime("2000-02-03 00:00:01")
+        make_datetime("2000-02-01 08:00:00Z"),
+        make_datetime("2000-02-03 00:00:01Z")
     )]
     #[case::both_some(
-        Some(make_naive_datetime("2000-02-01 08:00:00")),
-        Some(make_naive_datetime("2000-05-22 09:00:50")),
-        make_naive_datetime("2000-02-01 08:00:00"),
-        make_naive_datetime("2000-05-22 09:00:50")
+        Some(make_datetime("2000-02-01 08:00:00Z")),
+        Some(make_datetime("2000-05-22 09:00:50Z")),
+        make_datetime("2000-02-01 08:00:00Z"),
+        make_datetime("2000-05-22 09:00:50Z")
     )]
     async fn test_resolve_search_window(
-        #[case] search_window_begin: Option<NaiveDateTime>,
-        #[case] search_window_end: Option<NaiveDateTime>,
-        #[case] expected_begin: NaiveDateTime,
-        #[case] expected_end: NaiveDateTime,
+        #[case] search_window_begin: Option<DateTime<Utc>>,
+        #[case] search_window_end: Option<DateTime<Utc>>,
+        #[case] expected_begin: DateTime<Utc>,
+        #[case] expected_end: DateTime<Utc>,
     ) {
         let db_pool = DbConnectionPoolV2::for_tests();
         let conn = &mut db_pool.get_ok();
@@ -294,12 +296,12 @@ mod tests {
         let timetable = create_timetable(conn).await;
 
         let start_times = vec![
-            make_naive_datetime("2000-01-01 12:00:00"),
-            make_naive_datetime("2000-02-02 00:00:00"),
-            make_naive_datetime("2000-01-01 11:59:59"), // earliest
-            make_naive_datetime("2000-01-15 08:59:59"),
-            make_naive_datetime("2000-02-02 00:00:01"), // latest
-            make_naive_datetime("2000-01-19 17:00:00"),
+            make_datetime("2000-01-01 12:00:00Z"),
+            make_datetime("2000-02-02 00:00:00Z"),
+            make_datetime("2000-01-01 11:59:59Z"), // earliest
+            make_datetime("2000-01-15 08:59:59Z"),
+            make_datetime("2000-02-02 00:00:01Z"), // latest
+            make_datetime("2000-01-19 17:00:00Z"),
         ];
 
         create_train_schedules_from_start_times(start_times, timetable.id, conn).await;
@@ -327,14 +329,14 @@ mod tests {
 
     #[rstest]
     #[case::both_some(
-        Some(make_naive_datetime("2000-02-01 08:00:00")),
-        Some(make_naive_datetime("2000-02-01 00:00:00"))
+        Some(make_datetime("2000-02-01 08:00:00Z")),
+        Some(make_datetime("2000-02-01 00:00:00Z"))
     )]
-    #[case::end_none(Some(make_naive_datetime("2000-03-01 00:00:00")), None)]
-    #[case::begin_none(None, Some(make_naive_datetime("2000-01-01 08:00:00")))]
+    #[case::end_none(Some(make_datetime("2000-03-01 00:00:00Z")), None)]
+    #[case::begin_none(None, Some(make_datetime("2000-01-01 08:00:00Z")))]
     async fn test_resolve_search_window_incompatible_dates(
-        #[case] search_window_begin: Option<NaiveDateTime>,
-        #[case] search_window_end: Option<NaiveDateTime>,
+        #[case] search_window_begin: Option<DateTime<Utc>>,
+        #[case] search_window_end: Option<DateTime<Utc>>,
     ) {
         let db_pool = DbConnectionPoolV2::for_tests();
         let conn = &mut db_pool.get_ok();
@@ -342,8 +344,8 @@ mod tests {
         let timetable = create_timetable(conn).await;
 
         let start_times = vec![
-            make_naive_datetime("2000-01-01 12:00:00"),
-            make_naive_datetime("2000-02-02 00:00:01"),
+            make_datetime("2000-01-01 12:00:00Z"),
+            make_datetime("2000-02-02 00:00:01Z"),
         ];
 
         create_train_schedules_from_start_times(start_times, timetable.id, conn).await;
@@ -366,8 +368,8 @@ mod tests {
         let work_schedule_group = create_work_schedule_group(conn).await;
 
         let start_times = vec![
-            make_naive_datetime("2000-01-01 12:00:00"),
-            make_naive_datetime("2000-02-02 08:00:00"),
+            make_datetime("2000-01-01 12:00:00Z"),
+            make_datetime("2000-02-02 08:00:00Z"),
         ];
 
         create_train_schedules_from_start_times(
@@ -394,11 +396,11 @@ mod tests {
 
         assert_eq!(
             search_env.search_window_begin,
-            make_naive_datetime("2000-01-01 12:00:00")
+            make_datetime("2000-01-01 12:00:00Z")
         );
         assert_eq!(
             search_env.search_window_end,
-            make_naive_datetime("2000-02-03 08:00:00")
+            make_datetime("2000-02-03 08:00:00Z")
         );
     }
 
@@ -413,8 +415,8 @@ mod tests {
         let electrical_profile_set = create_electrical_profile_set(conn).await;
 
         let start_times = vec![
-            make_naive_datetime("2000-01-01 12:00:00"),
-            make_naive_datetime("2000-02-02 08:00:00"),
+            make_datetime("2000-01-01 12:00:00Z"),
+            make_datetime("2000-02-02 08:00:00Z"),
         ];
 
         create_train_schedules_from_start_times(start_times, timetable.id, conn).await;
@@ -438,11 +440,11 @@ mod tests {
 
         assert_eq!(
             search_env.search_window_begin,
-            make_naive_datetime("2000-01-01 12:00:00")
+            make_datetime("2000-01-01 12:00:00Z")
         );
         assert_eq!(
             search_env.search_window_end,
-            make_naive_datetime("2000-02-03 08:00:00")
+            make_datetime("2000-02-03 08:00:00Z")
         );
     }
 }
