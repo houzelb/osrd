@@ -183,7 +183,7 @@ tracing.workspace = true
 tracing-opentelemetry = { version = "0.28.0", default-features = false, features = [
   "tracing-log",
 ] }
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 url.workspace = true
 utoipa.workspace = true
 uuid.workspace = true
