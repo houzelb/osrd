@@ -2,6 +2,8 @@ import { useEffect, useMemo } from 'react';
 
 import { useSelector } from 'react-redux';
 
+import { getEntities } from 'applications/editor/data/api';
+import type { TrackSectionEntity } from 'applications/editor/tools/trackEdition/types';
 import type { StdcmPathProperties, StdcmResponse } from 'applications/stdcm/types';
 import {
   osrdEditoastApi,
@@ -14,6 +16,7 @@ import { formatSuggestedOperationalPoints } from 'modules/pathfinding/utils';
 import useSpeedSpaceChart from 'modules/simulationResult/components/SpeedSpaceChart/useSpeedSpaceChart';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import { getSelectedTrainId } from 'reducers/simulationResults/selectors';
+import { useAppDispatch } from 'store';
 
 import { STDCM_TRAIN_ID } from '../consts';
 
@@ -24,6 +27,7 @@ const useStdcmResults = (
 ) => {
   const infraId = useInfraID();
   const selectedTrainId = useSelector(getSelectedTrainId);
+  const dispatch = useAppDispatch();
 
   const [postPathProperties] =
     osrdEditoastApi.endpoints.postInfraByInfraIdPathProperties.useLazyQuery();
@@ -67,23 +71,52 @@ const useStdcmResults = (
         await postPathProperties(pathPropertiesParams).unwrap();
 
       if (geometry && operational_points && zones) {
-        const operationalPointsWithUniqueIds = operational_points.map((op, index) => ({
-          ...op,
-          id: `${op.id}-${op.position}-${index}`,
-        }));
+        if (infraId) {
+          const trackIds = operational_points.map((op) => op.part.track);
+          const trackSections = await getEntities<TrackSectionEntity>(
+            infraId,
+            trackIds,
+            'TrackSection',
+            dispatch
+          );
+          const operationalPointsWithMetadata = operational_points.map((op) => {
+            const associatedTrackSection = trackSections[op.part.track];
+            const sncf = associatedTrackSection?.properties?.extensions?.sncf;
 
-        const suggestedOperationalPoints: SuggestedOP[] = formatSuggestedOperationalPoints(
-          operational_points,
-          geometry,
-          path.length
-        );
+            const metadata =
+              sncf && Object.values(sncf).every((value) => value !== undefined)
+                ? {
+                    lineCode: sncf.line_code!,
+                    lineName: sncf.line_name!,
+                    trackName: sncf.track_name!,
+                    trackNumber: sncf.track_number!,
+                  }
+                : undefined;
 
-        setPathProperties({
-          manchetteOperationalPoints: operationalPointsWithUniqueIds,
-          geometry,
-          suggestedOperationalPoints,
-          zones,
-        });
+            return {
+              ...op,
+              metadata,
+            };
+          });
+
+          const operationalPointsWithUniqueIds = operational_points.map((op, index) => ({
+            ...op,
+            id: `${op.id}-${op.position}-${index}`,
+          }));
+
+          const suggestedOperationalPoints: SuggestedOP[] = formatSuggestedOperationalPoints(
+            operationalPointsWithMetadata, // Pass the operational points with metadata
+            geometry,
+            path.length
+          );
+
+          setPathProperties({
+            manchetteOperationalPoints: operationalPointsWithUniqueIds,
+            geometry,
+            suggestedOperationalPoints,
+            zones,
+          });
+        }
       }
     };
 

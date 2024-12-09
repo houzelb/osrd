@@ -140,24 +140,6 @@ const styles = {
       color: '#005BC1',
       letterSpacing: '-0.22',
     },
-    rcPersonName: {
-      fontSize: '16',
-      marginLeft: '40',
-      color: '#005BC1',
-      letterSpacing: '-0.2',
-    },
-    rcPhoneNumber: {
-      fontSize: '18',
-      marginTop: '22',
-      marginBottom: '3',
-      color: '#005BC1',
-      letterSpacing: '-0.22',
-    },
-    rcMail: {
-      fontSize: '16',
-      color: '#005BC1',
-      letterSpacing: '-0.2',
-    },
     stdcmApplication: {
       marginTop: '25',
     },
@@ -169,10 +151,6 @@ const styles = {
       fontSize: '24',
       fontWeight: 'semibold',
       marginBottom: '25',
-    },
-    referencePath: {
-      fontSize: '14',
-      color: '#797671',
     },
     pathNumber: {
       fontSize: '24',
@@ -295,11 +273,34 @@ const styles = {
     stopTableChWidth: {
       width: '112',
     },
+    stopForWidth: {
+      width: '112',
+    },
     stopTableEndWidth: {
       width: '118',
     },
     stopTableStartWidth: {
       width: '168',
+    },
+    tolerancesWidth: {
+      width: '25',
+      height: '25',
+      marginLeft: '5',
+      marginBottom: '3',
+    },
+    stopTolerancesView: {
+      width: '168',
+      fontSize: '14',
+      lineHeight: '14',
+      marginLeft: '25',
+    },
+    tolerancesText: {
+      fontSize: '14',
+    },
+    stopForText: {
+      fontSize: '14',
+      fontWeight: 'semibold',
+      textAlign: 'center',
     },
     stopTableStopTypeWidth: {
       width: '216',
@@ -466,7 +467,13 @@ const styles = {
     weightWidth: {
       width: '96',
     },
+    length: {
+      width: '96',
+    },
     refEngineWidth: {
+      width: '145',
+    },
+    stopType: {
       width: '155',
     },
     convSignWidth: {

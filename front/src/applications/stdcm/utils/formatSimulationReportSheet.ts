@@ -1,4 +1,5 @@
 import type { SimulationResponse } from 'common/api/osrdEditoastApi';
+import { matchPathStepAndOp } from 'modules/pathfinding/utils';
 import { interpolateValue } from 'modules/simulationResult/SimulationResultExport/utils';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import type { StdcmPathStep } from 'reducers/osrdconf/types';
@@ -135,6 +136,16 @@ export function getOperationalPointsWithTimes(
     const durationToString = secondsToTimeString(durationInSeconds);
     const stopEndTime = computeStopDepartureTime(formattedTime, durationToString);
 
+    // Find the corresponding stopType from pathSteps
+    const correspondingStep = simulationPathSteps.find(
+      (step) => step.location && matchPathStepAndOp(step.location, op)
+    );
+    let stopType;
+    if (correspondingStep) {
+      stopType = !correspondingStep.isVia ? 'serviceStop' : correspondingStep.stopType;
+    }
+    const stopFor = correspondingStep?.isVia ? correspondingStep.stopFor : undefined;
+
     return {
       opId: op.opId!,
       positionOnPath: op.positionOnPath,
@@ -144,6 +155,8 @@ export function getOperationalPointsWithTimes(
       duration: durationInSeconds,
       stopEndTime,
       trackName: op.metadata?.trackName,
+      stopType,
+      stopFor,
     };
   });
 
