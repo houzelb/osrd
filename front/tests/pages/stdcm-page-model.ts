@@ -308,8 +308,9 @@ class STDCMPage {
     }
   }
 
-  // Verify all input fields are empty
-  async verifyAllFieldsEmpty() {
+  // Verifies all input fields are empty
+  // Except for speedLimitTags, which has a default value of 'MA100'
+  async verifyDefaultFieldsValue() {
     const emptyFields = [
       this.tractionEngineField,
       this.towedRollingStockField,
@@ -322,7 +323,7 @@ class STDCMPage {
       this.destinationChField,
     ];
     for (const field of emptyFields) await expect(field).toHaveValue('');
-    await expect(this.speedLimitTagField).toHaveValue('__PLACEHOLDER__');
+    await expect(this.speedLimitTagField).toHaveValue('MA100');
   }
 
   // Add a via card, verify fields, and delete it

@@ -14,6 +14,7 @@ type SpeedLimitByTagSelectorProps = {
   speedLimitsByTags: string[];
   dispatchUpdateSpeedLimitByTag: (newTag: string | null) => void;
   className?: string;
+  isStdcm?: boolean;
 };
 
 export default function SpeedLimitByTagSelector({
@@ -23,6 +24,7 @@ export default function SpeedLimitByTagSelector({
   speedLimitsByTags,
   dispatchUpdateSpeedLimitByTag,
   className = '',
+  isStdcm = false,
 }: SpeedLimitByTagSelectorProps) {
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
 
@@ -48,7 +50,7 @@ export default function SpeedLimitByTagSelector({
           id="speed-limit-by-tag-selector"
           value={speedLimitByTag || ''}
           label={t('speedLimitByTagAbbrev')}
-          placeholder={t('noSpeedLimitByTag')}
+          placeholder={isStdcm ? undefined : t('noSpeedLimitByTag')}
           onChange={(e) => {
             if (e) {
               dispatchUpdateSpeedLimitByTag(e);

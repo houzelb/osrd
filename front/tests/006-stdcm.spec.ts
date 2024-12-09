@@ -62,7 +62,7 @@ test.describe('Verify train schedule elements and filters', () => {
     // Verify visibility of STDCM elements and handle empty via fields
     const stdcmPage = new STDCMPage(page);
     await stdcmPage.verifyStdcmElementsVisibility();
-    await stdcmPage.verifyAllFieldsEmpty();
+    await stdcmPage.verifyDefaultFieldsValue();
     await stdcmPage.addAndDeleteEmptyVia();
   });
 
@@ -127,7 +127,7 @@ test.describe('Verify train schedule elements and filters', () => {
     // Reset and verify empty fields
     await stdcmPage.startNewQuery();
     // TODO: Uncomment the check when the bug #9533 is fixed
-    // await stdcmPage.verifyAllFieldsEmpty();
+    // await stdcmPage.verifyDefaultFieldsValue();
   });
 
   /** *************** Test 4 **************** */

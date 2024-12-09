@@ -20,5 +20,6 @@ export const COMPOSITION_CODES_MAX_SPEEDS: Record<string, number | undefined> = 
   HLP: 100,
   MVGV: 200,
 };
+export const DEFAULT_COMPOSITION_CODE = 'MA100';
 
 export const COMPOSITION_CODES = Object.keys(COMPOSITION_CODES_MAX_SPEEDS);
