@@ -57,6 +57,7 @@ export type SimulationReportSheetProps = {
   consist: StdcmSimulationInputs['consist'];
   simulationReportSheetNumber: string;
   operationalPointsList: StdcmResultsOperationalPoint[];
+  userName?: string;
 };
 
 export type StdcmResultsOperationalPoint = {
@@ -69,6 +70,7 @@ export type StdcmResultsOperationalPoint = {
   duration: number;
   stopEndTime: string;
   trackName?: string;
+  stopType?: string;
 };
 
 export type ConsistErrors = {

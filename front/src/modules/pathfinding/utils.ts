@@ -17,7 +17,11 @@ import { getPointCoordinates } from 'utils/geometry';
 import getStepLocation from './helpers/getStepLocation';
 
 export const formatSuggestedOperationalPoints = (
-  operationalPoints: NonNullable<Required<PathProperties['operational_points']>>,
+  operationalPoints: Array<
+    NonNullable<Required<PathProperties['operational_points']>>[number] & {
+      metadata?: NonNullable<SuggestedOP['metadata']>;
+    }
+  >,
   geometry: GeoJsonLineString,
   pathLength: number
 ): SuggestedOP[] =>
@@ -32,10 +36,11 @@ export const formatSuggestedOperationalPoints = (
     track: op.part.track,
     positionOnPath: op.position,
     coordinates: getPointCoordinates(geometry, pathLength, op.position),
+    metadata: op?.metadata,
   }));
 
 export const matchPathStepAndOp = (
-  step: PathStep,
+  step: PathItemLocation,
   op: Pick<SuggestedOP, 'opId' | 'uic' | 'ch' | 'trigram' | 'track' | 'offsetOnTrack'>
 ) => {
   if ('operational_point' in step) {
