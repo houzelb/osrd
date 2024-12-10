@@ -15,6 +15,7 @@
   <a href="https://osrd.fr/en/docs/guides/contribute/"><img src="https://img.shields.io/github/contributors-anon/OpenRailAssociation/osrd" alt="Contributors badge" /></a>
   <a href="https://github.com/OpenRailAssociation/osrd/blob/dev/LICENSE"><img src="https://img.shields.io/badge/license-LGPL-blue.svg" alt="LGPL License badge" /></a>
   <a href="https://github.com/OpenRailAssociation/osrd/actions/workflows/build.yml"><img src="https://github.com/OpenRailAssociation/osrd/actions/workflows/build.yml/badge.svg" alt="Build Status" /></a>
+  <a href="https://api.reuse.software/info/github.com/OpenRailAssociation/osrd"><img src="https://api.reuse.software/badge/github.com/OpenRailAssociation/osrd" alt="REUSE status" /></a>
 </p>
 
 ## What is OSRD?
