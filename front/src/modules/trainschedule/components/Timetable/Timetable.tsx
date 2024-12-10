@@ -10,7 +10,10 @@ import type { Conflict, InfraState, TrainScheduleResult } from 'common/api/osrdE
 import i18n from 'i18n';
 import ConflictsList from 'modules/conflict/components/ConflictsList';
 import { updateSelectedTrainId } from 'reducers/simulationResults';
-import { getTrainIdUsedForProjection } from 'reducers/simulationResults/selectors';
+import {
+  getSelectedTrainId,
+  getTrainIdUsedForProjection,
+} from 'reducers/simulationResults/selectors';
 import { useAppDispatch } from 'store';
 
 import TimetableToolbar from './TimetableToolbar';
@@ -20,7 +23,6 @@ import type { TrainScheduleWithDetails } from './types';
 type TimetableProps = {
   setDisplayTrainScheduleManagement: (mode: string) => void;
   infraState: InfraState;
-  selectedTrainId?: number;
   conflicts?: Conflict[];
   upsertTrainSchedules: (trainSchedules: TrainScheduleResult[]) => void;
   setTrainIdToEdit: (trainId?: number) => void;
@@ -36,7 +38,6 @@ const formatDepartureDate = (d: Date) => dayjs(d).locale(i18n.language).format('
 const Timetable = ({
   setDisplayTrainScheduleManagement,
   infraState,
-  selectedTrainId,
   conflicts,
   upsertTrainSchedules,
   removeTrains,
@@ -54,6 +55,7 @@ const Timetable = ({
   const [conflictsListExpanded, setConflictsListExpanded] = useState(false);
   const [selectedTrainIds, setSelectedTrainIds] = useState<number[]>([]);
   const [showTrainDetails, setShowTrainDetails] = useState(false);
+  const selectedTrainId = useSelector(getSelectedTrainId);
   const trainIdUsedForProjection = useSelector(getTrainIdUsedForProjection);
   const dispatch = useAppDispatch();
 

@@ -65,3 +65,7 @@ export const ASPECT_LABELS_COLORS: Record<AspectLabel, string> = {
   '080A': OCCUPANCY_BLOCKS_COLORS.GREY,
   '000': OCCUPANCY_BLOCKS_COLORS.GREY,
 };
+
+export const PATH_COLORS = {
+  HOVERED_PATH: '#6B532E',
+};

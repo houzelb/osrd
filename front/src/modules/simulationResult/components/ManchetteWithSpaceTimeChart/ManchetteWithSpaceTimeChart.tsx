@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, useCallback, useEffect } from 'react';
 
 import { Slider } from '@osrd-project/ui-core';
 import { KebabHorizontal, Iterations } from '@osrd-project/ui-icons';
@@ -16,6 +16,10 @@ import {
   OccupancyBlockLayer,
 } from '@osrd-project/ui-spacetimechart';
 import type { Conflict } from '@osrd-project/ui-spacetimechart';
+import type {
+  SpaceTimeChartProps,
+  HoveredItem,
+} from '@osrd-project/ui-spacetimechart/dist/lib/types';
 import cx from 'classnames';
 import { compact } from 'lodash';
 import { createPortal } from 'react-dom';
@@ -31,8 +35,11 @@ import type {
   LayerRangeData,
   WaypointsPanelData,
 } from 'modules/simulationResult/types';
+import { updateSelectedTrainId } from 'reducers/simulationResults';
+import { useAppDispatch } from 'store';
 
 import SettingsPanel from './SettingsPanel';
+import { getIdFromTrainPath, getPathStyle } from './utils';
 import ManchetteMenuButton from '../SpaceTimeChart/ManchetteMenuButton';
 import ProjectionLoadingMessage from '../SpaceTimeChart/ProjectionLoadingMessage';
 import useWaypointMenu from '../SpaceTimeChart/useWaypointMenu';
@@ -49,7 +56,13 @@ type ManchetteWithSpaceTimeChartProps = {
     totalTrains: number;
     allTrainsProjected: boolean;
   };
+  handleTrainDrag?: (
+    draggedTrainId: number,
+    newDepartureTime: Date,
+    { stopPanning }: { stopPanning: boolean }
+  ) => Promise<void>;
   height?: number;
+  onTrainClick?: (trainId: number) => void;
 };
 
 export const MANCHETTE_WITH_SPACE_TIME_CHART_DEFAULT_HEIGHT = 561;
@@ -65,12 +78,27 @@ const ManchetteWithSpaceTimeChartWrapper = ({
   workSchedules,
   projectionLoaderData: { totalTrains, allTrainsProjected },
   height = MANCHETTE_WITH_SPACE_TIME_CHART_DEFAULT_HEIGHT,
+  handleTrainDrag,
+  onTrainClick,
 }: ManchetteWithSpaceTimeChartProps) => {
+  const dispatch = useAppDispatch();
+
   const manchetteWithSpaceTimeCharWrappertRef = useRef<HTMLDivElement>(null);
   const manchetteWithSpaceTimeChartRef = useRef<HTMLDivElement>(null);
+
+  const [hoveredItem, setHoveredItem] = useState<null | HoveredItem>(null);
+  const [draggingState, setDraggingState] = useState<{
+    draggedTrain: TrainSpaceTimeData;
+    initialDepartureTime: Date;
+  }>();
   const spaceTimeChartRef = useRef<HTMLDivElement>(null);
 
   const [waypointsPanelIsOpen, setWaypointsPanelIsOpen] = useState(false);
+
+  const [tmpSelectedTrain, setTmpSelectedTrain] = useState(selectedTrainScheduleId);
+  useEffect(() => {
+    setTmpSelectedTrain(selectedTrainScheduleId);
+  }, [selectedTrainScheduleId]);
 
   // Cut the space time chart curves if the first or last waypoints are hidden
   const { filteredProjectPathTrainResult: cutProjectedTrains, filteredConflicts: cutConflicts } =
@@ -170,7 +198,7 @@ const ManchetteWithSpaceTimeChartWrapper = ({
       manchetteWaypoints,
       cutProjectedTrains,
       manchetteWithSpaceTimeChartRef,
-      selectedTrainScheduleId,
+      tmpSelectedTrain,
       height,
       spaceTimeChartRef
     );
@@ -193,6 +221,51 @@ const ManchetteWithSpaceTimeChartWrapper = ({
     }));
   });
 
+  const onPanOverloaded: SpaceTimeChartProps['onPan'] = async (payload) => {
+    const { isPanning } = payload;
+
+    if (!handleTrainDrag) {
+      // if no handleTrainDrag, we pan normally
+      spaceTimeChartProps.onPan(payload);
+      return;
+    }
+
+    // if dragging
+    if (draggingState) {
+      const { draggedTrain, initialDepartureTime } = draggingState;
+      dispatch(updateSelectedTrainId(draggedTrain.id));
+
+      const timeDiff = payload.data.time - payload.initialData.time;
+      const newDeparture = new Date(initialDepartureTime.getTime() + timeDiff);
+
+      await handleTrainDrag(draggedTrain.id, newDeparture, { stopPanning: !isPanning });
+
+      // stop dragging if necessary
+      if (!isPanning) {
+        setDraggingState(undefined);
+      }
+      return;
+    }
+
+    // if not dragging, we check if we should start dragging
+    if (hoveredItem && 'pathId' in hoveredItem.element) {
+      const hoveredTrainId = getIdFromTrainPath(hoveredItem.element.pathId);
+      const train = projectPathTrainResult.find((res) => res.id === hoveredTrainId);
+      if (train) {
+        setTmpSelectedTrain(train.id);
+        setDraggingState({
+          draggedTrain: train,
+          initialDepartureTime: train.departureTime,
+        });
+      } else {
+        console.error(`No train found with id ${hoveredTrainId}`);
+      }
+    }
+
+    // if no hovered train, we pan normally
+    spaceTimeChartProps.onPan(payload);
+  };
+
   const waypointMenuData = useWaypointMenu(waypointsPanelData);
 
   const manchettePropsWithWaypointMenu = useMemo(
@@ -210,6 +283,22 @@ const ManchetteWithSpaceTimeChartWrapper = ({
     }),
     [manchetteProps, waypointMenuData]
   );
+
+  const handleHoveredChildUpdate: SpaceTimeChartProps['onHoveredChildUpdate'] = useCallback(
+    ({ item }: { item: HoveredItem | null }) => {
+      setHoveredItem(item);
+    },
+    [setHoveredItem]
+  );
+
+  const handleClick: SpaceTimeChartProps['onClick'] = () => {
+    if (!draggingState && hoveredItem && 'pathId' in hoveredItem.element) {
+      if (selectedTrainScheduleId !== Number(hoveredItem.element.pathId)) {
+        const trainId = getIdFromTrainPath(hoveredItem.element.pathId);
+        onTrainClick?.(trainId);
+      }
+    }
+  };
 
   return (
     <div ref={manchetteWithSpaceTimeCharWrappertRef} className="manchette-space-time-chart-wrapper">
@@ -299,9 +388,16 @@ const ManchetteWithSpaceTimeChartWrapper = ({
             }
             timeOrigin={Math.min(...projectPathTrainResult.map((p) => +p.departureTime))}
             {...spaceTimeChartProps}
+            onPan={onPanOverloaded}
+            onClick={handleClick}
+            onHoveredChildUpdate={handleHoveredChildUpdate}
           >
             {spaceTimeChartProps.paths.map((path) => (
-              <PathLayer key={path.id} path={path} color={path.color} />
+              <PathLayer
+                key={path.id}
+                path={path}
+                {...getPathStyle(hoveredItem, path, !!draggingState)}
+              />
             ))}
             {workSchedules && (
               <WorkScheduleLayer

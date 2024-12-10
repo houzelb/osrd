@@ -23,6 +23,7 @@ const formatTrainScheduleSummaries = (
 
   const trainScheduleWithDetails = relevantTrainSchedules.map((trainSchedule) => {
     const rollingStock = rollingStocks.find((rs) => rs.name === trainSchedule.rolling_stock_name);
+
     const trainSummary = rawSummaries[trainSchedule.id];
 
     if (!trainSummary) return null;
