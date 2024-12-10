@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from '@osrd-project/ui-icons';
 import cx from 'classnames';
 import { useTranslation } from 'react-i18next';
 
-import type { Conflict } from 'common/api/osrdEditoastApi';
+import { type Conflict } from 'common/api/osrdEditoastApi';
 import SimulationWarpedMap from 'common/Map/WarpedMap/SimulationWarpedMap';
 import ResizableSection from 'common/ResizableSection';
 import ManchetteWithSpaceTimeChartWrapper, {
@@ -22,10 +22,12 @@ import type { ProjectionData } from 'modules/simulationResult/types';
 import TimesStopsOutput from 'modules/timesStops/TimesStopsOutput';
 import type { TrainScheduleWithDetails } from 'modules/trainschedule/components/Timetable/types';
 import { updateViewport, type Viewport } from 'reducers/map';
+import { updateSelectedTrainId } from 'reducers/simulationResults';
 import { useAppDispatch } from 'store';
 import { getPointCoordinates } from 'utils/geometry';
 
 import useSimulationResults from '../hooks/useSimulationResults';
+import type { TrainSpaceTimeData } from '../types';
 
 const SPEED_SPACE_CHART_HEIGHT = 521.5;
 const HANDLE_TAB_RESIZE_HEIGHT = 20;
@@ -36,8 +38,9 @@ type SimulationResultsProps = {
   collapsedTimetable: boolean;
   infraId?: number;
   projectionData?: ProjectionData;
-  selectedTrainSummary?: TrainScheduleWithDetails;
+  trainScheduleSummaries?: TrainScheduleWithDetails[];
   conflicts?: Conflict[];
+  updateTrainDepartureTime: (trainId: number, newDepartureTime: Date) => void;
 };
 
 const SimulationResults = ({
@@ -45,8 +48,9 @@ const SimulationResults = ({
   collapsedTimetable,
   infraId,
   projectionData,
-  selectedTrainSummary,
+  trainScheduleSummaries,
   conflicts = [],
+  updateTrainDepartureTime,
 }: SimulationResultsProps) => {
   const { t } = useTranslation('simulation');
   const dispatch = useAppDispatch();
@@ -77,8 +81,15 @@ const SimulationResults = ({
     pathProperties
   );
 
-  // Compute path items coordinates in order to place them on the map
+  const [projectPathTrainResult, setProjectPathTrainResult] = useState<TrainSpaceTimeData[]>([]);
 
+  useEffect(() => {
+    if (projectionData?.projectedTrains) {
+      setProjectPathTrainResult(projectionData?.projectedTrains || []);
+    }
+  }, [projectionData]);
+
+  // Compute path items coordinates in order to place them on the map
   const pathItemsCoordinates =
     path &&
     pathProperties &&
@@ -105,6 +116,30 @@ const SimulationResults = ({
   );
 
   const conflictZones = useProjectedConflicts(infraId, conflicts, projectionData?.path);
+
+  const selectedTrainSummary = useMemo(
+    () => trainScheduleSummaries?.find((train) => train.id === selectedTrainSchedule?.id),
+    [trainScheduleSummaries, selectedTrainSchedule]
+  );
+
+  const handleTrainDrag = async (
+    draggedTrainId: number,
+    newDepartureTime: Date,
+    { stopPanning }: { stopPanning: boolean }
+  ) => {
+    if (stopPanning) {
+      // update in the database
+      dispatch(updateSelectedTrainId(draggedTrainId));
+      updateTrainDepartureTime(draggedTrainId, newDepartureTime);
+    } else {
+      // update in the state
+      setProjectPathTrainResult(
+        projectPathTrainResult.map((train) =>
+          train.id === draggedTrainId ? { ...train, departureTime: newDepartureTime } : train
+        )
+      );
+    }
+  };
 
   useEffect(() => {
     if (extViewport !== undefined) {
@@ -170,7 +205,7 @@ const SimulationResults = ({
                 <div className="chart-container">
                   <ManchetteWithSpaceTimeChartWrapper
                     operationalPoints={projectedOperationalPoints}
-                    projectPathTrainResult={projectionData?.projectedTrains}
+                    projectPathTrainResult={projectPathTrainResult}
                     selectedTrainScheduleId={selectedTrainSchedule?.id}
                     waypointsPanelData={{
                       filteredWaypoints: filteredOperationalPoints,
@@ -180,6 +215,8 @@ const SimulationResults = ({
                     conflicts={conflictZones}
                     projectionLoaderData={projectionData.projectionLoaderData}
                     height={manchetteWithSpaceTimeChartHeight - MANCHETTE_HEIGHT_DIFF}
+                    handleTrainDrag={handleTrainDrag}
+                    onTrainClick={(trainId) => dispatch(updateSelectedTrainId(trainId))}
                   />
                 </div>
               </div>

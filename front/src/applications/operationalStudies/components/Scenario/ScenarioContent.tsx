@@ -18,12 +18,12 @@ import useScenarioData from 'applications/operationalStudies/hooks/useScenarioDa
 import ImportTrainSchedule from 'applications/operationalStudies/views/ImportTrainSchedule';
 import ManageTrainSchedule from 'applications/operationalStudies/views/ManageTrainSchedule';
 import SimulationResults from 'applications/operationalStudies/views/SimulationResults';
-import {
-  osrdEditoastApi,
-  type InfraWithState,
-  type ScenarioResponse,
-  type TimetableDetailedResult,
-  type TrainScheduleResult,
+import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
+import type {
+  InfraWithState,
+  ScenarioResponse,
+  TimetableDetailedResult,
+  TrainScheduleResult,
 } from 'common/api/osrdEditoastApi';
 import ScenarioLoaderMessage from 'modules/scenario/components/ScenarioLoaderMessage';
 import TimetableManageTrainSchedule from 'modules/trainschedule/components/ManageTrainSchedule/TimetableManageTrainSchedule';
@@ -56,14 +56,13 @@ const ScenarioContent = ({
   const [trainIdToEdit, setTrainIdToEdit] = useState<number>();
   const [isMacro, setIsMacro] = useState(false);
   const {
-    selectedTrainId,
-    selectedTrainSummary,
     trainScheduleSummaries,
     trainSchedules,
     projectionData,
     conflicts,
     upsertTrainSchedules,
     removeTrains,
+    updateTrainDepartureTime,
   } = useScenarioData(scenario, timetable, infra);
   const macroEditorState = useRef<MacroEditorState>();
   const [ngeDto, setNgeDto] = useState<NetzgrafikDto>();
@@ -161,7 +160,6 @@ const ScenarioContent = ({
                 <Timetable
                   setDisplayTrainScheduleManagement={setDisplayTrainScheduleManagement}
                   infraState={infra.state}
-                  selectedTrainId={selectedTrainId}
                   conflicts={conflicts}
                   upsertTrainSchedules={upsertTrainSchedules}
                   removeTrains={removeTrains}
@@ -230,7 +228,8 @@ const ScenarioContent = ({
                   projectionData={projectionData}
                   infraId={infra.id}
                   conflicts={conflicts}
-                  selectedTrainSummary={selectedTrainSummary}
+                  trainScheduleSummaries={trainScheduleSummaries}
+                  updateTrainDepartureTime={updateTrainDepartureTime}
                 />
               )
             )}

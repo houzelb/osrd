@@ -10,37 +10,33 @@ import {
   type TimetableDetailedResult,
   type TrainScheduleResult,
 } from 'common/api/osrdEditoastApi';
-import { setFailure } from 'reducers/main';
-import {
-  getSelectedTrainId,
-  getTrainIdUsedForProjection,
-} from 'reducers/simulationResults/selectors';
-import { useAppDispatch } from 'store';
-import { castErrorToFailure } from 'utils/error';
+import { useOsrdConfSelectors } from 'common/osrdContext';
+import { getTrainIdUsedForProjection } from 'reducers/simulationResults/selectors';
 import { mapBy } from 'utils/types';
 
 import useAutoUpdateProjection from './useAutoUpdateProjection';
 import useLazyLoadTrains from './useLazyLoadTrains';
 import usePathProjection from './usePathProjection';
+import formatTrainScheduleSummaries from '../helpers/formatTrainScheduleSummaries';
 
 const useScenarioData = (
   scenario: ScenarioResponse,
   timetable: TimetableDetailedResult,
   infra: InfraWithState
 ) => {
-  const dispatch = useAppDispatch();
+  const { getElectricalProfileSetId } = useOsrdConfSelectors();
+  const electricalProfileSetId = useSelector(getElectricalProfileSetId);
   const trainIdUsedForProjection = useSelector(getTrainIdUsedForProjection);
-  const selectedTrainId = useSelector(getSelectedTrainId);
 
   const [trainSchedules, setTrainSchedules] = useState<TrainScheduleResult[]>();
   const [trainIdsToFetch, setTrainIdsToFetch] = useState<number[]>();
 
-  const { data: rawTrainSchedules, error: fetchTrainSchedulesError } =
-    osrdEditoastApi.endpoints.postTrainSchedule.useQuery({
-      body: {
-        ids: timetable.train_ids,
-      },
-    });
+  const [fetchTrainSchedules] = osrdEditoastApi.endpoints.postTrainSchedule.useLazyQuery();
+  const [putTrainScheduleById] = osrdEditoastApi.endpoints.putTrainScheduleById.useMutation();
+  const [postTrainScheduleSimulationSummary] =
+    osrdEditoastApi.endpoints.postTrainScheduleSimulationSummary.useLazyQuery();
+  const { data: { results: rollingStocks } = { results: null } } =
+    osrdEditoastApi.endpoints.getLightRollingStock.useQuery({ pageSize: 1000 });
 
   const projectionPath = usePathProjection(infra);
 
@@ -59,15 +55,16 @@ const useScenarioData = (
     trainSchedules,
   });
 
-  const { data: conflicts } = osrdEditoastApi.endpoints.getTimetableByIdConflicts.useQuery(
-    {
-      id: scenario.timetable_id,
-      infraId: scenario.infra_id,
-    },
-    {
-      skip: !allTrainsLoaded,
-    }
-  );
+  const { data: conflicts, refetch: refetchConflicts } =
+    osrdEditoastApi.endpoints.getTimetableByIdConflicts.useQuery(
+      {
+        id: scenario.timetable_id,
+        infraId: scenario.infra_id,
+      },
+      {
+        skip: !allTrainsLoaded,
+      }
+    );
 
   const trainScheduleSummaries = useMemo(
     () => sortBy(Array.from(trainScheduleSummariesById.values()), 'startTime'),
@@ -87,13 +84,18 @@ const useScenarioData = (
   useAutoUpdateProjection(infra, timetable.train_ids, trainScheduleSummaries);
 
   useEffect(() => {
-    if (!rawTrainSchedules) {
-      setTrainSchedules(undefined);
-    } else {
+    const fetchTrains = async () => {
+      const rawTrainSchedules = await fetchTrainSchedules({
+        body: {
+          ids: timetable.train_ids,
+        },
+      }).unwrap();
       const sortedTrainSchedules = sortBy(rawTrainSchedules, 'start_time');
       setTrainSchedules(sortedTrainSchedules);
-    }
-  }, [rawTrainSchedules]);
+    };
+
+    fetchTrains();
+  }, []);
 
   // first load of the trainScheduleSummaries
   useEffect(() => {
@@ -103,29 +105,22 @@ const useScenarioData = (
     }
   }, [trainSchedules, infra.state]);
 
-  useEffect(() => {
-    if (fetchTrainSchedulesError) {
-      dispatch(setFailure(castErrorToFailure(fetchTrainSchedulesError)));
-    }
-  }, [fetchTrainSchedulesError]);
-
   const upsertTrainSchedules = useCallback(
     (trainSchedulesToUpsert: TrainScheduleResult[]) => {
-      setTrainSchedules((prev) => {
-        const newTrainSchedulesById = {
-          ...keyBy(prev, 'id'),
-          ...keyBy(trainSchedulesToUpsert, 'id'),
-        };
-        const newTrainSchedules = sortBy(Object.values(newTrainSchedulesById), 'start_time');
-        return newTrainSchedules;
-      });
-
       setProjectedTrainsById((prev) => {
         const newProjectedTrainsById = new Map(prev);
         trainSchedulesToUpsert.forEach((trainSchedule) => {
           newProjectedTrainsById.delete(trainSchedule.id);
         });
         return newProjectedTrainsById;
+      });
+
+      setTrainSchedules((prev) => {
+        const newTrainSchedulesById = {
+          ...keyBy(prev, 'id'),
+          ...keyBy(trainSchedulesToUpsert, 'id'),
+        };
+        return sortBy(Object.values(newTrainSchedulesById), 'start_time');
       });
 
       const sortedTrainSchedulesToUpsert = sortBy(trainSchedulesToUpsert, 'start_time');
@@ -160,29 +155,103 @@ const useScenarioData = (
     });
   }, []);
 
-  return {
-    selectedTrainId,
-    selectedTrainSummary: selectedTrainId
-      ? trainScheduleSummariesById.get(selectedTrainId)
-      : undefined,
-    trainScheduleSummaries,
-    trainSchedules,
-    projectionData:
-      trainScheduleUsedForProjection && projectionPath
-        ? {
-            trainSchedule: trainScheduleUsedForProjection,
-            ...projectionPath,
-            projectedTrains,
-            projectionLoaderData: {
-              allTrainsProjected,
-              totalTrains: timetable.train_ids.length,
-            },
-          }
-        : undefined,
-    conflicts,
-    removeTrains,
-    upsertTrainSchedules,
-  };
+  /** Update only depature time of a train */
+  const updateTrainDepartureTime = useCallback(
+    async (trainId: number, newDeparture: Date) => {
+      const trainSchedule = trainSchedules?.find((train) => train.id === trainId);
+
+      if (!trainSchedule) {
+        throw new Error('Train non trouvé');
+      }
+
+      const trainScheduleResult = await putTrainScheduleById({
+        id: trainId,
+        trainScheduleForm: {
+          ...trainSchedule,
+          start_time: newDeparture.toISOString(),
+        },
+      }).unwrap();
+
+      setProjectedTrainsById((prev) => {
+        const newProjectedTrainsById = new Map(prev);
+        newProjectedTrainsById.set(trainScheduleResult.id, {
+          ...newProjectedTrainsById.get(trainScheduleResult.id)!,
+          departureTime: newDeparture,
+        });
+        return newProjectedTrainsById;
+      });
+
+      setTrainSchedules((prev) => {
+        const newTrainSchedulesById = {
+          ...keyBy(prev, 'id'),
+          ...keyBy([trainScheduleResult], 'id'),
+        };
+        return sortBy(Object.values(newTrainSchedulesById), 'start_time');
+      });
+
+      // update its summary
+      const rawSummaries = await postTrainScheduleSimulationSummary({
+        body: {
+          infra_id: scenario.infra_id,
+          ids: [trainId],
+          electrical_profile_set_id: electricalProfileSetId,
+        },
+      }).unwrap();
+      const summaries = formatTrainScheduleSummaries(
+        [trainId],
+        rawSummaries,
+        mapBy([trainScheduleResult], 'id'),
+        rollingStocks!
+      );
+      setTrainScheduleSummariesById((prev) => {
+        const newTrainScheduleSummariesById = new Map(prev);
+        newTrainScheduleSummariesById.set(trainId, summaries.get(trainId)!);
+        return newTrainScheduleSummariesById;
+      });
+
+      // fetch conflicts
+      refetchConflicts();
+    },
+    [trainSchedules, rollingStocks]
+  );
+
+  const results = useMemo(
+    () => ({
+      trainScheduleSummaries,
+      trainSchedules,
+      projectionData:
+        trainScheduleUsedForProjection && projectionPath
+          ? {
+              trainSchedule: trainScheduleUsedForProjection,
+              ...projectionPath,
+              projectedTrains,
+              projectionLoaderData: {
+                allTrainsProjected,
+                totalTrains: timetable.train_ids.length,
+              },
+            }
+          : undefined,
+      conflicts,
+      removeTrains,
+      upsertTrainSchedules,
+      updateTrainDepartureTime,
+    }),
+    [
+      trainScheduleSummaries,
+      trainSchedules,
+      trainScheduleUsedForProjection,
+      projectionPath,
+      projectedTrains,
+      allTrainsProjected,
+      timetable.train_ids.length,
+      conflicts,
+      removeTrains,
+      upsertTrainSchedules,
+      updateTrainDepartureTime,
+    ]
+  );
+
+  return results;
 };
 
 export default useScenarioData;

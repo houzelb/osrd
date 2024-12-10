@@ -9,10 +9,11 @@ type ReadOnlyTimeProps = CellProps<TimeExtraDays | undefined, string>;
 
 const ReadOnlyTime = ({ rowData }: ReadOnlyTimeProps) => {
   const { time, daySinceDeparture, dayDisplayed } = rowData || {};
+  const { t } = useTranslation('timesStops');
+
   if (!time) {
     return null;
   }
-  const { t } = useTranslation('timesStops');
   const fullString =
     daySinceDeparture !== undefined && dayDisplayed
       ? `${time}${NO_BREAK_SPACE}${t('dayCounter', { count: daySinceDeparture })}`
