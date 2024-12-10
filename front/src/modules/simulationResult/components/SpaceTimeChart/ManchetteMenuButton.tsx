@@ -32,7 +32,7 @@ const ManchetteMenuButton = ({ setWaypointsPanelIsOpen }: ManchetteMenuButtonPro
     },
   ];
 
-  useModalFocusTrap(menuRef, closeMenu);
+  useModalFocusTrap(menuRef, closeMenu, { focusOnFirstElement: true });
 
   useEffect(() => {
     // TODO : refacto useOutsideClick to accept a list of refs and use the hook here
