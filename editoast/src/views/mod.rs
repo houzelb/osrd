@@ -203,7 +203,7 @@ async fn authenticate(
         return Ok(Authentication::Unauthenticated);
     };
     let identity = str::from_utf8(identity.as_bytes())
-        .expect("unexpected non-ascii characters in x-remote-user-identity");
+        .expect("unexpected non-utf8 characters in x-remote-user-identity");
 
     let name = match headers.get("x-remote-user-name") {
         Some(name) => str::from_utf8(name.as_bytes())
