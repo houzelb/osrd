@@ -33,10 +33,6 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      minor-and-patch:
-        update-types:
-          - "minor"
-          - "patch"
       nivo:
         patterns:
           - "@nivo/*"
@@ -50,6 +46,9 @@ updates:
         patterns:
           - "vitest"
           - "@vitest/*"
+      patch:
+        update-types:
+          - "patch"
     commit-message:
       prefix: "front:"
     open-pull-requests-limit: 100
