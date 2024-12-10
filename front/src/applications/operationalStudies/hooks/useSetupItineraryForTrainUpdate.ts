@@ -13,7 +13,7 @@ import {
 } from 'common/api/osrdEditoastApi';
 import { useOsrdConfActions } from 'common/osrdContext';
 import buildOpSearchQuery from 'modules/operationalPoint/helpers/buildOpSearchQuery';
-import { formatSuggestedOperationalPoints, matchPathStepAndOp } from 'modules/pathfinding/utils';
+import { formatSuggestedOperationalPoints } from 'modules/pathfinding/utils';
 import { getSupportedElectrification, isThermal } from 'modules/rollingStock/helpers/electric';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import computeBasePathStep from 'modules/trainschedule/helpers/computeBasePathStep';
@@ -39,8 +39,8 @@ export function updatePathStepsFromOperationalPoints(
   stepsCoordinates: Position[]
 ) {
   const updatedPathSteps: PathStep[] = pathSteps.map((step, i) => {
-    const correspondingOp = suggestedOperationalPoints.find((suggestedOp) =>
-      matchPathStepAndOp(step, suggestedOp)
+    const correspondingOp = suggestedOperationalPoints.find(
+      (suggestedOp) => step.id === suggestedOp.pathStepId
     );
 
     const { kp, name } = correspondingOp || step;

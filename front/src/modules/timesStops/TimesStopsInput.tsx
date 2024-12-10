@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 
 import { useScenarioContext } from 'applications/operationalStudies/hooks/useScenarioContext';
 import { useOsrdConfActions } from 'common/osrdContext';
-import { isVia, matchPathStepAndOp } from 'modules/pathfinding/utils';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import type { OperationalStudiesConfSliceActions } from 'reducers/osrdconf/operationalStudiesConf';
 import type { PathStep } from 'reducers/osrdconf/types';
@@ -43,7 +42,7 @@ const createClearViaButton = ({
     pathStepsAndSuggestedOPs &&
     rowIndex > 0 &&
     rowIndex < pathStepsAndSuggestedOPs.length - 1 &&
-    isVia(pathSteps || [], rowData, { withKP: true }) &&
+    pathSteps.find((step) => step.id === rowData.pathStepId) &&
     (!isNil(rowData.stopFor) ||
       rowData.theoreticalMargin !== undefined ||
       rowData.arrival !== undefined ||
@@ -78,9 +77,7 @@ const TimesStopsInput = ({
   const { getTrackSectionsByIds, trackSectionsLoading } = useScenarioContext();
 
   const clearPathStep = (rowData: TimesStopsInputRow) => {
-    const index = pathSteps.findIndex(
-      (step) => matchPathStepAndOp(step, rowData) && step.positionOnPath === rowData.positionOnPath
-    );
+    const index = pathSteps.findIndex((step) => step.id === rowData.pathStepId);
 
     const updatedPathSteps = pathSteps.map((step, i) => {
       if (i === index) {

@@ -4,7 +4,6 @@ import nextId from 'react-id-generator';
 
 import { calculateDistanceAlongTrack } from 'applications/editor/tools/utils';
 import type { ManageTrainSchedulePathProperties } from 'applications/operationalStudies/types';
-import { pathStepMatchesOp } from 'modules/pathfinding/utils';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import { addElementAtIndex } from 'utils/array';
 
@@ -76,7 +75,7 @@ export function upsertPathStep(statePathSteps: (PathStep | null)[], op: Suggeste
         }),
   };
 
-  const stepIndex = cleanPathSteps.findIndex((step) => pathStepMatchesOp(step, op));
+  const stepIndex = cleanPathSteps.findIndex((step) => step.id === op.pathStepId);
   if (stepIndex >= 0) {
     // Because of import issues, there can be multiple ops with same position on path
     // To avoid updating the wrong one, we need to find the one that matches the payload
