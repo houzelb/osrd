@@ -35,7 +35,9 @@ const useProjectedConflicts = (
   }, [path]);
 
   const conflictReqsByZone = useMemo(() => {
-    const reqs = conflicts.flatMap((conflict) => conflict.requirements);
+    const reqs = conflicts.flatMap((conflict) =>
+      conflict.requirements.map((req) => ({ ...req, conflict }))
+    );
     return new Map(reqs.map((req) => [req.zone, req]));
   }, [conflicts]);
 
@@ -57,6 +59,7 @@ const useProjectedConflicts = (
           timeEnd: +new Date(req.end_time),
           spaceStart: boundaries[index],
           spaceEnd: boundaries[index + 1],
+          conflict: req.conflict,
         },
       ];
     });
