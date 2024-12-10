@@ -25,7 +25,7 @@ edition = "2021"
 license = "LGPL-3.0"
 
 [workspace.dependencies]
-chrono = { version = "0.4.38", default-features = false, features = ["serde"] }
+chrono = { version = "0.4.39", default-features = false, features = ["serde"] }
 derivative = "2.2.0"
 diesel = { version = "2.2", default-features = false, features = [
   "32-column-tables",
