@@ -14,7 +14,7 @@ type SimulationSummaryResultSuccess = Extract<SimulationSummaryResult, { status:
 
 export type TrainScheduleWithDetails = Omit<
   TrainScheduleResult,
-  'train_name' | 'rolling_stock_name' | 'timetable_id'
+  'train_name' | 'rolling_stock_name' | 'timetable_id' | 'start_time'
 > & {
   id: number;
   trainName: string;
