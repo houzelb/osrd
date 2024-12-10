@@ -4,6 +4,10 @@
   & > .tooltip {
     position: absolute;
 
+    .tooltip-inner {
+      font-family: 'IBM Plex Sans';
+    }
+
     // Layout
     &.bs-tooltip-left,
     &.bs-tooltip-right,
