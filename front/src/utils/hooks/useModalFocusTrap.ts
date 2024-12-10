@@ -6,7 +6,8 @@ import { useEffect } from 'react';
 
 export default function useModalFocusTrap(
   modalRef: React.RefObject<HTMLDivElement | HTMLDialogElement>,
-  closeModal: () => void
+  closeModal: () => void,
+  { focusOnFirstElement = false } = {}
 ) {
   useEffect(() => {
     const modalElement = modalRef.current;
@@ -16,8 +17,10 @@ export default function useModalFocusTrap(
       'input, button, [tabindex]:not([tabindex="-1"])'
     );
 
-    const firstElement = focusableElements?.[0];
-    const lastElement = focusableElements?.[focusableElements?.length - 1];
+    const firstElement = focusableElements?.[0] as HTMLElement;
+    const lastElement = focusableElements?.[focusableElements?.length - 1] as HTMLElement;
+
+    if (focusOnFirstElement) firstElement?.focus();
 
     /**
      *
@@ -30,10 +33,10 @@ export default function useModalFocusTrap(
       if (keyboardEvent.key === 'Tab') {
         if (keyboardEvent.shiftKey && document.activeElement === firstElement) {
           keyboardEvent.preventDefault();
-          (lastElement as HTMLElement).focus();
+          lastElement.focus();
         } else if (!keyboardEvent.shiftKey && document.activeElement === lastElement) {
           event.preventDefault();
-          (firstElement as HTMLElement).focus();
+          firstElement.focus();
         }
       }
     };
@@ -45,12 +48,12 @@ export default function useModalFocusTrap(
       }
     };
 
-    modalElement?.addEventListener('keydown', handleTabKeyPress);
-    modalElement?.addEventListener('keydown', handleEscapeKeyPress);
+    document.addEventListener('keydown', handleTabKeyPress);
+    document.addEventListener('keydown', handleEscapeKeyPress);
 
     return () => {
-      modalElement?.removeEventListener('keydown', handleTabKeyPress);
-      modalElement?.removeEventListener('keydown', handleEscapeKeyPress);
+      document.removeEventListener('keydown', handleTabKeyPress);
+      document.removeEventListener('keydown', handleEscapeKeyPress);
     };
   }, [modalRef, closeModal]);
 }
