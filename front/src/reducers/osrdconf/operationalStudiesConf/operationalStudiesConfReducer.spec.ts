@@ -34,7 +34,6 @@ describe('simulationConfReducer', () => {
       id: 1,
       trainName: 'train1',
       constraint_distribution: 'MARECO',
-      start_time: '2021-01-01T00:00:00Z',
       rollingStock: { id: 1, name: 'rollingStock1' } as LightRollingStockWithLiveries,
       path: [
         { id: 'id1', uic: 123 },
