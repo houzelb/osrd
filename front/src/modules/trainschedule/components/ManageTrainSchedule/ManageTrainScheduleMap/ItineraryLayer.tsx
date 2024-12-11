@@ -1,9 +1,7 @@
 import { Source } from 'react-map-gl/maplibre';
-import { useSelector } from 'react-redux';
 
 import type { GeoJsonLineString } from 'common/api/osrdEditoastApi';
 import OrderedLayer from 'common/Map/Layers/OrderedLayer';
-import { useOsrdConfSelectors } from 'common/osrdContext';
 
 type ItineraryLayerProps = {
   layerOrder: number;
@@ -24,10 +22,7 @@ export default function ItineraryLayer({
   showStdcmAssets,
   isFeasible,
 }: ItineraryLayerProps) {
-  const { getOrigin, getDestination } = useOsrdConfSelectors();
-  const origin = useSelector(getOrigin);
-  const destination = useSelector(getDestination);
-  if (geometry && origin && destination) {
+  if (geometry) {
     const lineWidth = showStdcmAssets ? 3 : 5;
 
     let lineColor = FEASIBLE_COLOR;
