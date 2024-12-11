@@ -63,7 +63,6 @@ const FREIGHT_ROLLING_STOCKS = [
   '67300AG',
   '68000B',
   '71000A',
-  '72000TGV',
   '72001BG',
   '7200GS',
   '7200PH',
