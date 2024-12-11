@@ -31,8 +31,8 @@ const StdcmDestination = ({ disabled = false }: StdcmConfigCardProps) => {
         ? extractDateAndTimefromISO(destination.arrival)
         : undefined,
       destinationToleranceValues: {
-        arrivalToleranceBefore: destination.tolerances!.before,
-        arrivalToleranceAfter: destination.tolerances!.after,
+        arrivalToleranceBefore: destination.tolerances?.before || 0,
+        arrivalToleranceAfter: destination.tolerances?.after || 0,
       },
     }),
     [destination]

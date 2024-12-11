@@ -28,8 +28,8 @@ const StdcmOrigin = ({ disabled = false }: StdcmConfigCardProps) => {
     () => ({
       originArrival: origin.arrival ? extractDateAndTimefromISO(origin.arrival) : undefined,
       originToleranceValues: {
-        arrivalToleranceBefore: origin.tolerances!.before,
-        arrivalToleranceAfter: origin.tolerances!.after,
+        arrivalToleranceBefore: origin.tolerances?.before || 0,
+        arrivalToleranceAfter: origin.tolerances?.after || 0,
       },
     }),
     [origin]
