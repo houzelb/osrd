@@ -13,7 +13,7 @@ import type {
 } from 'common/api/osrdEditoastApi';
 import type { SpeedSpaceChartData } from 'modules/simulationResult/types';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
-import type { PathStep } from 'reducers/osrdconf/types';
+import type { PathStep, StdcmPathStep } from 'reducers/osrdconf/types';
 import type { ValueOf } from 'utils/types';
 
 export type StdcmRequestStatus = ValueOf<typeof STDCM_REQUEST_STATUS>;
@@ -109,7 +109,7 @@ export type AllowanceValue =
 export type StdcmSimulationInputs = {
   departureDate?: string;
   departureTime?: string;
-  pathSteps: (PathStep | null)[];
+  pathSteps: StdcmPathStep[];
   consist?: {
     tractionEngine?: RollingStockWithLiveries;
     towedRollingStock?: TowedRollingStock;

@@ -39,7 +39,6 @@ const testDataBuilder = {
 };
 
 const pathSteps = testDataBuilder.buildPathSteps();
-const [brest, rennes, lemans, paris] = pathSteps;
 const stdcmPathSteps = pathSteps.map(
   (step, index) =>
     ({
@@ -55,10 +54,10 @@ const stdcmPathSteps = pathSteps.map(
           }),
     }) as StdcmPathStep
 );
+const [_brest, rennes, _lemans, paris] = stdcmPathSteps;
 
 const initialStateSTDCMConfig = {
   rollingStockID: 10,
-  pathSteps: [paris, lemans, rennes, brest],
   speedLimitByTag: 'init-tag',
   stdcmPathSteps,
 };
@@ -101,14 +100,14 @@ describe('stdcmConfReducers', () => {
     store.dispatch(
       stdcmConfSliceActions.updateStdcmConfigWithData({
         rollingStockID: 20,
-        pathSteps: [paris, rennes],
+        stdcmPathSteps: [paris, rennes],
         speedLimitByTag: 'new-tag',
       })
     );
 
     const state = store.getState()[stdcmConfSlice.name];
     expect(state.rollingStockID).toBe(20);
-    expect(state.pathSteps).toEqual([paris, rennes]);
+    expect(state.stdcmPathSteps).toEqual([paris, rennes]);
     expect(state.speedLimitByTag).toBe('new-tag');
   });
 

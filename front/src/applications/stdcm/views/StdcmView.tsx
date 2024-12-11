@@ -81,7 +81,7 @@ const StdcmView = () => {
           totalMass: consist?.totalMass,
           maxSpeed: consist?.maxSpeed,
           speedLimitByTag: consist?.speedLimitByTag,
-          pathSteps: [...pathSteps],
+          stdcmPathSteps: pathSteps,
         })
       );
     }
