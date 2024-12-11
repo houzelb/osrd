@@ -90,7 +90,7 @@ export const stdcmConfSlice = createSlice({
           OsrdStdcmConfState,
           | 'rollingStockID'
           | 'towedRollingStockID'
-          | 'pathSteps'
+          | 'stdcmPathSteps'
           | 'speedLimitByTag'
           | 'totalLength'
           | 'totalMass'
@@ -103,7 +103,7 @@ export const stdcmConfSlice = createSlice({
       state.totalLength = action.payload.totalLength;
       state.totalMass = action.payload.totalMass;
       state.maxSpeed = action.payload.maxSpeed;
-      state.pathSteps = action.payload.pathSteps;
+      state.stdcmPathSteps = action.payload.stdcmPathSteps;
       state.speedLimitByTag = action.payload.speedLimitByTag;
     },
     updateStdcmStandardAllowance(
