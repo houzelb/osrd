@@ -116,6 +116,10 @@ const SimulationResults = ({
     }
   }, [extViewport]);
 
+  if ((!selectedTrainSchedule || !trainSimulation) && !projectionData) {
+    return null;
+  }
+
   return (
     <div className="simulation-results">
       {/* SIMULATION : STICKY BAR */}
@@ -184,78 +188,72 @@ const SimulationResults = ({
         </div>
       </ResizableSection>
 
-      {/* TRAIN : SPACE SPEED CHART */}
-      {selectedTrainRollingStock && trainSimulation && pathProperties && selectedTrainSchedule && (
-        <div className="osrd-simulation-container speedspacechart-container">
-          <div
-            className="chart-container"
-            style={{
-              height: `${speedSpaceChartContainerHeight + HANDLE_TAB_RESIZE_HEIGHT}px`,
-            }}
-          >
-            <SpeedSpaceChartContainer
-              trainSimulation={trainSimulation}
-              selectedTrainPowerRestrictions={selectedTrainPowerRestrictions}
-              rollingStock={selectedTrainRollingStock}
-              pathProperties={pathProperties}
-              heightOfSpeedSpaceChartContainer={speedSpaceChartContainerHeight}
-              setHeightOfSpeedSpaceChartContainer={setSpeedSpaceChartContainerHeight}
+      {selectedTrainSchedule && trainSimulation && (
+        <>
+          {/* TRAIN : SPACE SPEED CHART */}
+          {selectedTrainRollingStock && pathProperties && (
+            <div className="osrd-simulation-container speedspacechart-container">
+              <div
+                className="chart-container"
+                style={{
+                  height: `${speedSpaceChartContainerHeight + HANDLE_TAB_RESIZE_HEIGHT}px`,
+                }}
+              >
+                <SpeedSpaceChartContainer
+                  trainSimulation={trainSimulation}
+                  selectedTrainPowerRestrictions={selectedTrainPowerRestrictions}
+                  rollingStock={selectedTrainRollingStock}
+                  pathProperties={pathProperties}
+                  heightOfSpeedSpaceChartContainer={speedSpaceChartContainerHeight}
+                  setHeightOfSpeedSpaceChartContainer={setSpeedSpaceChartContainerHeight}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* SIMULATION : MAP */}
+          <div className="simulation-map">
+            <SimulationResultsMap
+              setExtViewport={setExtViewport}
+              geometry={pathProperties?.geometry}
+              trainSimulation={{
+                ...trainSimulation,
+                trainId: selectedTrainSchedule.id,
+                startTime: selectedTrainSchedule.start_time,
+              }}
+              pathItemsCoordinates={pathItemsCoordinates}
+              setMapCanvas={setMapCanvas}
             />
           </div>
-        </div>
+
+          {/* TIME STOPS TABLE */}
+          <div className="time-stop-outputs">
+            <p className="mt-2 mb-3 ml-3 font-weight-bold">{t('timetableOutput')}</p>
+            <TimesStopsOutput
+              simulatedTrain={trainSimulation}
+              trainSummary={selectedTrainSummary}
+              operationalPoints={pathProperties?.operationalPoints}
+              selectedTrainSchedule={selectedTrainSchedule}
+              path={path}
+              dataIsLoading={formattedOpPointsLoading}
+            />
+          </div>
+
+          {/* SIMULATION EXPORT BUTTONS */}
+          {pathProperties && selectedTrainRollingStock && operationalPoints && path && infraId && (
+            <SimulationResultExport
+              path={path}
+              scenarioData={scenarioData}
+              train={selectedTrainSchedule}
+              simulatedTrain={trainSimulation}
+              pathElectrifications={pathProperties.electrifications}
+              operationalPoints={operationalPoints}
+              rollingStock={selectedTrainRollingStock}
+              mapCanvas={mapCanvas}
+            />
+          )}
+        </>
       )}
-
-      {/* SIMULATION : MAP */}
-      <div className="simulation-map">
-        <SimulationResultsMap
-          setExtViewport={setExtViewport}
-          geometry={pathProperties?.geometry}
-          trainSimulation={
-            selectedTrainSchedule && trainSimulation
-              ? {
-                  ...trainSimulation,
-                  trainId: selectedTrainSchedule.id,
-                  startTime: selectedTrainSchedule.start_time,
-                }
-              : undefined
-          }
-          pathItemsCoordinates={pathItemsCoordinates}
-          setMapCanvas={setMapCanvas}
-        />
-      </div>
-
-      {/* TIME STOPS TABLE */}
-      <div className="time-stop-outputs">
-        <p className="mt-2 mb-3 ml-3 font-weight-bold">{t('timetableOutput')}</p>
-        <TimesStopsOutput
-          simulatedTrain={trainSimulation}
-          trainSummary={selectedTrainSummary}
-          operationalPoints={pathProperties?.operationalPoints}
-          selectedTrainSchedule={selectedTrainSchedule}
-          path={path}
-          dataIsLoading={formattedOpPointsLoading}
-        />
-      </div>
-
-      {/* SIMULATION EXPORT BUTTONS */}
-      {selectedTrainSchedule &&
-        trainSimulation &&
-        pathProperties &&
-        selectedTrainRollingStock &&
-        operationalPoints &&
-        path &&
-        infraId && (
-          <SimulationResultExport
-            path={path}
-            scenarioData={scenarioData}
-            train={selectedTrainSchedule}
-            simulatedTrain={trainSimulation}
-            pathElectrifications={pathProperties.electrifications}
-            operationalPoints={operationalPoints}
-            rollingStock={selectedTrainRollingStock}
-            mapCanvas={mapCanvas}
-          />
-        )}
     </div>
   );
 };
