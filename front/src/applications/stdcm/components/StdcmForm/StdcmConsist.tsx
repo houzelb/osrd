@@ -92,8 +92,13 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
   };
 
   const onSelectSuggestion = (option?: LightRollingStockWithLiveries) => {
-    prefillConsist(option, towedRollingStock);
+    prefillConsist(option, towedRollingStock, speedLimitByTag);
     dispatch(updateRollingStockID(option?.id));
+  };
+
+  const onSpeedLimitByTagChange = (newTag: string | null) => {
+    prefillConsist(rollingStock, towedRollingStock, newTag);
+    dispatchUpdateSpeedLimitByTag(newTag);
   };
 
   useEffect(() => {
@@ -146,7 +151,7 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           suggestions={filteredTowedRollingStockList}
           getSuggestionLabel={(suggestion: TowedRollingStock) => suggestion.name}
           onSelectSuggestion={(towed) => {
-            prefillConsist(rollingStock, towed);
+            prefillConsist(rollingStock, towed, speedLimitByTag);
             dispatch(updateTowedRollingStockID(towed?.id));
           }}
         />
@@ -178,7 +183,7 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           disabled={disabled}
           selectedSpeedLimitByTag={speedLimitByTag}
           speedLimitsByTags={speedLimitsByTags}
-          dispatchUpdateSpeedLimitByTag={dispatchUpdateSpeedLimitByTag}
+          dispatchUpdateSpeedLimitByTag={onSpeedLimitByTagChange}
         />
         <Input
           id="maxSpeed"
