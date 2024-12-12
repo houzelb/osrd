@@ -8,7 +8,9 @@ import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import { type StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
 import { useAppDispatch } from 'store';
-import { kgToT, msToKmh } from 'utils/physics';
+import { kgToT, kmhToMs, msToKmh } from 'utils/physics';
+
+import maxSpeedFromSpeedLimitByTag from '../utils/maxSpeedFromSpeedLimitByTag';
 
 const useStdcmConsist = () => {
   const dispatch = useAppDispatch();
@@ -45,7 +47,8 @@ const useStdcmConsist = () => {
 
   const prefillConsist = (
     rollingStock?: LightRollingStockWithLiveries,
-    towed?: TowedRollingStock
+    towed?: TowedRollingStock,
+    maxSpeedTag?: string | null
   ) => {
     if (!totalMassChanged) {
       const consistMass = Math.floor(kgToT((rollingStock?.mass ?? 0) + (towed?.mass ?? 0)));
@@ -58,7 +61,12 @@ const useStdcmConsist = () => {
     }
 
     if (!maxSpeedChanged) {
-      const consistMaxSpeed = min([rollingStock?.max_speed, towed?.max_speed]);
+      const maxSpeedFromTag = maxSpeedFromSpeedLimitByTag(maxSpeedTag);
+      const consistMaxSpeed = min([
+        rollingStock?.max_speed,
+        towed?.max_speed,
+        maxSpeedFromTag ? kmhToMs(maxSpeedFromTag) : undefined,
+      ]);
       dispatch(updateMaxSpeed(consistMaxSpeed ? Math.floor(msToKmh(consistMaxSpeed)) : undefined));
     }
   };
