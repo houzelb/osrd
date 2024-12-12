@@ -25,6 +25,16 @@ const getStopType = (step: StdcmPathStep, t: TFunction) => {
   return capitalizeFirstLetter(t(`stdcm:trainPath.stopType.${step.stopType}`));
 };
 
+const getArrivalTime = (step: StdcmPathStep, t: TFunction) => {
+  if (!step.isVia) {
+    if (step.arrival && step.arrivalType === 'preciseTime') {
+      return dateToHHMMSS(step.arrival, { withoutSeconds: true });
+    }
+    return t('asap');
+  }
+  return '';
+};
+
 const SimulationReportSheet = ({
   stdcmLinkedPaths,
   stdcmData,
@@ -74,16 +84,6 @@ const SimulationReportSheet = ({
     },
     [mapImageUrl]
   );
-
-  const getArrivalTime = (step: StdcmPathStep) => {
-    if (!step.isVia) {
-      if (step.arrival && step.arrivalType === 'preciseTime') {
-        return dateToHHMMSS(step.arrival, { withoutSeconds: true });
-      }
-      return t('asap');
-    }
-    return '';
-  };
 
   return (
     <Document>
@@ -216,12 +216,12 @@ const SimulationReportSheet = ({
                       </View>
                       <View style={styles.convoyAndRoute.stopTableEndWidth}>
                         <TD style={styles.convoyAndRoute.stopTableItalicColumn}>
-                          {getArrivalTime(step)}
+                          {getArrivalTime(step, t)}
                         </TD>
                       </View>
                       <View style={styles.convoyAndRoute.stopTableStartWidth}>
                         <TD style={styles.convoyAndRoute.stopTableStartColumn}>
-                          {getArrivalTime(step)}
+                          {getArrivalTime(step, t)}
                         </TD>
                       </View>
                       <View style={styles.convoyAndRoute.stopTableStopTypeWidth}>
