@@ -17,6 +17,7 @@ import {
   type NetzgrafikDto,
   type LabelGroupDto,
   PortAlignment,
+  type LabelDto,
 } from '../NGE/types';
 
 const TRAINRUN_CATEGORY_HALTEZEITEN = {
@@ -28,10 +29,15 @@ const TRAINRUN_CATEGORY_HALTEZEITEN = {
   HaltezeitUncategorized: { haltezeit: 0, no_halt: false },
 };
 
-const DEFAULT_LABEL_GROUP: LabelGroupDto = {
+const TRAINRUN_LABEL_GROUP: LabelGroupDto = {
   id: 1,
   name: 'Default',
   labelRef: 'Trainrun',
+};
+const NODE_LABEL_GROUP: LabelGroupDto = {
+  id: 2,
+  name: 'Node',
+  labelRef: 'Node',
 };
 
 const DEFAULT_TRAINRUN_CATEGORY: TrainrunCategory = {
@@ -194,26 +200,29 @@ const applyLayout = (state: MacroEditorState) => {
 /**
  * Cast a node into NGE format.
  */
-const castNodeToNge = (state: MacroEditorState, node: NodeIndexed): NetzgrafikDto['nodes'][0] => {
-  const labelsList = Array.from(state.labels);
-  return {
-    id: node.ngeId,
-    betriebspunktName: node.trigram || '',
-    fullName: node.full_name || '',
-    positionX: node.position_x,
-    positionY: node.position_y,
-    ports: [],
-    transitions: [],
-    connections: [],
-    resourceId: state.ngeResource.id,
-    perronkanten: 10,
-    connectionTime: node.connection_time,
-    trainrunCategoryHaltezeiten: TRAINRUN_CATEGORY_HALTEZEITEN,
-    symmetryAxis: 0,
-    warnings: [],
-    labelIds: (node.labels || []).map((l) => labelsList.findIndex((e) => e === l)),
-  };
-};
+const castNodeToNge = (
+  state: MacroEditorState,
+  node: NodeIndexed,
+  labels: LabelDto[]
+): NetzgrafikDto['nodes'][0] => ({
+  id: node.ngeId,
+  betriebspunktName: node.trigram || '',
+  fullName: node.full_name || '',
+  positionX: node.position_x,
+  positionY: node.position_y,
+  ports: [],
+  transitions: [],
+  connections: [],
+  resourceId: state.ngeResource.id,
+  perronkanten: 10,
+  connectionTime: node.connection_time,
+  trainrunCategoryHaltezeiten: TRAINRUN_CATEGORY_HALTEZEITEN,
+  symmetryAxis: 0,
+  warnings: [],
+  labelIds: (node.labels || []).map((l) =>
+    labels.findIndex((e) => e.label === l && e.labelGroupId === NODE_LABEL_GROUP.id)
+  ),
+});
 
 /**
  * Load & index the data of the train schedule for the given scenario
@@ -279,7 +288,7 @@ export const loadAndIndexNge = async (
   // Index trainschedule labels
   state.trainSchedules.forEach((ts) => {
     ts.labels?.forEach((l) => {
-      state.labels.add(l);
+      state.trainrunLabels.add(l);
     });
   });
 
@@ -290,7 +299,7 @@ export const loadAndIndexNge = async (
 /**
  * Translate the train schedule in NGE "trainruns".
  */
-const getNgeTrainruns = (state: MacroEditorState) =>
+const getNgeTrainruns = (state: MacroEditorState, labels: LabelDto[]) =>
   state.trainSchedules
     .filter((trainSchedule) => trainSchedule.path.length >= 2)
     .map((trainSchedule) => ({
@@ -300,7 +309,7 @@ const getNgeTrainruns = (state: MacroEditorState) =>
       frequencyId: DEFAULT_TRAINRUN_FREQUENCY.id,
       trainrunTimeCategoryId: DEFAULT_TRAINRUN_TIME_CATEGORY.id,
       labelIds: (trainSchedule.labels || []).map((l) =>
-        Array.from(state.labels).findIndex((e) => e === l)
+        labels.findIndex((e) => e.label === l && e.labelGroupId === TRAINRUN_LABEL_GROUP.id)
       ),
     }));
 
@@ -308,7 +317,7 @@ const getNgeTrainruns = (state: MacroEditorState) =>
  * Translate the train schedule in NGE "trainrunSection" & "nodes".
  * It is needed to return the nodes as well, because we add ports & transitions on them
  */
-const getNgeTrainrunSectionsWithNodes = (state: MacroEditorState) => {
+const getNgeTrainrunSectionsWithNodes = (state: MacroEditorState, labels: LabelDto[]) => {
   let portId = 1;
   const createPort = (trainrunSectionId: number) => {
     const port = {
@@ -360,14 +369,22 @@ const getNgeTrainrunSectionsWithNodes = (state: MacroEditorState) => {
     return pathNodeKeys.slice(0, -1).map((sourceNodeKey, i) => {
       // Get the source node or created it
       if (!ngeNodesByPathKey[sourceNodeKey]) {
-        ngeNodesByPathKey[sourceNodeKey] = castNodeToNge(state, state.getNodeByKey(sourceNodeKey)!);
+        ngeNodesByPathKey[sourceNodeKey] = castNodeToNge(
+          state,
+          state.getNodeByKey(sourceNodeKey)!,
+          labels
+        );
       }
       const sourceNode = ngeNodesByPathKey[sourceNodeKey];
 
       // Get the target node or created it
       const targetNodeKey = pathNodeKeys[i + 1];
       if (!ngeNodesByPathKey[targetNodeKey]) {
-        ngeNodesByPathKey[targetNodeKey] = castNodeToNge(state, state.getNodeByKey(targetNodeKey)!);
+        ngeNodesByPathKey[targetNodeKey] = castNodeToNge(
+          state,
+          state.getNodeByKey(targetNodeKey)!,
+          labels
+        );
       }
       const targetNode = ngeNodesByPathKey[targetNodeKey];
 
@@ -449,25 +466,38 @@ const getNgeTrainrunSectionsWithNodes = (state: MacroEditorState) => {
   };
 };
 
+const getNgeLabels = (state: MacroEditorState): LabelDto[] => [
+  ...Array.from(state.nodeLabels).map((l, i) => ({
+    id: i,
+    label: l,
+    labelGroupId: NODE_LABEL_GROUP.id,
+    labelRef: 'Node',
+  })),
+  ...Array.from(state.trainrunLabels).map((l, i) => ({
+    id: i,
+    label: l,
+    labelGroupId: TRAINRUN_LABEL_GROUP.id,
+    labelRef: 'Trainrun',
+  })),
+];
+
 /**
  * Return a compatible object for NGE
  */
-export const getNgeDto = (state: MacroEditorState): NetzgrafikDto => ({
-  ...DEFAULT_DTO,
-  labels: Array.from(state.labels).map((l, i) => ({
-    id: i,
-    label: l,
-    labelGroupId: DEFAULT_LABEL_GROUP.id,
-    labelRef: 'Trainrun',
-  })),
-  labelGroups: [DEFAULT_LABEL_GROUP],
-  resources: [state.ngeResource],
-  metadata: {
-    netzgrafikColors: [],
-    trainrunCategories: [DEFAULT_TRAINRUN_CATEGORY],
-    trainrunFrequencies: [DEFAULT_TRAINRUN_FREQUENCY],
-    trainrunTimeCategories: [DEFAULT_TRAINRUN_TIME_CATEGORY],
-  },
-  trainruns: getNgeTrainruns(state),
-  ...getNgeTrainrunSectionsWithNodes(state),
-});
+export const getNgeDto = (state: MacroEditorState): NetzgrafikDto => {
+  const labels = getNgeLabels(state);
+  return {
+    ...DEFAULT_DTO,
+    labels,
+    labelGroups: [NODE_LABEL_GROUP, TRAINRUN_LABEL_GROUP],
+    resources: [state.ngeResource],
+    metadata: {
+      netzgrafikColors: [],
+      trainrunCategories: [DEFAULT_TRAINRUN_CATEGORY],
+      trainrunFrequencies: [DEFAULT_TRAINRUN_FREQUENCY],
+      trainrunTimeCategories: [DEFAULT_TRAINRUN_TIME_CATEGORY],
+    },
+    trainruns: getNgeTrainruns(state, labels),
+    ...getNgeTrainrunSectionsWithNodes(state, labels),
+  };
+};

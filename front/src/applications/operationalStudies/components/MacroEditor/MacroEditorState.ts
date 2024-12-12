@@ -42,9 +42,14 @@ export default class MacroEditorState {
   indexByNgeId: Record<string, number>;
 
   /**
-   * Storing labels
+   * Storing labels for nodes
    */
-  labels: Set<string>;
+  nodeLabels: Set<string>;
+
+  /**
+   * Storing labels for trainruns
+   */
+  trainrunLabels: Set<string>;
 
   /**
    * NGE resource
@@ -56,7 +61,8 @@ export default class MacroEditorState {
    */
   constructor(scenario: ScenarioResponse, trainSchedules: TrainScheduleResult[]) {
     // Empty
-    this.labels = new Set<string>([]);
+    this.nodeLabels = new Set<string>([]);
+    this.trainrunLabels = new Set<string>([]);
     this.nodes = [];
     this.indexByPathKey = {};
     this.indexByNgeId = {};
@@ -140,7 +146,7 @@ export default class MacroEditorState {
 
     // Index labels
     node.labels.forEach((l) => {
-      if (l) this.labels.add(l);
+      if (l) this.nodeLabels.add(l);
     });
   }
 

@@ -5,6 +5,10 @@ import cx from 'classnames';
 import { useTranslation } from 'react-i18next';
 
 import handleOperation from 'applications/operationalStudies/components/MacroEditor/ngeToOsrd';
+import {
+  loadAndIndexNge,
+  getNgeDto,
+} from 'applications/operationalStudies/components/MacroEditor/osrdToNge';
 import MicroMacroSwitch from 'applications/operationalStudies/components/MicroMacroSwitch';
 import NGE from 'applications/operationalStudies/components/NGE/NGE';
 import type { NetzgrafikDto, NGEEvent } from 'applications/operationalStudies/components/NGE/types';
@@ -13,10 +17,6 @@ import useScenarioData from 'applications/operationalStudies/hooks/useScenarioDa
 import ImportTrainSchedule from 'applications/operationalStudies/views/ImportTrainSchedule';
 import ManageTrainSchedule from 'applications/operationalStudies/views/ManageTrainSchedule';
 import SimulationResults from 'applications/operationalStudies/views/SimulationResults';
-import {
-  loadAndIndexNge,
-  getNgeDto,
-} from 'applications/operationalStudies/components/MacroEditor/osrdToNge';
 import type {
   InfraWithState,
   ScenarioResponse,
