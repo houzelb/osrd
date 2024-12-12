@@ -46,7 +46,7 @@ pub struct RunserverArgs {
     #[clap(long, env = "OSRDYNE_API_URL", default_value_t = Url::parse("http://127.0.0.1:4242/").unwrap())]
     osrdyne_api_url: Url,
     /// The timeout to use when performing the healthcheck, in milliseconds
-    #[clap(long, env = "EDITOAST_HEALTH_CHECK_TIMEOUT_MS", default_value_t = 500)]
+    #[clap(long, env = "EDITOAST_HEALTH_CHECK_TIMEOUT_MS", default_value_t = 1000)]
     health_check_timeout_ms: u64,
 }
 
