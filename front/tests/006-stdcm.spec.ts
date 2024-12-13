@@ -73,17 +73,15 @@ test.describe('Verify train schedule elements and filters', () => {
     await stdcmPage.fillDestinationDetailsLight();
     await stdcmPage.fillAndVerifyViaDetails(1, 'mid_west');
     // Verify input map markers in Chromium
-    // TODO: Uncomment this part when osm server is up again
-    // if (browserName === 'chromium') {
-    //   await stdcmPage.mapMarkerVisibility();
-    // }
+    if (browserName === 'chromium') {
+      await stdcmPage.mapMarkerVisibility();
+    }
     // Launch simulation and verify output data matches expected results
     await stdcmPage.launchSimulation();
     // Verify map results markers in Chromium
-    // TODO: Uncomment this part when osm server is up again
-    // if (browserName === 'chromium') {
-    //   await stdcmPage.mapMarkerResultVisibility();
-    // }
+    if (browserName === 'chromium') {
+      await stdcmPage.mapMarkerResultVisibility();
+    }
     await stdcmPage.verifyTableData('./tests/assets/stdcm/stdcmWithoutAllVia.json');
     await stdcmPage.clickOnAllViaButton();
     await stdcmPage.verifyTableData('./tests/assets/stdcm/stdcmWithAllVia.json');

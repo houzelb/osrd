@@ -58,7 +58,7 @@ test.describe('Route Tab Verification', () => {
   );
 
   /** *************** Test 1 **************** */
-  test('Select a route for operational study', async ({ page }) => {
+  test('Select a route for operational study', async ({ page, browserName }) => {
     const operationalStudiesPage = new OperationalStudiesPage(page);
     const routePage = new RoutePage(page);
 
@@ -67,18 +67,17 @@ test.describe('Route Tab Verification', () => {
 
     // Perform pathfinding by station trigrams and verify map markers in Chromium
     await routePage.performPathfindingByTrigram('WS', 'NES', 'MES');
-    // TODO: Uncomment this part when osm server is up again
-    // if (browserName === 'chromium') {
-    //   const expectedMapMarkersValues = ['West_station', 'North_East_station', 'Mid_East_station'];
-    //   await routePage.verifyMapMarkers(...expectedMapMarkersValues);
-    // }
+    if (browserName === 'chromium') {
+      const expectedMapMarkersValues = ['West_station', 'North_East_station', 'Mid_East_station'];
+      await routePage.verifyMapMarkers(...expectedMapMarkersValues);
+    }
 
     // Verify that tab warnings are absent
     await operationalStudiesPage.verifyTabWarningAbsence();
   });
 
   /** *************** Test 2 **************** */
-  test('Adding waypoints to a route for operational study', async ({ page }) => {
+  test('Adding waypoints to a route for operational study', async ({ page, browserName }) => {
     const operationalStudiesPage = new OperationalStudiesPage(page);
     const routePage = new RoutePage(page);
 
@@ -93,40 +92,40 @@ test.describe('Route Tab Verification', () => {
     await routePage.addNewWaypoints(2, ['Mid_West_station', 'Mid_East_station'], expectedViaValues);
 
     // Verify map markers in Chromium
-    // TODO: Uncomment this part when osm server is up again
-    // if (browserName === 'chromium') {
-    //   const expectedMapMarkersValues = [
-    //     'West_station',
-    //     'Mid_West_station',
-    //     'Mid_East_station',
-    //     'North_East_station',
-    //   ];
-    //   await routePage.verifyMapMarkers(...expectedMapMarkersValues);
-    // }
+    if (browserName === 'chromium') {
+      const expectedMapMarkersValues = [
+        'West_station',
+        'Mid_West_station',
+        'Mid_East_station',
+        'North_East_station',
+      ];
+      await routePage.verifyMapMarkers(...expectedMapMarkersValues);
+    }
 
     // Verify that tab warnings are absent
     await operationalStudiesPage.verifyTabWarningAbsence();
   });
 
   /** *************** Test 3 **************** */
-  test('Reversing and deleting waypoints in a route for operational study', async ({ page }) => {
+  test('Reversing and deleting waypoints in a route for operational study', async ({
+    page,
+    browserName,
+  }) => {
     const routePage = new RoutePage(page);
 
     // Perform pathfinding by station trigrams and verify map markers in Chromium
     await routePage.performPathfindingByTrigram('WS', 'SES', 'MWS');
-    // TODO: Uncomment this part when osm server is up again
-    // const expectedMapMarkersValues = ['West_station', 'South_East_station', 'Mid_West_station'];
-    // if (browserName === 'chromium') {
-    //   await routePage.verifyMapMarkers(...expectedMapMarkersValues);
-    // }
+    const expectedMapMarkersValues = ['West_station', 'South_East_station', 'Mid_West_station'];
+    if (browserName === 'chromium') {
+      await routePage.verifyMapMarkers(...expectedMapMarkersValues);
+    }
 
     // Reverse the itinerary and verify the map markers
     await routePage.clickOnReverseItinerary();
-    // TODO: Uncomment this part when osm server is up again
-    // if (browserName === 'chromium') {
-    //   const reversedMapMarkersValues = [...expectedMapMarkersValues].reverse();
-    //   await routePage.verifyMapMarkers(...reversedMapMarkersValues);
-    // }
+    if (browserName === 'chromium') {
+      const reversedMapMarkersValues = [...expectedMapMarkersValues].reverse();
+      await routePage.verifyMapMarkers(...reversedMapMarkersValues);
+    }
 
     // Delete operational points and verify no selected route
     await routePage.clickOnDeleteOPButtons(OSRDLanguage);
@@ -134,10 +133,9 @@ test.describe('Route Tab Verification', () => {
 
     // Perform pathfinding again and verify map markers in Chromium
     await routePage.performPathfindingByTrigram('WS', 'SES', 'MWS');
-    // TODO: Uncomment this part when osm server is up again
-    // if (browserName === 'chromium') {
-    //   await routePage.verifyMapMarkers(...expectedMapMarkersValues);
-    // }
+    if (browserName === 'chromium') {
+      await routePage.verifyMapMarkers(...expectedMapMarkersValues);
+    }
 
     // Delete the itinerary and verify no selected route
     await routePage.clickDeleteItineraryButton();
