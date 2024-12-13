@@ -18,11 +18,12 @@ import useScenarioData from 'applications/operationalStudies/hooks/useScenarioDa
 import ImportTrainSchedule from 'applications/operationalStudies/views/ImportTrainSchedule';
 import ManageTrainSchedule from 'applications/operationalStudies/views/ManageTrainSchedule';
 import SimulationResults from 'applications/operationalStudies/views/SimulationResults';
-import type {
-  InfraWithState,
-  ScenarioResponse,
-  TimetableDetailedResult,
-  TrainScheduleResult,
+import {
+  osrdEditoastApi,
+  type InfraWithState,
+  type ScenarioResponse,
+  type TimetableDetailedResult,
+  type TrainScheduleResult,
 } from 'common/api/osrdEditoastApi';
 import ScenarioLoaderMessage from 'modules/scenario/components/ScenarioLoaderMessage';
 import TimetableManageTrainSchedule from 'modules/trainschedule/components/ManageTrainSchedule/TimetableManageTrainSchedule';
@@ -67,13 +68,29 @@ const ScenarioContent = ({
   const macroEditorState = useRef<MacroEditorState>();
   const [ngeDto, setNgeDto] = useState<NetzgrafikDto>();
 
-  const dtoImport = async () => {
-    const state = new MacroEditorState(scenario, trainSchedules || []);
+  const dtoImport = useCallback(async () => {
+    const timetablePromise = dispatch(
+      osrdEditoastApi.endpoints.getTimetableById.initiate(
+        { id: timetable.timetable_id },
+        { forceRefetch: true, subscribe: false }
+      )
+    );
+    const { train_ids } = await timetablePromise.unwrap();
+    const trainSchedulesPromise = dispatch(
+      osrdEditoastApi.endpoints.postTrainSchedule.initiate(
+        { body: { ids: train_ids } },
+        { forceRefetch: true, subscribe: false }
+      )
+    );
+    const schedules = (await trainSchedulesPromise.unwrap()).filter(
+      (trainSchedule) => trainSchedule.path.length >= 2
+    );
+    const state = new MacroEditorState(scenario, schedules || []);
     await loadAndIndexNge(state, dispatch);
     const dto = getNgeDto(state);
     macroEditorState.current = state;
     setNgeDto(dto);
-  };
+  }, [dispatch, scenario, timetable.timetable_id]);
 
   const toggleMicroMacroButton = useCallback(
     (isMacroMode: boolean) => {
