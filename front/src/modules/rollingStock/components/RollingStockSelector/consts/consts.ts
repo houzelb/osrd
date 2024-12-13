@@ -1,5 +1,3 @@
-export const mlgTrafficURL = 'https://static.osm.osrd.fr/mlgtraffic/';
-
 export const powerClasses = {
   1: {
     a: 1000,
