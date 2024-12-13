@@ -150,7 +150,7 @@ opentelemetry_sdk = { version = "0.27.0", features = ["rt-tokio", "trace"] }
 ordered-float = { version = "4.5.0", features = ["serde"] }
 osm_to_railjson = { path = "./osm_to_railjson" }
 paste.workspace = true
-pathfinding = "4.11.0"
+pathfinding = "4.12.0"
 postgis_diesel.workspace = true
 rand.workspace = true
 rangemap.workspace = true
