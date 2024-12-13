@@ -22,3 +22,13 @@ impl From<Direction> for RangeMapDirection {
         }
     }
 }
+
+impl Direction {
+    #[must_use]
+    pub fn toggle(self) -> Self {
+        match self {
+            Self::StartToStop => Self::StopToStart,
+            Self::StopToStart => Self::StartToStop,
+        }
+    }
+}
