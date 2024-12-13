@@ -160,7 +160,7 @@ const TypeAndPath = ({ setDisplayTypeAndPath }: TypeAndPathProps) => {
 
   const isInvalid = useMemo(() => opList.some((op) => !op.name && op.trigram !== ''), [opList]);
 
-  const launchPathFinding = async () => {
+  const handleSubmit = async () => {
     if (infraId && rollingStockId && opList.length > 0) {
       const pathSteps = opList
         .filter((op) => op.trigram !== '')
@@ -265,7 +265,7 @@ const TypeAndPath = ({ setDisplayTypeAndPath }: TypeAndPathProps) => {
             type="button"
             aria-label={tManageTrainSchedule('launchPathFinding')}
             title={tManageTrainSchedule('launchPathFinding')}
-            onClick={launchPathFinding}
+            onClick={handleSubmit}
             disabled={isInvalid || opList.length < 2}
             data-testid="submit-search-by-trigram"
           >
