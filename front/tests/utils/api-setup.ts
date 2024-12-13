@@ -20,10 +20,14 @@ import type {
   Scenario,
   LightRollingStock,
   StdcmSearchEnvironment,
+  TowedRollingStock,
+  GetTowedRollingStockApiResponse,
 } from 'common/api/osrdEditoastApi';
 
 import electricalProfileSet from '../assets/operationStudies/simulationSettings/electricalProfiles/electricalProfile.json';
 import { globalProjectName, globalStudyName, infrastructureName } from '../assets/project-const';
+import towedRollingStockData from '../assets/stdcm/towedRollingStock/towedRollingStock.json';
+import { logger } from '../test-logger';
 
 /**
  * Initialize a new API request context with the base URL.
@@ -237,10 +241,10 @@ export async function getStdcmEnvironment(): Promise<StdcmSearchEnvironment | nu
       return (await response.json()) as StdcmSearchEnvironment;
     }
 
-    console.warn(`STDCM environment not configured. HTTP status: ${response.status()}`);
+    logger.warn(`STDCM environment not configured. HTTP status: ${response.status()}`);
     return null;
   } catch (error) {
-    console.error('Failed to fetch STDCM environment:', error);
+    logger.error('Failed to fetch STDCM environment:', error);
     return null;
   }
 }
@@ -259,4 +263,47 @@ export async function setStdcmEnvironment(stdcmEnvironment: StdcmSearchEnvironme
     undefined,
     'Failed to update STDCM configuration environment'
   );
+}
+
+/**
+ * Retrieve a towed rolling stock by name.
+ *
+ * @param towedRollingStockName - The name of the towed rolling stock to retrieve.
+ * @returns {Promise<TowedRollingStock >} - The matching towed rolling stock data .
+ */
+export const getTowedRollingStockByName = async (
+  towedRollingStockName: string
+): Promise<TowedRollingStock | undefined> => {
+  const towedRollingStocks: GetTowedRollingStockApiResponse = await getApiRequest(
+    '/api/towed_rolling_stock',
+    { page_size: 50 }
+  );
+  const towedRollingStock = towedRollingStocks.results.find(
+    (t: TowedRollingStock) => t.name === towedRollingStockName
+  );
+  return towedRollingStock;
+};
+
+/**
+ * Create a towed rolling stock using predefined data from the imported JSON file.
+ *
+ * @returns {Promise<TowedRollingStock>} - The created towed rolling stock.
+ */
+export async function setTowedRollingStock(): Promise<TowedRollingStock> {
+  // Check if the towed rolling stock already exists
+  const existingTowedRollingStock = await getTowedRollingStockByName(towedRollingStockData.name);
+  if (existingTowedRollingStock) {
+    logger.info(`Towed rolling stock with name "${towedRollingStockData.name}" already exists.`);
+    return existingTowedRollingStock;
+  }
+
+  // Create the towed rolling stock
+  const createdTowedRollingStock = await postApiRequest(
+    '/api/towed_rolling_stock',
+    towedRollingStockData,
+    undefined,
+    'Failed to create towed rolling stock'
+  );
+
+  return createdTowedRollingStock as TowedRollingStock;
 }

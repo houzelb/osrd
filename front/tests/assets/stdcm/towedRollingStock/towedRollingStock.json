@@ -1,0 +1,19 @@
+{
+  "name": "Towed-test-e2e",
+  "label": "",
+  "railjson_version": "3.2",
+  "locked": true,
+  "mass": 46000.0,
+  "length": 26.4,
+  "comfort_acceleration": 0.2,
+  "startup_acceleration": 0.05,
+  "inertia_coefficient": 1.038,
+  "rolling_resistance": {
+    "type": "davis",
+    "A": 8.596,
+    "B": 0.27396000000000004,
+    "C": 0.0225504
+  },
+  "const_gamma": 0.8,
+  "max_speed": 50
+}

@@ -2,7 +2,6 @@ import { expect, type Locator, type Page } from '@playwright/test';
 
 import enTranslations from '../../public/locales/en/stdcm.json';
 import frTranslations from '../../public/locales/fr/stdcm.json';
-import { electricRollingStockName } from '../assets/project-const';
 import {
   CI_SUGGESTIONS,
   DEFAULT_DETAILS,
@@ -13,7 +12,8 @@ import {
   VIA_STOP_TIMES,
   VIA_STOP_TYPES,
 } from '../assets/stdcm-const';
-import { readJsonFile } from '../utils';
+import { logger } from '../test-logger';
+import { handleAndVerifyInput, readJsonFile } from '../utils';
 
 interface TableRow {
   index: number;
@@ -25,6 +25,16 @@ interface TableRow {
   weight: string | null;
   refEngine: string | null;
 }
+
+export interface ConsistFields {
+  tractionEngine: string;
+  towedRollingStock?: string;
+  tonnage?: string;
+  length?: string;
+  maxSpeed?: string;
+  speedLimitTag?: string;
+}
+const EXPECT_TO_PASS_TIMEOUT = 90_000; // Since toPass ignores custom expect timeouts, this timeout is set to account for all actions within the function.
 
 class STDCMPage {
   readonly page: Page;
@@ -43,11 +53,13 @@ class STDCMPage {
 
   readonly tractionEngineField: Locator;
 
+  readonly towedRollingStockField: Locator;
+
   readonly tonnageField: Locator;
 
   readonly lengthField: Locator;
 
-  readonly codeCompoField: Locator;
+  readonly speedLimitTagField: Locator;
 
   readonly maxSpeedField: Locator;
 
@@ -135,6 +147,10 @@ class STDCMPage {
 
   readonly viaResultMarker: Locator;
 
+  readonly simulationResultTable: Locator;
+
+  readonly simulationLengthAndDuration: Locator;
+
   readonly helpButton: Locator;
 
   constructor(page: Page) {
@@ -147,9 +163,10 @@ class STDCMPage {
     this.originCard = page.locator('.stdcm-card:has(.stdcm-origin-icon)');
     this.destinationCard = page.locator('.stdcm-card:has(.stdcm-destination-icon)');
     this.tractionEngineField = page.locator('#tractionEngine');
+    this.towedRollingStockField = page.locator('#towedRollingStock');
     this.tonnageField = page.locator('#tonnage');
     this.lengthField = page.locator('#length');
-    this.codeCompoField = page.locator('#speed-limit-by-tag-selector');
+    this.speedLimitTagField = page.locator('#speed-limit-by-tag-selector');
     this.maxSpeedField = page.locator('#maxSpeed');
     this.addViaButton = page.locator('.stdcm-vias-list button .stdcm-card__body.add-via');
     this.launchSimulationButton = page.getByTestId('launch-simulation-button');
@@ -193,7 +210,7 @@ class STDCMPage {
     this.dynamicOriginCi = this.originCard.locator('[id^="id"][id$="-ci"]');
     this.dynamicDestinationCi = this.destinationCard.locator('[id^="id"][id$="-ci"]');
     this.simulationStatus = page.getByTestId('simulation-status');
-    this.simulationList = page.locator('.simulation-list .simulation-name');
+    this.simulationList = page.locator('.stdcm-results .simulation-list');
     this.incrementButton = page.locator('.minute-button', { hasText: '+1mn' });
     this.allViasButton = page.getByTestId('all-vias-button');
     this.retainSimulationButton = page.getByTestId('retain-simulation-button');
@@ -206,6 +223,10 @@ class STDCMPage {
     this.originResultMarker = this.mapResultContainer.locator('img[alt="origin"]');
     this.destinationResultMarker = this.mapResultContainer.locator('img[alt="destination"]');
     this.viaResultMarker = this.mapResultContainer.locator('img[alt="via"]');
+    this.simulationResultTable = page.locator('.simulation-results table.table-results');
+    this.simulationLengthAndDuration = page.locator(
+      '.simulation-metadata .total-length-trip-duration'
+    );
   }
 
   // Dynamic selectors for via cards
@@ -213,11 +234,11 @@ class STDCMPage {
     return this.page.locator(`.stdcm-card:has(.stdcm-via-icons:has-text("${viaNumber}"))`);
   }
 
-  private getViaCh(viaNumber: number): Locator {
+  private getViaCH(viaNumber: number): Locator {
     return this.getViaCard(viaNumber).locator('[id^="id"][id$="-ch"]');
   }
 
-  private getViaCi(viaNumber: number): Locator {
+  private getViaCI(viaNumber: number): Locator {
     return this.getViaCard(viaNumber).locator('[id^="id"][id$="-ci"]');
   }
 
@@ -241,6 +262,16 @@ class STDCMPage {
   private async setHourLocator(hourValue: string) {
     const hourLocator = this.page.locator('.time-grid .hour', { hasText: hourValue });
     await hourLocator.click();
+  }
+
+  private getSimulationLengthAndDurationLocator(simulationNumber: number): Locator {
+    return this.simulationList
+      .locator('.simulation-metadata .total-length-trip-duration')
+      .nth(simulationNumber - 1);
+  }
+
+  private getSimulationNameLocator(simulationNumber: number): Locator {
+    return this.simulationList.locator('.simulation-name').nth(simulationNumber - 1);
   }
 
   private async verifySuggestions(expectedSuggestions: string[]) {
@@ -272,6 +303,7 @@ class STDCMPage {
   async verifyAllFieldsEmpty() {
     const emptyFields = [
       this.tractionEngineField,
+      this.towedRollingStockField,
       this.tonnageField,
       this.lengthField,
       this.maxSpeedField,
@@ -281,19 +313,19 @@ class STDCMPage {
       this.destinationChField,
     ];
     for (const field of emptyFields) await expect(field).toHaveValue('');
-    await expect(this.codeCompoField).toHaveValue('__PLACEHOLDER__');
+    await expect(this.speedLimitTagField).toHaveValue('__PLACEHOLDER__');
   }
 
   // Add a via card, verify fields, and delete it
   async addAndDeleteEmptyVia() {
     await this.addViaButton.click();
-    await expect(this.getViaCi(1)).toHaveValue('');
-    await expect(this.getViaCh(1)).toHaveValue('');
+    await expect(this.getViaCI(1)).toHaveValue('');
+    await expect(this.getViaCH(1)).toHaveValue('');
     await this.viaIcon.hover();
     await expect(this.viaDeleteButton).toBeVisible();
     await this.viaDeleteButton.click();
-    await expect(this.getViaCi(1)).not.toBeVisible();
-    await expect(this.getViaCh(1)).not.toBeVisible();
+    await expect(this.getViaCI(1)).not.toBeVisible();
+    await expect(this.getViaCH(1)).not.toBeVisible();
   }
 
   // Verify the origin suggestions when searching for north
@@ -307,15 +339,89 @@ class STDCMPage {
   }
 
   // Fill fields with test values in the consist section
-  async fillConsistDetails() {
-    await this.tractionEngineField.fill(electricRollingStockName);
-    await this.tractionEngineField.press('ArrowDown');
-    await this.tractionEngineField.press('Enter');
-    await this.tractionEngineField.dispatchEvent('blur');
-    await this.tonnageField.fill('400');
-    await this.lengthField.fill('300');
-    await this.codeCompoField.selectOption('HLP');
-    await this.maxSpeedField.fill('180');
+  async fillAndVerifyConsistDetails(
+    consistFields: ConsistFields,
+    tractionEngineTonnage: string,
+    tractionEngineLength: string,
+    tractionEngineMaxSpeed: string,
+    towedRollingStockTonnage?: string,
+    towedRollingStockLength?: string,
+    towedRollingStockMaxSpeed?: string
+  ): Promise<void> {
+    const { tractionEngine, towedRollingStock, tonnage, length, maxSpeed, speedLimitTag } =
+      consistFields;
+
+    // Generic utility for handling dropdown selection and value verification
+    const handleAndVerifyDropdown = async (
+      dropdownField: Locator,
+      expectedValues: { expectedTonnage: string; expectedLength: string; expectedMaxSpeed: string },
+      selectedValue?: string
+    ) => {
+      if (!selectedValue) return;
+
+      await dropdownField.fill(selectedValue);
+      await dropdownField.press('ArrowDown');
+      await dropdownField.press('Enter');
+      await dropdownField.dispatchEvent('blur');
+      await expect(dropdownField).toHaveValue(selectedValue);
+
+      const { expectedTonnage, expectedLength, expectedMaxSpeed } = expectedValues;
+      await expect(this.tonnageField).toHaveValue(expectedTonnage);
+      await expect(this.lengthField).toHaveValue(expectedLength);
+      await expect(this.maxSpeedField).toHaveValue(expectedMaxSpeed);
+    };
+
+    // Utility to calculate prefilled values for towed rolling stock
+    const calculateTowedPrefilledValues = () => {
+      if (!towedRollingStockTonnage || !towedRollingStockLength || !towedRollingStockMaxSpeed) {
+        return { expectedTonnage: '0', expectedLength: '0', expectedMaxSpeed: '0' };
+      }
+
+      return {
+        expectedTonnage: (
+          parseFloat(towedRollingStockTonnage) + parseFloat(tractionEngineTonnage)
+        ).toString(),
+        expectedLength: (
+          parseFloat(towedRollingStockLength) + parseFloat(tractionEngineLength)
+        ).toString(),
+        expectedMaxSpeed: Math.min(
+          parseFloat(towedRollingStockMaxSpeed),
+          parseFloat(tractionEngineMaxSpeed)
+        ).toString(),
+      };
+    };
+
+    // Calculate prefilled values for the towed rolling stock
+    const towedPrefilledValues = calculateTowedPrefilledValues();
+
+    // Fill and verify traction engine dropdown
+    await handleAndVerifyDropdown(
+      this.tractionEngineField,
+      {
+        expectedTonnage: tractionEngineTonnage,
+        expectedLength: tractionEngineLength,
+        expectedMaxSpeed: tractionEngineMaxSpeed,
+      },
+      tractionEngine
+    );
+
+    // Fill and verify towed rolling stock dropdown
+    await handleAndVerifyDropdown(
+      this.towedRollingStockField,
+      towedPrefilledValues,
+      towedRollingStock
+    );
+
+    // Fill and verify individual fields
+    await handleAndVerifyInput(this.tonnageField, tonnage);
+    await handleAndVerifyInput(this.lengthField, length);
+    await handleAndVerifyInput(this.maxSpeedField, maxSpeed);
+
+    // Handle optional speed limit tag
+    if (speedLimitTag) {
+      await this.speedLimitTagField.selectOption(speedLimitTag);
+      await expect(this.speedLimitTagField).toHaveValue(speedLimitTag);
+    }
   }
 
   // Fill and verify origin details with suggestions
@@ -439,23 +545,31 @@ class STDCMPage {
     await this.mapContainer.click();
   }
 
-  async fillAndVerifyViaDetails(viaNumber: number, viaSearch: string, selectedLanguage?: string) {
+  async fillAndVerifyViaDetails({
+    viaNumber,
+    ciSearchText,
+    language,
+  }: {
+    viaNumber: number;
+    ciSearchText: string;
+    language?: string;
+  }): Promise<void> {
     const { PASSAGE_TIME, SERVICE_STOP, DRIVER_SWITCH } = VIA_STOP_TYPES;
     const { serviceStop, driverSwitch } = VIA_STOP_TIMES;
-    const translations = selectedLanguage === 'English' ? enTranslations : frTranslations;
+    const translations = language === 'English' ? enTranslations : frTranslations;
     const warning = this.getViaWarning(viaNumber);
     // Helper function to fill common fields
     const fillVia = async (selectedSuggestion: Locator) => {
       await this.addViaButton.nth(viaNumber - 1).click();
       expect(await this.addViaButton.count()).toBe(viaNumber + 1);
-      await expect(this.getViaCi(viaNumber)).toBeVisible();
-      await this.getViaCi(viaNumber).fill(viaSearch);
+      await expect(this.getViaCI(viaNumber)).toBeVisible();
+      await this.getViaCI(viaNumber).fill(ciSearchText);
       await selectedSuggestion.click();
-      await expect(this.getViaCh(viaNumber)).toHaveValue(DEFAULT_DETAILS.chValue);
+      await expect(this.getViaCH(viaNumber)).toHaveValue(DEFAULT_DETAILS.chValue);
       await expect(this.getViaType(viaNumber)).toHaveValue(PASSAGE_TIME);
     };
 
-    switch (viaSearch) {
+    switch (ciSearchText) {
       case 'mid_west':
         await fillVia(this.suggestionMWS);
         break;
@@ -476,32 +590,37 @@ class STDCMPage {
         await expect(this.getViaStopTime(viaNumber)).toHaveValue(driverSwitch.invalidInput);
         await expect(warning).toBeVisible();
         expect(await warning.textContent()).toEqual(translations.trainPath.warningMinStopTime);
-
         await this.getViaStopTime(viaNumber).fill(driverSwitch.validInput);
         await expect(this.getViaStopTime(viaNumber)).toHaveValue(driverSwitch.validInput);
         await expect(warning).not.toBeVisible();
         break;
 
       default:
-        throw new Error(`Unsupported viaSearch value: ${viaSearch}`);
+        throw new Error(`Unsupported viaSearch value: ${ciSearchText}`);
     }
   }
 
   // Launch the simulation and check if simulation-related elements are visible
   async launchSimulation() {
-    await expect(this.launchSimulationButton).toBeEnabled();
-    await this.launchSimulationButton.click();
-    await expect(this.simulationList).toBeVisible();
-    // Check map result container visibility only for Chromium browser
-    if (this.page.context().browser()?.browserType().name() === 'chromium') {
-      await expect(this.mapResultContainer).toBeVisible();
-    }
+    await expect(async () => {
+      await this.launchSimulationButton.waitFor();
+      await expect(this.launchSimulationButton).toBeEnabled();
+      await this.launchSimulationButton.click({ force: true });
+      const simulationElements = await this.simulationList.all();
+      await Promise.all(simulationElements.map((simulationElement) => simulationElement.waitFor()));
+      expect(await this.simulationList.count()).toBeGreaterThanOrEqual(1);
+      // Check map result container visibility only for Chromium browser
+      if (this.page.context().browser()?.browserType().name() === 'chromium') {
+        await expect(this.mapResultContainer).toBeVisible();
+      }
+    }).toPass({
+      timeout: EXPECT_TO_PASS_TIMEOUT,
+    });
   }
 
   async verifyTableData(tableDataPath: string): Promise<void> {
     // Load expected data from JSON file
     const jsonData: TableRow[] = readJsonFile(tableDataPath);
-
     // Extract rows from the HTML table and map each row's data to match JSON structure
     const tableRows = await this.page.$$eval('.table-results tbody tr', (rows) =>
       rows.map((row) => {
@@ -525,7 +644,7 @@ class STDCMPage {
 
       // Check if the row exists in the HTML table
       if (!tableRow) {
-        console.error(`Row ${index + 1} is missing in the HTML table`);
+        logger.error(`Row ${index + 1} is missing in the HTML table`);
         return;
       }
       expect(tableRow.operationalPoint).toBe(jsonRow.operationalPoint);
@@ -538,39 +657,37 @@ class STDCMPage {
     });
   }
 
-  async clickOnAllViaButton() {
+  async displayAllOperationalPoints() {
     await this.allViasButton.click();
   }
 
-  async clickOnRetainSimulation() {
-    await this.retainSimulationButton.click();
-  }
-
   async retainSimulation() {
-    await this.clickOnRetainSimulation();
+    await this.retainSimulationButton.click();
     await expect(this.downloadSimulationButton).toBeVisible();
     await expect(this.downloadSimulationButton).toBeEnabled();
     await expect(this.startNewQueryButton).toBeVisible();
   }
 
   async downloadSimulation(browserName: string) {
-    // Wait for the download event
-    await this.page.waitForTimeout(500);
-    const downloadPromise = this.page.waitForEvent('download', { timeout: 120000 });
-    await this.downloadSimulationButton.dispatchEvent('click');
-    const download = await downloadPromise.catch(() => {
-      throw new Error('Download event was not triggered.');
-    });
+    await expect(async () => {
+      const downloadPromise = this.page.waitForEvent('download');
+      await this.downloadSimulationButton.dispatchEvent('click');
+      const download = await downloadPromise.catch(() => {
+        throw new Error('Download event was not triggered.');
+      });
 
-    // Verify filename and save the download
-    const suggestedFilename = download.suggestedFilename();
-    expect(suggestedFilename).toMatch(/^STDCM.*\.pdf$/);
-    const downloadPath = `./tests/stdcm-results/${browserName}/${suggestedFilename}`;
-    await download.saveAs(downloadPath);
-    console.info(`The PDF was successfully downloaded to: ${downloadPath}`);
+      // Verify filename and save the download
+      const suggestedFilename = download.suggestedFilename();
+      expect(suggestedFilename).toMatch(/^STDCM.*\.pdf$/);
+      const downloadPath = `./tests/stdcm-results/${browserName}/${suggestedFilename}`;
+      await download.saveAs(downloadPath);
+      logger.info(`The PDF was successfully downloaded to: ${downloadPath}`);
+    }).toPass({
+      timeout: EXPECT_TO_PASS_TIMEOUT,
+    });
   }
 
-  async clickOnStartNewQueryButton() {
+  async startNewQuery() {
     await this.startNewQueryButton.dispatchEvent('click');
   }
 
@@ -584,6 +701,39 @@ class STDCMPage {
     await expect(this.originResultMarker).toBeVisible();
     await expect(this.destinationResultMarker).toBeVisible();
     await expect(this.viaResultMarker).toBeVisible();
+  }
+
+  async verifySimulationDetails({
+    language,
+    simulationNumber,
+    simulationLengthAndDuration,
+  }: {
+    language: string;
+    simulationNumber: number;
+    simulationLengthAndDuration?: string | null;
+  }): Promise<void> {
+    const translations = language === 'English' ? enTranslations : frTranslations;
+    const noCapacityLengthAndDuration = '— ';
+    // Determine expected simulation name
+    const isResultTableVisible = await this.simulationResultTable.isVisible();
+    const expectedSimulationName = isResultTableVisible
+      ? `Simulation n°${simulationNumber}`
+      : translations.simulation.results.simulationName.withoutOutputs;
+
+    // Validate simulation name
+    const actualSimulationName =
+      await this.getSimulationNameLocator(simulationNumber).textContent();
+    expect(actualSimulationName).toEqual(expectedSimulationName);
+
+    // Determine expected length and duration
+    const expectedLengthAndDuration = isResultTableVisible
+      ? simulationLengthAndDuration
+      : noCapacityLengthAndDuration;
+    const actualLengthAndDuration =
+      await this.getSimulationLengthAndDurationLocator(simulationNumber).textContent();
+
+    // Validate length and duration
+    expect(actualLengthAndDuration).toEqual(expectedLengthAndDuration);
   }
 }
 export default STDCMPage;

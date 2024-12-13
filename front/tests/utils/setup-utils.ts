@@ -10,7 +10,7 @@ import type {
 } from 'common/api/osrdEditoastApi';
 
 import { readJsonFile } from '.';
-import { getApiRequest, postApiRequest, setStdcmEnvironment } from './api-setup';
+import { getApiRequest, getInfra, postApiRequest, setStdcmEnvironment } from './api-setup';
 import createScenario from './scenario';
 import { sendTrainSchedules } from './trainSchedule';
 import projectData from '../assets/operationStudies/project.json';
@@ -28,6 +28,7 @@ import {
   trainScheduleScenarioName,
   trainScheduleStudyName,
 } from '../assets/project-const';
+import { logger } from '../test-logger';
 
 /**
  * Helper function to create infrastructure using RailJson.
@@ -144,7 +145,8 @@ export async function createDataForTests(): Promise<void> {
   const trainSchedulesJson = readJsonFile('./tests/assets/trainSchedule/train_schedules.json');
   try {
     // Step 1: Create infrastructure
-    const smallInfra = await createInfrastructure();
+    let smallInfra = await getInfra();
+    if (!smallInfra) smallInfra = await createInfrastructure();
 
     // Step 2: Create rolling stocks
     await createRollingStocks();
@@ -182,6 +184,6 @@ export async function createDataForTests(): Promise<void> {
 
     await setStdcmEnvironment(stdcmEnvironment);
   } catch (error) {
-    console.error('Error during test data setup:', error);
+    logger.error('Error during test data setup:', error);
   }
 }

@@ -4,6 +4,7 @@ import ROLLING_STOCK_NAMES, {
   globalProjectName,
   trainScheduleProjectName,
 } from './assets/project-const';
+import { logger } from './test-logger';
 import { getStdcmEnvironment } from './utils/api-setup';
 import { createDataForTests } from './utils/setup-utils';
 import { deleteProject, deleteRollingStocks } from './utils/teardown-utils';
@@ -14,12 +15,12 @@ setup('setup', async () => {
     process.env.STDCM_ENVIRONMENT = JSON.stringify(stdcmEnvironment);
   }
 
-  console.info('Starting test data setup ...');
+  logger.info('Starting test data setup ...');
 
   await deleteProject(trainScheduleProjectName);
   await deleteProject(globalProjectName);
   await deleteRollingStocks(ROLLING_STOCK_NAMES);
 
   await createDataForTests();
-  console.info('Test data setup completed successfully.');
+  logger.info('Test data setup completed successfully.');
 });

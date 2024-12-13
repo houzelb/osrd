@@ -1,10 +1,10 @@
 import { test as baseTest } from '@playwright/test';
 
 // Simple logger
-const logger = {
+export const logger = {
   // eslint-disable-next-line no-console
   info: (message: string) => console.log(`[INFO] ${message}`),
-  error: (message: string) => console.error(`[ERROR] ${message}`),
+  error: (message: string, error?: unknown) => console.error(`[ERROR] ${message}`, error),
   warn: (message: string) => console.warn(`[WARN] ${message}`),
 };
 
