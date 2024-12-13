@@ -23,7 +23,7 @@ export type StdcmSuccessResponse = Omit<
   'simulation'
 > & {
   simulation: Extract<SimulationResponse, { status: 'success' }>;
-  rollingStock: LightRollingStock;
+  consistLength: number;
   creationDate: Date;
   speedLimitByTag?: string;
   simulationPathSteps: PathStep[];
@@ -106,21 +106,23 @@ export type AllowanceValue =
       value_type: 'percentage';
     };
 
+export type Consist = {
+  tractionEngine?: RollingStockWithLiveries;
+  towedRollingStock?: TowedRollingStock;
+  /** In ton */
+  totalMass?: number;
+  /** In meters */
+  totalLength?: number;
+  /** In km/s */
+  maxSpeed?: number;
+  speedLimitByTag?: string;
+};
+
 export type StdcmSimulationInputs = {
   departureDate?: string;
   departureTime?: string;
   pathSteps: (PathStep | null)[];
-  consist?: {
-    tractionEngine?: RollingStockWithLiveries;
-    towedRollingStock?: TowedRollingStock;
-    /** In ton */
-    totalMass?: number;
-    /** In meters */
-    totalLength?: number;
-    /** In km/s */
-    maxSpeed?: number;
-    speedLimitByTag?: string;
-  };
+  consist?: Consist;
   linkedPaths: LinkedPaths;
 };
 

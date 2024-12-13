@@ -93,7 +93,7 @@ const StdcmDebugResults = ({
             pathProperties={speedSpaceChartData.formattedPathProperties}
             heightOfSpeedSpaceChartContainer={speedSpaceChartContainerHeight}
             setHeightOfSpeedSpaceChartContainer={setSpeedSpaceChartContainerHeight}
-            rollingStock={speedSpaceChartData.rollingStock}
+            rollingStockLength={results.consistLength}
           />
         </div>
       </div>
