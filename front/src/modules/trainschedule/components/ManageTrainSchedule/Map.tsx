@@ -393,23 +393,19 @@ const Map = ({
             <RenderPopup pathProperties={pathProperties} />
           </>
         )}
-        {mapIsLoaded && (
-          <>
-            <ItineraryLayer
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.ITINERARY.GROUP]}
-              geometry={pathGeometry}
-              hideItineraryLine={hideItinerary}
-              showStdcmAssets={showStdcmAssets}
-              isFeasible={isFeasible}
-            />
-            {mapRef.current && (
-              <ItineraryMarkers
-                simulationPathSteps={simulationPathSteps}
-                map={mapRef.current.getMap()}
-                showStdcmAssets={showStdcmAssets}
-              />
-            )}
-          </>
+        <ItineraryLayer
+          layerOrder={LAYER_GROUPS_ORDER[LAYERS.ITINERARY.GROUP]}
+          geometry={pathGeometry}
+          hideItineraryLine={hideItinerary}
+          showStdcmAssets={showStdcmAssets}
+          isFeasible={isFeasible}
+        />
+        {mapRef.current && (
+          <ItineraryMarkers
+            simulationPathSteps={simulationPathSteps}
+            map={mapRef.current.getMap()}
+            showStdcmAssets={showStdcmAssets}
+          />
         )}
         {mapSearchMarker && <SearchMarker data={mapSearchMarker} colors={colors[mapStyle]} />}
         {snappedPoint !== undefined && <SnappedMarker geojson={snappedPoint} />}
