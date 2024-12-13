@@ -473,6 +473,53 @@
             "title": "Endpoint",
             "type": "string"
         },
+        "EtcsLevel2System": {
+            "properties": {
+                "conditional_parameters": {
+                    "description": "ETCS_LEVEL2 signal parameters for specific routes",
+                    "items": {
+                        "$ref": "#/$defs/__main____EtcsLevel2System__ConditionalParameters"
+                    },
+                    "title": "Conditional Parameters",
+                    "type": "array"
+                },
+                "default_parameters": {
+                    "allOf": [
+                        {
+                            "$ref": "#/$defs/__main____EtcsLevel2System__Parameters"
+                        }
+                    ],
+                    "description": "ETCS_LEVEL2 signal parameters"
+                },
+                "next_signaling_systems": {
+                    "description": "The list of allowed input signaling systems",
+                    "items": {
+                        "$ref": "#/$defs/SignalingSystem"
+                    },
+                    "title": "Next Signaling Systems",
+                    "type": "array"
+                },
+                "settings": {
+                    "allOf": [
+                        {
+                            "$ref": "#/$defs/__main____EtcsLevel2System__Settings"
+                        }
+                    ],
+                    "description": "ETCS_LEVEL2 signal settings"
+                },
+                "signaling_system": {
+                    "const": "ETCS_LEVEL2",
+                    "default": "ETCS_LEVEL2",
+                    "title": "Signaling System"
+                }
+            },
+            "required": [
+                "settings",
+                "default_parameters"
+            ],
+            "title": "EtcsLevel2System",
+            "type": "object"
+        },
         "FlagSignalParameter": {
             "enum": [
                 "true",
@@ -487,6 +534,7 @@
                 "mapping": {
                     "BAL": "#/$defs/BalSystem",
                     "BAPR": "#/$defs/BaprSystem",
+                    "ETCS_LEVEL2": "#/$defs/EtcsLevel2System",
                     "TVM300": "#/$defs/Tvm300System",
                     "TVM430": "#/$defs/Tvm430System"
                 },
@@ -504,6 +552,9 @@
                 },
                 {
                     "$ref": "#/$defs/Tvm430System"
+                },
+                {
+                    "$ref": "#/$defs/EtcsLevel2System"
                 }
             ],
             "title": "LimitedLogicalSignal"
@@ -1299,7 +1350,8 @@
                 "BAL",
                 "BAPR",
                 "TVM300",
-                "TVM430"
+                "TVM430",
+                "ETCS_LEVEL2"
             ],
             "title": "SignalingSystem",
             "type": "string"
@@ -1988,6 +2040,53 @@
             "required": [
                 "Nf",
                 "distant"
+            ],
+            "title": "Settings",
+            "type": "object"
+        },
+        "__main____EtcsLevel2System__ConditionalParameters": {
+            "properties": {
+                "on_route": {
+                    "description": "Route for which those parameters are active",
+                    "maxLength": 255,
+                    "minLength": 1,
+                    "title": "On Route",
+                    "type": "string"
+                },
+                "parameters": {
+                    "allOf": [
+                        {
+                            "$ref": "#/$defs/__main____EtcsLevel2System__Parameters"
+                        }
+                    ],
+                    "description": "ETCS_LEVEL2 signal parameters"
+                }
+            },
+            "required": [
+                "on_route",
+                "parameters"
+            ],
+            "title": "ConditionalParameters",
+            "type": "object"
+        },
+        "__main____EtcsLevel2System__Parameters": {
+            "properties": {},
+            "title": "Parameters",
+            "type": "object"
+        },
+        "__main____EtcsLevel2System__Settings": {
+            "properties": {
+                "Nf": {
+                    "allOf": [
+                        {
+                            "$ref": "#/$defs/FlagSignalParameter"
+                        }
+                    ],
+                    "description": "Is the signal non-passable"
+                }
+            },
+            "required": [
+                "Nf"
             ],
             "title": "Settings",
             "type": "object"
