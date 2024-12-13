@@ -288,6 +288,7 @@ pub enum TrackLocationFromPath {
 mod tests {
     use super::*;
     use rstest::rstest;
+    use std::iter::DoubleEndedIterator;
 
     #[test]
     #[should_panic]
@@ -407,6 +408,48 @@ mod tests {
         );
     }
 
+    // To invert track ranges, we need to get the list of track ranges
+    // backwards, and toggle the direction for each track range
+    fn invert_track_ranges(
+        track_ranges: impl DoubleEndedIterator<Item = TrackRange>,
+    ) -> Vec<TrackRange> {
+        track_ranges
+            .rev()
+            .map(|mut track_range| {
+                track_range.direction = track_range.direction.toggle();
+                track_range
+            })
+            .collect()
+    }
+
+    // To invert the intersection, we need to get the intersection backwards,
+    // invert each tuple and change the offsets by subtracting them from
+    // the total length of the projection path.
+    //
+    // For example, let's project "A+120-140" on a path "A+100-200", it will
+    // give the intersection (20, 40). If we invert the projection path (from
+    // "A+100-200" into "A+200-100"), we then get an intersection (60, 80).
+    // This new result can be calculated by:
+    // - calculating the length of the projection path: 200 - 100 = 100
+    // - inverting the original tuple: (20, 40) -> (40, 20)
+    // - subtracting from the length: (100-40, 100-20) = (60, 80)
+    fn invert_intersections(
+        intersections: impl DoubleEndedIterator<Item = Intersection>,
+        path_length: u64,
+    ) -> Vec<Intersection> {
+        // If 'track_range' is inverted, then offset of intersections are backwards
+        intersections
+            .into_iter()
+            .rev()
+            .map(|intersection| {
+                Intersection::from((
+                    path_length - intersection.end(),
+                    path_length - intersection.start(),
+                ))
+            })
+            .collect()
+    }
+
     #[rstest]
     // One track on the path
     #[case::one_path_different_track(&["A+0-100"], &["B+0-100"], &[])]
@@ -437,17 +480,38 @@ mod tests {
         #[case] path: &[&str],
         #[case] track_ranges: &[&str],
         #[case] expected_intersections: &[(u64, u64)],
+        // If we invert the projected track ranges, it doesn't change the intersection
+        #[values(false, true)] toggle_path: bool,
+        // If we invert the projection path, the intersections will be backwards
+        // and the offsets will be subtracted from the total length
+        #[values(false, true)] toggle_track_ranges: bool,
     ) {
-        let path: Vec<TrackRange> = path.iter().map(|s| s.parse().unwrap()).collect();
+        let path = path.iter().map(|s| s.parse().unwrap());
+        let path = if toggle_path {
+            invert_track_ranges(path)
+        } else {
+            path.collect()
+        };
         let projection = PathProjection::new(&path);
 
-        let track_ranges: Vec<TrackRange> =
-            track_ranges.iter().map(|s| s.parse().unwrap()).collect();
-        let intersections = projection.get_intersections(&track_ranges);
-        let expected_intersections: Vec<Intersection> = expected_intersections
+        let track_ranges = track_ranges.iter().map(|s| s.parse().unwrap());
+        let track_ranges = if toggle_track_ranges {
+            invert_track_ranges(track_ranges)
+        } else {
+            track_ranges.collect()
+        };
+        let expected_intersections = expected_intersections
             .iter()
-            .map(|tuple| Intersection::from(*tuple))
-            .collect::<Vec<_>>();
+            .copied()
+            .map(Intersection::from);
+        let expected_intersections = if toggle_track_ranges {
+            let length: u64 = track_ranges.iter().map(TrackRange::length).sum();
+            invert_intersections(expected_intersections, length)
+        } else {
+            expected_intersections.collect()
+        };
+
+        let intersections = projection.get_intersections(&track_ranges);
 
         assert_eq!(intersections, expected_intersections);
     }
