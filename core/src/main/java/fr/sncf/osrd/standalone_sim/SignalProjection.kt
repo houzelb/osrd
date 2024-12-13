@@ -7,7 +7,6 @@ import fr.sncf.osrd.signaling.SignalingSimulator
 import fr.sncf.osrd.signaling.ZoneStatus
 import fr.sncf.osrd.sim_infra.api.*
 import fr.sncf.osrd.sim_infra.impl.ChunkPath
-import fr.sncf.osrd.sim_infra.utils.recoverBlocks
 import fr.sncf.osrd.standalone_sim.result.ResultTrain.SignalSighting
 import fr.sncf.osrd.standalone_sim.result.ResultTrain.ZoneUpdate
 import fr.sncf.osrd.standalone_sim.result.SignalUpdate
@@ -58,15 +57,6 @@ fun project(
     val detailedBlockPath = recoverBlockPath(simulator, fullInfra, routePath)
     val blockPath = mutableStaticIdxArrayListOf<Block>()
     for (block in detailedBlockPath) blockPath.add(block.block)
-
-    val blockPaths =
-        recoverBlocks(
-            rawInfra,
-            blockInfra,
-            routePath,
-            mutableStaticIdxArrayListOf(bal, bapr, tvm300, tvm430, etcsLevel2)
-        )
-    assert(blockPaths.isNotEmpty())
 
     val zoneMap = mutableMapOf<String, Int>()
     var zoneCount = 0
