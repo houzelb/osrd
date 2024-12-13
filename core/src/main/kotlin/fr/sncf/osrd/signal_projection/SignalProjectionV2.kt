@@ -45,6 +45,7 @@ fun projectSignals(
     val bapr = sigSystemManager.findSignalingSystemOrThrow("BAPR")
     val tvm300 = sigSystemManager.findSignalingSystemOrThrow("TVM300")
     val tvm430 = sigSystemManager.findSignalingSystemOrThrow("TVM430")
+    val etcsLevel2 = sigSystemManager.findSignalingSystemOrThrow("ETCS_LEVEL2")
 
     val leastConstrainingStates = mutableMapOf<SignalingSystemId, SigState>()
     leastConstrainingStates[bal] = (sigModuleManager.getStateSchema(bal)) { value("aspect", "VL") }
@@ -55,6 +56,9 @@ fun projectSignals(
         value("aspect", "300VL")
     }
     leastConstrainingStates[tvm430] = (sigModuleManager.getStateSchema(tvm430)) {
+        value("aspect", "300VL")
+    }
+    leastConstrainingStates[etcsLevel2] = (sigModuleManager.getStateSchema(etcsLevel2)) {
         value("aspect", "300VL")
     }
 

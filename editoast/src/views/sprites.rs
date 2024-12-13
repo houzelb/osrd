@@ -113,6 +113,7 @@ mod tests {
         assert!(response.contains(&"BAPR".to_string()));
         assert!(response.contains(&"TVM300".to_string()));
         assert!(response.contains(&"TVM430".to_string()));
+        assert!(response.contains(&"ETCS_LEVEL2".to_string()));
     }
 
     #[rstest]

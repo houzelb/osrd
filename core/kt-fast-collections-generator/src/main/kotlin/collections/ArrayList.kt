@@ -2,7 +2,10 @@ package fr.sncf.osrd.fast_collections.generator.collections
 
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.symbol.KSFile
-import fr.sncf.osrd.fast_collections.generator.*
+import fr.sncf.osrd.fast_collections.generator.CollectionGenerator
+import fr.sncf.osrd.fast_collections.generator.CollectionItemType
+import fr.sncf.osrd.fast_collections.generator.GeneratorContext
+import fr.sncf.osrd.fast_collections.generator.appendText
 
 const val DEFAULT_CAPACITY = 4
 
@@ -258,11 +261,22 @@ private fun CollectionItemType.generateArrayList(context: GeneratorContext, curr
 
             /** GENERATED CODE */
             fun ${paramsDecl} mutable${simpleName}ArrayListOf(a: $type, b: $type, c: $type, d: $type): Mutable${simpleName}ArrayList${paramsUse} {
-                val res = Mutable${simpleName}ArrayList${paramsUse}(3)
+                val res = Mutable${simpleName}ArrayList${paramsUse}(4)
                 res.add(a)
                 res.add(b)
                 res.add(c)
                 res.add(d)
+                return res
+            }
+
+            /** GENERATED CODE */
+            fun ${paramsDecl} mutable${simpleName}ArrayListOf(a: $type, b: $type, c: $type, d: $type, e: $type): Mutable${simpleName}ArrayList${paramsUse} {
+                val res = Mutable${simpleName}ArrayList${paramsUse}(5)
+                res.add(a)
+                res.add(b)
+                res.add(c)
+                res.add(d)
+                res.add(e)
                 return res
             }
         """

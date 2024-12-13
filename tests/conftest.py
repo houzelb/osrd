@@ -162,7 +162,7 @@ def west_to_south_east_path(small_infra: Infra, fast_rolling_stock: int) -> Iter
             "rolling_stock_is_thermal": True,
             "rolling_stock_loading_gauge": "G1",
             "rolling_stock_supported_electrifications": [],
-            "rolling_stock_supported_signaling_systems": ["BAL", "BAPR", "TVM300", "TVM430"],
+            "rolling_stock_supported_signaling_systems": ["BAL", "BAPR", "TVM300", "TVM430", "ETCS_LEVEL2"],
             "rolling_stock_maximum_speed": 200,
             "rolling_stock_length": 100000,
         },

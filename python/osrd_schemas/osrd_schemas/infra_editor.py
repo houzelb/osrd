@@ -12,6 +12,7 @@ class SignalingSystem(str, Enum):
     bapr = "BAPR"
     tvm300 = "TVM300"
     tvm430 = "TVM430"
+    etcsLevel2 = "ETCS_LEVEL2"
 
 
 class FlagSignalParameter(str, Enum):
@@ -102,10 +103,31 @@ class Tvm430System(BaseLogicalSignal):
     )
 
 
+class EtcsLevel2System(BaseLogicalSignal):
+    class Settings(BaseModel):
+        Nf: FlagSignalParameter = Field(description="Is the signal non-passable")
+
+    class Parameters(BaseModel):
+        pass
+
+    class ConditionalParameters(BaseModel):
+        on_route: Identifier = Field(description="Route for which those parameters are active")
+        parameters: "EtcsLevel2System.Parameters" = Field(description="ETCS_LEVEL2 signal parameters")
+
+    signaling_system: Literal["ETCS_LEVEL2"] = Field(default="ETCS_LEVEL2")
+    settings: Settings = Field(description="ETCS_LEVEL2 signal settings")
+    default_parameters: Parameters = Field(description="ETCS_LEVEL2 signal parameters")
+    conditional_parameters: List[ConditionalParameters] = Field(
+        description="ETCS_LEVEL2 signal parameters for specific routes", default_factory=list
+    )
+
+
 class LimitedLogicalSignal(RootModel):
     """Limited list of logical signals. Used to generate a usable schema for the front editor"""
 
-    root: Union[BalSystem, BaprSystem, Tvm300System, Tvm430System] = Field(..., discriminator="signaling_system")
+    root: Union[BalSystem, BaprSystem, Tvm300System, Tvm430System, EtcsLevel2System] = Field(
+        ..., discriminator="signaling_system"
+    )
 
 
 class _TmpSignal(BaseModel):
