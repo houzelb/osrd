@@ -4,6 +4,7 @@ import { type Locator, type Page, expect } from '@playwright/test';
 import { v4 as uuidv4 } from 'uuid';
 
 import { getInfraById } from './api-setup';
+import { logger } from '../test-logger';
 
 /**
  * Fill the input field identified by ID or TestID with the specified value and verifies it.
@@ -88,7 +89,20 @@ export async function clickWithDelay(element: Locator, delay = 500): Promise<voi
   await element.click();
   await element.page().waitForTimeout(delay);
 }
-
+/**
+ * Generic function to handle input fields.
+ *
+ * @param {Locator} inputField - The locator for the input field to interact with.
+ * @param {string} [value] - The value to input into the field. If not provided, the function will do nothing.
+ * @returns {Promise<void>} A promise that resolves once the input field is filled and verified.
+ */
+export async function handleAndVerifyInput(inputField: Locator, value?: string): Promise<void> {
+  if (value) {
+    await inputField.click();
+    await inputField.fill(value);
+    await expect(inputField).toHaveValue(value);
+  }
+}
 /**
  * Convert a date string from YYYY-MM-DD format to "DD mmm YYYY" format.
  * @param dateString - The input date string in YYYY-MM-DD format.
@@ -123,12 +137,12 @@ export const waitForInfraStateToBeCached = async (infraId: number): Promise<void
     const infra = await getInfraById(infraId); // Retrieve the latest infra object
     if (infra.state === 'CACHED') {
       const totalTime = Date.now() - startTime;
-      console.info(
+      logger.info(
         `Infrastructure state is 'CACHED'. Total time taken: ${totalTime / 1000} seconds.`
       );
       return;
     }
-    console.info(
+    logger.info(
       `Attempt ${attempt + 1}: Infrastructure current state is '${infra.state}', waiting...`
     );
     await new Promise((resolve) => {

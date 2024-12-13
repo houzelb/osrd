@@ -11,6 +11,7 @@ import {
   getScenario,
   getProject,
 } from './api-setup';
+import { logger } from '../test-logger';
 
 /**
  * Delete infrastructure by name if it exists.
@@ -24,7 +25,7 @@ export async function deleteInfra(infraName: string): Promise<void> {
   if (infra) {
     await deleteApiRequest(`/api/infra/${infra.id}`);
   } else {
-    console.warn(`Infra "${infraName}" not found for deletion.`);
+    logger.warn(`Infra "${infraName}" not found for deletion.`);
   }
 }
 
@@ -39,7 +40,7 @@ export async function deleteProject(projectName: string): Promise<void> {
   if (project) {
     await deleteApiRequest(`/api/projects/${project.id}`);
   } else {
-    console.warn(`Project "${projectName}" not found for deletion.`);
+    logger.warn(`Project "${projectName}" not found for deletion.`);
   }
 }
 
@@ -66,7 +67,7 @@ export async function deleteRollingStocks(rollingStockNames: string[]): Promise<
       rollingStockIds.map((id: number) => deleteApiRequest(`/api/rolling_stock/${id}`))
     );
   } else {
-    console.warn('No matching rolling stocks found for deletion.');
+    logger.warn('No matching rolling stocks found for deletion.');
   }
 }
 
@@ -82,7 +83,7 @@ export async function deleteStudy(projectId: number, studyName: string): Promise
   if (study) {
     await deleteApiRequest(`/api/projects/${projectId}/studies/${study.id}`);
   } else {
-    console.warn(`Study "${studyName}" not found for deletion.`);
+    logger.warn(`Study "${studyName}" not found for deletion.`);
   }
 }
 
@@ -103,6 +104,6 @@ export async function deleteScenario(
       `/api/projects/${projectId}/studies/${studyId}/scenarios/${scenario.id}`
     );
   } else {
-    console.warn(`Scenario "${scenarioName}" not found for deletion.`);
+    logger.warn(`Scenario "${scenarioName}" not found for deletion.`);
   }
 }
