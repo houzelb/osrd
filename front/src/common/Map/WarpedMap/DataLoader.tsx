@@ -141,11 +141,13 @@ const DataLoader = ({ bbox, getGeoJSONs, layers }: DataLoaderProps) => {
       >
         {state === 'render' && (
           <>
-            <Source id="osm" type="vector" url={OSM_URL}>
-              {osmLayers.map((layer) => (
-                <OrderedLayer key={layer.id} {...layer} />
-              ))}
-            </Source>
+            {OSM_URL && (
+              <Source id="osm" type="vector" url={OSM_URL}>
+                {osmLayers.map((layer) => (
+                  <OrderedLayer key={layer.id} {...layer} />
+                ))}
+              </Source>
+            )}
             <GeoJSONs
               colors={colors[mapStyle]}
               layersSettings={layersSettings}

@@ -5,7 +5,9 @@ export * from 'common/Map/Consts/SignalsNames';
 // Map constants
 export const MAP_URL = `${config.proxy_editoast}/layers`;
 export const SPRITES_URL = `${config.proxy_editoast}/sprites`;
-export const OSM_URL = 'https://osm.osrd.fr/data/v3.json';
+export const OSM_URL = ''; // TODO: set the new url once the server is ready
+export const TERRAIN_URL = ''; // TODO: set the new url once the server is ready
+export const HILLSHADE_URL = ''; // TODO: set the new url once the server is ready
 
 export const MAP_MODES = {
   display: 'display',

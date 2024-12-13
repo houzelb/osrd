@@ -23,6 +23,7 @@ export function Platforms(props: PlatformsProps) {
     },
   };
 
+  if (!OSM_URL) return null;
   return (
     <Source id="platforms" type="vector" url={OSM_URL} source-layer="transportation">
       <OrderedLayer {...platformsParams} layerOrder={layerOrder} />

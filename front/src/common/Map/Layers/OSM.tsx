@@ -84,7 +84,7 @@ function OSM({ mapStyle, layerOrder, mapIsLoaded }: OSMProps) {
 
   const toggledLayers = { showOSM3dBuildings };
 
-  if (reload) return null;
+  if (reload || !OSM_URL) return null;
   return (
     <Source id="osm" type="vector" url={OSM_URL}>
       {genOSMLayers(mapStyle, toggledLayers, layerOrder)}

@@ -2,6 +2,7 @@ import { Source, type LayerProps } from 'react-map-gl/maplibre';
 
 import OrderedLayer from 'common/Map/Layers/OrderedLayer';
 import type { Theme } from 'types';
+import { OSM_URL } from '../const';
 
 interface BackgroundProps {
   colors: Theme;
@@ -23,12 +24,7 @@ function Background(props: BackgroundProps) {
   };
 
   return (
-    <Source
-      id="platform"
-      type="vector"
-      url="https://osm.osrd.fr/data/v3.json"
-      source-layer="transportation"
-    >
+    <Source id="platform" type="vector" url={OSM_URL} source-layer="transportation">
       <OrderedLayer {...backgroundParams} layerOrder={layerOrder} />
     </Source>
   );

@@ -44,7 +44,7 @@ function TracksOSM(props: TracksOSMProps) {
     },
   };
 
-  if (!showOSMtracksections) return null;
+  if (!showOSMtracksections || !OSM_URL) return null;
   return (
     <Source id="tracksOSM" type="vector" url={OSM_URL} source-layer="transportation">
       <OrderedLayer {...railwayMinor} layerOrder={layerOrder} />
