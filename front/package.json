@@ -100,8 +100,8 @@
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "^10.1.0",
-    "@import-meta-env/prepare": "^0.1.13",
-    "@import-meta-env/unplugin": "^0.5.1",
+    "@import-meta-env/prepare": "^0.2.1",
+    "@import-meta-env/unplugin": "^0.6.1",
     "@playwright/test": "^1.41.2",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -124,7 +124,6 @@
     "@vitejs/plugin-react": "^4.3.4",
     "@vitejs/plugin-react-swc": "^3.7.2",
     "@vitest/coverage-v8": "^2.1.8",
-    "dotenv": "^16.4.7",
     "eslint": "^8.56.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^9.1.0",
