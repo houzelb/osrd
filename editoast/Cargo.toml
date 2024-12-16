@@ -171,7 +171,7 @@ strum.workspace = true
 thiserror.workspace = true
 tokio.workspace = true
 tokio-util = { version = "0.7.13", features = ["io", "tracing"] }
-tower = "0.5.1"
+tower = "0.5.2"
 tower-http = { version = "0.6.2", features = [
   "cors",
   "fs",
