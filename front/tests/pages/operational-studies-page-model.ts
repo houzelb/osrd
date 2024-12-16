@@ -123,6 +123,7 @@ class OperationalStudiesPage extends CommonPage {
 
   async addTrainSchedule() {
     await this.addTrainScheduleButton.click();
+    await this.closeToastNotification();
   }
 
   async setTrainScheduleName(name: string) {

@@ -3,17 +3,16 @@ import { type Locator, type Page, expect } from '@playwright/test';
 import enTranslations from '../../public/locales/en/operationalStudies/scenario.json';
 import frTranslations from '../../public/locales/fr/operationalStudies/scenario.json';
 import { clickWithDelay } from '../utils';
+import CommonPage from './common-page-model';
 
-class OperationalStudiesTimetablePage {
-  readonly page: Page;
-
+class OperationalStudiesTimetablePage extends CommonPage {
   readonly invalidTrainsMessage: Locator;
 
   readonly timetableTrains: Locator;
 
   readonly selectedTimetableTrain: Locator;
 
-  // TODO: remove this commented code when the design of simationBar has been changed
+  // TODO: remove this commented code when the design of simulation bar has been changed
   // readonly simulationBar: Locator;
 
   readonly manchetteSpaceTimeChart: Locator;
@@ -43,11 +42,11 @@ class OperationalStudiesTimetablePage {
   readonly scenarioSideMenu: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.invalidTrainsMessage = page.getByTestId('invalid-trains-message');
     this.timetableTrains = page.getByTestId('scenario-timetable-train');
     this.selectedTimetableTrain = page.locator('[data-testid="scenario-timetable-train"].selected');
-    // TODO: remove this commented code when the design of simationBar has been changed
+    // TODO: remove this commented code when the design of simulation bar has been changed
     // this.simulationBar = page.locator('.osrd-simulation-sticky-bar');
     this.manchetteSpaceTimeChart = page.locator('.manchette-space-time-chart-wrapper');
     this.speedSpaceChart = page.locator('#container-SpeedSpaceChart');
@@ -224,6 +223,7 @@ class OperationalStudiesTimetablePage {
 
   async clickOnEditTrainSchedule() {
     await this.editTrainScheduleButton.click();
+    await this.closeToastNotification();
   }
 
   async getTrainArrivalTime(expectedArrivalTime: string) {

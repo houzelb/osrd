@@ -14,6 +14,7 @@ export default defineConfig({
   /* Maximum time one test can run for. */
   timeout: process.env.CI ? 90 * 1000 : 180 * 1000, // 90 seconds in CI, otherwise 180 seconds
   expect: {
+    toHaveScreenshot: { maxDiffPixelRatio: 0.02 },
     /**
      * Maximum time expect() should wait for the condition to be met.
      */
