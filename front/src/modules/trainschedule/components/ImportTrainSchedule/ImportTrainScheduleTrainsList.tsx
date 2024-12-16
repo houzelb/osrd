@@ -64,7 +64,7 @@ const ImportTrainScheduleTrainsList = ({
 
         const validTrainNameKey = findValidTrainNameKey(rollingStock);
         const validTrainName = validTrainNameKey
-          ? rollingstockOpenData2OSRD[validTrainNameKey as keyof typeof rollingstockOpenData2OSRD]
+          ? rollingstockOpenData2OSRD[validTrainNameKey]
           : rollingStock;
 
         return { ...train, rollingStock: validTrainName };

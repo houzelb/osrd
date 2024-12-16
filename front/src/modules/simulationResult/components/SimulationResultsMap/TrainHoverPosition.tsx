@@ -219,7 +219,7 @@ function TrainHoverPosition(props: TrainHoverPositionProps) {
     point.tailDistanceAlong
   ) {
     const { ecoBlocks } = get(allowancesSettings, train.id, {} as AllowancesSetting);
-    const fill = getFill(isSelectedTrain as boolean, ecoBlocks);
+    const fill = getFill(isSelectedTrain, ecoBlocks);
     const label = getSpeedTimeLabel(isSelectedTrain, ecoBlocks, point);
 
     const zoomLengthFactor = getzoomPowerOf2LengthFactor(viewport);

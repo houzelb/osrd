@@ -218,7 +218,7 @@ const SelectionTool: Tool<SelectionState> = {
           const selection = map
             .queryRenderedFeatures([
               map.project(state.selectionState.rectangleTopLeft),
-              map.project(position.toArray() as [number, number]),
+              map.project(position.toArray()),
             ])
             .filter((f) => !f.layer.id.startsWith('osm'));
 
@@ -253,7 +253,7 @@ const SelectionTool: Tool<SelectionState> = {
           ...state,
           selectionState: {
             ...state.selectionState,
-            rectangleTopLeft: position.toArray() as [number, number],
+            rectangleTopLeft: position.toArray(),
           },
         });
       }
@@ -306,7 +306,7 @@ const SelectionTool: Tool<SelectionState> = {
           ...state,
           selectionState: {
             ...state.selectionState,
-            polygonPoints: points.concat([position.toArray() as [number, number]]),
+            polygonPoints: points.concat([position.toArray()]),
           },
         });
       }

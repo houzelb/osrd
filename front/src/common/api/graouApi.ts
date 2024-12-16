@@ -2,6 +2,8 @@ import type {
   ImportStation,
   TrainScheduleImportConfig,
 } from 'applications/operationalStudies/types';
+import { setFailure } from 'reducers/main';
+import { castErrorToFailure } from 'utils/error';
 
 export const GRAOU_URL = 'https://graou.info';
 
@@ -12,9 +14,9 @@ export const getGraouTrainSchedules = async (config: TrainScheduleImportConfig) 
   });
   try {
     const res = await fetch(`${GRAOU_URL}/api/trainschedules.php?${params}`);
-    return res.json();
+    return res.json() as Promise<Record<string, unknown>[]>;
   } catch (error) {
-    console.error(error);
+    setFailure(castErrorToFailure(error));
     return null;
   }
 };

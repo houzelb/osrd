@@ -61,6 +61,7 @@ async function getAdditionalEntities(
         try {
           return { [trackId]: await getEntity(infra, trackId, 'TrackSection', dispatch) };
         } catch (e) {
+          console.error(e);
           return {};
         }
       }
@@ -79,6 +80,7 @@ async function getAdditionalEntities(
         );
         return results;
       } catch (e) {
+        console.error(e);
         return {};
       }
     }
@@ -94,6 +96,7 @@ async function getAdditionalEntities(
         );
       } catch (e) {
         // ignore error
+        console.error(e);
       }
       try {
         results.exitPoint = await getEntity(
@@ -104,6 +107,7 @@ async function getAdditionalEntities(
         );
       } catch (e) {
         // ignore error
+        console.error(e);
       }
       return results;
     }
@@ -327,16 +331,18 @@ const EntitySumUp = ({ entity, id, objType, classes, status, error }: EntitySumU
     const fetchEntities = async () => {
       setState({ type: 'loading' });
 
-      if (!entity) {
-        entity = await getEntity(infraID!, id, objType as EditoastType, dispatch);
+      if (!entity && objType && id) {
+        entity = await getEntity(infraID!, id, objType, dispatch);
       }
 
-      const additionalEntities = await getAdditionalEntities(infraID!, entity, dispatch);
-      setState({
-        type: 'ready',
-        entity,
-        additionalEntities,
-      });
+      if (entity) {
+        const additionalEntities = await getAdditionalEntities(infraID!, entity, dispatch);
+        setState({
+          type: 'ready',
+          entity,
+          additionalEntities,
+        });
+      }
     };
 
     fetchEntities();

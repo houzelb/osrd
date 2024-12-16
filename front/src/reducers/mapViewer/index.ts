@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { InfraState } from 'reducers/infra';
 import { infraState, buildInfraStateReducers } from 'reducers/infra';
 
-export interface MapViewerState extends InfraState {}
+export type MapViewerState = InfraState;
 
 export const mapViewerInitialState: MapViewerState = {
   ...infraState,

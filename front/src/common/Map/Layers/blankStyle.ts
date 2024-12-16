@@ -13,6 +13,7 @@ const isValidUrl = async (url: string) => {
       const response = await fetch(`${url}.${extension}`);
       return response.ok;
     } catch (error) {
+      console.error(error);
       return false;
     }
   };
