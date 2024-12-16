@@ -231,6 +231,7 @@ class TowedRollingStock(BaseModel, extra="forbid"):
     locked: bool = Field(default=False, description="Whether the rolling stock can be edited/deleted or not")
     mass: NonNegativeFloat = Field(description="The mass of the train, in kg")
     length: NonNegativeFloat = Field(description="The length of the train, in m")
+    max_speed: Optional[NonNegativeFloat] = Field(description="The maximum speed of the train, in m/s")
     comfort_acceleration: NonNegativeFloat = Field(description="The maximum operational acceleration in m/s^2")
     startup_acceleration: NonNegativeFloat = Field(description="The maximum acceleration during startup in m/s^2")
     inertia_coefficient: NonNegativeFloat = Field(description="The coefficient of inertia")
