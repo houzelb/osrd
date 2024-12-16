@@ -44,7 +44,7 @@ function computeMargins(
     !margins ||
     pathStepIndex === selectedTrainSchedule.path.length - 1 ||
     !stepTheoreticalMarginInfo ||
-    !(schedule || stepTheoreticalMarginInfo.isBoundary)
+    !((schedule && schedule.arrival) || stepTheoreticalMarginInfo.isBoundary)
   ) {
     return {
       theoreticalMargin: undefined,
@@ -62,7 +62,7 @@ function computeMargins(
   for (let index = pathStepIndex + 1; index < path.length; index += 1) {
     const curStepId = path[index].id;
     const curStepSchedule = scheduleByAt[curStepId];
-    if (theoreticalMargins[curStepId]?.isBoundary || curStepSchedule) {
+    if (theoreticalMargins[curStepId]?.isBoundary || (curStepSchedule && curStepSchedule.arrival)) {
       nextIndex = index;
       break;
     }

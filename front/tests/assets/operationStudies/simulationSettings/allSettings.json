@@ -9,8 +9,8 @@
     "signalReceptionClosed": false,
     "margin": {
       "theoretical": "5 %",
-      "theoreticalS": "86 s",
-      "actual": "86 s",
+      "theoreticalS": "117 s",
+      "actual": "117 s",
       "difference": "0 s"
     },
     "calculatedArrival": "11:22:40",
@@ -42,10 +42,10 @@
     "stopTime": "124",
     "signalReceptionClosed": false,
     "margin": {
-      "theoretical": "5 %",
-      "theoreticalS": "32 s",
-      "actual": "32 s",
-      "difference": "0 s"
+      "theoretical": "",
+      "theoreticalS": "",
+      "actual": "",
+      "difference": ""
     },
     "calculatedArrival": "11:53:04",
     "calculatedDeparture": "11:55:08"
