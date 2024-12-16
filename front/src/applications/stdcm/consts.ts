@@ -20,3 +20,15 @@ export const COMPOSITION_CODES = [
   'MV160',
   'MVGV',
 ];
+
+export const COMPOSITION_CODES_MAX_SPEEDS: Record<string, number | undefined> = {
+  MA80: 80,
+  MA90: 90,
+  MA100: 100,
+  ME100: 100,
+  ME120: 120,
+  ME140: 140,
+  ME160: 160,
+  HLP: 100,
+  MVGV: 200,
+};
