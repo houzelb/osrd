@@ -48,7 +48,7 @@
     "@typescript-eslint/no-unsafe-call": "error",
     "@typescript-eslint/non-nullable-type-assertion-style": "error",
 
-    "@typescript-eslint/ban-types": [
+    "@typescript-eslint/no-restricted-types": [
       "error",
       {
         "types": {

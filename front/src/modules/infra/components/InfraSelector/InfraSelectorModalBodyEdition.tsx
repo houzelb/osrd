@@ -41,6 +41,7 @@ const InfraSelectorModalBodyEdition = ({
     try {
       JSON.parse(await fileToValidate.text());
     } catch (e) {
+      console.error(e);
       setErrorMessage(t('jsonUpload.badJSON'));
       return false;
     }

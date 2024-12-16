@@ -73,7 +73,7 @@ const RollingStockEditor = () => {
                   rollingStock={selectedRollingStock}
                   setIsEditing={setIsEditing}
                   resetFilters={resetFilters}
-                  isRollingStockLocked={selectedRollingStock.locked as boolean}
+                  isRollingStockLocked={selectedRollingStock.locked}
                 />
               </div>
             )}

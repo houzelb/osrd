@@ -210,6 +210,7 @@ const IntervalEditorComponent = (
                 }
               } catch (e) {
                 // TODO: should we display it ?
+                console.error(e);
               }
             }}
           />
@@ -399,6 +400,7 @@ const IntervalEditorComponent = (
                     customOnChange(newData);
                   } catch (error) {
                     // TODO: Should we display the resize error ?
+                    console.error(error);
                   } finally {
                     setSelectedData(newItem);
                   }

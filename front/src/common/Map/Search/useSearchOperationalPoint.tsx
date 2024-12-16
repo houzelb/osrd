@@ -4,6 +4,8 @@ import { isEmpty } from 'lodash';
 
 import { type SearchResultItemOperationalPoint, osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import { useInfraID } from 'common/osrdContext';
+import { setFailure } from 'reducers/main';
+import { castErrorToFailure } from 'utils/error';
 import { useDebounce } from 'utils/helpers';
 
 export const MAIN_OP_CH_CODES = ['', '00', 'BV'];
@@ -52,6 +54,7 @@ export default function useSearchOperationalPoint({
       setSearchResults(results as SearchResultItemOperationalPoint[]);
     } catch (error) {
       setSearchResults([]);
+      setFailure(castErrorToFailure(error));
     }
   };
 

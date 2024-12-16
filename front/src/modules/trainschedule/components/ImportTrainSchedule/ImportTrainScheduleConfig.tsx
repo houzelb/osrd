@@ -115,7 +115,7 @@ const ImportTrainScheduleConfig = ({
     setTrainsXmlData([]);
 
     const result = await getGraouTrainSchedules(config);
-    const importedTrainSchedules = validateImportedTrainSchedules(result);
+    const importedTrainSchedules = validateImportedTrainSchedules(result!);
     if (importedTrainSchedules && !isEmpty(importedTrainSchedules)) {
       updateTrainSchedules(importedTrainSchedules);
     }

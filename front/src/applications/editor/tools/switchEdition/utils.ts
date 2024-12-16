@@ -29,7 +29,7 @@ export function isSwitchValid(entity: Partial<SwitchEntity>, type: SwitchType): 
 /**
  * "Flat switch" management:
  */
-export const FLAT_SWITCH_PORTS_PREFIX = 'port::' as const;
+export const FLAT_SWITCH_PORTS_PREFIX = 'port::';
 
 export type FlatSwitchEntity = Omit<
   EditorEntity<Point, { [key: `${typeof FLAT_SWITCH_PORTS_PREFIX}${string}`]: TrackEndpoint }>,
@@ -38,7 +38,7 @@ export type FlatSwitchEntity = Omit<
   objType: 'FlatSwitch';
 };
 
-export const GROUP_CHANGE_DELAY = 'group_change_delay' as const;
+export const GROUP_CHANGE_DELAY = 'group_change_delay';
 
 export function getSwitchTypeJSONSchema(
   baseSchema: JSONSchema7,

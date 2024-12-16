@@ -187,6 +187,7 @@ const RouteEditionPanel = () => {
         },
       });
     } catch (e) {
+      console.error(e);
       setState({ optionsState: { type: 'idle' } });
     }
   }, [infraID, setState, state.entity]);
