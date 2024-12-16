@@ -47,6 +47,8 @@ type ManchetteWithSpaceTimeChartProps = {
 };
 
 export const MANCHETTE_WITH_SPACE_TIME_CHART_DEFAULT_HEIGHT = 561;
+const BOTTOM_TOOLBAR_HEIGHT = 40;
+const SPACE_TIME_CHART_DIFF_HEIGHT = 8;
 
 const ManchetteWithSpaceTimeChartWrapper = ({
   operationalPoints,
@@ -232,14 +234,14 @@ const ManchetteWithSpaceTimeChartWrapper = ({
         style={{ height }}
         onScroll={handleScroll}
       >
-        <Manchette {...manchettePropsWithWaypointMenu} height={height} />
+        <Manchette {...manchettePropsWithWaypointMenu} height={height - BOTTOM_TOOLBAR_HEIGHT} />
         <div
           className="space-time-chart-container"
           style={{
             bottom: 0,
             left: 0,
             top: 2,
-            height: height - 6,
+            height: height - SPACE_TIME_CHART_DIFF_HEIGHT,
           }}
         >
           <div className="toolbar">
