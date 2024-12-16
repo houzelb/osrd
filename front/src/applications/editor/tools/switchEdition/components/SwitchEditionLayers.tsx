@@ -2,7 +2,6 @@ import { useContext, useEffect, useMemo, useState } from 'react';
 
 import { featureCollection, point } from '@turf/helpers';
 import nearestPoint from '@turf/nearest-point';
-import type { Position } from 'geojson';
 import { first, last } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { Layer, Popup, Source } from 'react-map-gl/maplibre';
@@ -98,10 +97,7 @@ const SwitchEditionLayers = () => {
     const trackSectionPoints = hoveredTrack.geometry.coordinates;
     const closest = nearestPoint(
       mousePosition,
-      featureCollection([
-        point(first(trackSectionPoints) as Position),
-        point(last(trackSectionPoints) as Position),
-      ])
+      featureCollection([point(first(trackSectionPoints)!), point(last(trackSectionPoints)!)])
     );
 
     setState({

@@ -43,9 +43,9 @@ export function getSamples(
   const step = l / (samples - 1);
   for (let i = 0; i < samples; i++) {
     if (!i) {
-      points.push(point(first(line.geometry.coordinates) as Position));
+      points.push(point(first(line.geometry.coordinates)!));
     } else if (i === samples - 1) {
-      points.push(point(last(line.geometry.coordinates) as Position));
+      points.push(point(last(line.geometry.coordinates)!));
     } else {
       points.push(along(line, step * i, { units: 'meters' }));
     }

@@ -97,8 +97,8 @@ export function computeRouteGeometry(
         const isFirst = !i;
         const isLast = i === trackRanges.length - 1;
 
-        const p1 = first(track.geometry.coordinates) as Position;
-        const p2 = last(track.geometry.coordinates) as Position;
+        const p1 = first(track.geometry.coordinates)!;
+        const p2 = last(track.geometry.coordinates)!;
 
         // Weird case of only range:
         if (isFirst && isLast) {

@@ -15,7 +15,6 @@ import type {
   SpeedSectionPslEntity,
   AvailableSwitchPositions,
   SwitchPosition,
-  ApplicableTrackRange,
 } from 'applications/editor/tools/rangeEdition/types';
 import {
   makeSpeedRestrictionTrackRanges,
@@ -158,7 +157,7 @@ const RangeEditionLeftPanel = () => {
           true
         );
         if (returnedExtra) {
-          newRouteExtra[routeId] = last(trackRangesWithBothDirections) as ApplicableTrackRange;
+          newRouteExtra[routeId] = last(trackRangesWithBothDirections)!;
         }
         return trackRangesWithBothDirections;
       });

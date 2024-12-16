@@ -70,7 +70,7 @@ export function getQuadTree<G extends Geometry | null = Geometry, P = GeoJsonPro
           const candidate = candidates[k];
           if (bboxIntersect(fBBox, candidate)) {
             quad.children[k] = quad.children[k] || getNewQuadChild(candidate, d === depth - 1);
-            newQuads.push(quad.children[k] as QuadChild<Feature<G, P>>);
+            newQuads.push(quad.children[k]!);
           }
         }
       }

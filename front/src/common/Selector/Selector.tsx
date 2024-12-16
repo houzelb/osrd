@@ -40,7 +40,7 @@ const SelectorItem = <T extends string | null>({
     updateData: (newData: { [key: string]: string }) => void;
   };
 }) => {
-  const inputValue = extraColumn?.data[item.id as string] || '';
+  const inputValue = extraColumn?.data[item.id!] || '';
   const isDisabled = isDefaultItem || !extraColumn;
   const isWarning = inputValue === '' && !isDisabled;
 
@@ -104,11 +104,11 @@ const SelectorItem = <T extends string | null>({
             sm
             noMargin
             disabled={isDefaultItem}
-            value={isDefaultItem ? extraColumn.defaultValue : extraColumn.data[item.id as string]}
+            value={isDefaultItem ? extraColumn.defaultValue : extraColumn.data[item.id!]}
             onChange={(e) =>
               extraColumn.updateData({
                 ...extraColumn.data,
-                [item.id as string]: e.target.value,
+                [item.id!]: e.target.value,
               })
             }
           />

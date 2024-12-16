@@ -129,7 +129,7 @@ export const formatElectrificationRanges = (
       // We know we will find one because currentProfile is still defined
       const associatedProfile = electricalProfiles.find(
         (profile) => profile.stop >= currentElectrification.stop
-      ) as ElectricalRangesData<ElectricalProfileValue>;
+      )!;
 
       return {
         electrificationUsage: {
@@ -146,7 +146,7 @@ export const formatElectrificationRanges = (
     // We know we will find one because theirs last stops are the same
     const associatedProfile = electricalProfiles.find(
       (profile) => profile.stop >= currentElectrification.stop
-    ) as ElectricalRangesData<ElectricalProfileValue>;
+    )!;
 
     return {
       electrificationUsage: {
@@ -168,23 +168,9 @@ export const preparePathPropertiesData = (
   trainSchedulePath: TrainScheduleResult['path'],
   t: TFunction
 ): PathPropertiesFormatted => {
-  const formattedSlopes = transformBoundariesDataToPositionDataArray(
-    slopes as NonNullable<PathProperties['slopes']>,
-    length,
-    'gradient'
-  );
-
-  const formattedCurves = transformBoundariesDataToPositionDataArray(
-    curves as NonNullable<PathProperties['curves']>,
-    length,
-    'radius'
-  );
-
-  const electrificationsRanges = transformBoundariesDataToRangesData(
-    electrifications as NonNullable<PathProperties['electrifications']>,
-    length
-  );
-
+  const formattedSlopes = transformBoundariesDataToPositionDataArray(slopes!, length, 'gradient');
+  const formattedCurves = transformBoundariesDataToPositionDataArray(curves!, length, 'radius');
+  const electrificationsRanges = transformBoundariesDataToRangesData(electrifications!, length);
   const electricalProfilesRanges = transformBoundariesDataToRangesData(electricalProfiles, length);
 
   const electrificationRanges = formatElectrificationRanges(
@@ -192,10 +178,7 @@ export const preparePathPropertiesData = (
     electricalProfilesRanges
   );
 
-  const voltageRanges = getPathVoltages(
-    electrifications as NonNullable<PathProperties['electrifications']>,
-    length
-  );
+  const voltageRanges = getPathVoltages(electrifications!, length);
 
   const operationalPointsWithAllWaypoints = upsertMapWaypointsInOperationalPoints(
     trainSchedulePath,
@@ -209,7 +192,7 @@ export const preparePathPropertiesData = (
     curves: formattedCurves,
     slopes: formattedSlopes,
     operationalPoints: operationalPointsWithAllWaypoints,
-    geometry: geometry as NonNullable<PathProperties['geometry']>,
+    geometry: geometry!,
     voltages: voltageRanges,
   };
 };
