@@ -1,13 +1,7 @@
 .scenario {
-  --navbar-height: 65px;
-  --content-height: calc(100vh - var(--navbar-height));
-  position: relative;
+  height: 100vh;
   background-color: var(--ambiantB10);
   font-family: 'IBM Plex Sans';
-  .scenario-container {
-    margin: 0;
-    position: relative;
-  }
 
   @keyframes fadein {
     from {
@@ -114,7 +108,7 @@
   .scenario-sidemenu {
     display: flex;
     flex-direction: column;
-    height: var(--content-height);
+    height: 100%;
     background-color: var(--black5);
     padding: 14px 24px 0 24px;
     box-shadow: inset -1px 0 var(--black5);
@@ -823,11 +817,6 @@
     position: relative;
     overflow: auto;
     width: 100%;
-    height: var(--content-height);
-  }
-
-  .macro-container {
-    height: calc(var(--content-height) - 20px);
-    padding-right: 10px;
+    height: 100%;
   }
 }
