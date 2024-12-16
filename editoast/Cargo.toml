@@ -97,7 +97,7 @@ axum-test = { version = "16.4.0", default-features = false }
 axum-tracing-opentelemetry = { version = "0.24.1", default-features = false }
 chrono.workspace = true
 clap = { version = "4.5.23", features = ["derive", "env"] }
-colored = "2.1.0"
+colored = "2.2.0"
 dashmap = "6.1.0"
 deadpool = { version = "0.12.1", features = [
   "managed",
