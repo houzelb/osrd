@@ -138,7 +138,7 @@ json-patch = { version = "3.0.1", default-features = false, features = [
 lapin = "2.5.0"
 mime = "0.3.17"
 mvt.workspace = true
-opentelemetry = { version = "0.27.0", default-features = false, features = [
+opentelemetry = { version = "0.27.1", default-features = false, features = [
   "trace",
 ] }
 opentelemetry-otlp = { version = "0.27.0", default-features = false, features = [
@@ -146,7 +146,7 @@ opentelemetry-otlp = { version = "0.27.0", default-features = false, features = 
   "trace",
 ] }
 opentelemetry-semantic-conventions.workspace = true
-opentelemetry_sdk = { version = "0.27.0", features = ["rt-tokio", "trace"] }
+opentelemetry_sdk = { version = "0.27.1", features = ["rt-tokio", "trace"] }
 ordered-float = { version = "4.5.0", features = ["serde"] }
 osm_to_railjson = { path = "./osm_to_railjson" }
 paste.workspace = true

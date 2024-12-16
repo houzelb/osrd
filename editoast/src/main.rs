@@ -106,10 +106,9 @@ fn init_tracing(mode: EditoastMode, telemetry_config: &client::TelemetryConfig) 
                     Box::new(EnvResourceDetector::new()),
                 ],
             ));
-            let trace_config = opentelemetry_sdk::trace::Config::default().with_resource(resource);
             let otlp_tracer = opentelemetry_sdk::trace::TracerProvider::builder()
                 .with_batch_exporter(exporter, opentelemetry_sdk::runtime::Tokio)
-                .with_config(trace_config)
+                .with_resource(resource)
                 .build()
                 .tracer("osrd-editoast");
             let layer = tracing_opentelemetry::OpenTelemetryLayer::new(otlp_tracer);
