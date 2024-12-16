@@ -42,10 +42,10 @@
     "stopTime": "124",
     "signalReceptionClosed": false,
     "margin": {
-      "theoretical": "0 %",
-      "theoreticalS": "0 s",
-      "actual": "0 s",
-      "difference": "0 s"
+      "theoretical": "",
+      "theoreticalS": "",
+      "actual": "",
+      "difference": ""
     },
     "calculatedArrival": "11:50:58",
     "calculatedDeparture": "11:53:02"

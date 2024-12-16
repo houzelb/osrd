@@ -71,16 +71,16 @@ describe('computeMargins', () => {
     expect(computeMargins(theoreticalMargins, train, scheduleByAt, 2, pathItemTimes)).toEqual({
       theoreticalMargin: '5 %',
       isTheoreticalMarginBoundary: true,
-      theoreticalMarginSeconds: '10 s',
-      calculatedMargin: '10 s',
+      theoreticalMarginSeconds: '15 s',
+      calculatedMargin: '15 s',
       diffMargins: '0 s',
     });
     expect(computeMargins(theoreticalMargins, train, scheduleByAt, 3, pathItemTimes)).toEqual({
-      theoreticalMargin: '5 %',
-      isTheoreticalMarginBoundary: false,
-      theoreticalMarginSeconds: '5 s',
-      calculatedMargin: '5 s',
-      diffMargins: '0 s',
+      theoreticalMargin: undefined,
+      isTheoreticalMarginBoundary: undefined,
+      theoreticalMarginSeconds: undefined,
+      calculatedMargin: undefined,
+      diffMargins: undefined,
     });
     expect(computeMargins(theoreticalMargins, train, scheduleByAt, 4, pathItemTimes)).toEqual({
       theoreticalMargin: undefined,
