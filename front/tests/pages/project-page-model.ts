@@ -130,7 +130,7 @@ class ProjectPage extends CommonPage {
 
   // Retrieve a project element by its name.
   getProjectByName(name: string) {
-    return this.page.locator(`text=${name}`);
+    return this.page.locator(`.project-card .project-card-name:has-text("${name}")`);
   }
 
   // Delete a project by its name.

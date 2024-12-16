@@ -56,7 +56,12 @@ const ToastSNCF = ({ title, date, type, text }: Notification) => {
           {title || type}
         </strong>
         {date && <small>{dateToFromAgo(date)}</small>}
-        <button type="button" className="ml-2 close" onClick={() => setOpen(false)}>
+        <button
+          data-testid="close-toast-button"
+          type="button"
+          className="ml-2 close"
+          onClick={() => setOpen(false)}
+        >
           <span>&times;</span>
         </button>
       </div>

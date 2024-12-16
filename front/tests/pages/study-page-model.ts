@@ -192,7 +192,7 @@ class StudyPage extends CommonPage {
   }
 
   getStudyByName(name: string) {
-    return this.page.locator(`text=${name}`);
+    return this.page.locator(`.study-card .study-card-name-text:has-text("${name}")`);
   }
 
   // Open a study by its test ID (The Test ID is the same as the Name).

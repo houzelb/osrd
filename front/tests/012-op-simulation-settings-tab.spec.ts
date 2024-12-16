@@ -1,3 +1,5 @@
+import { expect } from '@playwright/test';
+
 import type {
   ElectricalProfileSet,
   Infra,
@@ -11,12 +13,13 @@ import HomePage from './pages/home-page-model';
 import OperationalStudiesInputTablePage from './pages/op-input-table-page-model';
 import OperationalStudiesOutputTablePage from './pages/op-output-table-page-model';
 import RoutePage from './pages/op-route-page-model';
+import OpSimulationResultPage from './pages/op-simulation-results-page-model';
 import OperationalStudiesSimulationSettingsPage from './pages/op-simulation-settings-page-model';
 import OperationalStudiesTimetablePage from './pages/op-timetable-page-model';
 import OperationalStudiesPage from './pages/operational-studies-page-model';
 import RollingStockSelectorPage from './pages/rollingstock-selector-page-model';
 import test from './test-logger';
-import { readJsonFile, waitForInfraStateToBeCached } from './utils';
+import { performOnSpecificOSAndBrowser, readJsonFile, waitForInfraStateToBeCached } from './utils';
 import { deleteApiRequest, getInfra, setElectricalProfile } from './utils/api-setup';
 import { cleanWhitespace, type StationData } from './utils/dataNormalizer';
 import createScenario from './utils/scenario';
@@ -84,7 +87,7 @@ test.describe('Simulation Settings Tab Verification', () => {
   test.beforeEach(
     'Navigate to Times and Stops tab with rolling stock and route set',
     async ({ page, browserName }) => {
-      stabilityTimeout = browserName === 'webkit' ? 2000 : 500;
+      stabilityTimeout = browserName === 'webkit' ? 2000 : 1000;
       const [operationalStudiesPage, routePage, rollingStockPage, homePage] = [
         new OperationalStudiesPage(page),
         new RoutePage(page),
@@ -106,12 +109,13 @@ test.describe('Simulation Settings Tab Verification', () => {
       await page.goto(
         `/operational-studies/projects/${project.id}/studies/${study.id}/scenarios/${scenario.id}`
       );
+      await homePage.removeViteOverlay();
       // Wait for infra to be in 'CACHED' state before proceeding
       await waitForInfraStateToBeCached(infra.id);
       // Add a new train and set its properties
       await operationalStudiesPage.clickOnAddTrainButton();
       await operationalStudiesPage.setTrainScheduleName('Train-name-e2e-test');
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(stabilityTimeout);
       await operationalStudiesPage.setTrainStartTime('11:22:40');
       // Select electric rolling stock
       await rollingStockPage.selectRollingStock(improbableRollingStockName);
@@ -127,20 +131,23 @@ test.describe('Simulation Settings Tab Verification', () => {
     await deleteScenario(project.id, study.id, scenario.name);
   });
 
-  test('Activate electrical profiles', async ({ page }) => {
+  test('Activate electrical profiles', async ({ page, browserName }) => {
     const [
       operationalStudiesPage,
       opInputTablePage,
       opTimetablePage,
       opOutputTablePage,
       opSimulationSettingsPage,
+      simulationResultPage,
     ] = [
       new OperationalStudiesPage(page),
       new OperationalStudiesInputTablePage(page),
       new OperationalStudiesTimetablePage(page),
       new OperationalStudiesOutputTablePage(page),
       new OperationalStudiesSimulationSettingsPage(page),
+      new OpSimulationResultPage(page),
     ];
+
     // Project selected language
     const translations = OSRDLanguage === 'English' ? enTranslations : frTranslations;
     const cell: CellData = {
@@ -167,6 +174,18 @@ test.describe('Simulation Settings Tab Verification', () => {
     await opTimetablePage.getTrainArrivalTime('11:53');
     await opTimetablePage.clickOnScenarioCollapseButton();
     await opOutputTablePage.verifyTimesStopsDataSheetVisibility();
+    await performOnSpecificOSAndBrowser(
+      async () => {
+        await simulationResultPage.selectAllSpeedSpaceChartCheckboxes();
+        await expect(simulationResultPage.speedSpaceChartTabindexElement).toHaveScreenshot(
+          'SpeedSpaceChart-ElectricalProfileActivated.png'
+        );
+      },
+      {
+        currentBrowser: browserName,
+        actionName: 'visual assertion',
+      }
+    );
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataElectricalProfileON, OSRDLanguage);
     await opTimetablePage.clickOnTimetableCollapseButton();
@@ -179,21 +198,35 @@ test.describe('Simulation Settings Tab Verification', () => {
     await opTimetablePage.getTrainArrivalTime('11:52');
     await opTimetablePage.clickOnScenarioCollapseButton();
     await opOutputTablePage.verifyTimesStopsDataSheetVisibility();
+    await performOnSpecificOSAndBrowser(
+      async () => {
+        await simulationResultPage.selectAllSpeedSpaceChartCheckboxes();
+        await expect(simulationResultPage.speedSpaceChartTabindexElement).toHaveScreenshot(
+          'SpeedSpaceChart-ElectricalProfileDisabled.png'
+        );
+      },
+      {
+        currentBrowser: browserName,
+        actionName: 'visual assertion',
+      }
+    );
     await opOutputTablePage.getOutputTableData(expectedCellDataElectricalProfileOFF, OSRDLanguage);
   });
-  test('Activate composition code', async ({ page }) => {
+  test('Activate composition code', async ({ page, browserName }) => {
     const [
       operationalStudiesPage,
       opInputTablePage,
       opTimetablePage,
       opOutputTablePage,
       opSimulationSettingsPage,
+      simulationResultPage,
     ] = [
       new OperationalStudiesPage(page),
       new OperationalStudiesInputTablePage(page),
       new OperationalStudiesTimetablePage(page),
       new OperationalStudiesOutputTablePage(page),
       new OperationalStudiesSimulationSettingsPage(page),
+      new OpSimulationResultPage(page),
     ];
 
     const translations = OSRDLanguage === 'English' ? enTranslations : frTranslations;
@@ -221,6 +254,18 @@ test.describe('Simulation Settings Tab Verification', () => {
     await opTimetablePage.getTrainArrivalTime('12:03');
     await opTimetablePage.clickOnScenarioCollapseButton();
     await opOutputTablePage.verifyTimesStopsDataSheetVisibility();
+    await performOnSpecificOSAndBrowser(
+      async () => {
+        await simulationResultPage.selectAllSpeedSpaceChartCheckboxes();
+        await expect(simulationResultPage.speedSpaceChartTabindexElement).toHaveScreenshot(
+          'SpeedSpaceChart-SpeedLimitTagActivated.png'
+        );
+      },
+      {
+        currentBrowser: browserName,
+        actionName: 'visual assertion',
+      }
+    );
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataCodeCompoON, OSRDLanguage);
     await opTimetablePage.clickOnTimetableCollapseButton();
@@ -233,21 +278,35 @@ test.describe('Simulation Settings Tab Verification', () => {
     await opTimetablePage.getTrainArrivalTime('11:52');
     await opTimetablePage.clickOnScenarioCollapseButton();
     await opOutputTablePage.verifyTimesStopsDataSheetVisibility();
+    await performOnSpecificOSAndBrowser(
+      async () => {
+        await simulationResultPage.selectAllSpeedSpaceChartCheckboxes();
+        await expect(simulationResultPage.speedSpaceChartTabindexElement).toHaveScreenshot(
+          'SpeedSpaceChart-SpeedLimitTagDisabled.png'
+        );
+      },
+      {
+        currentBrowser: browserName,
+        actionName: 'visual assertion',
+      }
+    );
     await opOutputTablePage.getOutputTableData(expectedCellDataCodeCompoOFF, OSRDLanguage);
   });
-  test('Activate linear and mareco margin', async ({ page }) => {
+  test('Activate linear and mareco margin', async ({ page, browserName }) => {
     const [
       operationalStudiesPage,
       opInputTablePage,
       opTimetablePage,
       opOutputTablePage,
       opSimulationSettingsPage,
+      simulationResultPage,
     ] = [
       new OperationalStudiesPage(page),
       new OperationalStudiesInputTablePage(page),
       new OperationalStudiesTimetablePage(page),
       new OperationalStudiesOutputTablePage(page),
       new OperationalStudiesSimulationSettingsPage(page),
+      new OpSimulationResultPage(page),
     ];
 
     const translations = OSRDLanguage === 'English' ? enTranslations : frTranslations;
@@ -284,6 +343,18 @@ test.describe('Simulation Settings Tab Verification', () => {
     await opTimetablePage.getTrainArrivalTime('11:54');
     await opTimetablePage.clickOnScenarioCollapseButton();
     await opOutputTablePage.verifyTimesStopsDataSheetVisibility();
+    await performOnSpecificOSAndBrowser(
+      async () => {
+        await simulationResultPage.selectAllSpeedSpaceChartCheckboxes();
+        await expect(simulationResultPage.speedSpaceChartTabindexElement).toHaveScreenshot(
+          'SpeedSpaceChart-LinearMargin.png'
+        );
+      },
+      {
+        currentBrowser: browserName,
+        actionName: 'visual assertion',
+      }
+    );
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataLinearMargin, OSRDLanguage);
     await opTimetablePage.clickOnTimetableCollapseButton();
@@ -296,21 +367,35 @@ test.describe('Simulation Settings Tab Verification', () => {
     await opTimetablePage.getTrainArrivalTime('11:54');
     await opTimetablePage.clickOnScenarioCollapseButton();
     await opOutputTablePage.verifyTimesStopsDataSheetVisibility();
+    await performOnSpecificOSAndBrowser(
+      async () => {
+        await simulationResultPage.selectAllSpeedSpaceChartCheckboxes();
+        await expect(simulationResultPage.speedSpaceChartTabindexElement).toHaveScreenshot(
+          'SpeedSpaceChart-MarecoMargin.png'
+        );
+      },
+      {
+        currentBrowser: browserName,
+        actionName: 'visual assertion',
+      }
+    );
     await opOutputTablePage.getOutputTableData(expectedCellDataMarecoMargin, OSRDLanguage);
   });
-  test('Add all the simulation settings', async ({ page }) => {
+  test('Add all the simulation settings', async ({ page, browserName }) => {
     const [
       operationalStudiesPage,
       opInputTablePage,
       opTimetablePage,
       opOutputTablePage,
       opSimulationSettingsPage,
+      simulationResultPage,
     ] = [
       new OperationalStudiesPage(page),
       new OperationalStudiesInputTablePage(page),
       new OperationalStudiesTimetablePage(page),
       new OperationalStudiesOutputTablePage(page),
       new OperationalStudiesSimulationSettingsPage(page),
+      new OpSimulationResultPage(page),
     ];
 
     const translations = OSRDLanguage === 'English' ? enTranslations : frTranslations;
@@ -348,6 +433,19 @@ test.describe('Simulation Settings Tab Verification', () => {
     await opTimetablePage.getTrainArrivalTime('12:06');
     await opTimetablePage.clickOnScenarioCollapseButton();
     await opOutputTablePage.verifyTimesStopsDataSheetVisibility();
+
+    await performOnSpecificOSAndBrowser(
+      async () => {
+        await simulationResultPage.selectAllSpeedSpaceChartCheckboxes();
+        await expect(simulationResultPage.speedSpaceChartTabindexElement).toHaveScreenshot(
+          'SpeedSpaceChart-AllSettingsEnabled.png'
+        );
+      },
+      {
+        currentBrowser: browserName,
+        actionName: 'visual assertion',
+      }
+    );
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
     await opOutputTablePage.getOutputTableData(expectedCellDataForAllSettings, OSRDLanguage);
   });
