@@ -12,6 +12,7 @@ import type { PathfindingResultSuccess, TrainScheduleResult } from 'common/api/o
 import { interpolateValue } from 'modules/simulationResult/SimulationResultExport/utils';
 import type { TrainScheduleWithDetails } from 'modules/trainschedule/components/Timetable/types';
 import { dateToHHMMSS } from 'utils/date';
+import { msToS } from 'utils/physics';
 import { calculateTimeDifferenceInSeconds } from 'utils/timeManipulation';
 
 import { ARRIVAL_TIME_ACCEPTABLE_ERROR_MS } from '../consts';
@@ -79,8 +80,8 @@ const useOutputTableData = (
       lastReferenceDate = refDate;
 
       const isOnTime = theoreticalArrival
-        ? calculateTimeDifferenceInSeconds(theoreticalArrival, computedArrival) <=
-          ARRIVAL_TIME_ACCEPTABLE_ERROR_MS / 1000
+        ? Math.abs(calculateTimeDifferenceInSeconds(theoreticalArrival, computedArrival)) <=
+          msToS(ARRIVAL_TIME_ACCEPTABLE_ERROR_MS)
         : false;
 
       return {
