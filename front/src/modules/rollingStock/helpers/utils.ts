@@ -53,9 +53,7 @@ export const getDefaultRollingStockMode = (selectedMode: string | null): EffortC
     : null;
 
 const getDefaultMultiUnitsParameter = (parameter: string): MultiUnitsParameter => {
-  const { min, max, units } = RS_SCHEMA_PROPERTIES.find(
-    (rsParam) => rsParam.title === parameter
-  ) as SchemaProperty;
+  const { min, max, units } = RS_SCHEMA_PROPERTIES.find((rsParam) => rsParam.title === parameter)!;
   return {
     min: min!,
     max: max!,
@@ -157,7 +155,7 @@ export const rollingStockEditorQueryArg = (
     comfort_acceleration: data.comfortAcceleration,
     const_gamma: data.constGamma,
     inertia_coefficient: data.inertiaCoefficient,
-    mass: handleUnitValue({ unit: 'kg', value: data.mass.value }, data.mass, data.mass) as number, // Back-end needs value in kg.
+    mass: handleUnitValue({ unit: 'kg', value: data.mass.value }, data.mass, data.mass)!, // Back-end needs value in kg.
     rolling_resistance: {
       A: handleUnitValue(
         { unit: 'N', value: data.rollingResistanceA.value },

@@ -294,7 +294,7 @@ const AddOrEditStudyModal = ({ editionMode, study, scenarios }: AddOrEditStudyMo
                       label: t(`studyStates.${currentStudy.state}`).toString(),
                     }}
                     options={studyStateOptions}
-                    onChange={(e) => handleStudyInputChange('state', e?.id as StudyForm['state'])}
+                    onChange={(e) => handleStudyInputChange('state', e?.id)}
                   />
                 </div>
               </div>

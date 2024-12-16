@@ -4,7 +4,7 @@ import bbox from '@turf/bbox';
 import { lineString } from '@turf/helpers';
 import type { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
 import length from '@turf/length';
-import type { Feature, FeatureCollection, LineString, Position } from 'geojson';
+import type { Feature, FeatureCollection, LineString } from 'geojson';
 import { clamp, first, isEmpty, isNil, last, mapValues, omitBy } from 'lodash';
 import type { LngLatBoundsLike } from 'maplibre-gl';
 import { PiLinkBold, PiLinkBreakBold } from 'react-icons/pi';
@@ -103,9 +103,9 @@ const SimulationWarpedMap = ({
       const size = !rotate ? height : width;
 
       // we don't clip the path
-      const transformedPath = transform(path, false) as typeof path;
-      const latStart = (first(transformedPath.geometry.coordinates) as Position)[1];
-      const latEnd = (last(transformedPath.geometry.coordinates) as Position)[1];
+      const transformedPath = transform(path, false)!;
+      const latStart = first(transformedPath.geometry.coordinates)![1];
+      const latEnd = last(transformedPath.geometry.coordinates)![1];
 
       /*
        * Here, `y` is the function provided by d3 to scale distance in meters from the beginning of the path to pixels
@@ -140,7 +140,7 @@ const SimulationWarpedMap = ({
           [warpedBBox[0], latTop],
           [warpedBBox[2], latBottom],
         ],
-      }) as typeof transformedPath;
+      })!;
       const clippedPathBBox = bbox(clippedPath) as BBox2d;
       const lngAverage = (clippedPathBBox[0] + clippedPathBBox[2]) / 2;
 

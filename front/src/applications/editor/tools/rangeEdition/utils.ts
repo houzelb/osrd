@@ -188,7 +188,7 @@ export function getTrackRangeFeatures(
         itemType: 'TrackRangeExtremity',
         rangeIndex,
       }),
-      point(last(track.geometry.coordinates) as Position, {
+      point(last(track.geometry.coordinates)!, {
         ...properties,
         id: `speedSectionRangeExtremity::${rangeIndex}::${end}`,
         track: range.track,
@@ -304,7 +304,7 @@ export function generatePslSignFeatures(
 export function getPointAt(track: TrackSectionEntity, at: number): Position {
   const dataLength = track.properties.length;
   if (at <= 0) return track.geometry.coordinates[0];
-  if (at >= dataLength) return last(track.geometry.coordinates) as Position;
+  if (at >= dataLength) return last(track.geometry.coordinates)!;
 
   const computedLength = length(track);
   return along(track.geometry, (at * computedLength) / dataLength).geometry.coordinates;

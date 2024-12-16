@@ -71,7 +71,7 @@ const SimulationResultExport = ({
       >
         {({ url }) => (
           <Button
-            onClick={() => window.open(url as string, '_blank')}
+            onClick={() => window.open(url!, '_blank')}
             variant="Quiet"
             label={t('simulationSheet')}
             size="medium"

@@ -98,6 +98,7 @@ const specificInterpolateOnTime =
           const currentData = dataSimulation[listValue] as ObjectWithXAxis[];
 
           if (currentData.length) {
+            // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
             const timeBisect = d3.bisector<ObjectWithXAxis, Time>((d) => d.time as Time).left;
             const index = timeBisect(currentData, timePositionLocal, 1);
             bisection = [currentData[index - 1], currentData[index]];
