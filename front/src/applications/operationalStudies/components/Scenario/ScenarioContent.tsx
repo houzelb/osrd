@@ -101,107 +101,113 @@ const ScenarioContent = ({
   };
 
   return (
-    <main className="mastcontainer mastcontainer-no-mastnav">
-      <div className="scenario">
-        <div className="row no-gutters scenario-container">
-          <div
-            data-testid="scenario-sidemenu"
-            className={collapsedTimetable ? 'd-none' : 'col-hdp-3 col-xl-4 col-lg-5 col-md-6'}
-          >
-            <div className="scenario-sidemenu">
-              <ScenarioDescription
-                scenario={scenario}
-                infra={infra}
-                infraReloadCount={reloadCount}
-                collapseTimetable={() => setCollapsedTimetable(true)}
-              />
+    <main className="mastcontainer mastcontainer-no-mastnav scenario">
+      <div className="row no-gutters h-100">
+        <div
+          data-testid="scenario-sidemenu"
+          className={cx(
+            'h-100',
+            collapsedTimetable ? 'd-none' : 'col-hdp-3 col-xl-4 col-lg-5 col-md-6'
+          )}
+        >
+          <div className="scenario-sidemenu">
+            <ScenarioDescription
+              scenario={scenario}
+              infra={infra}
+              infraReloadCount={reloadCount}
+              collapseTimetable={() => setCollapsedTimetable(true)}
+            />
 
-              <MicroMacroSwitch isMacro={isMacro} setIsMacro={toggleMicroMacroButton} />
+            <MicroMacroSwitch isMacro={isMacro} setIsMacro={toggleMicroMacroButton} />
 
-              {infra && (
-                <>
-                  {displayTrainScheduleManagement !== MANAGE_TRAIN_SCHEDULE_TYPES.none && (
-                    <TimetableManageTrainSchedule
-                      displayTrainScheduleManagement={displayTrainScheduleManagement}
-                      setDisplayTrainScheduleManagement={setDisplayTrainScheduleManagement}
-                      upsertTrainSchedules={upsertTrainSchedules}
-                      trainIdToEdit={trainIdToEdit}
-                      setTrainIdToEdit={setTrainIdToEdit}
-                      infraState={infra.state}
-                      dtoImport={dtoImport}
-                    />
-                  )}
-                  <Timetable
+            {infra && (
+              <>
+                {displayTrainScheduleManagement !== MANAGE_TRAIN_SCHEDULE_TYPES.none && (
+                  <TimetableManageTrainSchedule
+                    displayTrainScheduleManagement={displayTrainScheduleManagement}
                     setDisplayTrainScheduleManagement={setDisplayTrainScheduleManagement}
-                    infraState={infra.state}
-                    selectedTrainId={selectedTrainId}
-                    conflicts={conflicts}
                     upsertTrainSchedules={upsertTrainSchedules}
-                    removeTrains={removeTrains}
-                    setTrainIdToEdit={setTrainIdToEdit}
                     trainIdToEdit={trainIdToEdit}
-                    trainSchedules={trainSchedules}
-                    trainSchedulesWithDetails={trainScheduleSummaries}
+                    setTrainIdToEdit={setTrainIdToEdit}
+                    infraState={infra.state}
                     dtoImport={dtoImport}
                   />
-                </>
-              )}
-            </div>
-          </div>
-
-          <div className={collapsedTimetable ? 'col-12' : 'col-hdp-9 col-xl-8 col-lg-7 col-md-6'}>
-            {collapsedTimetable && (
-              <button
-                data-testid="timetable-collapse-button"
-                className="timetable-collapse-button"
-                type="button"
-                aria-label={t('toggleTimetable')}
-                onClick={() => setCollapsedTimetable(false)}
-              >
-                <ChevronRight />
-              </button>
-            )}
-            {!isInfraLoaded &&
-              !isMacro &&
-              displayTrainScheduleManagement !== MANAGE_TRAIN_SCHEDULE_TYPES.add &&
-              displayTrainScheduleManagement !== MANAGE_TRAIN_SCHEDULE_TYPES.edit && (
-                <ScenarioLoaderMessage infraState={infra?.state} />
-              )}
-            {(displayTrainScheduleManagement === MANAGE_TRAIN_SCHEDULE_TYPES.add ||
-              displayTrainScheduleManagement === MANAGE_TRAIN_SCHEDULE_TYPES.edit) && (
-              <div className="scenario-managetrainschedule">
-                <ManageTrainScheduleContextProvider>
-                  <ManageTrainSchedule trainIdToEdit={trainIdToEdit} />
-                </ManageTrainScheduleContextProvider>
-              </div>
-            )}
-            {displayTrainScheduleManagement === MANAGE_TRAIN_SCHEDULE_TYPES.import && (
-              <div className="scenario-managetrainschedule">
-                <ImportTrainSchedule
-                  timetableId={scenario.timetable_id}
+                )}
+                <Timetable
+                  setDisplayTrainScheduleManagement={setDisplayTrainScheduleManagement}
+                  infraState={infra.state}
+                  selectedTrainId={selectedTrainId}
+                  conflicts={conflicts}
                   upsertTrainSchedules={upsertTrainSchedules}
+                  removeTrains={removeTrains}
+                  setTrainIdToEdit={setTrainIdToEdit}
+                  trainIdToEdit={trainIdToEdit}
+                  trainSchedules={trainSchedules}
+                  trainSchedulesWithDetails={trainScheduleSummaries}
+                  dtoImport={dtoImport}
                 />
-              </div>
+              </>
             )}
-            <div className="scenario-results">
-              {isMacro ? (
-                <div className={cx(collapsedTimetable ? 'macro-container' : 'h-100 p-1')}>
-                  <NGE dto={ngeDto} onOperation={handleNGEOperation} />
-                </div>
-              ) : (
-                isInfraLoaded &&
-                infra && (
-                  <SimulationResults
-                    scenarioData={{ name: scenario.name, infraName: scenario.infra_name }}
-                    collapsedTimetable={collapsedTimetable}
-                    projectionData={projectionData}
-                    infraId={infra.id}
-                    conflicts={conflicts}
-                    selectedTrainSummary={selectedTrainSummary}
-                  />
-                )
-              )}
+          </div>
+        </div>
+
+        <div
+          className={cx(
+            'h-100',
+            collapsedTimetable ? 'col-12' : 'col-hdp-9 col-xl-8 col-lg-7 col-md-6'
+          )}
+        >
+          {collapsedTimetable && (
+            <button
+              data-testid="timetable-collapse-button"
+              className="timetable-collapse-button"
+              type="button"
+              aria-label={t('toggleTimetable')}
+              onClick={() => setCollapsedTimetable(false)}
+            >
+              <ChevronRight />
+            </button>
+          )}
+          {!isInfraLoaded &&
+            !isMacro &&
+            displayTrainScheduleManagement !== MANAGE_TRAIN_SCHEDULE_TYPES.add &&
+            displayTrainScheduleManagement !== MANAGE_TRAIN_SCHEDULE_TYPES.edit && (
+              <ScenarioLoaderMessage infraState={infra?.state} />
+            )}
+          {(displayTrainScheduleManagement === MANAGE_TRAIN_SCHEDULE_TYPES.add ||
+            displayTrainScheduleManagement === MANAGE_TRAIN_SCHEDULE_TYPES.edit) && (
+            <div className="scenario-managetrainschedule">
+              <ManageTrainScheduleContextProvider>
+                <ManageTrainSchedule trainIdToEdit={trainIdToEdit} />
+              </ManageTrainScheduleContextProvider>
             </div>
+          )}
+          {displayTrainScheduleManagement === MANAGE_TRAIN_SCHEDULE_TYPES.import && (
+            <div className="scenario-managetrainschedule">
+              <ImportTrainSchedule
+                timetableId={scenario.timetable_id}
+                upsertTrainSchedules={upsertTrainSchedules}
+              />
+            </div>
+          )}
+          <div className="scenario-results">
+            {isMacro ? (
+              <div className="h-100 p-1">
+                <NGE dto={ngeDto} onOperation={handleNGEOperation} />
+              </div>
+            ) : (
+              isInfraLoaded &&
+              infra && (
+                <SimulationResults
+                  scenarioData={{ name: scenario.name, infraName: scenario.infra_name }}
+                  collapsedTimetable={collapsedTimetable}
+                  projectionData={projectionData}
+                  infraId={infra.id}
+                  conflicts={conflicts}
+                  selectedTrainSummary={selectedTrainSummary}
+                />
+              )
+            )}
           </div>
         </div>
       </div>
