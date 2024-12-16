@@ -4,7 +4,7 @@
 
 - go inside `/front/` from OSRD main project
 - you'll need [`npm`](https://nodejs.org/en/download/package-manager)
-- exec `npm install` (hope you have a good connexion and a good cup of tea)
+- exec `npm install` (hope you have a good connection and a good cup of tea)
 - exec `npm start` (perhaps you'll need `NODE_OPTIONS="--openssl-legacy-provider"` if your node
   version is too new)
 - enjoy
@@ -38,35 +38,42 @@ Launches end to end tests.
 
 It requires:
 
-- Install playwright dependencies `cd ./front/ && npx playwright install --with-deps`
+- Install Playwright dependencies `cd ./front/ && npx playwright install --with-deps`
 - Backend containers to be up:
+
   `docker compose up --no-build --detach valkey postgres gateway core editoast`
+
 - Running front with `docker compose up --build --detach front`
 
 Now you can run the test with `cd front/ && npm run e2e-tests`.
 
-If you are using a Linux distribution not supported by playwright (which only supports Windows,
-macOS and Ubuntu/Debian), you can instead start the tests inside a docker container using
-`osrd/scripts/run-front-playwright-container.sh`. You may pass the same options and arguments to
-this script as you would to `npm run e2e-tests` or `npx playwright test`.
+If you are using a Linux distribution not supported by Playwright (Playwright only supports Windows,
+macOS and Ubuntu/Debian), you can start the tests inside a Docker container using:
+`osrd/scripts/run-front-playwright-container.sh`. This script accepts the same options and arguments
+as `npm run e2e-tests` or `npx playwright test`.
 
 > [!CAUTION] If you try to run `npm run start` instead of running it through docker, you'll notice
 > it doesn't work because the gateway can't access your local port from inside a container. 2
 > solutions:
 >
-> - run all the components locally (you might keep Postgres and Valkey in containers)
-> - if on Linux, you can also launch all the containers on the host network: you can replace the
+> - Run all the components locally (you might keep Postgres and Valkey in containers)
+> - If on Linux, you can also launch all the containers on the host network: you can replace the
 >   `docker compose <something>` above with `osrd/scripts/host-compose.sh <something>`
 
-If the tests fail, you'll find a `front/test-results` folder that will contain videos of the fail
-test executions. They might be of help to understand what's going on. Note that the CI also exports
-these videos as artifacts.
+If the tests fail, a `front/test-results` folder will be created, containing videos and traces of
+the failed test executions. These files can help you understand what went wrong. Additionally, the
+CI system exports these videos and traces as artifacts. You can view the trace files using the
+[Playwright trace viewer](https://trace.playwright.dev/).
 
-You may also want to explore the documentation of the test framework
-[Playwright](https://playwright.dev/). For example, try launching each test independently using
-`npm run playwright test --ui`, debug a test with `npm run playwright test --debug`, or launch a
-specified test of a specified test file with a specified browser once with for example
-`npm run playwright test 011-op-times-and-stops-tab.spec.ts -g "should correctly set and display times and stops tables" --project=firefox  --retries=0`.
+If visual comparisons tests fail due to UI changes, new snapshots are required as the baseline. You
+can automatically update snapshots by running tests with the `--update-snapshots` flag:
+`npx playwright test --update-snapshots`.
+
+You may also want to explore [Playwright documentation](https://playwright.dev/docs/intro) for more
+insights. For example: Launch each test independently using: `npx playwright test --ui`. Debug a
+test with: `npx playwright test --debug`. Run a specific test in a specific test file with a
+specific browser and no retries using:
+`npx playwright test 011-op-times-and-stops-tab.spec.ts -g "should correctly set and display times and stops tables" --project=firefox  --retries=0`.
 
 ## Design rules
 
@@ -209,10 +216,12 @@ All common code (and shared components) supposed to be in `common/`.
 
 ### Javascript / Javascript-React
 
+### Javascript / Javascript-React
+
 - ESLint is used as linter and prettier as formatter. Both are configured as devDependencies to
-  enforce default eslint configuration eventually overidden by
+  enforce default eslint configuration eventually overridden by
   [airbnb rules](https://airbnb.io/javascript/) translation. A few rules (see eslintrc) has been
-  disabled and will be re-enabled in the near future):
+  disabled and will be re-enabled in the near future:
   - 'no-named-as-default': 'off',
   - 'react/jsx-props-no-spreading': 0,
   - 'react/static-property-placement': 0,
@@ -262,6 +271,7 @@ To fix this, follow these steps:
 1. After pulling new changes, run `npm install` to update local dependencies.
 2. If issues persist, delete `node_modules` and run `npm install` again.
 3. Run `docker compose build --no-cache` to rebuild Docker images from scratch with new
+
    dependencies.
 
 This ensures developers can run the app with the latest dependencies using Docker.
