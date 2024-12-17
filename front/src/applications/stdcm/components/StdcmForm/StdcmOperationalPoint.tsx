@@ -10,7 +10,7 @@ import useSearchOperationalPoint from 'common/Map/Search/useSearchOperationalPoi
 import { useOsrdConfActions } from 'common/osrdContext';
 import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmPathStep } from 'reducers/osrdconf/types';
-import { getIsOnlyStdcmProfile } from 'reducers/user/userSelectors';
+import { userHasOnlyStdcmRoles } from 'reducers/user/userSelectors';
 import { useAppDispatch } from 'store';
 import { normalized } from 'utils/strings';
 import { createFixedSelectOptions } from 'utils/uiCoreHelpers';
@@ -37,7 +37,7 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
       initialChCodeFilter: location?.secondary_code,
     });
 
-  const isOnlyStdcmProfile = useSelector(getIsOnlyStdcmProfile);
+  const hasOnlyStdcmRoles = useSelector(userHasOnlyStdcmRoles);
 
   const { updateStdcmPathStep } = useOsrdConfActions() as StdcmConfSliceActions;
 
@@ -49,7 +49,7 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
           const isNameMatch = normalized(op.name).startsWith(normalized(searchTerm));
           const isTrigramMatch = op.trigram === searchTerm.toUpperCase();
 
-          if (isOnlyStdcmProfile) {
+          if (hasOnlyStdcmRoles) {
             return (
               CI_CH_OPERATIONAL_POINTS_ON_DPY_MAS[op.ci]?.includes(op.ch) &&
               (isNameMatch || isTrigramMatch)
