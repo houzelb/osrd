@@ -1,11 +1,11 @@
 import along from '@turf/along';
 import bezierSpline from '@turf/bezier-spline';
-import { type Point, polygon, lineString } from '@turf/helpers';
+import { polygon, lineString } from '@turf/helpers';
 import length from '@turf/length';
 import lineSliceAlong from '@turf/line-slice-along';
 import transformTranslate from '@turf/transform-translate';
 import cx from 'classnames';
-import type { Feature, LineString } from 'geojson';
+import type { Feature, LineString, Point } from 'geojson';
 import { mapValues, get } from 'lodash';
 import { Source, Marker } from 'react-map-gl/maplibre';
 

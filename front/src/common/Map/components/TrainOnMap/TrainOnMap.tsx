@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
 
-import type { Position } from '@turf/helpers';
 import cx from 'classnames';
-import type { Feature, LineString } from 'geojson';
+import type { Feature, LineString, Position } from 'geojson';
 import { Source, Marker } from 'react-map-gl/maplibre';
 
 import type { SimulationResponseSuccess } from 'applications/operationalStudies/types';

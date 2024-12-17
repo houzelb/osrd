@@ -1,5 +1,4 @@
-import type { MultiLineString } from '@turf/helpers';
-import type { Feature, LineString, Point, Position } from 'geojson';
+import type { Feature, LineString, MultiLineString, Point, Position } from 'geojson';
 
 import type { TrackRange, TrackSectionEntity } from 'applications/editor/tools/trackEdition/types';
 import type { CommonToolState } from 'applications/editor/tools/types';

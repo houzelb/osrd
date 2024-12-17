@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
-import type { Position } from '@turf/helpers';
 import cx from 'classnames';
+import type { Position } from 'geojson';
 import type { Map } from 'maplibre-gl';
 import { Marker } from 'react-map-gl/maplibre';
 

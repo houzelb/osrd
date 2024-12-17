@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import bbox from '@turf/bbox';
-import { lineString, point, type Position } from '@turf/helpers';
+import { lineString, point } from '@turf/helpers';
 import lineLength from '@turf/length';
 import lineSlice from '@turf/line-slice';
+import type { Position } from 'geojson';
 import type { MapLayerMouseEvent } from 'maplibre-gl';
 import ReactMapGL, { AttributionControl, ScaleControl } from 'react-map-gl/maplibre';
 import type { MapRef } from 'react-map-gl/maplibre';

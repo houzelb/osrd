@@ -1,6 +1,6 @@
 import type { Dispatch, PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-import type { Position } from '@turf/helpers';
+import type { Position } from 'geojson';
 import type { ViewState } from 'react-map-gl/maplibre';
 
 import type { InfraErrorTypeLabel } from 'common/api/osrdEditoastApi';
