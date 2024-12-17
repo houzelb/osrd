@@ -75,21 +75,36 @@ impl PaginationStats {
     /// - If the page or the page_size are null
     /// - If `(page - 1) * page_size + current_page_count <= total_count`. In other words if
     ///   the `current_page_count` is inconsistent with the pagination settings and the `total_count`.
-    pub fn new(current_page_count: u64, total_count: u64, page: u64, page_size: u64) -> Self {
-        assert!(page > 0);
-        assert!(page_size > 0);
-        assert!((page - 1) * page_size + current_page_count <= total_count);
+    pub fn new(
+        current_page_count: u64,
+        total_count: u64,
+        page: u64,
+        page_size: u64,
+    ) -> Result<Self, PaginationError> {
+        if page == 0 {
+            return Err(PaginationError::InvalidPageNumber { page });
+        }
+        if page_size == 0 {
+            return Err(PaginationError::InvalidPageSize { page_size });
+        }
+        if (page - 1) * page_size + current_page_count > total_count {
+            return Err(PaginationError::PageOutOfBound {
+                page,
+                page_size,
+                total_count,
+            });
+        }
         let page_count = total_count.div_ceil(page_size);
         let previous = (page > 1 && total_count > 0).then_some(page - 1);
         let next = ((page - 1) * page_size + current_page_count < total_count).then_some(page + 1);
-        Self {
+        Ok(Self {
             count: total_count,
             page_size,
             page_count,
             current: page,
             previous,
             next,
-        }
+        })
     }
 }
 
@@ -115,7 +130,7 @@ pub trait PaginatedList: ListAndCount + 'static {
             .get_pagination_settings()
             .expect("the limit and the offset must be set in order to call list_paginated");
         let (results, count) = Self::list_and_count(conn, settings).await?;
-        let stats = PaginationStats::new(results.len() as u64, count, page, page_size);
+        let stats = PaginationStats::new(results.len() as u64, count, page, page_size)?;
         Ok((results, stats))
     }
 }
@@ -146,7 +161,7 @@ impl PaginationQueryParams {
     pub fn validate(self, max_page_size: i64) -> Result<PaginationQueryParams> {
         let (page, page_size) = self.unpack();
         if page_size > max_page_size || page_size < 1 || page < 1 {
-            return Err(PaginationError::InvalidPageSize {
+            return Err(PaginationError::PageSizeTooBig {
                 provided_page_size: page_size,
                 max_page_size,
             }
@@ -185,9 +200,22 @@ impl<M: Model + 'static> From<PaginationQueryParams> for SelectionSettings<M> {
 pub enum PaginationError {
     #[error("Invalid page size ({provided_page_size}), expected an integer 0 < page_size <= {max_page_size}")]
     #[editoast_error(status = 400)]
-    InvalidPageSize {
+    PageSizeTooBig {
         provided_page_size: i64,
         max_page_size: i64,
+    },
+    #[error("page number must be strictly positive, was {page}")]
+    #[editoast_error(status = 400)]
+    InvalidPageNumber { page: u64 },
+    #[error("page size must be strictly positive, was {page_size}")]
+    #[editoast_error(status = 400)]
+    InvalidPageSize { page_size: u64 },
+    #[error("no more information after page {page} when page size is {page_size} (total number of elements is {total_count})")]
+    #[editoast_error(status = 404)]
+    PageOutOfBound {
+        page: u64,
+        page_size: u64,
+        total_count: u64,
     },
 }
 
@@ -198,7 +226,7 @@ mod pagination_stats_tests {
     #[test]
     fn no_results() {
         assert_eq!(
-            PaginationStats::new(0, 0, 1, 25),
+            PaginationStats::new(0, 0, 1, 25).unwrap(),
             PaginationStats {
                 count: 0,
                 page_size: 25,
@@ -213,7 +241,7 @@ mod pagination_stats_tests {
     #[test]
     fn single_result() {
         assert_eq!(
-            PaginationStats::new(1, 1, 1, 25),
+            PaginationStats::new(1, 1, 1, 25).unwrap(),
             PaginationStats {
                 count: 1,
                 page_size: 25,
@@ -228,7 +256,7 @@ mod pagination_stats_tests {
     #[test]
     fn first_page() {
         assert_eq!(
-            PaginationStats::new(25, 26, 1, 25),
+            PaginationStats::new(25, 26, 1, 25).unwrap(),
             PaginationStats {
                 count: 26,
                 page_size: 25,
@@ -243,7 +271,7 @@ mod pagination_stats_tests {
     #[test]
     fn second_page() {
         assert_eq!(
-            PaginationStats::new(1, 26, 2, 25),
+            PaginationStats::new(1, 26, 2, 25).unwrap(),
             PaginationStats {
                 count: 26,
                 page_size: 25,

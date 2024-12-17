@@ -105,8 +105,10 @@
       "ObjectNotFound": "Object '{{obj_id}}', could not be found in the infrastructure '{{infra_id}}'"
     },
     "pagination": {
-      "InvalidPage": "Invalid page number ({{page}})",
-      "InvalidPageSize": "Invalid page size ({{provided_page_size}}), expected an integer 0 < page_size <= {{max_page_size}}"
+      "InvalidPageNumber": "Invalid page number '{{page}}', should be stricty positive",
+      "InvalidPageSize": "Invalid page size '{{page_size}}', should be strictly positive",
+      "PageSizeTooBig": "Page size '{{provided_page_size}}' is bigger than maximum page size '{{max_page_size}}'",
+      "PageOutOfBound": "No more element on page '{{page}}' with a page size of '{{page_size}}' (total number of elements is '{{total_count}}')"
     },
     "pathfinding": {
       "ElectricalProfilesOverlap": "Electrical Profile overlaps with others",

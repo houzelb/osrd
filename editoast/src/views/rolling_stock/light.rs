@@ -459,7 +459,7 @@ mod tests {
             .assert_status(StatusCode::BAD_REQUEST)
             .json_into();
 
-        assert_eq!(response.error_type, "editoast:pagination:InvalidPageSize");
+        assert_eq!(response.error_type, "editoast:pagination:PageSizeTooBig");
         assert_eq!(response.context["provided_page_size"], 1010);
         assert_eq!(response.context["max_page_size"], 1000);
     }
