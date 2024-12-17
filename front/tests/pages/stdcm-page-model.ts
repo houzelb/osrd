@@ -3,6 +3,16 @@ import { expect, type Locator, type Page } from '@playwright/test';
 import enTranslations from '../../public/locales/en/stdcm.json';
 import frTranslations from '../../public/locales/fr/stdcm.json';
 import { electricRollingStockName } from '../assets/project-const';
+import {
+  CI_SUGGESTIONS,
+  DEFAULT_DETAILS,
+  DESTINATION_DETAILS,
+  LIGHT_DESTINATION_DETAILS,
+  LIGHT_ORIGIN_DETAILS,
+  ORIGIN_DETAILS,
+  VIA_STOP_TIMES,
+  VIA_STOP_TYPES,
+} from '../assets/stdcm-const';
 import { readJsonFile } from '../utils';
 
 interface TableRow {
@@ -125,10 +135,13 @@ class STDCMPage {
 
   readonly viaResultMarker: Locator;
 
+  readonly helpButton: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.notificationHeader = page.locator('#notification');
     this.debugButton = page.getByTestId('stdcm-debug-button');
+    this.helpButton = page.getByTestId('stdcm-help-button');
     this.mapContainer = page.locator('#map-container');
     this.consistCard = page.locator('.stdcm-consist-container .stdcm-card');
     this.originCard = page.locator('.stdcm-card:has(.stdcm-origin-icon)');
@@ -230,10 +243,18 @@ class STDCMPage {
     await hourLocator.click();
   }
 
-  // Verifies STDCM elements are visible
+  private async verifySuggestions(expectedSuggestions: string[]) {
+    await expect(this.suggestionList).toBeVisible();
+    expect(await this.suggestionItems.count()).toBe(expectedSuggestions.length);
+    const actualSuggestions = await this.suggestionItems.allTextContents();
+    expect(actualSuggestions).toEqual(expectedSuggestions);
+  }
+
+  // Verify STDCM elements are visible
   async verifyStdcmElementsVisibility() {
     const elements = [
       this.debugButton,
+      this.helpButton,
       this.notificationHeader,
       this.consistCard,
       this.originCard,
@@ -247,7 +268,7 @@ class STDCMPage {
     }
   }
 
-  // Verifies all input fields are empty
+  // Verify all input fields are empty
   async verifyAllFieldsEmpty() {
     const emptyFields = [
       this.tractionEngineField,
@@ -263,7 +284,7 @@ class STDCMPage {
     await expect(this.codeCompoField).toHaveValue('__PLACEHOLDER__');
   }
 
-  // Adds a via card, verifies fields, and deletes it
+  // Add a via card, verify fields, and delete it
   async addAndDeleteEmptyVia() {
     await this.addViaButton.click();
     await expect(this.getViaCi(1)).toHaveValue('');
@@ -275,25 +296,17 @@ class STDCMPage {
     await expect(this.getViaCh(1)).not.toBeVisible();
   }
 
-  // Verifies the origin suggestions when search for north
+  // Verify the origin suggestions when searching for north
   async verifyOriginNorthSuggestions() {
-    await expect(this.suggestionList).toBeVisible();
-    expect(await this.suggestionItems.count()).toEqual(3);
-    await expect(this.suggestionItems.nth(0)).toHaveText('NES North_East_station');
-    await expect(this.suggestionItems.nth(1)).toHaveText('NS North_station');
-    await expect(this.suggestionItems.nth(2)).toHaveText('NWS North_West_station');
+    await this.verifySuggestions(CI_SUGGESTIONS.north);
   }
 
-  // Verifies the destination suggestions when search for south
+  // Verify the destination suggestions when searching for south
   async verifyDestinationSouthSuggestions() {
-    await expect(this.suggestionList).toBeVisible();
-    expect(await this.suggestionItems.count()).toEqual(3);
-    await expect(this.suggestionItems.nth(0)).toHaveText('SES South_East_station');
-    await expect(this.suggestionItems.nth(1)).toHaveText('SS South_station');
-    await expect(this.suggestionItems.nth(2)).toHaveText('SWS South_West_station');
+    await this.verifySuggestions(CI_SUGGESTIONS.south);
   }
 
-  // Fills fields with test values in the consist section
+  // Fill fields with test values in the consist section
   async fillConsistDetails() {
     await this.tractionEngineField.fill(electricRollingStockName);
     await this.tractionEngineField.press('ArrowDown');
@@ -305,70 +318,112 @@ class STDCMPage {
     await this.maxSpeedField.fill('180');
   }
 
-  // Fills and verifies origin details with suggestions
+  // Fill and verify origin details with suggestions
   async fillAndVerifyOriginDetails() {
-    await this.dynamicOriginCi.fill('North');
+    const {
+      input,
+      suggestion,
+      chValue,
+      arrivalDate,
+      arrivalTime,
+      tolerance,
+      updatedChValue,
+      arrivalType,
+    } = ORIGIN_DETAILS;
+    // Fill and verify origin CI suggestions
+    await this.dynamicOriginCi.fill(input);
     await this.verifyOriginNorthSuggestions();
     await this.suggestionNWS.click();
     const originCiValue = await this.dynamicOriginCi.getAttribute('value');
-    expect(originCiValue).toContain('North_West_station');
-    await expect(this.dynamicOriginCh).toHaveValue('BV');
-    await expect(this.originArrival).toHaveValue('preciseTime');
-    await expect(this.dateOriginArrival).toHaveValue('17/10/24');
-    await expect(this.timeOriginArrival).toHaveValue('00:00');
-    await expect(this.toleranceOriginArrival).toHaveValue('-30/+30');
-    await this.dynamicOriginCh.selectOption('BC');
-    await this.originArrival.selectOption('respectDestinationSchedule');
+    expect(originCiValue).toContain(suggestion);
+    // Verify default values
+    await expect(this.dynamicOriginCh).toHaveValue(chValue);
+    await expect(this.originArrival).toHaveValue(arrivalType.default);
+    await expect(this.dateOriginArrival).toHaveValue(arrivalDate);
+    await expect(this.timeOriginArrival).toHaveValue(arrivalTime);
+    await expect(this.toleranceOriginArrival).toHaveValue(tolerance);
+    // Update and verify origin values
+    await this.dynamicOriginCh.selectOption(updatedChValue);
+    await expect(this.dynamicOriginCh).toHaveValue(updatedChValue);
+    await this.originArrival.selectOption(arrivalType.updated);
+    await expect(this.originArrival).toHaveValue(arrivalType.updated);
+    // Verify fields are hidden
     await expect(this.dateOriginArrival).not.toBeVisible();
     await expect(this.timeOriginArrival).not.toBeVisible();
     await expect(this.toleranceOriginArrival).not.toBeVisible();
   }
 
-  // Fills and verifies destination details based on selected language
+  // Fill and verify destination details based on selected language
   async fillAndVerifyDestinationDetails(selectedLanguage: string) {
+    const {
+      input,
+      suggestion,
+      chValue,
+      arrivalDate,
+      arrivalTime,
+      tolerance,
+      arrivalType,
+      updatedDetails,
+    } = DESTINATION_DETAILS;
     const translations = selectedLanguage === 'English' ? enTranslations : frTranslations;
-    await this.dynamicDestinationCi.fill('South');
+    // Fill destination input and verify suggestions
+    await this.dynamicDestinationCi.fill(input);
     await this.verifyDestinationSouthSuggestions();
     await this.suggestionSS.click();
     const destinationCiValue = await this.dynamicDestinationCi.getAttribute('value');
-    expect(destinationCiValue).toContain('South_station');
-    await expect(this.dynamicDestinationCh).toHaveValue('BV');
-    await expect(this.destinationArrival).toHaveValue('asSoonAsPossible');
+    expect(destinationCiValue).toContain(suggestion);
+    // Verify default values
+    await expect(this.dynamicDestinationCh).toHaveValue(chValue);
+    await expect(this.destinationArrival).toHaveValue(arrivalType.default);
     await expect(this.warningBox).toContainText(translations.stdcmErrors.noScheduledPoint);
     await expect(this.dateDestinationArrival).not.toBeVisible();
     await expect(this.timeDestinationArrival).not.toBeVisible();
     await expect(this.toleranceDestinationArrival).not.toBeVisible();
-    await this.destinationArrival.selectOption('preciseTime');
-    await expect(this.dateDestinationArrival).toHaveValue('17/10/24');
-    await expect(this.timeDestinationArrival).toHaveValue('00:00');
-    await expect(this.toleranceDestinationArrival).toHaveValue('-30/+30');
-    await this.dateDestinationArrival.fill('18/10/24');
+    // Select 'preciseTime' and verify values
+    await this.destinationArrival.selectOption(arrivalType.updated);
+    await expect(this.destinationArrival).toHaveValue(arrivalType.updated);
+    await expect(this.dateDestinationArrival).toHaveValue(arrivalDate);
+    await expect(this.timeDestinationArrival).toHaveValue(arrivalTime);
+    await expect(this.toleranceDestinationArrival).toHaveValue(tolerance);
+    // Update date and time values
+    await this.dateDestinationArrival.fill(updatedDetails.date);
+    await expect(this.dateDestinationArrival).toHaveValue(updatedDetails.date);
     await this.timeDestinationArrival.click();
-    await this.setHourLocator('01'); // Select hour 01
-    await this.setMinuteLocator('35'); // Select minute 35
+    await this.setHourLocator(updatedDetails.hour);
+    await this.setMinuteLocator(updatedDetails.minute);
     await this.incrementButton.dblclick(); // Double-click the +1 minute button to reach 37
     await this.timeDestinationArrival.click();
-    await this.fillToleranceField('-75', '+45', false);
+    await expect(this.timeDestinationArrival).toHaveValue(updatedDetails.timeValue);
+
+    // Update tolerance and verify warning box
+    await this.fillToleranceField(
+      updatedDetails.tolerance.negative,
+      updatedDetails.tolerance.positive,
+      false
+    );
     await expect(this.warningBox).not.toBeVisible();
   }
 
   // Fill origin section
   async fillOriginDetailsLight() {
-    await this.dynamicOriginCi.fill('North');
+    const { input, chValue, arrivalDate, arrivalTime, tolerance, arrivalType } =
+      LIGHT_ORIGIN_DETAILS;
+    await this.dynamicOriginCi.fill(input);
     await this.suggestionNWS.click();
-    await expect(this.dynamicOriginCh).toHaveValue('BV');
-    await expect(this.originArrival).toHaveValue('preciseTime');
-    await this.dateOriginArrival.fill('17/10/24');
-    await this.timeOriginArrival.fill('20:21');
-    await this.fillToleranceField('-60', '+15', true);
+    await expect(this.dynamicOriginCh).toHaveValue(chValue);
+    await expect(this.originArrival).toHaveValue(arrivalType);
+    await this.dateOriginArrival.fill(arrivalDate);
+    await this.timeOriginArrival.fill(arrivalTime);
+    await this.fillToleranceField(tolerance.negative, tolerance.positive, true);
   }
 
-  // Fill origin section
+  // Fill destination section
   async fillDestinationDetailsLight() {
-    await this.dynamicDestinationCi.fill('South');
+    const { input, chValue, arrivalType } = LIGHT_DESTINATION_DETAILS;
+    await this.dynamicDestinationCi.fill(input);
     await this.suggestionSS.click();
-    await expect(this.dynamicDestinationCh).toHaveValue('BV');
-    await expect(this.destinationArrival).toHaveValue('asSoonAsPossible');
+    await expect(this.dynamicDestinationCh).toHaveValue(chValue);
+    await expect(this.destinationArrival).toHaveValue(arrivalType);
   }
 
   async fillToleranceField(minusValue: string, plusValue: string, isOrigin: boolean) {
@@ -379,11 +434,14 @@ class STDCMPage {
     await toleranceField.click();
     await this.page.getByRole('button', { name: minusValue, exact: true }).click();
     await this.page.getByRole('button', { name: plusValue, exact: true }).click();
+    await expect(toleranceField).toHaveValue(`${minusValue}/${plusValue}`);
     // TODO : Add a click on the close button instead of clicking on the map when #693 is done
     await this.mapContainer.click();
   }
 
   async fillAndVerifyViaDetails(viaNumber: number, viaSearch: string, selectedLanguage?: string) {
+    const { PASSAGE_TIME, SERVICE_STOP, DRIVER_SWITCH } = VIA_STOP_TYPES;
+    const { serviceStop, driverSwitch } = VIA_STOP_TIMES;
     const translations = selectedLanguage === 'English' ? enTranslations : frTranslations;
     const warning = this.getViaWarning(viaNumber);
     // Helper function to fill common fields
@@ -393,8 +451,8 @@ class STDCMPage {
       await expect(this.getViaCi(viaNumber)).toBeVisible();
       await this.getViaCi(viaNumber).fill(viaSearch);
       await selectedSuggestion.click();
-      await expect(this.getViaCh(viaNumber)).toHaveValue('BV');
-      await expect(this.getViaType(viaNumber)).toHaveValue('passageTime');
+      await expect(this.getViaCh(viaNumber)).toHaveValue(DEFAULT_DETAILS.chValue);
+      await expect(this.getViaType(viaNumber)).toHaveValue(PASSAGE_TIME);
     };
 
     switch (viaSearch) {
@@ -404,21 +462,23 @@ class STDCMPage {
 
       case 'mid_east':
         await fillVia(this.suggestionMES);
-        await this.getViaType(viaNumber).selectOption('serviceStop');
-        await expect(this.getViaStopTime(viaNumber)).toHaveValue('0');
-        await this.getViaStopTime(viaNumber).fill('3');
+        await this.getViaType(viaNumber).selectOption(SERVICE_STOP);
+        await expect(this.getViaStopTime(viaNumber)).toHaveValue(serviceStop.default);
+        await this.getViaStopTime(viaNumber).fill(serviceStop.input);
+        await expect(this.getViaStopTime(viaNumber)).toHaveValue(serviceStop.input);
         break;
 
       case 'nS':
         await fillVia(this.suggestionNS);
-        await this.getViaType(viaNumber).selectOption('driverSwitch');
-        await expect(this.getViaStopTime(viaNumber)).toHaveValue('3');
-        await this.getViaStopTime(viaNumber).fill('2');
-
+        await this.getViaType(viaNumber).selectOption(DRIVER_SWITCH);
+        await expect(this.getViaStopTime(viaNumber)).toHaveValue(driverSwitch.default);
+        await this.getViaStopTime(viaNumber).fill(driverSwitch.invalidInput);
+        await expect(this.getViaStopTime(viaNumber)).toHaveValue(driverSwitch.invalidInput);
         await expect(warning).toBeVisible();
         expect(await warning.textContent()).toEqual(translations.trainPath.warningMinStopTime);
 
-        await this.getViaStopTime(viaNumber).fill('4');
+        await this.getViaStopTime(viaNumber).fill(driverSwitch.validInput);
+        await expect(this.getViaStopTime(viaNumber)).toHaveValue(driverSwitch.validInput);
         await expect(warning).not.toBeVisible();
         break;
 
@@ -427,7 +487,7 @@ class STDCMPage {
     }
   }
 
-  // Launches the simulation and checks if simulation-related elements are visible
+  // Launch the simulation and check if simulation-related elements are visible
   async launchSimulation() {
     await expect(this.launchSimulationButton).toBeEnabled();
     await this.launchSimulationButton.click();

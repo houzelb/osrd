@@ -42,6 +42,7 @@ const StdcmHeader = ({
           </button>
           <button
             type="button"
+            data-testid="stdcm-help-button"
             aria-label="stdcm-help"
             className={cx('ml-4 px-3', { selected: showHelpModule })}
             onClick={() => toggleHelpModule()}
