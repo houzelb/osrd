@@ -5,8 +5,10 @@ import fr.sncf.osrd.api.ExceptionHandler
 import fr.sncf.osrd.api.InfraManager
 import fr.sncf.osrd.api.api_v2.parseRawSimulationScheduleItems
 import fr.sncf.osrd.api.pathfinding.makeChunkPath
+import fr.sncf.osrd.reporting.exceptions.ErrorType
 import fr.sncf.osrd.reporting.exceptions.OSRDError
 import fr.sncf.osrd.reporting.warnings.DiagnosticRecorderImpl
+import fr.sncf.osrd.sim_infra.api.Block
 import fr.sncf.osrd.sim_infra.api.RawInfra
 import fr.sncf.osrd.sim_infra.api.Route
 import fr.sncf.osrd.sim_infra.api.makePathProperties
@@ -51,6 +53,13 @@ class SimulationEndpoint(
             val chunkPath = makeChunkPath(infra.rawInfra, request.path.trackSectionRanges)
             val routePath = convertRoutePath(infra.rawInfra, request.path.routes)
             val pathProps = makePathProperties(infra.rawInfra, chunkPath, routePath.toList())
+            val blockPath = mutableStaticIdxArrayListOf<Block>()
+            for (blockName in request.path.blocks) {
+                val blockId =
+                    infra.blockInfra.getBlockFromName(blockName)
+                        ?: throw OSRDError(ErrorType.UnknownBlock)
+                blockPath.add(blockId)
+            }
 
             val res =
                 runStandaloneSimulation(
@@ -58,6 +67,7 @@ class SimulationEndpoint(
                     pathProps,
                     chunkPath,
                     routePath,
+                    blockPath,
                     electricalProfileMap,
                     rollingStock,
                     request.comfort,

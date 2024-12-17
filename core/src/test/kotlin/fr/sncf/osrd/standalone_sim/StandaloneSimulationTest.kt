@@ -17,7 +17,9 @@ import fr.sncf.osrd.envelope_sim_infra.computeMRSP
 import fr.sncf.osrd.external_generated_inputs.ElectricalProfileMapping
 import fr.sncf.osrd.railjson.schema.rollingstock.Comfort
 import fr.sncf.osrd.railjson.schema.schedule.RJSAllowanceDistribution
-import fr.sncf.osrd.railjson.schema.schedule.RJSTrainStop.RJSReceptionSignal.*
+import fr.sncf.osrd.railjson.schema.schedule.RJSTrainStop.RJSReceptionSignal.OPEN
+import fr.sncf.osrd.railjson.schema.schedule.RJSTrainStop.RJSReceptionSignal.SHORT_SLIP_STOP
+import fr.sncf.osrd.railjson.schema.schedule.RJSTrainStop.RJSReceptionSignal.STOP
 import fr.sncf.osrd.sim_infra.api.makePathProperties
 import fr.sncf.osrd.train.TestTrains
 import fr.sncf.osrd.utils.*
@@ -34,6 +36,7 @@ import org.junit.jupiter.params.provider.MethodSource
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class StandaloneSimulationTest {
     private val infra = Helpers.tinyInfra
+    private val rollingStock = TestTrains.REALISTIC_FAST_TRAIN
     private val routes =
         listOf(
                 "rt.buffer_stop_c->tde.track-bar",
@@ -41,10 +44,16 @@ class StandaloneSimulationTest {
                 "rt.tde.switch_foo-track->buffer_stop_a"
             )
             .map { infra.rawInfra.getRouteFromName(it) }
+    private val blocks =
+        listOf(
+                "[il.sig.C2-BAL];[buffer_stop_c, tde.track-bar];[]",
+                "[il.sig.C2-BAL, il.sig.C6-BAL];[tde.track-bar, tde.switch_foo-track];[]",
+                "[il.sig.C6-BAL];[tde.switch_foo-track, buffer_stop_a];[il.switch_foo-A_B2]"
+            )
+            .map { infra.blockInfra.getBlockFromName("block.${md5(it)}")!! }
 
     private val chunkPath = pathFromRoutes(infra.rawInfra, routes)
     private val pathProps = makePathProperties(infra.rawInfra, chunkPath, routes)
-    private val rollingStock = TestTrains.REALISTIC_FAST_TRAIN
     private val pathLength = pathProps.getLength()
 
     // Build a reference max speed envelope
@@ -74,6 +83,7 @@ class StandaloneSimulationTest {
                 pathProps,
                 chunkPath,
                 routes.toIdxList(),
+                blocks.toIdxList(),
                 ElectricalProfileMapping(),
                 rollingStock,
                 Comfort.STANDARD,
@@ -218,6 +228,7 @@ class StandaloneSimulationTest {
                 pathProps,
                 chunkPath,
                 routes.toIdxList(),
+                blocks.toIdxList(),
                 ElectricalProfileMapping(),
                 rollingStock,
                 Comfort.STANDARD,

@@ -18,7 +18,9 @@ import fr.sncf.osrd.envelope_sim.EnvelopeSimContext
 import fr.sncf.osrd.envelope_sim.allowances.LinearAllowance
 import fr.sncf.osrd.envelope_sim.allowances.MarecoAllowance
 import fr.sncf.osrd.envelope_sim.allowances.utils.AllowanceRange
-import fr.sncf.osrd.envelope_sim.allowances.utils.AllowanceValue.*
+import fr.sncf.osrd.envelope_sim.allowances.utils.AllowanceValue.FixedTime
+import fr.sncf.osrd.envelope_sim.allowances.utils.AllowanceValue.Percentage
+import fr.sncf.osrd.envelope_sim.allowances.utils.AllowanceValue.TimePerDistance
 import fr.sncf.osrd.envelope_sim.pipelines.MaxEffortEnvelope
 import fr.sncf.osrd.envelope_sim.pipelines.MaxSpeedEnvelope
 import fr.sncf.osrd.envelope_sim_infra.EnvelopeTrainPath
@@ -50,6 +52,7 @@ fun runStandaloneSimulation(
     pathProps: PathProperties,
     chunkPath: ChunkPath,
     routes: StaticIdxList<Route>,
+    blockPath: StaticIdxList<Block>,
     electricalProfileMap: ElectricalProfileMapping?,
     rollingStock: RollingStock,
     comfort: Comfort,
@@ -98,7 +101,7 @@ fun runStandaloneSimulation(
             envelopeSimPath,
             timeStep,
             curvesAndConditions.curves,
-            makeETCSContext(rollingStock, infra.rawInfra, chunkPath, routes)
+            makeETCSContext(rollingStock, infra, chunkPath, routes, blockPath)
         )
 
     // Max speed envelope
