@@ -29,14 +29,13 @@ impl Instrumentation for TracingInstrumentation {
                 let url = Url::parse(url).unwrap();
                 let span = tracing::trace_span!(
                     "connection",
-                    // opentelemetry_semantic_conventions::attribute::DB_SYSTEM
-                    "db.system" = "postgresql",
-                    // opentelemetry_semantic_conventions::attribute::NETWORK_PEER_ADDRESS
-                    "network.peer.address" = tracing::field::display(url.host().unwrap()),
-                    // opentelemetry_semantic_conventions::attribute::NETWORK_PEER_PORT
-                    "network.peer.port" = tracing::field::display(url.port().unwrap()),
-                    // opentelemetry_semantic_conventions::attribute::ERROR_TYPE
-                    "error.type" = tracing::field::Empty,
+                    { opentelemetry_semantic_conventions::attribute::DB_SYSTEM } = "postgresql",
+                    { opentelemetry_semantic_conventions::attribute::NETWORK_PEER_ADDRESS } =
+                        tracing::field::display(url.host().unwrap()),
+                    { opentelemetry_semantic_conventions::attribute::NETWORK_PEER_PORT } =
+                        tracing::field::display(url.port().unwrap()),
+                    { opentelemetry_semantic_conventions::attribute::ERROR_TYPE } =
+                        tracing::field::Empty,
                 );
                 {
                     let _guard = span.enter();
@@ -62,10 +61,10 @@ impl Instrumentation for TracingInstrumentation {
             InstrumentationEvent::StartQuery { query, .. } => {
                 let span = tracing::info_span!(
                     "query",
-                    // opentelemetry_semantic_conventions::attribute::DB_QUERY_TEXT
-                    "db.query.text" = tracing::field::display(query),
-                    // opentelemetry_semantic_conventions::attribute::ERROR_TYPE
-                    "error.type" = tracing::field::Empty,
+                    { opentelemetry_semantic_conventions::attribute::DB_QUERY_TEXT } =
+                        tracing::field::display(query),
+                    { opentelemetry_semantic_conventions::attribute::ERROR_TYPE } =
+                        tracing::field::Empty,
                 );
                 {
                     let _guard = span.enter();
@@ -102,11 +101,11 @@ impl Instrumentation for TracingInstrumentation {
             InstrumentationEvent::BeginTransaction { depth, .. } => {
                 let span = tracing::info_span!(
                     "transaction",
-                    // opentelemetry_semantic_conventions::attribute::DB_OPERATION_NAME,
-                    "db.operation.name" = "create_transaction",
+                    { opentelemetry_semantic_conventions::attribute::DB_OPERATION_NAME } =
+                        "create_transaction",
                     "db.transaction.depth" = depth,
-                    // opentelemetry_semantic_conventions::attribute::ERROR_TYPE
-                    "error.type" = tracing::field::Empty,
+                    { opentelemetry_semantic_conventions::attribute::ERROR_TYPE } =
+                        tracing::field::Empty,
                 );
                 {
                     let _guard = span.enter();
