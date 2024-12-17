@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 
-import { Select, ComboBox } from '@osrd-project/ui-core';
+import { ComboBox, Select } from '@osrd-project/ui-core';
 import { useTranslation } from 'react-i18next';
 
 import { type SearchResultItemOperationalPoint } from 'common/api/osrdEditoastApi';
@@ -148,6 +148,9 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
           disabled={disabled}
           getSuggestionLabel={(option: Option) => option?.label}
           onSelectSuggestion={onSelectSuggestion}
+          onBlur={() => {
+            setSearchTerm('');
+          }}
           disableDefaultFilter
         />
       </div>

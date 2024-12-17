@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { Input, ComboBox } from '@osrd-project/ui-core';
+import { ComboBox, Input } from '@osrd-project/ui-core';
 import { useTranslation } from 'react-i18next';
 
 import useStdcmTowedRollingStock from 'applications/stdcm/hooks/useStdcmTowedRollingStock';
@@ -128,6 +128,9 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           suggestions={filteredRollingStockList}
           getSuggestionLabel={(suggestion: LightRollingStockWithLiveries) => getLabel(suggestion)}
           onSelectSuggestion={onSelectSuggestion}
+          onBlur={() => {
+            searchRollingStock('');
+          }}
         />
       </div>
       <div className="towed-rolling-stock">
@@ -153,6 +156,9 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           onSelectSuggestion={(towed) => {
             prefillConsist(rollingStock, towed, speedLimitByTag);
             dispatch(updateTowedRollingStockID(towed?.id));
+          }}
+          onBlur={() => {
+            searchTowedRollingStock('');
           }}
         />
       </div>
