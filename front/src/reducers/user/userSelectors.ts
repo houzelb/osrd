@@ -21,7 +21,7 @@ const makeUserHasAllRequiredRolesSelector =
     const userRoles = getUserRoles(state);
     return requiredRoles.every((role) => userRoles.includes(role));
   };
-export const getIsOnlyStdcmProfile = (state: RootState) => {
+export const userHasOnlyStdcmRoles = (state: RootState) => {
   const userRoles = getUserRoles(state);
   return (
     userRoles.length === REQUIRED_USER_ROLES_FOR.USER_PROFILE.STDCM.length &&

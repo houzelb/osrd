@@ -2,12 +2,12 @@ import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 
 import Home from 'main/home';
-import { getIsOnlyStdcmProfile } from 'reducers/user/userSelectors';
+import { userHasOnlyStdcmRoles } from 'reducers/user/userSelectors';
 
 const InitialRedirect = () => {
-  const isOnlyStdcmProfile = useSelector(getIsOnlyStdcmProfile);
+  const hasOnlyStdcmRoles = useSelector(userHasOnlyStdcmRoles);
 
-  return isOnlyStdcmProfile ? <Navigate to="stdcm" /> : <Home />;
+  return hasOnlyStdcmRoles ? <Navigate to="stdcm" /> : <Home />;
 };
 
 export default InitialRedirect;
