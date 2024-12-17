@@ -45,7 +45,7 @@ const StdcmLinkedPathResults = ({
               value={`${index}`}
               name={`linked-path-radio-buttons-${extremityType}`}
               onClick={({ target }) => {
-                const resultIndex = Number((target as HTMLInputElement).value);
+                const resultIndex = Number(target.value);
                 dispatch(
                   updateLinkedPathStep({
                     linkedPathStep: extremityType,
