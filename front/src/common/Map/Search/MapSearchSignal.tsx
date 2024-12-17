@@ -20,7 +20,7 @@ import {
 } from 'common/Map/utils';
 import { useInfraID } from 'common/osrdContext';
 import { setFailure } from 'reducers/main';
-import type { Viewport } from 'reducers/map';
+import { updateLayersSettings, type Viewport } from 'reducers/map';
 import { getMap } from 'reducers/map/selectors';
 import { useAppDispatch } from 'store';
 import { castErrorToFailure } from 'utils/error';
@@ -126,6 +126,14 @@ const MapSearchSignal = ({ updateExtViewport, closeMapSearchPopUp }: MapSearchSi
   };
 
   const updateSearch = async (infraIDPayload: number) => {
+    // display signals
+    dispatch(
+      updateLayersSettings({
+        ...map.layersSettings,
+        signals: true,
+      })
+    );
+
     const settings = selectedSettings.map((setting) => REVERSED_SIGNAL_SETTINGS_DISPLAY[setting]);
     const payload = getPayload(
       searchLineState,
