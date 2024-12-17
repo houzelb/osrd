@@ -1,10 +1,10 @@
-import along from '@turf/along';
-import bezierSpline from '@turf/bezier-spline';
-import { type Point, polygon, lineString } from '@turf/helpers';
-import length from '@turf/length';
-import lineSliceAlong from '@turf/line-slice-along';
-import transformTranslate from '@turf/transform-translate';
-import type { Feature, LineString } from 'geojson';
+import { along } from '@turf/along';
+import { bezierSpline } from '@turf/bezier-spline';
+import { polygon, lineString } from '@turf/helpers';
+import { length } from '@turf/length';
+import { lineSliceAlong } from '@turf/line-slice-along';
+import { transformTranslate } from '@turf/transform-translate';
+import type { Feature, LineString, Point } from 'geojson';
 import { mapValues } from 'lodash';
 
 import { getCurrentBearing } from 'utils/geometry';

@@ -37,10 +37,10 @@ function getNewQuadChild<T>(box: BBox2d, isLeaf?: boolean): QuadChild<T> {
  * This function takes a collection of GeoJSON features and a depth, and returns a QuadTree of the given depth, with all
  * features properly indexed.
  */
-export function getQuadTree<G extends Geometry | null = Geometry, P = GeoJsonProperties>(
-  collection: FeatureCollection<G, P>,
-  depth: number
-): Quad<Feature<G, P>> {
+export function getQuadTree<
+  G extends Geometry = Geometry,
+  P extends GeoJsonProperties = GeoJsonProperties,
+>(collection: FeatureCollection<G, P>, depth: number): Quad<Feature<G, P>> {
   const boundingBox = bbox(collection) as BBox2d;
   const root = getNewQuadChild(boundingBox) as Quad<Feature<G, P>>;
 

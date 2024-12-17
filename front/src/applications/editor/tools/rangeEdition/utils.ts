@@ -1,8 +1,8 @@
 import along from '@turf/along';
-import { feature, lineString, point, type Feature, type LineString } from '@turf/helpers';
+import { feature, lineString, point } from '@turf/helpers';
 import length from '@turf/length';
 import lineSliceAlong from '@turf/line-slice-along';
-import type { Position } from 'geojson';
+import type { Feature, LineString, Position } from 'geojson';
 import { last, cloneDeep, compact, isEmpty } from 'lodash';
 import type { MapLayerMouseEvent } from 'maplibre-gl';
 

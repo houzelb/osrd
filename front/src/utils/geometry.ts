@@ -1,10 +1,17 @@
 import along from '@turf/along';
 import bearing from '@turf/bearing';
 import turfDistance from '@turf/distance';
-import { point, type Position, featureCollection, lineString, type Units } from '@turf/helpers';
+import { point, featureCollection, lineString, type Units } from '@turf/helpers';
 import { getCoord } from '@turf/invariant';
 import length from '@turf/length';
-import type { Feature, Point, FeatureCollection, LineString, MultiLineString } from 'geojson';
+import type {
+  Feature,
+  Point,
+  FeatureCollection,
+  LineString,
+  MultiLineString,
+  Position,
+} from 'geojson';
 import { minBy } from 'lodash';
 
 import type { GeoJsonLineString } from 'common/api/osrdEditoastApi';

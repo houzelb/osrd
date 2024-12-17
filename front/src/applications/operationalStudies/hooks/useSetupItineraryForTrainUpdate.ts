@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { type Position } from '@turf/helpers';
+import { type Position } from 'geojson';
 
 import {
   osrdEditoastApi,

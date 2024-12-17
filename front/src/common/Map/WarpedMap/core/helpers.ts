@@ -1,9 +1,17 @@
 /* eslint-disable prefer-destructuring, no-plusplus */
 import along from '@turf/along';
 import distance from '@turf/distance';
-import { point, type BBox } from '@turf/helpers';
+import { point } from '@turf/helpers';
 import length from '@turf/length';
-import type { Feature, FeatureCollection, LineString, Point, Polygon, Position } from 'geojson';
+import type {
+  Feature,
+  FeatureCollection,
+  LineString,
+  Point,
+  Polygon,
+  Position,
+  BBox,
+} from 'geojson';
 import _, { first, last, mapValues } from 'lodash';
 import type { MapGeoJSONFeature } from 'maplibre-gl';
 import WebMercatorViewport from 'viewport-mercator-project';

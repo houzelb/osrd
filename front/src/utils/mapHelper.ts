@@ -4,11 +4,12 @@ import booleanIntersects from '@turf/boolean-intersects';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import fnDistance from '@turf/distance';
 import fnExplode from '@turf/explode';
-import { type BBox, type Coord, featureCollection, lineString } from '@turf/helpers';
+import { type Coord, featureCollection, lineString } from '@turf/helpers';
 import lineIntersect from '@turf/line-intersect';
 import lineSlice from '@turf/line-slice';
 import nearestPoint, { type NearestPoint } from '@turf/nearest-point';
 import type {
+  BBox,
   Feature,
   FeatureCollection,
   LineString,
