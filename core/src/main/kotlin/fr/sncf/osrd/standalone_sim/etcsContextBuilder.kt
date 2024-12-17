@@ -1,6 +1,8 @@
 package fr.sncf.osrd.standalone_sim
 
+import fr.sncf.osrd.api.FullInfra
 import fr.sncf.osrd.envelope_sim.EnvelopeSimContext
+import fr.sncf.osrd.signaling.etcs_level2.ETCS_LEVEL2
 import fr.sncf.osrd.sim_infra.api.*
 import fr.sncf.osrd.sim_infra.impl.ChunkPath
 import fr.sncf.osrd.sim_infra.utils.getNextTrackSections
@@ -10,22 +12,42 @@ import fr.sncf.osrd.utils.distanceRangeSetOf
 import fr.sncf.osrd.utils.indexing.DirStaticIdx
 import fr.sncf.osrd.utils.indexing.StaticIdxList
 import fr.sncf.osrd.utils.units.Offset
+import fr.sncf.osrd.utils.units.meters
 
 /** Build the ETCS context, if relevant. */
 fun makeETCSContext(
     rollingStock: RollingStock,
-    infra: RawInfra,
+    infra: FullInfra,
     chunkPath: ChunkPath,
-    routePath: StaticIdxList<Route>
+    routePath: StaticIdxList<Route>,
+    blockPath: StaticIdxList<Block>
 ): EnvelopeSimContext.ETCSContext? {
-    val isRollingStockETCSCompatible = false // TODO
-    if (!isRollingStockETCSCompatible) return null
+    val blockInfra = infra.blockInfra
+    val etcsRanges = distanceRangeSetOf()
+    val etcsLevel2 =
+        infra.signalingSimulator.sigModuleManager.findSignalingSystemOrThrow(ETCS_LEVEL2.id)
+    var offsetSinceStart = Offset<Path>(0.meters)
+    for (blockId in blockPath) {
+        val blockLength = blockInfra.getBlockLength(blockId)
+        if (blockInfra.getBlockSignalingSystem(blockId) == etcsLevel2) {
+            etcsRanges.put(
+                offsetSinceStart.distance,
+                offsetSinceStart.distance + blockLength.distance
+            )
+        }
+        offsetSinceStart += blockLength.distance
+    }
 
-    val etcsRanges = distanceRangeSetOf() // TODO
-    if (etcsRanges.asList().isEmpty()) return null
+    if (etcsRanges.asList().isEmpty()) {
+        return null
+    } else {
+        assert(rollingStock.etcsBrakeParams != null) {
+            "Invalid ETCS context: ETCS ranges on the path while no ETCS brake params provided on rolling-stock"
+        }
+    }
     return EnvelopeSimContext.ETCSContext(
         etcsRanges,
-        buildETCSDangerPoints(infra, chunkPath, routePath)
+        buildETCSDangerPoints(infra.rawInfra, chunkPath, routePath)
     )
 }
 

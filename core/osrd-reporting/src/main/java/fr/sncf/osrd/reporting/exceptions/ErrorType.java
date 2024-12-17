@@ -108,6 +108,7 @@ public enum ErrorType {
     UnknownAllowanceType("unknown_allowance_type", "unknown allowance type", ErrorCause.USER),
     UnknownAllowanceValueType("unknown_allowance_value_type", "unknown allowance value type", ErrorCause.USER),
     UnknownRoute("unknown_route", "unknown route", ErrorCause.USER),
+    UnknownBlock("unknown_block", "unknown block", ErrorCause.USER),
     DuplicateRoute("duplicate_route", "Two routes have the same name", ErrorCause.USER),
     MissingAttributeError("missing_attribute", "referencing missing attribute", ErrorCause.INTERNAL),
     MissingSignalOnRouteTransition(
