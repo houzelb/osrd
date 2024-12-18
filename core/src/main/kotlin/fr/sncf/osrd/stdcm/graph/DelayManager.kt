@@ -9,6 +9,8 @@ import fr.sncf.osrd.utils.units.Distance.Companion.fromMeters
 import fr.sncf.osrd.utils.units.Offset
 import fr.sncf.osrd.utils.units.meters
 import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * This class contains all the methods used to handle delays (how much we can add, how much we need
@@ -29,14 +31,17 @@ internal constructor(
      */
     fun minimumDelaysPerOpening(
         infraExplorerWithNewEnvelope: InfraExplorerWithEnvelope,
-        startTime: Double,
+        timeData: TimeData,
         envelope: Envelope,
         startOffset: Offset<Block>,
     ): NavigableSet<Double> {
+        val startTime = timeData.earliestReachableTime
+        val maximumDelay = computeMaximumDelay(timeData)
         val res = TreeSet<Double>()
         val endOffset = startOffset + fromMeters(envelope.endPos)
         var time = startTime
         while (java.lang.Double.isFinite(time)) {
+            if (time - startTime > maximumDelay) break
             val availability =
                 getLastBlockAvailability(
                     infraExplorerWithNewEnvelope,
@@ -56,6 +61,18 @@ internal constructor(
                 }
         }
         return res
+    }
+
+    /**
+     * Compute how much delay we may add here. Prevents the generation of edges very far in the
+     * future that would necessarily be discarded.
+     */
+    private fun computeMaximumDelay(data: TimeData): Double {
+        val maxExtraRunTime = maxRunTime - data.totalRunningTime
+        val maxDelayForMaxRunTime = data.maxDepartureDelayingWithoutConflict + maxExtraRunTime
+        val maxDelayWithLocalConflict =
+            data.timeOfNextConflictAtLocation - data.earliestReachableTime
+        return max(0.0, min(maxDelayForMaxRunTime, maxDelayWithLocalConflict))
     }
 
     /** Returns the start time of the next occupancy for the block */

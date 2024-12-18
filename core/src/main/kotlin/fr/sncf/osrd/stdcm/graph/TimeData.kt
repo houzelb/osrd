@@ -89,6 +89,9 @@ data class TimeData(
         var maxDepartureDelayingWithoutConflict = maxDepartureDelayingWithoutConflict
         val nextEarliestReachableTime =
             earliestReachableTime + extraTravelTime + (extraStopTime ?: 0.0)
+        var timeOfNextConflict = timeOfNextConflictAtLocation
+        if (maxAdditionalStopTime != null)
+            timeOfNextConflict = nextEarliestReachableTime + maxAdditionalStopTime
         if (extraStopTime != null) {
             val stopDataCopy = newStopData.toMutableList()
             stopDataCopy.add(
@@ -108,6 +111,7 @@ data class TimeData(
             maxDepartureDelayingWithoutConflict = maxDepartureDelayingWithoutConflict,
             maxFirstDepartureDelaying =
                 min(maxFirstDepartureDelaying, (maxAdditionalStopTime ?: POSITIVE_INFINITY)),
+            timeOfNextConflictAtLocation = timeOfNextConflict,
         )
     }
 

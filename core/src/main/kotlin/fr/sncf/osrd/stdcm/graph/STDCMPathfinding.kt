@@ -25,6 +25,7 @@ import io.opentelemetry.instrumentation.annotations.WithSpan
 import java.time.Duration
 import java.time.Instant
 import java.util.*
+import kotlin.Double.Companion.POSITIVE_INFINITY
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -272,7 +273,7 @@ class STDCMPathfinding(
                             earliestReachableTime = startTime,
                             maxDepartureDelayingWithoutConflict = maxDepartureDelay,
                             departureTime = startTime,
-                            timeOfNextConflictAtLocation = 0.0,
+                            timeOfNextConflictAtLocation = POSITIVE_INFINITY,
                             totalRunningTime = 0.0,
                             stopTimeData = listOf(),
                             maxFirstDepartureDelaying = maxDepartureDelay,
