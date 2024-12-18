@@ -132,7 +132,7 @@ internal constructor(
     private fun getDelaysPerOpening(): Set<Double> {
         return graph.delayManager.minimumDelaysPerOpening(
             getExplorerWithNewEnvelope()!!,
-            prevNode.timeData.earliestReachableTime,
+            prevNode.timeData,
             envelope!!,
             startOffset,
         )
