@@ -30,29 +30,21 @@ use client::user::UserCommand;
 use client::Client;
 use client::Color;
 use client::Commands;
+use editoast_common::tracing::create_tracing_subscriber;
+use editoast_common::tracing::TracingConfig;
 use editoast_models::DbConnectionPoolV2;
 use models::RollingStockModel;
-use opentelemetry::trace::TracerProvider as _;
-use opentelemetry_sdk::propagation::TraceContextPropagator;
-use opentelemetry_sdk::resource::EnvResourceDetector;
-use opentelemetry_sdk::resource::SdkProvidedResourceDetector;
-use opentelemetry_sdk::resource::TelemetryResourceDetector;
+use tracing_subscriber::util::SubscriberInitExt;
 pub use views::AppState;
 
 use models::prelude::*;
-use opentelemetry::KeyValue;
 use opentelemetry_otlp::WithExportConfig as _;
-use opentelemetry_sdk::Resource;
 use std::error::Error;
 use std::io::IsTerminal;
 use std::process::exit;
 use std::sync::Arc;
-use std::time::Duration;
 use thiserror::Error;
 use tracing::error;
-use tracing_subscriber::layer::SubscriberExt as _;
-use tracing_subscriber::util::SubscriberInitExt as _;
-use tracing_subscriber::Layer as _;
 pub use valkey_utils::ValkeyClient;
 pub use valkey_utils::ValkeyConnection;
 
@@ -71,56 +63,13 @@ enum EditoastMode {
     Cli,
 }
 
-fn init_tracing(mode: EditoastMode, telemetry_config: &client::TelemetryConfig) {
-    let env_filter_layer = tracing_subscriber::EnvFilter::builder()
-        // Set the default log level to 'info'
-        .with_default_directive(tracing_subscriber::filter::LevelFilter::INFO.into())
-        .from_env_lossy();
-    let fmt_layer = tracing_subscriber::fmt::layer()
-        .pretty()
-        .with_file(true)
-        .with_line_number(false);
-    let fmt_layer = if mode == EditoastMode::Cli {
-        fmt_layer.with_writer(std::io::stderr).boxed()
-    } else {
-        fmt_layer.boxed()
-    };
-    // https://docs.rs/tracing-subscriber/latest/tracing_subscriber/layer/index.html#runtime-configuration-with-layers
-    let telemetry_layer = match telemetry_config.telemetry_kind {
-        client::TelemetryKind::None => None,
-        client::TelemetryKind::Opentelemetry => {
-            let exporter = opentelemetry_otlp::SpanExporter::builder()
-                .with_tonic()
-                .with_endpoint(telemetry_config.telemetry_endpoint.as_str())
-                .build()
-                .expect("failed to build a span exporter");
-            let resource = Resource::new(vec![KeyValue::new(
-                opentelemetry_semantic_conventions::resource::SERVICE_NAME,
-                telemetry_config.service_name.clone(),
-            )])
-            .merge(&Resource::from_detectors(
-                Duration::from_secs(10),
-                vec![
-                    Box::new(SdkProvidedResourceDetector),
-                    Box::new(TelemetryResourceDetector),
-                    Box::new(EnvResourceDetector::new()),
-                ],
-            ));
-            let otlp_tracer = opentelemetry_sdk::trace::TracerProvider::builder()
-                .with_batch_exporter(exporter, opentelemetry_sdk::runtime::Tokio)
-                .with_resource(resource)
-                .build()
-                .tracer("osrd-editoast");
-            let layer = tracing_opentelemetry::OpenTelemetryLayer::new(otlp_tracer);
-            opentelemetry::global::set_text_map_propagator(TraceContextPropagator::new());
-            Some(layer)
+impl From<EditoastMode> for editoast_common::tracing::Stream {
+    fn from(mode: EditoastMode) -> Self {
+        match mode {
+            EditoastMode::Webservice => Self::Stdout,
+            EditoastMode::Cli => Self::Stderr,
         }
-    };
-    tracing_subscriber::registry()
-        .with(telemetry_layer)
-        .with(env_filter_layer)
-        .with(fmt_layer)
-        .init();
+    }
 }
 
 impl EditoastMode {
@@ -151,7 +100,22 @@ async fn main() {
 
 async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
     let client = Client::parse();
-    init_tracing(EditoastMode::from_client(&client), &client.telemetry_config);
+    let exporter = opentelemetry_otlp::SpanExporter::builder()
+        .with_tonic()
+        .with_endpoint(client.telemetry_config.telemetry_endpoint.as_str())
+        .build()
+        .expect("failed to build a span exporter");
+
+    let telemetry = match client.telemetry_config.telemetry_kind {
+        client::TelemetryKind::None => None,
+        client::TelemetryKind::Opentelemetry => Some(client.telemetry_config.clone().into()),
+    };
+
+    let tracing_config = TracingConfig {
+        stream: EditoastMode::from_client(&client).into(),
+        telemetry,
+    };
+    create_tracing_subscriber(tracing_config, exporter).init();
 
     let pg_config = client.postgres_config;
     let db_pool =

@@ -17,6 +17,15 @@ pub struct TelemetryConfig {
     pub telemetry_endpoint: Url,
 }
 
+impl From<TelemetryConfig> for editoast_common::tracing::Telemetry {
+    fn from(telemetry_config: TelemetryConfig) -> Self {
+        Self {
+            service_name: telemetry_config.service_name,
+            endpoint: telemetry_config.telemetry_endpoint,
+        }
+    }
+}
+
 #[derive(Default, ValueEnum, Debug, Derivative, Clone, strum::Display)]
 #[strum(serialize_all = "lowercase")]
 pub enum TelemetryKind {
