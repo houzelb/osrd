@@ -21,13 +21,7 @@ export function generateCodeNumber(): string {
 }
 
 export function getStopDurationTime(sec: number) {
-  const timeInMilliseconds = sec * 1000;
-  const time = new Date(timeInMilliseconds);
-
-  if (timeInMilliseconds < 60000) {
-    return `${time.getUTCSeconds()} sec`;
-  }
-  return `${time.getUTCMinutes()} min`;
+  return `${Math.round(sec / 60)} min`;
 }
 
 function secondsToTimeString(duration: number): string {
