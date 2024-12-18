@@ -9,6 +9,7 @@ use axum::extract::Path;
 use axum::extract::State;
 use axum::Extension;
 use editoast_authz::BuiltinRole;
+use editoast_common::units::*;
 use editoast_schemas::rolling_stock::LoadingGaugeType;
 use editoast_schemas::rolling_stock::RollingStock;
 use editoast_schemas::train_schedule::PathItemLocation;
@@ -395,8 +396,10 @@ pub async fn pathfinding_from_train_batch(
                 .supported_signaling_systems
                 .0
                 .clone(),
-            rolling_stock_maximum_speed: OrderedFloat(rolling_stock.max_speed),
-            rolling_stock_length: OrderedFloat(rolling_stock.length),
+            rolling_stock_maximum_speed: OrderedFloat(meter_per_second::from(
+                rolling_stock.max_speed,
+            )),
+            rolling_stock_length: OrderedFloat(meter::from(rolling_stock.length)),
             path_items: train_schedule
                 .path
                 .clone()

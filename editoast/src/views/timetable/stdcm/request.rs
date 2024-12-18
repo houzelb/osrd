@@ -1,6 +1,7 @@
 use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
+use editoast_common::units::*;
 use editoast_models::DbConnection;
 use editoast_schemas::rolling_stock::LoadingGaugeType;
 use editoast_schemas::train_schedule::Comfort;
@@ -66,6 +67,7 @@ struct StepTimingData {
 }
 
 /// An STDCM request
+#[editoast_derive::annotate_units]
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Validate, ToSchema)]
 pub(super) struct Request {
     /// Deprecated, first step arrival time should be used instead
@@ -102,15 +104,16 @@ pub(super) struct Request {
     #[serde(default)]
     #[schema(value_type = Option<String>, example = json!(["5%", "2min/100km"]))]
     pub(super) margin: Option<MarginValue>,
-    /// Total mass of the consist in kg
-    #[validate(range(exclusive_min = 0.0))]
-    pub(super) total_mass: Option<f64>,
+    /// Total mass of the consist
+    //#[validate(range(exclusive_min = 0.0))] TODOUOM
+    #[serde(default, with = "kilogram::option")]
+    pub(super) total_mass: Option<Mass>,
     /// Total length of the consist in meters
-    #[validate(range(exclusive_min = 0.0))]
-    pub(super) total_length: Option<f64>,
+    #[serde(default, with = "meter::option")]
+    pub(super) total_length: Option<Length>,
     /// Maximum speed of the consist in km/h
-    #[validate(range(exclusive_min = 0.0))]
-    pub(super) max_speed: Option<f64>,
+    #[serde(default, with = "meter_per_second::option")]
+    pub(super) max_speed: Option<Velocity>,
     pub(super) loading_gauge_type: Option<LoadingGaugeType>,
 }
 

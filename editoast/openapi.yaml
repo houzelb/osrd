@@ -2793,7 +2793,9 @@ paths:
                 max_speed:
                   type: number
                   format: double
-                  description: Maximum speed of the consist in km/h
+                  description: |-
+                    Maximum speed of the consist in km/h
+                    Velocity in m·s⁻¹
                   nullable: true
                 maximum_departure_delay:
                   type: integer
@@ -2852,12 +2854,16 @@ paths:
                 total_length:
                   type: number
                   format: double
-                  description: Total length of the consist in meters
+                  description: |-
+                    Total length of the consist in meters
+                    Length in m
                   nullable: true
                 total_mass:
                   type: number
                   format: double
-                  description: Total mass of the consist in kg
+                  description: |-
+                    Total mass of the consist
+                    Mass in kg
                   nullable: true
                 towed_rolling_stock_id:
                   type: integer
@@ -7270,9 +7276,11 @@ components:
         comfort_acceleration:
           type: number
           format: double
+          description: Acceleration in m·s⁻²
         const_gamma:
           type: number
           format: double
+          description: Acceleration in m·s⁻²
         effort_curves:
           $ref: '#/components/schemas/LightEffortCurves'
         energy_sources:
@@ -7289,9 +7297,11 @@ components:
         inertia_coefficient:
           type: number
           format: double
+          description: Ratio 1:1
         length:
           type: number
           format: double
+          description: Length in m
         loading_gauge:
           $ref: '#/components/schemas/LoadingGaugeType'
         locked:
@@ -7299,9 +7309,11 @@ components:
         mass:
           type: number
           format: double
+          description: Mass in kg
         max_speed:
           type: number
           format: double
+          description: Velocity in m·s⁻¹
         metadata:
           allOf:
           - $ref: '#/components/schemas/RollingStockMetadata'
@@ -7319,9 +7331,11 @@ components:
         startup_acceleration:
           type: number
           format: double
+          description: Acceleration in m·s⁻²
         startup_time:
           type: number
           format: double
+          description: Duration in s
         supported_signaling_systems:
           $ref: '#/components/schemas/RollingStockSupportedSignalingSystems'
     LightRollingStockWithLiveries:
@@ -8978,7 +8992,9 @@ components:
         max_speed:
           type: number
           format: double
-          description: Maximum speed of the consist in km/h
+          description: |-
+            Maximum speed of the consist in km/h
+            Velocity in m·s⁻¹
           nullable: true
         maximum_departure_delay:
           type: integer
@@ -9037,12 +9053,16 @@ components:
         total_length:
           type: number
           format: double
-          description: Total length of the consist in meters
+          description: |-
+            Total length of the consist in meters
+            Length in m
           nullable: true
         total_mass:
           type: number
           format: double
-          description: Total mass of the consist in kg
+          description: |-
+            Total mass of the consist
+            Mass in kg
           nullable: true
         towed_rolling_stock_id:
           type: integer
@@ -9125,15 +9145,21 @@ components:
         A:
           type: number
           format: double
-          description: Solid friction in N
+          description: |-
+            Solid friction
+            Solid Friction in N
         B:
           type: number
           format: double
-          description: Viscosity friction in N/(m/s)
+          description: |-
+            Viscosity friction in N·(m/s)⁻¹; N = kg⋅m⋅s⁻²
+            Viscosity friction in kg·s⁻¹
         C:
           type: number
           format: double
-          description: Aerodynamic drag in N/(m/s)²
+          description: |-
+            Aerodynamic drag in N·(m/s)⁻²; N = kg⋅m⋅s⁻²
+            Aerodynamic drag in kg·m⁻¹
         type:
           type: string
       additionalProperties: false
@@ -9148,15 +9174,21 @@ components:
         A:
           type: number
           format: double
-          description: Solid friction in N/kg
+          description: |-
+            Solid friction in N·kg⁻¹; N = kg⋅m⋅s⁻²
+            Acceleration in m·s⁻²
         B:
           type: number
           format: double
-          description: Viscosity friction in (N/kg)/(m/s)
+          description: |-
+            Viscosity friction in (N·kg⁻¹)·(m/s)⁻¹; N = kg⋅m⋅s⁻²
+            Viscosity friction per weight in s⁻¹
         C:
           type: number
           format: double
-          description: Aerodynamic drag in (N/kg)/(m/s)²
+          description: |-
+            Aerodynamic drag per kg in (N·kg⁻¹)·(m/s)⁻²; N = kg⋅m⋅s⁻²
+            Aerodynamic drag per kg in m⁻¹
         type:
           type: string
       additionalProperties: false
@@ -9194,14 +9226,17 @@ components:
         comfort_acceleration:
           type: number
           format: double
+          description: Acceleration in m·s⁻²
         const_gamma:
           type: number
           format: double
+          description: Acceleration in m·s⁻²
         effort_curves:
           $ref: '#/components/schemas/EffortCurves'
         electrical_power_startup_time:
           type: number
           format: double
+          description: Duration in s
           nullable: true
         energy_sources:
           type: array
@@ -9217,9 +9252,11 @@ components:
         inertia_coefficient:
           type: number
           format: double
+          description: Ratio 1:1
         length:
           type: number
           format: double
+          description: Length in m
         loading_gauge:
           $ref: '#/components/schemas/LoadingGaugeType'
         locked:
@@ -9227,9 +9264,11 @@ components:
         mass:
           type: number
           format: double
+          description: Mass in kg
         max_speed:
           type: number
           format: double
+          description: Velocity in m·s⁻¹
         metadata:
           allOf:
           - $ref: '#/components/schemas/RollingStockMetadata'
@@ -9245,15 +9284,18 @@ components:
         raise_pantograph_time:
           type: number
           format: double
+          description: Duration in s
           nullable: true
         rolling_resistance:
           $ref: '#/components/schemas/RollingResistance'
         startup_acceleration:
           type: number
           format: double
+          description: Acceleration in m·s⁻²
         startup_time:
           type: number
           format: double
+          description: Duration in s
         supported_signaling_systems:
           type: array
           items:
@@ -9349,15 +9391,19 @@ components:
         comfort_acceleration:
           type: number
           format: double
+          description: Acceleration in m·s⁻²
         const_gamma:
           type: number
           format: double
+          description: Acceleration in m·s⁻²
         effort_curves:
           $ref: '#/components/schemas/EffortCurves'
         electrical_power_startup_time:
           type: number
           format: double
-          description: The time the train takes before actually using electrical power (in seconds). Is null if the train is not electric.
+          description: |-
+            The time the train takes before actually using electrical power (in seconds). Is null if the train is not electric.
+            Duration in s
           example: 5.0
           nullable: true
         energy_sources:
@@ -9367,9 +9413,11 @@ components:
         inertia_coefficient:
           type: number
           format: double
+          description: Ratio 1:1
         length:
           type: number
           format: double
+          description: Length in m
         loading_gauge:
           $ref: '#/components/schemas/LoadingGaugeType'
         locked:
@@ -9378,9 +9426,11 @@ components:
         mass:
           type: number
           format: double
+          description: Mass in kg
         max_speed:
           type: number
           format: double
+          description: Velocity in m·s⁻¹
         metadata:
           allOf:
           - $ref: '#/components/schemas/RollingStockMetadata'
@@ -9395,7 +9445,9 @@ components:
         raise_pantograph_time:
           type: number
           format: double
-          description: The time it takes to raise this train's pantograph in seconds. Is null if the train is not electric.
+          description: |-
+            The time it takes to raise this train's pantograph in seconds. Is null if the train is not electric.
+            Duration in s
           example: 15.0
           nullable: true
         rolling_resistance:
@@ -9403,9 +9455,11 @@ components:
         startup_acceleration:
           type: number
           format: double
+          description: Acceleration in m·s⁻²
         startup_time:
           type: number
           format: double
+          description: Duration in s
         supported_signaling_systems:
           $ref: '#/components/schemas/RollingStockSupportedSignalingSystems'
     RollingStockKey:
@@ -11163,32 +11217,39 @@ components:
       - inertia_coefficient
       - rolling_resistance
       - const_gamma
+      - max_speed
       properties:
         comfort_acceleration:
           type: number
           format: double
+          description: Acceleration in m·s⁻²
         const_gamma:
           type: number
           format: double
+          description: Acceleration in m·s⁻²
         id:
           type: integer
           format: int64
         inertia_coefficient:
           type: number
           format: double
+          description: Ratio 1:1
         label:
           type: string
         length:
           type: number
           format: double
+          description: Length in m
         locked:
           type: boolean
         mass:
           type: number
           format: double
+          description: Mass in kg
         max_speed:
           type: number
           format: double
+          description: Velocity in m·s⁻¹
           nullable: true
         name:
           type: string
@@ -11199,6 +11260,7 @@ components:
         startup_acceleration:
           type: number
           format: double
+          description: Acceleration in m·s⁻²
     TowedRollingStockCountList:
       allOf:
       - $ref: '#/components/schemas/PaginationStats'
@@ -11227,25 +11289,31 @@ components:
         comfort_acceleration:
           type: number
           format: double
+          description: Acceleration in m·s⁻²
         const_gamma:
           type: number
           format: double
+          description: Acceleration in m·s⁻²
         inertia_coefficient:
           type: number
           format: double
+          description: Ratio 1:1
         label:
           type: string
         length:
           type: number
           format: double
+          description: Length in m
         locked:
           type: boolean
         mass:
           type: number
           format: double
+          description: Mass in kg
         max_speed:
           type: number
           format: double
+          description: Velocity in m·s⁻¹
           nullable: true
         name:
           type: string
@@ -11254,6 +11322,7 @@ components:
         startup_acceleration:
           type: number
           format: double
+          description: Acceleration in m·s⁻²
     TowedRollingStockLockedForm:
       type: object
       required:

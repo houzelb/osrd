@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::hash::Hash;
 
 use derivative::Derivative;
+use editoast_common::units::*;
 use editoast_schemas::primitives::Identifier;
 use editoast_schemas::rolling_stock::EffortCurves;
 use editoast_schemas::rolling_stock::EtcsBrakeParams;
@@ -39,48 +40,57 @@ editoast_common::schemas! {
 pub struct PhysicsConsist {
     pub effort_curves: EffortCurves,
     pub base_power_class: Option<String>,
-    /// Length of the rolling stock in mm
-    pub length: u64,
-    /// Maximum speed of the rolling stock in m/s
-    #[derivative(Hash(hash_with = "editoast_common::hash_float::<3,_>"))]
-    pub max_speed: f64,
-    // Time in ms
-    pub startup_time: u64,
-    #[derivative(Hash(hash_with = "editoast_common::hash_float::<5,_>"))]
-    /// In m/s²
-    pub startup_acceleration: f64,
-    #[derivative(Hash(hash_with = "editoast_common::hash_float::<5,_>"))]
-    /// In m/s²
-    pub comfort_acceleration: f64,
-    #[derivative(Hash(hash_with = "editoast_common::hash_float::<5,_>"))]
+    /// Length of the rolling stock
+    #[derivative(Hash(hash_with = "meter::hash"))]
+    #[serde(with = "meter")]
+    pub length: Length,
+    /// Maximum speed of the rolling stock
+    #[derivative(Hash(hash_with = "meter_per_second::hash"))]
+    #[serde(with = "meter_per_second")]
+    pub max_speed: Velocity,
+    #[derivative(Hash(hash_with = "millisecond::hash"))]
+    #[serde(with = "millisecond::u64")]
+    pub startup_time: Time,
+    #[derivative(Hash(hash_with = "meter_per_second_squared::hash"))]
+    #[serde(with = "meter_per_second_squared")]
+    pub startup_acceleration: Acceleration,
+    #[derivative(Hash(hash_with = "meter_per_second_squared::hash"))]
+    #[serde(with = "meter_per_second_squared")]
+    pub comfort_acceleration: Acceleration,
     /// The constant gamma braking coefficient used when NOT circulating
-    /// under ETCS/ERTMS signaling system in m/s^2
-    pub const_gamma: f64,
+    /// under ETCS/ERTMS signaling system
+    #[derivative(Hash(hash_with = "meter_per_second_squared::hash"))]
+    #[serde(with = "meter_per_second_squared")]
+    pub const_gamma: Acceleration,
     pub etcs_brake_params: Option<EtcsBrakeParams>,
-    #[derivative(Hash(hash_with = "editoast_common::hash_float::<5,_>"))]
-    pub inertia_coefficient: f64,
-    /// Mass of the rolling stock in kg
-    pub mass: u64,
+    #[derivative(Hash(hash_with = "meter_per_second_squared::hash"))]
+    #[serde(with = "meter_per_second_squared")]
+    pub inertia_coefficient: Acceleration,
+    /// Mass of the rolling stock
+    #[derivative(Hash(hash_with = "kilogram::hash"))]
+    #[serde(with = "kilogram")]
+    pub mass: Mass,
     pub rolling_resistance: RollingResistance,
     /// Mapping of power restriction code to power class
     #[serde(default)]
     pub power_restrictions: BTreeMap<String, String>,
-    /// The time the train takes before actually using electrical power (in milliseconds).
+    /// The time the train takes before actually using electrical power.
     /// Is null if the train is not electric or the value not specified.
-    pub electrical_power_startup_time: Option<u64>,
-    /// The time it takes to raise this train's pantograph in milliseconds.
+    #[derivative(Hash(hash_with = "millisecond::option::hash"))]
+    #[serde(default, with = "millisecond::option")]
+    pub electrical_power_startup_time: Option<Time>,
+    /// The time it takes to raise this train's pantograph.
     /// Is null if the train is not electric or the value not specified.
-    pub raise_pantograph_time: Option<u64>,
+    #[derivative(Hash(hash_with = "millisecond::option::hash"))]
+    #[serde(default, with = "millisecond::option")]
+    pub raise_pantograph_time: Option<Time>,
 }
 
 #[derive(Debug, Clone)]
 pub struct PhysicsConsistParameters {
-    /// In kg
-    pub total_mass: Option<f64>,
-    /// In m
-    pub total_length: Option<f64>,
-    /// In m/s
-    pub max_speed: Option<f64>,
+    pub total_mass: Option<Mass>,
+    pub total_length: Option<Length>,
+    pub max_speed: Option<Velocity>,
     pub towed_rolling_stock: Option<TowedRollingStock>,
     pub traction_engine: RollingStock,
 }
@@ -98,24 +108,18 @@ impl PhysicsConsistParameters {
 }
 
 impl PhysicsConsistParameters {
-    pub fn compute_length(&self) -> u64 {
+    pub fn compute_length(&self) -> Length {
         let towed_rolling_stock_length = self
             .towed_rolling_stock
             .as_ref()
             .map(|trs| trs.length)
-            .unwrap_or(0.0);
+            .unwrap_or_default();
 
-        let length = self
-            .total_length
-            .unwrap_or(self.traction_engine.length + towed_rolling_stock_length);
-
-        // Convert m to mm
-        let length = length * 1000.0;
-
-        length.round() as u64
+        self.total_length
+            .unwrap_or(self.traction_engine.length + towed_rolling_stock_length)
     }
 
-    pub fn compute_max_speed(&self) -> f64 {
+    pub fn compute_max_speed(&self) -> Velocity {
         let max_speeds = [
             self.max_speed,
             self.towed_rolling_stock
@@ -126,35 +130,33 @@ impl PhysicsConsistParameters {
         max_speeds
             .into_iter()
             .flatten()
-            .reduce(f64::min)
+            .reduce(Velocity::min)
             .unwrap_or(self.traction_engine.max_speed)
     }
 
-    pub fn compute_startup_acceleration(&self) -> f64 {
+    pub fn compute_startup_acceleration(&self) -> Acceleration {
         self.towed_rolling_stock
             .as_ref()
             .map(|towed_rolling_stock| {
-                f64::max(
-                    self.traction_engine.startup_acceleration,
-                    towed_rolling_stock.startup_acceleration,
-                )
+                self.traction_engine
+                    .startup_acceleration
+                    .max(towed_rolling_stock.startup_acceleration)
             })
             .unwrap_or(self.traction_engine.startup_acceleration)
     }
 
-    pub fn compute_comfort_acceleration(&self) -> f64 {
+    pub fn compute_comfort_acceleration(&self) -> Acceleration {
         self.towed_rolling_stock
             .as_ref()
             .map(|towed_rolling_stock| {
-                f64::min(
-                    self.traction_engine.comfort_acceleration,
-                    towed_rolling_stock.comfort_acceleration,
-                )
+                self.traction_engine
+                    .comfort_acceleration
+                    .min(towed_rolling_stock.comfort_acceleration)
             })
             .unwrap_or(self.traction_engine.comfort_acceleration)
     }
 
-    pub fn compute_inertia_coefficient(&self) -> f64 {
+    pub fn compute_inertia_coefficient(&self) -> Acceleration {
         if let (Some(towed_rolling_stock), Some(total_mass)) =
             (self.towed_rolling_stock.as_ref(), self.total_mass)
         {
@@ -168,17 +170,15 @@ impl PhysicsConsistParameters {
         }
     }
 
-    pub fn compute_mass(&self) -> u64 {
+    pub fn compute_mass(&self) -> Mass {
         let traction_engine_mass = self.traction_engine.mass;
         let towed_rolling_stock_mass = self
             .towed_rolling_stock
             .as_ref()
             .map(|trs| trs.mass)
-            .unwrap_or(0.0);
-        let mass = self
-            .total_mass
-            .unwrap_or(traction_engine_mass + towed_rolling_stock_mass);
-        mass.round() as u64
+            .unwrap_or_default();
+        self.total_mass
+            .unwrap_or(traction_engine_mass + towed_rolling_stock_mass)
     }
 
     pub fn compute_rolling_resistance(&self) -> RollingResistance {
@@ -215,10 +215,10 @@ impl PhysicsConsistParameters {
         }
     }
 
-    pub fn compute_const_gamma(&self) -> f64 {
+    pub fn compute_const_gamma(&self) -> Acceleration {
         self.towed_rolling_stock
             .as_ref()
-            .map(|towed| f64::min(towed.const_gamma, self.traction_engine.const_gamma))
+            .map(|towed| Acceleration::min(towed.const_gamma, self.traction_engine.const_gamma))
             .unwrap_or_else(|| self.traction_engine.const_gamma)
     }
 
@@ -258,7 +258,7 @@ impl From<PhysicsConsistParameters> for PhysicsConsist {
             length,
             mass,
             max_speed,
-            startup_time: (traction_engine.startup_time * 1000.0).round() as u64,
+            startup_time: traction_engine.startup_time,
             startup_acceleration,
             comfort_acceleration,
             const_gamma,
@@ -266,12 +266,8 @@ impl From<PhysicsConsistParameters> for PhysicsConsist {
             inertia_coefficient,
             rolling_resistance,
             power_restrictions: traction_engine.power_restrictions.into_iter().collect(),
-            electrical_power_startup_time: traction_engine
-                .electrical_power_startup_time
-                .map(|v| (v * 1000.0).round() as u64),
-            raise_pantograph_time: traction_engine
-                .raise_pantograph_time
-                .map(|v| (v * 1000.0).round() as u64),
+            electrical_power_startup_time: traction_engine.electrical_power_startup_time,
+            raise_pantograph_time: traction_engine.raise_pantograph_time,
         }
     }
 }
@@ -531,6 +527,7 @@ impl SimulationResponse {
 
 #[cfg(test)]
 mod tests {
+    use editoast_common::units::*;
     use editoast_schemas::rolling_stock::RollingResistance;
     use pretty_assertions::assert_eq;
 
@@ -541,9 +538,9 @@ mod tests {
 
     fn create_physics_consist() -> PhysicsConsistParameters {
         PhysicsConsistParameters {
-            total_length: Some(100.0),
-            total_mass: Some(50000.0),
-            max_speed: Some(22.0),
+            total_length: Some(meter::new(100.0)),
+            total_mass: Some(kilogram::new(50000.0)),
+            max_speed: Some(meter_per_second::new(22.0)),
             towed_rolling_stock: Some(create_towed_rolling_stock()),
             traction_engine: create_simple_rolling_stock(),
         }
@@ -552,64 +549,79 @@ mod tests {
     #[test]
     fn physics_consist_compute_length() {
         let mut physics_consist = create_physics_consist();
-        physics_consist.total_length = Some(100.0); // m
-        physics_consist.traction_engine.length = 40.0; // m
+        physics_consist.total_length = Some(meter::new(100.0));
+        physics_consist.traction_engine.length = meter::new(40.0);
 
         // We always take total_length
-        assert_eq!(physics_consist.compute_length(), 100000);
+        assert_eq!(physics_consist.compute_length(), millimeter::new(100000.));
 
         physics_consist.total_length = None;
         // When no total_length we take towed length + traction_engine length
-        assert_eq!(physics_consist.compute_length(), 70000);
+        assert_eq!(physics_consist.compute_length(), millimeter::new(70000.));
 
         physics_consist.total_length = None;
         physics_consist.towed_rolling_stock = None;
         // When no user specified length and towed rolling stock, we take traction_engine length
-        assert_eq!(physics_consist.compute_length(), 40000);
+        assert_eq!(physics_consist.compute_length(), millimeter::new(40000.));
     }
 
     #[test]
     fn physics_consist_compute_mass() {
         let mut physics_consist = create_physics_consist();
-        physics_consist.total_mass = Some(50000.0); // kg
-        physics_consist.traction_engine.mass = 15000.0; // kg
+        physics_consist.total_mass = Some(kilogram::new(50000.0));
+        physics_consist.traction_engine.mass = kilogram::new(15000.0);
 
         // We always take total_mass
-        assert_eq!(physics_consist.compute_mass(), 50000);
+        assert_eq!(physics_consist.compute_mass(), kilogram::new(50000.));
 
         physics_consist.total_mass = None;
         // When no total_mass we take towed mass + traction_engine mass
-        assert_eq!(physics_consist.compute_mass(), 65000);
+        assert_eq!(physics_consist.compute_mass(), kilogram::new(65000.));
 
         physics_consist.total_mass = None;
         physics_consist.towed_rolling_stock = None;
         // When no user specified mass and towed rolling stock, we take traction_engine mass
-        assert_eq!(physics_consist.compute_mass(), 15000);
+        assert_eq!(physics_consist.compute_mass(), kilogram::new(15000.));
     }
 
     #[test]
     fn physics_consist_max_speed() {
         // Towed max speed 35
         let mut physics_consist = create_physics_consist();
-        physics_consist.max_speed = Some(20.0); // m/s
-        physics_consist.traction_engine.max_speed = 22.0; // m/s
+        physics_consist.max_speed = Some(meter_per_second::new(20.0));
+        physics_consist.traction_engine.max_speed = meter_per_second::new(22.0);
 
         // We take the smallest max speed
-        assert_eq!(physics_consist.compute_max_speed(), 20.0);
+        assert_eq!(
+            physics_consist.compute_max_speed(),
+            meter_per_second::new(20.0)
+        );
 
-        physics_consist.max_speed = Some(25.0); // m/s
-        physics_consist.traction_engine.max_speed = 24.0; // m/s
+        physics_consist.max_speed = Some(meter_per_second::new(25.0));
+        physics_consist.traction_engine.max_speed = meter_per_second::new(24.0);
 
-        assert_eq!(physics_consist.compute_max_speed(), 24.0);
+        assert_eq!(
+            physics_consist.compute_max_speed(),
+            meter_per_second::new(24.0)
+        );
 
         physics_consist.max_speed = None;
-        assert_eq!(physics_consist.compute_max_speed(), 24.0);
+        assert_eq!(
+            physics_consist.compute_max_speed(),
+            meter_per_second::new(24.0)
+        );
 
-        physics_consist.traction_engine.max_speed = 40.0; // m/s
-        assert_eq!(physics_consist.compute_max_speed(), 35.0);
+        physics_consist.traction_engine.max_speed = meter_per_second::new(40.0);
+        assert_eq!(
+            physics_consist.compute_max_speed(),
+            meter_per_second::new(35.0)
+        );
 
         physics_consist.towed_rolling_stock = None;
-        assert_eq!(physics_consist.compute_max_speed(), 40.0);
+        assert_eq!(
+            physics_consist.compute_max_speed(),
+            meter_per_second::new(40.0)
+        );
     }
 
     #[test]
@@ -617,10 +629,16 @@ mod tests {
         let mut physics_consist = create_physics_consist(); // 0.06
 
         // We take the biggest
-        assert_eq!(physics_consist.compute_startup_acceleration(), 0.06);
+        assert_eq!(
+            physics_consist.compute_startup_acceleration(),
+            meter_per_second_squared::new(0.06)
+        );
 
         physics_consist.towed_rolling_stock = None;
-        assert_eq!(physics_consist.compute_startup_acceleration(), 0.04);
+        assert_eq!(
+            physics_consist.compute_startup_acceleration(),
+            meter_per_second_squared::new(0.04)
+        );
     }
 
     #[test]
@@ -628,20 +646,32 @@ mod tests {
         let mut physics_consist = create_physics_consist(); // 0.2
 
         // We take the smallest
-        assert_eq!(physics_consist.compute_comfort_acceleration(), 0.1);
+        assert_eq!(
+            physics_consist.compute_comfort_acceleration(),
+            meter_per_second_squared::new(0.1)
+        );
 
         physics_consist.towed_rolling_stock = None;
-        assert_eq!(physics_consist.compute_comfort_acceleration(), 0.1);
+        assert_eq!(
+            physics_consist.compute_comfort_acceleration(),
+            meter_per_second_squared::new(0.1)
+        );
     }
 
     #[test]
     fn physics_consist_compute_inertia_coefficient() {
         let mut physics_consist = create_physics_consist();
 
-        assert_eq!(physics_consist.compute_inertia_coefficient(), 1.065);
+        assert_eq!(
+            physics_consist.compute_inertia_coefficient(),
+            meter_per_second_squared::new(1.065)
+        );
 
         physics_consist.towed_rolling_stock = None;
-        assert_eq!(physics_consist.compute_inertia_coefficient(), 1.10,);
+        assert_eq!(
+            physics_consist.compute_inertia_coefficient(),
+            meter_per_second_squared::new(1.10,)
+        );
     }
 
     #[test]
@@ -652,9 +682,9 @@ mod tests {
             physics_consist.compute_rolling_resistance(),
             RollingResistance {
                 rolling_resistance_type: "davis".to_string(),
-                A: 35001.0,
-                B: 350.01,
-                C: 7.0005,
+                A: newton::new(35001.0),
+                B: kilogram_per_second::new(350.01),
+                C: kilogram_per_meter::new(7.0005),
             }
         );
 
@@ -669,14 +699,23 @@ mod tests {
     fn physics_consist_compute_gamma() {
         // Towed const gamma 0.5
         let mut physics_consist = create_physics_consist();
-        physics_consist.traction_engine.const_gamma = 0.4;
+        physics_consist.traction_engine.const_gamma = meter_per_second_squared::new(0.4);
 
-        assert_eq!(physics_consist.compute_const_gamma(), 0.4);
+        assert_eq!(
+            physics_consist.compute_const_gamma(),
+            meter_per_second_squared::new(0.4)
+        );
 
-        physics_consist.traction_engine.const_gamma = 0.6;
-        assert_eq!(physics_consist.compute_const_gamma(), 0.5);
+        physics_consist.traction_engine.const_gamma = meter_per_second_squared::new(0.6);
+        assert_eq!(
+            physics_consist.compute_const_gamma(),
+            meter_per_second_squared::new(0.5)
+        );
 
         physics_consist.towed_rolling_stock = None;
-        assert_eq!(physics_consist.compute_const_gamma(), 0.6);
+        assert_eq!(
+            physics_consist.compute_const_gamma(),
+            meter_per_second_squared::new(0.6)
+        );
     }
 }

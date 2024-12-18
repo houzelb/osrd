@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use editoast_common::units::*;
 use editoast_schemas::rolling_stock::EffortCurves;
 use editoast_schemas::rolling_stock::EnergySource;
 use editoast_schemas::rolling_stock::LoadingGaugeType;
@@ -18,6 +19,7 @@ use crate::models::Changeset;
 use crate::models::Model;
 use crate::models::RollingStockModel;
 
+#[editoast_derive::annotate_units]
 #[derive(Debug, Clone, Deserialize, Serialize, ToSchema, Validate)]
 #[validate(schema(function = "validate_rolling_stock_form"))]
 pub struct RollingStockForm {
@@ -25,14 +27,22 @@ pub struct RollingStockForm {
     pub effort_curves: EffortCurves,
     #[schema(example = "5", required)]
     pub base_power_class: Option<String>,
-    pub length: f64,
-    pub max_speed: f64,
-    pub startup_time: f64,
-    pub startup_acceleration: f64,
-    pub comfort_acceleration: f64,
-    pub const_gamma: f64,
-    pub inertia_coefficient: f64,
-    pub mass: f64,
+    #[serde(with = "meter")]
+    pub length: Length,
+    #[serde(with = "meter_per_second")]
+    pub max_speed: Velocity,
+    #[serde(with = "second")]
+    pub startup_time: Time,
+    #[serde(with = "meter_per_second_squared")]
+    pub startup_acceleration: Acceleration,
+    #[serde(with = "meter_per_second_squared")]
+    pub comfort_acceleration: Acceleration,
+    #[serde(with = "meter_per_second_squared")]
+    pub const_gamma: Acceleration,
+    #[serde(with = "meter_per_second_squared")]
+    pub inertia_coefficient: Acceleration,
+    #[serde(with = "kilogram")]
+    pub mass: Mass,
     pub rolling_resistance: RollingResistance,
     pub loading_gauge: LoadingGaugeType,
     /// Mapping of power restriction code to power class
@@ -43,10 +53,12 @@ pub struct RollingStockForm {
     pub energy_sources: Vec<EnergySource>,
     /// The time the train takes before actually using electrical power (in seconds). Is null if the train is not electric.
     #[schema(example = 5.0)]
-    pub electrical_power_startup_time: Option<f64>,
+    #[serde(default, with = "second::option")]
+    pub electrical_power_startup_time: Option<Time>,
     /// The time it takes to raise this train's pantograph in seconds. Is null if the train is not electric.
     #[schema(example = 15.0)]
-    pub raise_pantograph_time: Option<f64>,
+    #[serde(default, with = "second::option")]
+    pub raise_pantograph_time: Option<Time>,
     pub supported_signaling_systems: RollingStockSupportedSignalingSystems,
     pub locked: Option<bool>,
     pub metadata: Option<RollingStockMetadata>,

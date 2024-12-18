@@ -1,22 +1,26 @@
 use super::RollingResistancePerWeight;
+use editoast_common::units::*;
 
 #[derive(Debug, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct TowedRollingStock {
     pub name: String,
     pub label: String,
     pub railjson_version: String,
-    /// In kg
-    pub mass: f64,
-    /// In m
-    pub length: f64,
-    /// In m/s²
-    pub comfort_acceleration: f64,
-    /// In m/s²
-    pub startup_acceleration: f64,
-    pub inertia_coefficient: f64,
+    #[serde(with = "kilogram")]
+    pub mass: Mass,
+    #[serde(with = "meter")]
+    pub length: Length,
+    #[serde(with = "meter_per_second_squared")]
+    pub comfort_acceleration: Acceleration,
+    #[serde(with = "meter_per_second_squared")]
+    pub startup_acceleration: Acceleration,
+    #[serde(with = "meter_per_second_squared")]
+    pub inertia_coefficient: Acceleration,
     pub rolling_resistance: RollingResistancePerWeight,
     /// The constant gamma braking coefficient used when NOT circulating
-    /// under ETCS/ERTMS signaling system in m/s^2
-    pub const_gamma: f64,
-    pub max_speed: Option<f64>,
+    /// under ETCS/ERTMS signaling system
+    #[serde(with = "meter_per_second_squared")]
+    pub const_gamma: Acceleration,
+    #[serde(default, with = "meter_per_second::option")]
+    pub max_speed: Option<Velocity>,
 }

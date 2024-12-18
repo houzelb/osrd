@@ -2,6 +2,7 @@ mod power_restrictions;
 
 use std::collections::HashMap;
 
+use editoast_common::units::*;
 use editoast_derive::Model;
 use editoast_schemas::rolling_stock::EffortCurves;
 use editoast_schemas::rolling_stock::EnergySource;
@@ -14,6 +15,7 @@ use editoast_schemas::rolling_stock::RollingStockSupportedSignalingSystems;
 use power_restrictions::PowerRestriction;
 use serde::Deserialize;
 use serde::Serialize;
+
 use utoipa::ToSchema;
 use validator::ValidationError;
 use validator::ValidationErrors;
@@ -28,6 +30,7 @@ editoast_common::schemas! {
     PowerRestriction,
 }
 
+#[editoast_derive::annotate_units]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Model, ToSchema)]
 #[model(table = editoast_models::tables::rolling_stock)]
 #[model(gen(ops = crud, batch_ops = r, list))]
@@ -43,19 +46,35 @@ pub struct RollingStockModel {
     #[model(json)]
     #[schema(required)]
     pub metadata: Option<RollingStockMetadata>,
-    pub length: f64,
-    pub max_speed: f64,
-    pub startup_time: f64,
-    pub startup_acceleration: f64,
-    pub comfort_acceleration: f64,
-    pub const_gamma: f64,
+    #[serde(with = "meter")]
+    #[model(uom_unit = "meter")]
+    pub length: Length,
+    #[serde(with = "meter_per_second")]
+    #[model(uom_unit = "meter_per_second")]
+    pub max_speed: Velocity,
+    #[serde(with = "second")]
+    #[model(uom_unit = "second")]
+    pub startup_time: Time,
+    #[serde(with = "meter_per_second_squared")]
+    #[model(uom_unit = "meter_per_second_squared")]
+    pub startup_acceleration: Acceleration,
+    #[serde(with = "meter_per_second_squared")]
+    #[model(uom_unit = "meter_per_second_squared")]
+    pub comfort_acceleration: Acceleration,
+    #[serde(with = "meter_per_second_squared")]
+    #[model(uom_unit = "meter_per_second_squared")]
+    pub const_gamma: Acceleration,
     #[model(json)]
     #[schema(required)]
     pub etcs_brake_params: Option<EtcsBrakeParams>,
-    pub inertia_coefficient: f64,
+    #[serde(with = "meter_per_second_squared")]
+    #[model(uom_unit = "meter_per_second_squared")]
+    pub inertia_coefficient: Acceleration,
     #[schema(required)]
     pub base_power_class: Option<String>,
-    pub mass: f64,
+    #[serde(with = "kilogram")]
+    #[model(uom_unit = "kilogram")]
+    pub mass: Mass,
     #[model(json)]
     pub rolling_resistance: RollingResistance,
     #[model(to_enum)]
@@ -66,9 +85,13 @@ pub struct RollingStockModel {
     pub energy_sources: Vec<EnergySource>,
     pub locked: bool,
     #[schema(required)]
-    pub electrical_power_startup_time: Option<f64>,
+    #[serde(default, with = "second::option")]
+    #[model(uom_unit = "second::option")]
+    pub electrical_power_startup_time: Option<Time>,
     #[schema(required)]
-    pub raise_pantograph_time: Option<f64>,
+    #[serde(default, with = "second::option")]
+    #[model(uom_unit = "second::option")]
+    pub raise_pantograph_time: Option<Time>,
     pub version: i64,
     #[schema(value_type = Vec<String>)]
     #[model(remote = "Vec<Option<String>>")]
@@ -80,8 +103,10 @@ impl RollingStockModelChangeset {
         match &self.effort_curves {
             Some(effort_curves) => validate_rolling_stock(
                 effort_curves,
-                self.electrical_power_startup_time.flatten(),
-                self.raise_pantograph_time.flatten(),
+                self.electrical_power_startup_time
+                    .flatten()
+                    .map(second::new),
+                self.raise_pantograph_time.flatten().map(second::new),
             )
             .map_err(|e| {
                 let mut err = ValidationErrors::new();
@@ -102,8 +127,8 @@ impl RollingStockModelChangeset {
 
 pub fn validate_rolling_stock(
     effort_curves: &EffortCurves,
-    electrical_power_startup_time: Option<f64>,
-    raise_pantograph_time: Option<f64>,
+    electrical_power_startup_time: Option<Time>,
+    raise_pantograph_time: Option<Time>,
 ) -> std::result::Result<(), ValidationError> {
     if !effort_curves.is_electric() {
         return Ok(());
