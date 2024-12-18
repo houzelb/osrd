@@ -543,6 +543,7 @@ fn build_single_margin(margin: Option<MarginValue>) -> Margins {
 mod tests {
     use axum::http::StatusCode;
     use chrono::DateTime;
+    use editoast_common::units::*;
     use editoast_models::DbConnectionPoolV2;
     use editoast_schemas::rolling_stock::RollingResistance;
     use pretty_assertions::assert_eq;
@@ -574,21 +575,21 @@ mod tests {
     #[test]
     fn simulation_with_towed_rolling_stock_parameters() {
         let mut rolling_stock = create_simple_rolling_stock();
-        rolling_stock.mass = 100000.0;
-        rolling_stock.length = 20.0;
-        rolling_stock.inertia_coefficient = 1.10; // m/s²
-        rolling_stock.comfort_acceleration = 0.1;
-        rolling_stock.startup_acceleration = 0.04; // m/s²
+        rolling_stock.mass = kilogram::new(100000.0);
+        rolling_stock.length = meter::new(20.0);
+        rolling_stock.inertia_coefficient = meter_per_second_squared::new(1.10);
+        rolling_stock.comfort_acceleration = meter_per_second_squared::new(0.1);
+        rolling_stock.startup_acceleration = meter_per_second_squared::new(0.04);
         rolling_stock.rolling_resistance = RollingResistance {
             rolling_resistance_type: "davis".to_string(),
-            A: 1.0,
-            B: 0.01,
-            C: 0.0005,
+            A: newton::new(1.0),
+            B: kilogram_per_second::new(0.01),
+            C: kilogram_per_meter::new(0.0005),
         };
 
         let towed_rolling_stock = create_towed_rolling_stock();
 
-        let total_mass = 200000.0;
+        let total_mass = kilogram::new(200000.0);
 
         let simulation_parameters = PhysicsConsistParameters {
             total_length: None,
@@ -600,17 +601,20 @@ mod tests {
 
         let physics_consist: PhysicsConsist = simulation_parameters.into();
 
-        assert_eq!(physics_consist.mass, total_mass as u64);
+        assert_eq!(physics_consist.mass, total_mass);
 
-        assert_eq!(physics_consist.inertia_coefficient, 1.075_f64);
+        assert_eq!(
+            physics_consist.inertia_coefficient,
+            meter_per_second_squared::new(1.075)
+        );
 
         assert_eq!(
             physics_consist.rolling_resistance,
             RollingResistance {
                 rolling_resistance_type: "davis".to_string(),
-                A: 100001.0,
-                B: 1000.01,
-                C: 20.0005
+                A: newton::new(100001.0),
+                B: kilogram_per_second::new(1000.01),
+                C: kilogram_per_meter::new(20.0005),
             }
         );
     }
@@ -618,18 +622,18 @@ mod tests {
     #[test]
     fn simulation_with_parameters() {
         let simulation_parameters = PhysicsConsistParameters {
-            total_mass: Some(123.0),
-            total_length: Some(455.0),
-            max_speed: Some(10.0), // m/s
+            total_mass: Some(kilogram::new(123.0)),
+            total_length: Some(meter::new(455.0)),
+            max_speed: Some(meter_per_second::new(10.0)),
             towed_rolling_stock: None,
             traction_engine: create_simple_rolling_stock(),
         };
 
         let physics_consist: PhysicsConsist = simulation_parameters.into();
 
-        assert_eq!(physics_consist.mass, 123_u64);
-        assert_eq!(physics_consist.length, 455000_u64); // It should be converted in mm
-        assert_eq!(physics_consist.max_speed, 10_f64); // It should be in m/s
+        assert_eq!(physics_consist.mass, kilogram::new(123.0));
+        assert_eq!(physics_consist.length, millimeter::new(455000.0)); // It should be converted in mm
+        assert_eq!(physics_consist.max_speed, meter_per_second::new(10_f64)); // It should be in m/s
     }
 
     #[test]
@@ -639,17 +643,17 @@ mod tests {
 
         let physics_consist: PhysicsConsist = simulation_parameters.into();
 
-        assert_eq!(physics_consist.mass, 15000_u64);
-        assert_eq!(physics_consist.length, 140000_u64); // It should be converted in mm
-        assert_eq!(physics_consist.max_speed, 20_f64);
+        assert_eq!(physics_consist.mass, kilogram::new(15000.0));
+        assert_eq!(physics_consist.length, millimeter::new(140000.)); // It should be converted in mm
+        assert_eq!(physics_consist.max_speed, meter_per_second::new(20_f64));
     }
 
     #[test]
     fn new_physics_rolling_stock_keeps_the_smallest_available_comfort_acceleration() {
         let mut rolling_stock = create_simple_rolling_stock();
         let mut towed_rolling_stock = create_towed_rolling_stock();
-        rolling_stock.comfort_acceleration = 0.2;
-        towed_rolling_stock.comfort_acceleration = 0.1;
+        rolling_stock.comfort_acceleration = meter_per_second_squared::new(0.2);
+        towed_rolling_stock.comfort_acceleration = meter_per_second_squared::new(0.1);
 
         let mut simulation_parameters = PhysicsConsistParameters {
             max_speed: None,
@@ -661,15 +665,22 @@ mod tests {
 
         let physics_consist: PhysicsConsist = simulation_parameters.clone().into();
 
-        assert_eq!(physics_consist.comfort_acceleration, 0.1);
+        assert_eq!(
+            physics_consist.comfort_acceleration,
+            meter_per_second_squared::new(0.1)
+        );
 
-        simulation_parameters.traction_engine.comfort_acceleration = 0.2;
-        towed_rolling_stock.comfort_acceleration = 0.67;
+        simulation_parameters.traction_engine.comfort_acceleration =
+            meter_per_second_squared::new(0.2);
+        towed_rolling_stock.comfort_acceleration = meter_per_second_squared::new(0.67);
         simulation_parameters.towed_rolling_stock = Some(towed_rolling_stock);
 
         let physics_consist: PhysicsConsist = simulation_parameters.into();
 
-        assert_eq!(physics_consist.comfort_acceleration, 0.2);
+        assert_eq!(
+            physics_consist.comfort_acceleration,
+            meter_per_second_squared::new(0.2)
+        );
     }
 
     #[test]
@@ -682,23 +693,31 @@ mod tests {
             traction_engine: create_simple_rolling_stock(),
         };
 
-        simulation_parameters.traction_engine.startup_acceleration = 0.3;
+        simulation_parameters.traction_engine.startup_acceleration =
+            meter_per_second_squared::new(0.3);
         if let Some(trs) = simulation_parameters.towed_rolling_stock.as_mut() {
-            trs.startup_acceleration = 0.45;
+            trs.startup_acceleration = meter_per_second_squared::new(0.45);
         }
 
         let physics_consist: PhysicsConsist = simulation_parameters.clone().into();
 
-        assert_eq!(physics_consist.startup_acceleration, 0.45);
+        assert_eq!(
+            physics_consist.startup_acceleration,
+            meter_per_second_squared::new(0.45)
+        );
 
         if let Some(trs) = simulation_parameters.towed_rolling_stock.as_mut() {
-            trs.startup_acceleration = 0.4;
+            trs.startup_acceleration = meter_per_second_squared::new(0.4);
         }
-        simulation_parameters.traction_engine.startup_acceleration = 0.88;
+        simulation_parameters.traction_engine.startup_acceleration =
+            meter_per_second_squared::new(0.88);
 
         let physics_consist: PhysicsConsist = simulation_parameters.into();
 
-        assert_eq!(physics_consist.startup_acceleration, 0.88);
+        assert_eq!(
+            physics_consist.startup_acceleration,
+            meter_per_second_squared::new(0.88)
+        );
     }
 
     #[test]
@@ -706,14 +725,14 @@ mod tests {
         let simulation_parameters = PhysicsConsistParameters {
             total_mass: None,
             total_length: None,
-            max_speed: Some(30.0), // m/s
+            max_speed: Some(meter_per_second::new(30.0)),
             towed_rolling_stock: None,
             traction_engine: create_simple_rolling_stock(),
         };
 
         let physics_consist: PhysicsConsist = simulation_parameters.into();
 
-        assert_eq!(physics_consist.max_speed, 20_f64);
+        assert_eq!(physics_consist.max_speed, meter_per_second::new(20_f64));
     }
 
     fn pathfinding_result_success() -> PathfindingResult {

@@ -1,3 +1,4 @@
+use editoast_common::units::*;
 use editoast_derive::Model;
 use editoast_schemas::rolling_stock::RollingResistancePerWeight;
 use editoast_schemas::rolling_stock::TowedRollingStock;
@@ -7,6 +8,7 @@ use utoipa::ToSchema;
 
 use crate::models::prelude::*;
 
+#[editoast_derive::annotate_units]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Model, ToSchema)]
 #[model(table = editoast_models::tables::towed_rolling_stock)]
 #[model(gen(ops = crud, batch_ops = r, list))]
@@ -20,18 +22,30 @@ pub struct TowedRollingStockModel {
     pub railjson_version: String,
     pub locked: bool,
 
-    /// In kg
-    pub mass: f64,
-    /// In m
-    pub length: f64,
-    /// In km/h
-    pub max_speed: Option<f64>,
-    pub comfort_acceleration: f64,
-    pub startup_acceleration: f64,
-    pub inertia_coefficient: f64,
+    #[serde(with = "kilogram")]
+    #[model(uom_unit = "kilogram")]
+    pub mass: Mass,
+    #[serde(with = "meter")]
+    #[model(uom_unit = "meter")]
+    pub length: Length,
+    #[schema(required)]
+    #[serde(default, with = "meter_per_second::option")]
+    #[model(uom_unit = "meter_per_second::option")]
+    pub max_speed: Option<Velocity>,
+    #[model(uom_unit = "meter_per_second_squared")]
+    #[serde(with = "meter_per_second_squared")]
+    pub comfort_acceleration: Acceleration,
+    #[model(uom_unit = "meter_per_second_squared")]
+    #[serde(with = "meter_per_second_squared")]
+    pub startup_acceleration: Acceleration,
+    #[model(uom_unit = "meter_per_second_squared")]
+    #[serde(with = "meter_per_second_squared")]
+    pub inertia_coefficient: Acceleration,
     #[model(json)]
     pub rolling_resistance: RollingResistancePerWeight,
-    pub const_gamma: f64,
+    #[model(uom_unit = "meter_per_second_squared")]
+    #[serde(with = "meter_per_second_squared")]
+    pub const_gamma: Acceleration,
 
     pub version: i64,
 }

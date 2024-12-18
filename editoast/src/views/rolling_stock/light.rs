@@ -4,6 +4,7 @@ use axum::extract::Query;
 use axum::extract::State;
 use axum::Extension;
 use editoast_authz::BuiltinRole;
+use editoast_common::units::*;
 use editoast_models::DbConnection;
 use editoast_models::DbConnectionPoolV2;
 use editoast_schemas::rolling_stock::EffortCurves;
@@ -206,6 +207,7 @@ async fn get_by_name(
     Ok(Json(light_rolling_stock_with_liveries))
 }
 
+#[editoast_derive::annotate_units]
 #[derive(Debug, Serialize, ToSchema)]
 #[cfg_attr(test, derive(Deserialize))]
 struct LightRollingStock {
@@ -216,16 +218,24 @@ struct LightRollingStock {
     effort_curves: LightEffortCurves,
     #[schema(required)]
     base_power_class: Option<String>,
-    length: f64,
-    max_speed: f64,
-    startup_time: f64,
-    startup_acceleration: f64,
-    comfort_acceleration: f64,
-    const_gamma: f64,
+    #[serde(with = "meter")]
+    length: Length,
+    #[serde(with = "meter_per_second")]
+    max_speed: Velocity,
+    #[serde(with = "second")]
+    startup_time: Time,
+    #[serde(with = "meter_per_second_squared")]
+    startup_acceleration: Acceleration,
+    #[serde(with = "meter_per_second_squared")]
+    comfort_acceleration: Acceleration,
+    #[serde(with = "meter_per_second_squared")]
+    const_gamma: Acceleration,
     #[schema(required)]
     etcs_brake_params: Option<EtcsBrakeParams>,
-    inertia_coefficient: f64,
-    mass: f64,
+    #[serde(with = "meter_per_second_squared")]
+    inertia_coefficient: Acceleration,
+    #[serde(with = "kilogram")]
+    mass: Mass,
     rolling_resistance: RollingResistance,
     loading_gauge: LoadingGaugeType,
     #[schema(required)]
