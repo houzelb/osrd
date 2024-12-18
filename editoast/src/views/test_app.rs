@@ -7,8 +7,16 @@ use std::sync::Arc;
 use axum::Router;
 use axum_tracing_opentelemetry::middleware::OtelAxumLayer;
 use dashmap::DashMap;
+use editoast_common::tracing::create_tracing_subscriber;
+use editoast_common::tracing::Stream;
+use editoast_common::tracing::Telemetry;
+use editoast_common::tracing::TracingConfig;
 use editoast_models::DbConnectionPoolV2;
 use editoast_osrdyne_client::OsrdyneClient;
+use futures::future::BoxFuture;
+use opentelemetry_sdk::export::trace::ExportResult;
+use opentelemetry_sdk::export::trace::SpanData;
+use opentelemetry_sdk::export::trace::SpanExporter;
 use serde::de::DeserializeOwned;
 use tower_http::trace::TraceLayer;
 use url::Url;
@@ -25,6 +33,15 @@ use axum_test::TestRequest;
 use axum_test::TestServer;
 
 use super::{authentication_middleware, CoreConfig, OsrdyneConfig, PostgresConfig, ServerConfig};
+
+#[derive(Debug)]
+pub struct NoopSpanExporter;
+
+impl SpanExporter for NoopSpanExporter {
+    fn export(&mut self, _: Vec<SpanData>) -> BoxFuture<'static, ExportResult> {
+        Box::pin(std::future::ready(Ok(())))
+    }
+}
 
 /// A builder interface for [TestApp]
 ///
@@ -106,15 +123,14 @@ impl TestAppBuilder {
         };
 
         // Setup tracing
-        let sub = tracing_subscriber::fmt()
-            .pretty()
-            .with_env_filter(
-                tracing_subscriber::EnvFilter::builder()
-                    .with_default_directive(tracing_subscriber::filter::LevelFilter::DEBUG.into())
-                    .from_env_lossy(),
-            )
-            .with_span_events(tracing_subscriber::fmt::format::FmtSpan::CLOSE)
-            .finish();
+        let tracing_config = TracingConfig {
+            stream: Stream::Stdout,
+            telemetry: Some(Telemetry {
+                service_name: "osrd-editoast".into(),
+                endpoint: Url::parse("http://localhost:4317").unwrap(),
+            }),
+        };
+        let sub = create_tracing_subscriber(tracing_config, NoopSpanExporter);
         let tracing_guard = tracing::subscriber::set_default(sub);
 
         // Config valkey
