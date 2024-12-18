@@ -79,6 +79,8 @@ pub(super) struct ModelFieldArgs {
     pub(super) to_enum: bool,
     #[darling(default)]
     pub(super) remote: Option<syn::Type>,
+    #[darling(default)]
+    pub(super) uom_unit: Option<syn::Path>,
 }
 
 impl GeneratedTypeArgs {

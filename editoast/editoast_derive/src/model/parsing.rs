@@ -165,6 +165,7 @@ impl ModelField {
             value.geo,
             value.to_string,
             to_enum,
+            value.uom_unit,
         )
         .map_err(|e| e.with_span(&ident))?;
         Ok(Self {
@@ -188,16 +189,18 @@ impl FieldTransformation {
         geo: bool,
         to_string: bool,
         to_enum: Option<syn::Type>,
+        uom_unit: Option<syn::Path>,
     ) -> darling::Result<Option<Self>> {
-        match (remote, json, geo, to_string, to_enum) {
-            (Some(ty), false, false, false, None) => Ok(Some(Self::Remote(ty))),
-            (None, true, false, false, None) => Ok(Some(Self::Json)),
-            (None, false, true, false, None) => Ok(Some(Self::Geo)),
-            (None, false, false, true, None) => Ok(Some(Self::ToString)),
-            (None, false, false, false, Some(ty)) => Ok(Some(Self::ToEnum(ty))),
-            (None, false, false, false, None) => Ok(None),
+        match (remote, json, geo, to_string, to_enum, uom_unit) {
+            (Some(ty), false, false, false, None, None) => Ok(Some(Self::Remote(ty))),
+            (None, true, false, false, None, None) => Ok(Some(Self::Json)),
+            (None, false, true, false, None, None) => Ok(Some(Self::Geo)),
+            (None, false, false, true, None, None) => Ok(Some(Self::ToString)),
+            (None, false, false, false, Some(ty), None) => Ok(Some(Self::ToEnum(ty))),
+            (None, false, false, false, None, Some(ty)) => Ok(Some(Self::UomUnit(ty))),
+            (None, false, false, false, None, None) => Ok(None),
             _ => Err(Error::custom(
-                "Model: remote, json, geo, to_string and to_enum attributes are mutually exclusive",
+                "Model: remote, json, geo, to_string, to_enum and uom_unit attributes are mutually exclusive",
             )),
         }
     }

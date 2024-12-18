@@ -45,6 +45,7 @@ pub(crate) enum FieldTransformation {
     Geo,
     ToString,
     ToEnum(syn::Type),
+    UomUnit(syn::Path),
 }
 
 #[derive(Debug, PartialEq)]
@@ -132,6 +133,9 @@ impl ModelField {
             Some(FieldTransformation::ToEnum(_)) => {
                 parse_quote! { #expr as i16 }
             }
+            Some(FieldTransformation::UomUnit(ref unit)) => {
+                parse_quote! { #unit::from(#expr) }
+            }
             None => parse_quote! { #expr },
         }
     }
@@ -146,6 +150,9 @@ impl ModelField {
             Some(FieldTransformation::ToEnum(ref ty)) => {
                 parse_quote! { #ty::from_repr(#expr as usize).expect("Invalid variant repr") }
             }
+            Some(FieldTransformation::UomUnit(ref unit)) => {
+                parse_quote! { #unit::new(#expr) }
+            }
             None => parse_quote! { #expr },
         }
     }
@@ -158,6 +165,7 @@ impl ModelField {
             Some(FieldTransformation::Geo) => unimplemented!("to be designed"),
             Some(FieldTransformation::ToString) => parse_quote! { String },
             Some(FieldTransformation::ToEnum(_)) => parse_quote! { i16 },
+            Some(FieldTransformation::UomUnit(ref unit)) => parse_quote! { #unit::ReprType },
             None => ty.clone(),
         }
     }
