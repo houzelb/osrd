@@ -90,9 +90,6 @@ const StcdmResultsTable = ({
                       className={
                         step.duration !== 0 && !isLastStep ? 'stop-with-duration ml-n2' : 'stop'
                       }
-                      style={{
-                        width: `${step.duration < 600 && step.duration >= 60 ? 55 : 65}px`,
-                      }}
                     >
                       {
                         // eslint-disable-next-line no-nested-ternary

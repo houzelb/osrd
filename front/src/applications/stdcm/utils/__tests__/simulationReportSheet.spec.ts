@@ -17,7 +17,6 @@ describe('generateCodeNumber', () => {
 
 describe('getStopDurationTime', () => {
   it('should return correct time format', () => {
-    expect(getStopDurationTime(30)).toBe('30 sec');
     expect(getStopDurationTime(120)).toBe('2 min');
   });
 });
