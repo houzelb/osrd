@@ -356,7 +356,6 @@ async fn patch_by_id_locked(
 #[cfg(test)]
 mod tests {
     use super::TowedRollingStock;
-    use super::TowedRollingStockCountList;
     use crate::views::test_app::TestApp;
     use crate::views::test_app::TestAppBuilder;
     use axum::http::StatusCode;
@@ -400,15 +399,14 @@ mod tests {
         let name = Uuid::new_v4().to_string();
         let towed_rolling_stock = create_towed_rolling_stock(&app, &name, LOCKED);
 
-        let towed_rolling_stocks: TowedRollingStockCountList = app
-            .fetch(app.get("/towed_rolling_stock"))
-            .assert_status(StatusCode::OK)
-            .json_into();
+        let request = app.get(format!("/towed_rolling_stock/{}", towed_rolling_stock.id).as_str());
 
-        assert!(towed_rolling_stocks
-            .results
-            .iter()
-            .any(|trs| trs.id == towed_rolling_stock.id));
+        // WHEN
+        let response: TowedRollingStock =
+            app.fetch(request).assert_status(StatusCode::OK).json_into();
+
+        // THEN
+        assert_eq!(response.id, towed_rolling_stock.id);
     }
 
     #[rstest]
