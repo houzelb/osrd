@@ -4,7 +4,7 @@ import { compact, concat, uniq } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
-import { COMPOSITION_CODES } from 'applications/stdcm/consts';
+import { COMPOSITION_CODES, DEFAULT_COMPOSITION_CODE } from 'applications/stdcm/consts';
 import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import { useOsrdConfSelectors, useOsrdConfActions, useInfraID } from 'common/osrdContext';
 import { setFailure } from 'reducers/main';
@@ -44,6 +44,12 @@ export const useStoreDataForSpeedLimitByTagSelector = ({ isStdcm } = { isStdcm: 
       );
     }
   }, [error]);
+
+  useEffect(() => {
+    if (isStdcm && !speedLimitByTag) {
+      dispatchUpdateSpeedLimitByTag(DEFAULT_COMPOSITION_CODE);
+    }
+  }, []);
 
   const speedLimitsByTags = isStdcm
     ? COMPOSITION_CODES
