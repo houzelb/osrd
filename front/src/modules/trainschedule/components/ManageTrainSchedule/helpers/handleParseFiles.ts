@@ -1,4 +1,4 @@
-import { t } from 'i18next';
+import type { TFunction } from 'i18next';
 import type { Dispatch } from 'redux';
 
 import type { ImportedTrainSchedule } from 'applications/operationalStudies/types';
@@ -11,18 +11,27 @@ export const handleFileReadingError = (error: Error) => {
 
 export const processJsonFile = (
   fileContent: string,
-  setTrainsJsonData: (data: TrainScheduleBase[]) => void
+  setTrainsJsonData: (data: TrainScheduleBase[]) => void,
+  dispatch: Dispatch,
+  t: TFunction
 ) => {
   const importedTrainSchedules: TrainScheduleBase[] = JSON.parse(fileContent);
   if (importedTrainSchedules && importedTrainSchedules.length > 0) {
     setTrainsJsonData(importedTrainSchedules);
+  } else {
+    dispatch(
+      setFailure({
+        name: t('errorMessages.error'),
+        message: t('errorMessages.errorEmptyFile'),
+      })
+    );
   }
 };
 
 export const processXmlFile = async (
   fileContent: string,
   parseRailML: (xmlDoc: Document) => Promise<ImportedTrainSchedule[]>,
-  updateTrainSchedules: (schedules: ImportedTrainSchedule[]) => void,
+  updateTrainSchedules: (schedules: ImportedTrainSchedule[]) => void
 ) => {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(fileContent, 'application/xml');
@@ -36,14 +45,4 @@ export const processXmlFile = async (
   if (importedTrainSchedules && importedTrainSchedules.length > 0) {
     updateTrainSchedules(importedTrainSchedules);
   }
-};
-
-export const handleUnsupportedFileType = (dispatch: Dispatch) => {
-  console.error('Unsupported file type');
-  dispatch(
-    setFailure({
-      name: t('errorMessages.error'),
-      message: t('errorMessages.errorUnsupportedFileType'),
-    })
-  );
 };
