@@ -320,22 +320,35 @@ const ImportTrainScheduleConfig = ({
     closeModal();
     setTrainsList([]);
 
-    const fileName = file.name.toLowerCase();
-    const fileExtension = fileName.split('.').pop();
-
+    let fileContent: string;
     try {
-      const fileContent = await file.text();
-
-      if (fileExtension === 'json') {
-        processJsonFile(fileContent, setTrainsJsonData, dispatch);
-      } else if (fileExtension === 'xml' || fileExtension === 'railml') {
-        processXmlFile(fileContent, parseRailML, updateTrainSchedules, dispatch);
-      } else {
-        handleUnsupportedFileType(dispatch);
-      }
+      fileContent = await file.text();
     } catch (error) {
       handleFileReadingError(error as Error);
+      return;
     }
+
+    try {
+      processJsonFile(fileContent, setTrainsJsonData);
+    } catch {
+      // if file was json, display error message immidiately and return
+      if (file.type === 'application/json') {
+        dispatch(
+          setFailure({
+            name: t('errorMessages.error'),
+            message: t('errorMessages.errorInvalidFile'),
+          })
+        );
+        return;
+      }
+
+      try {
+        await processXmlFile(fileContent, parseRailML, updateTrainSchedules);
+      } catch {
+        handleUnsupportedFileType(dispatch);
+      }
+    }
+
   };
   return (
     <>
