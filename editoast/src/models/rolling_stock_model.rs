@@ -72,24 +72,6 @@ pub struct RollingStockModel {
     pub supported_signaling_systems: RollingStockSupportedSignalingSystems,
 }
 
-impl RollingStockModel {
-    pub fn has_thermal_curves(&self) -> bool {
-        self.effort_curves
-            .modes
-            .values()
-            .any(|mode| !mode.is_electric)
-    }
-
-    pub fn supported_electrification(&self) -> Vec<String> {
-        self.effort_curves
-            .modes
-            .iter()
-            .filter(|(_, mode)| mode.is_electric)
-            .map(|(key, _)| key.clone())
-            .collect()
-    }
-}
-
 impl RollingStockModelChangeset {
     pub fn validate_imported_rolling_stock(&self) -> std::result::Result<(), ValidationErrors> {
         self.validate()?;

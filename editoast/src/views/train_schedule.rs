@@ -14,6 +14,10 @@ use axum::extract::State;
 use axum::response::IntoResponse;
 use axum::Extension;
 use editoast_authz::BuiltinRole;
+use editoast_derive::EditoastError;
+use editoast_models::DbConnection;
+use editoast_models::DbConnectionPoolV2;
+use editoast_schemas::train_schedule::TrainScheduleBase;
 use itertools::Itertools;
 use serde::Deserialize;
 use serde::Serialize;
@@ -27,6 +31,7 @@ use crate::core::pathfinding::PathfindingInputError;
 use crate::core::pathfinding::PathfindingNotFound;
 use crate::core::pathfinding::PathfindingResultSuccess;
 use crate::core::simulation::CompleteReportTrain;
+use crate::core::simulation::PhysicsConsist;
 use crate::core::simulation::PhysicsConsistParameters;
 use crate::core::simulation::ReportTrain;
 use crate::core::simulation::SignalCriticalPosition;
@@ -55,10 +60,6 @@ use crate::views::AuthorizationError;
 use crate::AppState;
 use crate::RollingStockModel;
 use crate::ValkeyClient;
-use editoast_derive::EditoastError;
-use editoast_models::DbConnection;
-use editoast_models::DbConnectionPoolV2;
-use editoast_schemas::train_schedule::TrainScheduleBase;
 
 crate::routes! {
     "/train_schedule" => {
@@ -354,40 +355,20 @@ async fn simulation(
         })
         .await?;
 
-    Ok(Json(
-        train_simulation(
-            &mut db_pool.get().await?,
-            valkey_client,
-            core_client,
-            train_schedule,
-            &infra,
-            electrical_profile_set_id,
-        )
-        .await?
-        .0,
-    ))
-}
-
-/// Compute simulation of a train schedule
-pub async fn train_simulation(
-    conn: &mut DbConnection,
-    valkey_client: Arc<ValkeyClient>,
-    core: Arc<CoreClient>,
-    train_schedule: TrainSchedule,
-    infra: &Infra,
-    electrical_profile_set_id: Option<i64>,
-) -> Result<(SimulationResponse, PathfindingResult)> {
-    Ok(train_simulation_batch(
-        conn,
+    // Compute simulation of a train schedule
+    let (simulation, _) = train_simulation_batch(
+        &mut db_pool.get().await?,
         valkey_client,
-        core,
+        core_client,
         &[train_schedule],
-        infra,
+        &infra,
         electrical_profile_set_id,
     )
     .await?
     .pop()
-    .unwrap())
+    .unwrap();
+
+    Ok(Json(simulation))
 }
 
 /// Compute in batch the simulation of a list of train schedule
@@ -401,28 +382,59 @@ pub async fn train_simulation_batch(
     infra: &Infra,
     electrical_profile_set_id: Option<i64>,
 ) -> Result<Vec<(SimulationResponse, PathfindingResult)>> {
-    let mut valkey_conn = valkey_client.get_connection().await?;
     // Compute path
-    let (rolling_stocks, _): (Vec<_>, _) = RollingStockModel::retrieve_batch(
-        conn,
-        train_schedules
-            .iter()
-            .map::<String, _>(|t| t.rolling_stock_name.clone()),
-    )
-    .await?;
-    let rolling_stocks: HashMap<_, _> = rolling_stocks
+    let rolling_stocks_ids = train_schedules
+        .iter()
+        .map::<String, _>(|t| t.rolling_stock_name.clone());
+
+    let (rolling_stocks, _): (Vec<_>, HashSet<String>) =
+        RollingStockModel::retrieve_batch(conn, rolling_stocks_ids).await?;
+
+    let consists: Vec<PhysicsConsistParameters> = rolling_stocks
         .into_iter()
-        .map(|rs| (rs.name.clone(), rs))
+        .map(|rs| PhysicsConsistParameters::from_traction_engine(rs.into()))
         .collect();
+
+    consist_train_simulation_batch(
+        conn,
+        valkey_client,
+        core.clone(),
+        infra,
+        train_schedules,
+        &consists,
+        electrical_profile_set_id,
+    )
+    .await
+}
+
+pub async fn consist_train_simulation_batch(
+    conn: &mut DbConnection,
+    valkey_client: Arc<ValkeyClient>,
+    core: Arc<CoreClient>,
+    infra: &Infra,
+    train_schedules: &[TrainSchedule],
+    consists: &[PhysicsConsistParameters],
+    electrical_profile_set_id: Option<i64>,
+) -> Result<Vec<(SimulationResponse, PathfindingResult)>> {
+    let mut valkey_conn = valkey_client.get_connection().await?;
+
     let pathfinding_results = pathfinding_from_train_batch(
         conn,
         &mut valkey_conn,
         core.clone(),
         infra,
         train_schedules,
-        &rolling_stocks,
+        &consists
+            .iter()
+            .map(|consist| consist.traction_engine.clone())
+            .collect::<Vec<_>>(),
     )
     .await?;
+
+    let consists: HashMap<_, _> = consists
+        .iter()
+        .map(|consist| (&consist.traction_engine.name, consist))
+        .collect();
 
     let mut simulation_results = vec![SimulationResponse::default(); train_schedules.len()];
     let mut to_sim = Vec::with_capacity(train_schedules.len());
@@ -454,14 +466,15 @@ pub async fn train_simulation_batch(
         };
 
         // Build simulation request
-        let rolling_stock = rolling_stocks[&train_schedule.rolling_stock_name].clone();
+        let physics_consist_parameters = consists[&train_schedule.rolling_stock_name].clone();
+
         let simulation_request = build_simulation_request(
             infra,
             train_schedule,
             path_item_positions,
             path,
-            rolling_stock,
             electrical_profile_set_id,
+            physics_consist_parameters.into(),
         );
 
         // Compute unique hash of the simulation input
@@ -525,8 +538,8 @@ fn build_simulation_request(
     train_schedule: &TrainSchedule,
     path_item_positions: &[u64],
     path: SimulationPath,
-    rolling_stock: RollingStockModel,
     electrical_profile_set_id: Option<i64>,
+    physics_consist: PhysicsConsist,
 ) -> SimulationRequest {
     assert_eq!(path_item_positions.len(), train_schedule.path.len());
     // Project path items to path offset
@@ -586,8 +599,7 @@ fn build_simulation_request(
         speed_limit_tag: train_schedule.speed_limit_tag.clone(),
         power_restrictions,
         options: train_schedule.options.clone(),
-        physics_consist: PhysicsConsistParameters::with_traction_engine(rolling_stock.into())
-            .into(),
+        physics_consist,
         electrical_profile_set_id,
     }
 }

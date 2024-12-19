@@ -1,6 +1,9 @@
 use std::collections::BTreeMap;
 use std::collections::HashMap;
+use std::hash::Hash;
 
+use derivative::Derivative;
+use editoast_schemas::primitives::Identifier;
 use editoast_schemas::rolling_stock::EffortCurves;
 use editoast_schemas::rolling_stock::RollingResistance;
 use editoast_schemas::rolling_stock::RollingStock;
@@ -18,9 +21,6 @@ use super::pathfinding::TrackRange;
 use crate::core::{AsCoreRequest, Json};
 use crate::error::InternalError;
 use crate::views::path::pathfinding::PathfindingFailure;
-use derivative::Derivative;
-use editoast_schemas::primitives::Identifier;
-use std::hash::Hash;
 
 editoast_common::schemas! {
     CompleteReportTrain,
@@ -84,7 +84,7 @@ pub struct PhysicsConsistParameters {
 }
 
 impl PhysicsConsistParameters {
-    pub fn with_traction_engine(traction_engine: RollingStock) -> Self {
+    pub fn from_traction_engine(traction_engine: RollingStock) -> Self {
         PhysicsConsistParameters {
             max_speed: None,
             total_length: None,

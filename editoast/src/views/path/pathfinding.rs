@@ -10,7 +10,9 @@ use axum::extract::State;
 use axum::Extension;
 use editoast_authz::BuiltinRole;
 use editoast_schemas::rolling_stock::LoadingGaugeType;
+use editoast_schemas::rolling_stock::RollingStock;
 use editoast_schemas::train_schedule::PathItemLocation;
+use itertools::Itertools;
 use ordered_float::OrderedFloat;
 use serde::Deserialize;
 use serde::Serialize;
@@ -336,24 +338,19 @@ pub async fn pathfinding_from_train(
     infra: &Infra,
     train_schedule: TrainSchedule,
 ) -> Result<PathfindingResult> {
-    let rolling_stocks =
+    let rolling_stock: Vec<RollingStock> =
         RollingStockModel::retrieve(conn, train_schedule.rolling_stock_name.clone())
             .await?
             .into_iter()
-            .map(|rs| (rs.name.clone(), rs))
+            .map_into()
             .collect();
 
-    Ok(pathfinding_from_train_batch(
-        conn,
-        valkey,
-        core,
-        infra,
-        &[train_schedule],
-        &rolling_stocks,
+    Ok(
+        pathfinding_from_train_batch(conn, valkey, core, infra, &[train_schedule], &rolling_stock)
+            .await?
+            .pop()
+            .unwrap(),
     )
-    .await?
-    .pop()
-    .unwrap())
 }
 
 /// Compute a path given a batch of trainschedule and an infrastructure.
@@ -363,7 +360,7 @@ pub async fn pathfinding_from_train_batch(
     core: Arc<CoreClient>,
     infra: &Infra,
     train_schedules: &[TrainSchedule],
-    rolling_stocks: &HashMap<String, RollingStockModel>,
+    rolling_stocks: &[RollingStock],
 ) -> Result<Vec<PathfindingResult>> {
     let mut results = vec![
         PathfindingResult::Failure(PathfindingFailure::PathfindingInputError(
@@ -371,12 +368,15 @@ pub async fn pathfinding_from_train_batch(
         ));
         train_schedules.len()
     ];
+
+    let rolling_stocks: HashMap<_, _> = rolling_stocks.iter().map(|rs| (&rs.name, rs)).collect();
+
     let mut to_compute = vec![];
     let mut to_compute_index = vec![];
     for (index, train_schedule) in train_schedules.iter().enumerate() {
         // Retrieve rolling stock
         let rolling_stock_name = &train_schedule.rolling_stock_name;
-        let Some(rolling_stock) = rolling_stocks.get(rolling_stock_name).cloned() else {
+        let Some(rolling_stock) = rolling_stocks.get(rolling_stock_name) else {
             let rolling_stock_name = rolling_stock_name.clone();
             results[index] = PathfindingResult::Failure(PathfindingFailure::PathfindingInputError(
                 PathfindingInputError::RollingStockNotFound { rolling_stock_name },
@@ -387,9 +387,14 @@ pub async fn pathfinding_from_train_batch(
         // Create the path input
         let path_input = PathfindingInput {
             rolling_stock_loading_gauge: rolling_stock.loading_gauge,
-            rolling_stock_is_thermal: rolling_stock.has_thermal_curves(),
-            rolling_stock_supported_electrifications: rolling_stock.supported_electrification(),
-            rolling_stock_supported_signaling_systems: rolling_stock.supported_signaling_systems.0,
+            rolling_stock_is_thermal: rolling_stock.effort_curves.has_thermal_curves(),
+            rolling_stock_supported_electrifications: rolling_stock
+                .effort_curves
+                .supported_electrification(),
+            rolling_stock_supported_signaling_systems: rolling_stock
+                .supported_signaling_systems
+                .0
+                .clone(),
             rolling_stock_maximum_speed: OrderedFloat(rolling_stock.max_speed),
             rolling_stock_length: OrderedFloat(rolling_stock.length),
             path_items: train_schedule

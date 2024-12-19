@@ -45,7 +45,7 @@ use crate::models::train_schedule::TrainSchedule;
 use crate::models::Infra;
 use crate::models::RollingStockModel;
 use crate::views::path::pathfinding::PathfindingResult;
-use crate::views::train_schedule::train_simulation;
+use crate::views::train_schedule::consist_train_simulation_batch;
 use crate::views::train_schedule::train_simulation_batch;
 use crate::views::AuthenticationExt;
 use crate::views::AuthorizationError;
@@ -92,6 +92,8 @@ enum StdcmError {
     RollingStockNotFound { rolling_stock_id: i64 },
     #[error("Towed rolling stock {towed_rolling_stock_id} does not exist")]
     TowedRollingStockNotFound { towed_rolling_stock_id: i64 },
+    #[error("Train simulation fail")]
+    TrainSimulationFail,
     #[error("Path items are invalid")]
     InvalidPathItems { items: Vec<InvalidPathItem> },
 }
@@ -167,7 +169,19 @@ async fn stdcm(
                 rolling_stock_id: stdcm_request.rolling_stock_id,
             }
         })
-        .await?;
+        .await?
+        .into();
+
+    let physics_consist_parameters = PhysicsConsistParameters {
+        max_speed: stdcm_request.max_speed,
+        total_length: stdcm_request.total_length,
+        total_mass: stdcm_request.total_mass,
+        towed_rolling_stock: stdcm_request
+            .get_towed_rolling_stock(&mut conn)
+            .await?
+            .map(From::from),
+        traction_engine: rolling_stock,
+    };
 
     // 2. Compute the earliest start time and maximum departure delay
     let virtual_train_run = VirtualTrainRun::simulate(
@@ -176,7 +190,7 @@ async fn stdcm(
         core_client.clone(),
         &stdcm_request,
         &infra,
-        &rolling_stock,
+        &physics_consist_parameters,
         timetable_id,
     )
     .await?;
@@ -219,21 +233,12 @@ async fn stdcm(
     let stdcm_request = crate::core::stdcm::Request {
         infra: infra.id,
         expected_version: infra.version.clone(),
-        rolling_stock_loading_gauge: rolling_stock.loading_gauge,
-        rolling_stock_supported_signaling_systems: rolling_stock
+        rolling_stock_loading_gauge: physics_consist_parameters.traction_engine.loading_gauge,
+        rolling_stock_supported_signaling_systems: physics_consist_parameters
+            .traction_engine
             .supported_signaling_systems
             .clone(),
-        physics_consist: PhysicsConsistParameters {
-            max_speed: stdcm_request.max_speed,
-            total_length: stdcm_request.total_length,
-            total_mass: stdcm_request.total_mass,
-            towed_rolling_stock: stdcm_request
-                .get_towed_rolling_stock(&mut conn)
-                .await?
-                .map(From::from),
-            traction_engine: rolling_stock.into(),
-        }
-        .into(),
+        physics_consist: physics_consist_parameters.into(),
         temporary_speed_limits: stdcm_request
             .get_temporary_speed_limits(&mut conn, simulation_run_time)
             .await?,
@@ -407,7 +412,7 @@ impl VirtualTrainRun {
         core_client: Arc<CoreClient>,
         stdcm_request: &Request,
         infra: &Infra,
-        rolling_stock: &RollingStockModel,
+        consist_parameters: &PhysicsConsistParameters,
         timetable_id: i64,
     ) -> Result<Self> {
         // Doesn't matter for now, but eventually it will affect tmp speed limits
@@ -420,7 +425,7 @@ impl VirtualTrainRun {
             id: 0,
             train_name: "".to_string(),
             labels: vec![],
-            rolling_stock_name: rolling_stock.name.clone(),
+            rolling_stock_name: consist_parameters.traction_engine.name.clone(),
             timetable_id,
             start_time: approx_start_time,
             schedule: vec![ScheduleItem {
@@ -441,15 +446,19 @@ impl VirtualTrainRun {
             options: Default::default(),
         };
 
-        let (simulation, pathfinding) = train_simulation(
+        // Compute simulation of a train schedule
+        let (simulation, pathfinding) = consist_train_simulation_batch(
             &mut db_pool.get().await?,
             valkey_client,
             core_client,
-            train_schedule.clone(),
             infra,
+            &[train_schedule.clone()],
+            &[consist_parameters.clone()],
             None,
         )
-        .await?;
+        .await?
+        .pop()
+        .ok_or(StdcmError::TrainSimulationFail)?;
 
         Ok(Self {
             train_schedule,
@@ -569,7 +578,7 @@ mod tests {
     #[test]
     fn simulation_without_parameters() {
         let rolling_stock = create_simple_rolling_stock();
-        let simulation_parameters = PhysicsConsistParameters::with_traction_engine(rolling_stock);
+        let simulation_parameters = PhysicsConsistParameters::from_traction_engine(rolling_stock);
 
         let physics_consist: PhysicsConsist = simulation_parameters.into();
 
