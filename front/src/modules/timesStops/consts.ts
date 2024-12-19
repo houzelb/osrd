@@ -6,4 +6,4 @@ export const MarginUnit = {
   second: 's',
 } as const;
 
-export const ARRIVAL_TIME_ACCEPTABLE_ERROR_MS = 1000;
+export const ARRIVAL_TIME_ACCEPTABLE_ERROR_MS = 2000;
