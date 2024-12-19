@@ -10,8 +10,8 @@
     "margin": {
       "theoretical": "5 %",
       "theoreticalS": "29 s",
-      "actual": "922 s",
-      "difference": "893 s"
+      "actual": "920 s",
+      "difference": "891 s"
     },
     "calculatedArrival": "11:22:40",
     "calculatedDeparture": ""
@@ -28,11 +28,11 @@
     "margin": {
       "theoretical": "1 min/100km",
       "theoreticalS": "9 s",
-      "actual": "291 s",
-      "difference": "282 s"
+      "actual": "253 s",
+      "difference": "244 s"
     },
     "calculatedArrival": "11:47:40",
-    "calculatedDeparture": "11:52:40"
+    "calculatedDeparture": "11:52:39"
   },
   {
     "stationName": "Mid_East_station",

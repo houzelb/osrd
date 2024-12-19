@@ -1,6 +1,7 @@
 package fr.sncf.osrd.standalone_sim
 
 import com.google.common.collect.ImmutableRangeMap
+import fr.sncf.osrd.DriverBehaviour
 import fr.sncf.osrd.api.api_v2.RangeValues
 import fr.sncf.osrd.api.api_v2.standalone_sim.MarginValue
 import fr.sncf.osrd.api.api_v2.standalone_sim.ReportTrain
@@ -229,6 +230,7 @@ class StandaloneSimulationTest {
                 testCase.startSpeed,
                 testCase.margins,
                 listOf(),
+                DriverBehaviour(0.0, 0.0),
             )
 
         // Test scheduled points
