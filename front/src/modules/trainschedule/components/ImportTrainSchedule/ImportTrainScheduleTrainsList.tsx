@@ -104,7 +104,7 @@ const ImportTrainScheduleTrainsList = ({
       dispatch(
         setFailure({
           name: t('failure'),
-          message: t('status.calculatingTrainScheduleCompleteAllFailure', {
+          message: t('status.invalidTrainSchedules', {
             trainsList,
             count: trainsList.length,
           }),
