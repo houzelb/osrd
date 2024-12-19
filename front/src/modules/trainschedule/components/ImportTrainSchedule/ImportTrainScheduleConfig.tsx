@@ -25,7 +25,6 @@ import { formatIsoDate } from 'utils/date';
 
 import {
   handleFileReadingError,
-  handleUnsupportedFileType,
   processJsonFile,
   processXmlFile,
 } from '../ManageTrainSchedule/helpers/handleParseFiles';
@@ -329,7 +328,7 @@ const ImportTrainScheduleConfig = ({
     }
 
     try {
-      processJsonFile(fileContent, setTrainsJsonData);
+      processJsonFile(fileContent, setTrainsJsonData, dispatch, t);
     } catch {
       // if file was json, display error message immidiately and return
       if (file.type === 'application/json') {
@@ -345,10 +344,14 @@ const ImportTrainScheduleConfig = ({
       try {
         await processXmlFile(fileContent, parseRailML, updateTrainSchedules);
       } catch {
-        handleUnsupportedFileType(dispatch);
+        dispatch(
+          setFailure({
+            name: t('errorMessages.error'),
+            message: t('errorMessages.errorUnsupportedFileType'),
+          })
+        );
       }
     }
-
   };
   return (
     <>
