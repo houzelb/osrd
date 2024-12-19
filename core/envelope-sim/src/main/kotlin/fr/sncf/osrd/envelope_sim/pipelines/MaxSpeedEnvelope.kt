@@ -119,6 +119,7 @@ object MaxSpeedEnvelope {
                     )
                 )
             }
+            cursor.nextPart()
         }
         return etcsSimulator.addETCSBrakingParts(envelope, limitsOfAuthority, listOf())
     }
