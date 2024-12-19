@@ -237,6 +237,7 @@ impl ValkeyClient {
         }
     }
 
+    #[tracing::instrument(skip_all)]
     pub async fn ping_valkey(&self) -> RedisResult<()> {
         let mut conn = self.get_connection().await?;
         cmd("PING").query_async::<()>(&mut conn).await?;

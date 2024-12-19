@@ -238,6 +238,7 @@ impl RabbitMQClient {
         })
     }
 
+    #[tracing::instrument(name = "ping_mq", skip_all)]
     pub async fn ping(&self) -> Result<bool, MqClientError> {
         let channel_worker = self
             .pool
