@@ -72,6 +72,7 @@ impl CoreClient {
         error
     }
 
+    #[tracing::instrument(name = "ping_core", skip_all)]
     pub async fn ping(&self) -> Result<bool, CoreError> {
         match self {
             CoreClient::MessageQueue(mq_client) => {
