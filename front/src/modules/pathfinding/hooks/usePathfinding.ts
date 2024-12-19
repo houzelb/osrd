@@ -51,6 +51,10 @@ const usePathfinding = (
   const [pathfindingState, setPathfindingState] =
     useState<PathfindingState>(initialPathfindingState);
 
+  // isInitialized is used to prevent the pathfinding to be launched multiple times
+  // and especially to prevent the power restrictions to be reset
+  const [isInitialized, setIsInitialized] = useState(false);
+
   const [postPathfindingBlocks] =
     osrdEditoastApi.endpoints.postInfraByInfraIdPathfindingBlocks.useLazyQuery();
   const [postPathProperties] =
@@ -266,14 +270,20 @@ const usePathfinding = (
   );
 
   useEffect(() => {
-    if (infra?.state === 'CACHED') {
+    if (isInitialized && infra?.state === 'CACHED') {
       launchPathfinding(pathSteps);
     }
   }, [infra?.state]);
 
   useEffect(() => {
-    launchPathfinding(pathSteps);
+    if (isInitialized) {
+      launchPathfinding(pathSteps);
+    }
   }, [rollingStock]);
+
+  useEffect(() => {
+    setIsInitialized(true);
+  }, []);
 
   return {
     launchPathfinding,
