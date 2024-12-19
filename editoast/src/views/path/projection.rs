@@ -411,6 +411,12 @@ mod tests {
     // One track on the path
     #[case::one_path_different_track(&["A+0-100"], &["B+0-100"], &[])]
     #[case::one_path_no_overlap(&["A+0-100"], &["A+100-200"], &[])]
+    #[case::one_path_one_simple_intersection(&["A+120-140"], &["A+100-200"], &[(20, 40)])]
+    #[case::one_path_one_simple_intersection_reverse_on_track_ranges(&["A+140-120"], &["A+100-200"], &[(20, 40)])]
+    #[case::two_path_merged(&["A+180-200", "B+100-120"], &["A+100-200", "B+100-200"], &[(80, 120)])]
+    #[case::two_path_not_merged(&["A+180-220", "B+80-120"], &["A+100-200", "B+100-200"], &[(80, 120)])]
+    #[case::two_path_merged_with_extra_bounds(&["A+180-220", "B+80-120"], &["A+100-200", "B+100-200"], &[(80, 120)])]
+    #[case::three_path_with_hole(&["A+150-200", "C+100-150"], &["A+100-200", "B+100-200", "C+100-200"], &[(50, 100), (200, 250)])]
     // Complex paths with complex track ranges
     #[case::complex_path_one_intersection(
         &["A+50-100", "B+200-0", "C+0-300", "D+250-120"],
