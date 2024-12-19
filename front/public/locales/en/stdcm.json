@@ -68,6 +68,7 @@
       },
       "simulationSelected": "You have selected this simulation",
       "startNewQuery": "Start a new query",
+      "startNewQueryFromCurrent": "Start a new query from the current one",
       "status": {
         "completed": "Calculation completed",
         "errorMessage": "We are sorry that we could not process your request. The LMR team has been notified and will be aware of the situation as soon as possible.",

@@ -137,6 +137,8 @@ class STDCMPage {
 
   readonly startNewQueryButton: Locator;
 
+  readonly startNewQueryWithDataButton: Locator;
+
   readonly originMarker: Locator;
 
   readonly destinationMarker: Locator;
@@ -222,6 +224,7 @@ class STDCMPage {
     this.retainSimulationButton = page.getByTestId('retain-simulation-button');
     this.downloadSimulationButton = page.getByTestId('download-simulation-button');
     this.startNewQueryButton = page.getByTestId('start-new-query-button');
+    this.startNewQueryWithDataButton = page.getByTestId('start-new-query-with-data-button');
     this.originMarker = this.mapContainer.locator('img[alt="origin"]');
     this.destinationMarker = this.mapContainer.locator('img[alt="destination"]');
     this.viaMarker = this.mapContainer.locator('img[alt="via"]');
@@ -671,6 +674,7 @@ class STDCMPage {
     await expect(this.downloadSimulationButton).toBeVisible();
     await expect(this.downloadSimulationButton).toBeEnabled();
     await expect(this.startNewQueryButton).toBeVisible();
+    await expect(this.startNewQueryWithDataButton).toBeVisible();
   }
 
   async downloadSimulation(browserName: string) {

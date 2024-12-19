@@ -127,7 +127,13 @@ const StdcmConfig = ({
   }, [infra]);
 
   useEffect(() => {
-    dispatch(resetStdcmConfig());
+    const keepForm = localStorage.getItem('keepForm');
+
+    if (!keepForm) {
+      dispatch(resetStdcmConfig());
+    } else {
+      localStorage.removeItem('keepForm');
+    }
   }, []);
 
   return (

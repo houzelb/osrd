@@ -26,6 +26,8 @@ type StcdmResultsProps = {
   onRetainSimulation: () => void;
   onSelectSimulation: (simulationIndex: number) => void;
   onStartNewQuery: () => void;
+  onStartNewQueryWithData: () => void;
+  buttonsVisible: boolean;
   retainedSimulationIndex: number;
   selectedSimulationIndex: number;
   showStatusBanner: boolean;
@@ -39,6 +41,8 @@ const StcdmResults = ({
   onRetainSimulation,
   onSelectSimulation,
   onStartNewQuery,
+  onStartNewQueryWithData,
+  buttonsVisible,
   retainedSimulationIndex,
   selectedSimulationIndex,
   showStatusBanner,
@@ -120,13 +124,20 @@ const StcdmResults = ({
                 <div className="gesico-text">{t('gesicoRequest')}</div>
               </div>
             )}
-            {retainedSimulationIndex > -1 && (
+            {retainedSimulationIndex > -1 && buttonsVisible && (
               <div className="start-new-query">
                 <Button
                   data-testid="start-new-query-button"
-                  variant="Normal"
+                  variant="Primary"
                   label={t('startNewQuery')}
                   onClick={onStartNewQuery}
+                />
+                <Button
+                  className="start-new-query-with-data"
+                  data-testid="start-new-query-with-data-button"
+                  variant="Normal"
+                  label={t('startNewQueryFromCurrent')}
+                  onClick={onStartNewQueryWithData}
                 />
               </div>
             )}

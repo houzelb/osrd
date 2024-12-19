@@ -29,6 +29,7 @@ const StdcmView = () => {
   const [showBtnToLaunchSimulation, setShowBtnToLaunchSimulation] = useState(false);
   const [isDebugMode, setIsDebugMode] = useState(false);
   const [showHelpModule, setShowHelpModule] = useState(false);
+  const [buttonsVisible, setButtonsVisible] = useState(true);
 
   const {
     launchStdcmRequest,
@@ -47,8 +48,7 @@ const StdcmView = () => {
   const { loading, error, loadStdcmEnvironment } = useStdcmEnvironment();
 
   const dispatch = useAppDispatch();
-  const { resetStdcmConfig, updateStdcmConfigWithData } =
-    useOsrdConfActions() as StdcmConfSliceActions;
+  const { updateStdcmConfigWithData } = useOsrdConfActions() as StdcmConfSliceActions;
 
   const selectedSimulation = simulationsList[selectedSimulationIndex];
   const showResults = showStatusBanner || simulationsList.length > 0 || hasConflicts;
@@ -62,12 +62,27 @@ const StdcmView = () => {
     }
   };
 
+  const openNewWindow = () => {
+    const newWindow = window.open(window.location.href, '_blank');
+    if (newWindow) {
+      newWindow.onload = () => {
+        newWindow.focus();
+      };
+    }
+  };
+
   const handleStartNewQuery = () => {
-    setSimulationsList([]);
+    setButtonsVisible(false);
     resetStdcmState();
-    setSelectedSimulationIndex(-1);
-    setRetainedSimulationIndex(-1);
-    dispatch(resetStdcmConfig());
+
+    openNewWindow();
+  };
+
+  const handleStartNewQueryWithData = () => {
+    setButtonsVisible(false);
+    localStorage.setItem('keepForm', 'true');
+
+    openNewWindow();
   };
 
   const toggleHelpModule = () => setShowHelpModule((show) => !show);
@@ -215,6 +230,8 @@ const StdcmView = () => {
                   onRetainSimulation={handleRetainSimulation}
                   onSelectSimulation={handleSelectSimulation}
                   onStartNewQuery={handleStartNewQuery}
+                  onStartNewQueryWithData={handleStartNewQueryWithData}
+                  buttonsVisible={buttonsVisible}
                   retainedSimulationIndex={retainedSimulationIndex}
                   selectedSimulationIndex={selectedSimulationIndex}
                   showStatusBanner={showStatusBanner}
