@@ -28,7 +28,8 @@
   "status": {
     "calculatingTrainScheduleCompleteAllSuccess_one": "Le train a été importé.",
     "calculatingTrainScheduleCompleteAllSuccess": "Tous les trains ont été importés.",
-    "calculatingTrainScheduleCompleteAllFailure": "Tous les calculs de marche ont échoué."
+    "invalidTrainSchedules_one": "La circulation à importer n'est pas au bon format.",
+    "invalidTrainSchedules": "Les circulations à importer ne sont pas au bon format."
   },
   "success": "Opération réussie",
   "to": "Destination",

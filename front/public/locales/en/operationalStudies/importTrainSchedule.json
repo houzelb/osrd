@@ -28,7 +28,8 @@
   "status": {
     "calculatingTrainScheduleCompleteAllSuccess_one": "A train is imported.",
     "calculatingTrainScheduleCompleteAllSuccess": "All trains are imported.",
-    "calculatingTrainScheduleCompleteAllFailure": "All running time calculations have failed."
+    "invalidTrainSchedules_one": "Invalid train schedule.",
+    "invalidTrainSchedules": "Invalid train schedules."
   },
   "success": "Operation successful",
   "to": "Destination",
