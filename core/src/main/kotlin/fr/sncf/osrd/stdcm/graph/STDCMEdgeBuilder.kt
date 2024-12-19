@@ -46,7 +46,7 @@ internal constructor(
      */
     fun makeAllEdges(): Collection<STDCMEdge> {
         return try {
-            if (getEnvelope() == null || hasDuplicateBlocks()) {
+            if (getEnvelope() == null) {
                 listOf()
             } else {
                 val delays = getDelaysPerOpening()
@@ -215,17 +215,6 @@ internal constructor(
             )
         res = graph.backtrackingManager.backtrack(res!!, envelope!!)
         return if (res == null || graph.delayManager.isRunTimeTooLong(res)) null else res
-    }
-
-    /** Returns true if the current block is already present in the path to this edge */
-    private fun hasDuplicateBlocks(): Boolean {
-        var node = prevNode
-        while (true) {
-            val prevEdge = node.previousEdge ?: return false
-            if (!prevEdge.endAtStop && prevEdge.block == infraExplorer.getCurrentBlock())
-                return true
-            node = prevEdge.previousNode
-        }
     }
 
     companion object {
