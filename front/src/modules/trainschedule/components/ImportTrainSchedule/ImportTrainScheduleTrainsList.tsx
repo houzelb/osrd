@@ -94,9 +94,9 @@ const ImportTrainScheduleTrainsList = ({
       dispatch(
         setSuccess({
           title: t('success'),
-          text: t('status.calculatingTrainScheduleCompleteAllSuccess', {
+          text: t('status.successfulImport', {
             trainsList,
-            count: trainsList.length,
+            count: trainsList.length || trainsJsonData.length,
           }),
         })
       );
@@ -106,7 +106,7 @@ const ImportTrainScheduleTrainsList = ({
           name: t('failure'),
           message: t('status.invalidTrainSchedules', {
             trainsList,
-            count: trainsList.length,
+            count: trainsList.length || trainsJsonData.length,
           }),
         })
       );

@@ -26,10 +26,10 @@
   "selectStation": "Select this station",
   "startTime": "START",
   "status": {
-    "calculatingTrainScheduleCompleteAllSuccess_one": "A train is imported.",
-    "calculatingTrainScheduleCompleteAllSuccess": "All trains are imported.",
     "invalidTrainSchedules_one": "Invalid train schedule.",
-    "invalidTrainSchedules": "Invalid train schedules."
+    "invalidTrainSchedules": "Invalid train schedules.",
+    "successfulImport_one": "A train is imported.",
+    "successfulImport": "All trains are imported."
   },
   "success": "Operation successful",
   "to": "Destination",
