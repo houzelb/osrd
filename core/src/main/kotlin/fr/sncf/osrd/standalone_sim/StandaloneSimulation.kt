@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableRangeMap
 import com.google.common.collect.Range
 import com.google.common.collect.RangeMap
 import com.google.common.collect.TreeRangeMap
+import fr.sncf.osrd.DriverBehaviour
 import fr.sncf.osrd.api.FullInfra
 import fr.sncf.osrd.api.api_v2.RangeValues
 import fr.sncf.osrd.api.api_v2.standalone_sim.ElectricalProfileValue
@@ -60,11 +61,13 @@ fun runStandaloneSimulation(
     schedule: List<SimulationScheduleItem>,
     initialSpeed: Double,
     margins: RangeValues<MarginValue>,
-    pathItemPositions: List<Offset<Path>>
+    pathItemPositions: List<Offset<Path>>,
+    driverBehaviour: DriverBehaviour = DriverBehaviour()
 ): SimulationSuccess {
     // MRSP & SpeedLimits
     val safetySpeedRanges = makeSafetySpeedRanges(infra, chunkPath, routes, schedule)
-    val mrsp = computeMRSP(pathProps, rollingStock, true, speedLimitTag, null, safetySpeedRanges)
+    var mrsp = computeMRSP(pathProps, rollingStock, true, speedLimitTag, null, safetySpeedRanges)
+    mrsp = driverBehaviour.applyToMRSP(mrsp)
     // We don't use speed safety ranges in the MRSP displayed in the front
     // (just like we don't add the train length)
     val speedLimits =
