@@ -27,8 +27,20 @@ impl EffortCurves {
         self.modes.values().any(|mode| mode.is_electric)
     }
 
+    pub fn has_thermal_curves(&self) -> bool {
+        self.modes.values().any(|mode| !mode.is_electric)
+    }
+
     pub fn is_electric(&self) -> bool {
         self.has_electric_curves()
+    }
+
+    pub fn supported_electrification(&self) -> Vec<String> {
+        self.modes
+            .iter()
+            .filter(|(_, mode)| mode.is_electric)
+            .map(|(key, _)| key.clone())
+            .collect()
     }
 }
 

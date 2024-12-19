@@ -4741,6 +4741,7 @@ components:
       - $ref: '#/components/schemas/EditoastStdcmErrorRollingStockNotFound'
       - $ref: '#/components/schemas/EditoastStdcmErrorTimetableNotFound'
       - $ref: '#/components/schemas/EditoastStdcmErrorTowedRollingStockNotFound'
+      - $ref: '#/components/schemas/EditoastStdcmErrorTrainSimulationFail'
       - $ref: '#/components/schemas/EditoastStudyErrorNotFound'
       - $ref: '#/components/schemas/EditoastStudyErrorStartDateAfterEndDate'
       - $ref: '#/components/schemas/EditoastTemporarySpeedLimitErrorNameAlreadyUsed'
@@ -5960,6 +5961,25 @@ components:
           type: string
           enum:
           - editoast:stdcm_v2:TowedRollingStockNotFound
+    EditoastStdcmErrorTrainSimulationFail:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 400
+        type:
+          type: string
+          enum:
+          - editoast:stdcm_v2:TrainSimulationFail
     EditoastStudyErrorNotFound:
       type: object
       required:
