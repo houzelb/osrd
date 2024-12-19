@@ -54,7 +54,7 @@ fun project(
     }
 
     // Recover blocks from the route path
-    val detailedBlockPath = recoverBlockPath(simulator, fullInfra, routePath)
+    val detailedBlockPath = deprecatedRecoverBlockPath(simulator, fullInfra, routePath)
     val blockPath = mutableStaticIdxArrayListOf<Block>()
     for (block in detailedBlockPath) blockPath.add(block.block)
 

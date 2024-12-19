@@ -54,12 +54,14 @@ class PathOffsetBuilder(val startOffset: Distance) {
     }
 }
 
-fun recoverBlockPath(
+// TODO: remove this function as blockPath is provided by the pathfinding and
+//   must not be reprocessed later (leading to possible inconsistencies, especially
+//   with multiple signaling systems)
+fun deprecatedRecoverBlockPath(
     simulator: SignalingSimulator,
     fullInfra: FullInfra,
     routePath: StaticIdxList<Route>,
 ): List<BlockPathElement> {
-    // TODO: the allowed signaling systems should depend on the type of train
     val sigSystemManager = simulator.sigModuleManager
     val bal = sigSystemManager.findSignalingSystemOrThrow("BAL")
     val bapr = sigSystemManager.findSignalingSystemOrThrow("BAPR")
@@ -68,6 +70,7 @@ fun recoverBlockPath(
     val etcsLevel2 = sigSystemManager.findSignalingSystemOrThrow("ETCS_LEVEL2")
 
     val blockPaths =
+        // TODO: probably remove that function too
         recoverBlocks(
             fullInfra.rawInfra,
             fullInfra.blockInfra,
@@ -97,7 +100,7 @@ fun run(
     val routePath = fullInfra.blockInfra.chunksToRoutes(rawInfra, chunkPath.chunks)
 
     // recover blocks from the route paths
-    val detailedBlockPath = recoverBlockPath(simulator, fullInfra, routePath)
+    val detailedBlockPath = deprecatedRecoverBlockPath(simulator, fullInfra, routePath)
     val blockPath = mutableStaticIdxArrayListOf<Block>()
     for (block in detailedBlockPath) blockPath.add(block.block)
 
