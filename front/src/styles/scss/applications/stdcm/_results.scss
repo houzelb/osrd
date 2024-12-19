@@ -324,8 +324,12 @@
       .start-new-query {
         margin-top: 76px;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
+        .start-new-query-with-data {
+          margin-top: 48px;
+        }
       }
     }
 

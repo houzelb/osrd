@@ -82,6 +82,7 @@
       },
       "simulationSelected": "Vous avez retenu cette simulation",
       "startNewQuery": "Démarrez une nouvelle requête",
+      "startNewQueryFromCurrent": "Démarrez une nouvelle requête à partir de celle-ci",
       "status": {
         "completed": "Calcul terminé",
         "errorMessage": "Nous sommes désolés de ne pas avoir pu traiter votre demande. L’équipe LMR a été notifiée et prendra connaissance de la situation dès que possible.",
