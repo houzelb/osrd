@@ -9,38 +9,13 @@ export const handleFileReadingError = (error: Error) => {
   console.error('File reading error:', error);
 };
 
-export const handleJsonParsingError = (error: Error, dispatch: Dispatch) => {
-  console.error('Error parsing JSON:', error);
-  dispatch(
-    setFailure({
-      name: t('errorMessages.error'),
-      message: t('errorMessages.errorInvalidJSONFormat'),
-    })
-  );
-};
-
-export const handleXmlParsingError = (error: Error, dispatch: Dispatch) => {
-  console.error('Error parsing XML/RailML:', error);
-  dispatch(
-    setFailure({
-      name: t('errorMessages.error'),
-      message: t('errorMessages.errorInvalidXMLFormat'),
-    })
-  );
-};
-
 export const processJsonFile = (
   fileContent: string,
-  setTrainsJsonData: (data: TrainScheduleBase[]) => void,
-  dispatch: Dispatch
+  setTrainsJsonData: (data: TrainScheduleBase[]) => void
 ) => {
-  try {
-    const importedTrainSchedules: TrainScheduleBase[] = JSON.parse(fileContent);
-    if (importedTrainSchedules && importedTrainSchedules.length > 0) {
-      setTrainsJsonData(importedTrainSchedules);
-    }
-  } catch (error) {
-    handleJsonParsingError(error as Error, dispatch);
+  const importedTrainSchedules: TrainScheduleBase[] = JSON.parse(fileContent);
+  if (importedTrainSchedules && importedTrainSchedules.length > 0) {
+    setTrainsJsonData(importedTrainSchedules);
   }
 };
 
@@ -48,23 +23,18 @@ export const processXmlFile = async (
   fileContent: string,
   parseRailML: (xmlDoc: Document) => Promise<ImportedTrainSchedule[]>,
   updateTrainSchedules: (schedules: ImportedTrainSchedule[]) => void,
-  dispatch: Dispatch
 ) => {
-  try {
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(fileContent, 'application/xml');
-    const parserError = xmlDoc.getElementsByTagName('parsererror');
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(fileContent, 'application/xml');
+  const parserError = xmlDoc.getElementsByTagName('parsererror');
 
-    if (parserError.length > 0) {
-      throw new Error('Invalid XML');
-    }
+  if (parserError.length > 0) {
+    throw new Error('Invalid XML');
+  }
 
-    const importedTrainSchedules = await parseRailML(xmlDoc);
-    if (importedTrainSchedules && importedTrainSchedules.length > 0) {
-      updateTrainSchedules(importedTrainSchedules);
-    }
-  } catch (error) {
-    handleXmlParsingError(error as Error, dispatch);
+  const importedTrainSchedules = await parseRailML(xmlDoc);
+  if (importedTrainSchedules && importedTrainSchedules.length > 0) {
+    updateTrainSchedules(importedTrainSchedules);
   }
 };
 
