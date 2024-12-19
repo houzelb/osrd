@@ -53,7 +53,7 @@ fun runScheduleMetadataExtractor(
     // get a new generation route path
 
     // recover blocks from the route paths
-    val detailedBlockPath = recoverBlockPath(simulator, fullInfra, routePath)
+    val detailedBlockPath = deprecatedRecoverBlockPath(simulator, fullInfra, routePath)
     val blockPath = mutableStaticIdxArrayListOf<Block>()
     for (block in detailedBlockPath) blockPath.add(block.block)
 
