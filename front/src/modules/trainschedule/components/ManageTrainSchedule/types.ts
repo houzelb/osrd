@@ -69,4 +69,4 @@ export type ValidConfig = {
   speedLimitByTag?: string;
 };
 
-export type FeatureInfoClick = { displayPopup: boolean; feature?: Feature; coordinates?: number[] };
+export type FeatureInfoClick = { feature: Feature; coordinates: number[] };

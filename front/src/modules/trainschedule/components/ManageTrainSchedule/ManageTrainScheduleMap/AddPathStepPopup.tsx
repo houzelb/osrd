@@ -24,13 +24,13 @@ import type { FeatureInfoClick } from '../types';
 type AddPathStepPopupProps = {
   pathProperties?: ManageTrainSchedulePathProperties;
   featureInfoClick: FeatureInfoClick;
-  setFeatureInfoClick: React.Dispatch<React.SetStateAction<FeatureInfoClick>>;
+  resetFeatureInfoClick: () => void;
 };
 
 function AddPathStepPopup({
   pathProperties,
   featureInfoClick,
-  setFeatureInfoClick,
+  resetFeatureInfoClick,
 }: AddPathStepPopupProps) {
   const { getInfraID, getOrigin, getDestination } = useOsrdConfSelectors();
   const { launchPathfinding } = useManageTrainScheduleContext();
@@ -46,13 +46,7 @@ function AddPathStepPopup({
 
   useEffect(() => {
     const calculateOffset = async () => {
-      if (
-        !featureInfoClick.feature ||
-        !featureInfoClick.feature.properties ||
-        !featureInfoClick.coordinates
-      )
-        return;
-      const trackId = featureInfoClick.feature.properties.id;
+      const trackId = featureInfoClick.feature.properties?.id;
       const result = await getTrackEntity({
         infraId: infraId!,
         objectType: 'TrackSection',
@@ -73,18 +67,10 @@ function AddPathStepPopup({
       setTrackOffset(offset);
     };
 
-    if (featureInfoClick.displayPopup) {
-      calculateOffset();
-    }
+    calculateOffset();
   }, [featureInfoClick]);
 
-  if (
-    !featureInfoClick.displayPopup ||
-    !featureInfoClick.feature ||
-    !featureInfoClick.feature.properties ||
-    !featureInfoClick.coordinates
-  )
-    return null;
+  if (!featureInfoClick.feature.properties) return null;
 
   const { properties: trackProperties } = featureInfoClick.feature;
   const coordinates = featureInfoClick.coordinates.slice(0, 2);
@@ -127,7 +113,7 @@ function AddPathStepPopup({
           className="btn btn-sm btn-success"
           type="button"
           onClick={() =>
-            setPointIti('origin', pathStepProperties, launchPathfinding, setFeatureInfoClick)
+            setPointIti('origin', pathStepProperties, launchPathfinding, resetFeatureInfoClick)
           }
         >
           <RiMapPin2Fill />
@@ -142,7 +128,7 @@ function AddPathStepPopup({
                 'via',
                 pathStepProperties,
                 launchPathfinding,
-                setFeatureInfoClick,
+                resetFeatureInfoClick,
                 pathProperties
               )
             }
@@ -156,7 +142,7 @@ function AddPathStepPopup({
           className="btn btn-sm btn-warning"
           type="button"
           onClick={() =>
-            setPointIti('destination', pathStepProperties, launchPathfinding, setFeatureInfoClick)
+            setPointIti('destination', pathStepProperties, launchPathfinding, resetFeatureInfoClick)
           }
         >
           <IoFlag />
