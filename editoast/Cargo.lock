@@ -2836,7 +2836,7 @@ dependencies = [
  "log",
  "num-traits",
  "pointy",
- "protobuf 3.7.1",
+ "protobuf",
  "thiserror 2.0.7",
 ]
 
@@ -3119,9 +3119,9 @@ dependencies = [
 
 [[package]]
 name = "osm4routing"
-version = "0.7.0"
+version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e5b0ec9dbbc5329190af6aa7cae008b35ff93a05a99af02b01c71fc31251241"
+checksum = "939f752445d7481d80a6a81fe173b8e7f846262a9e74f21d508fc08883d4798a"
 dependencies = [
  "clap",
  "csv",
@@ -3147,16 +3147,16 @@ dependencies = [
 
 [[package]]
 name = "osmpbfreader"
-version = "0.16.1"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "31a9a5652ee5d1ac97f64960117f9165d2d185034c5ccf22f6fadd3fcb78ccb2"
+checksum = "38e9c16f77106ccd0f85602ff6b2237375b1f331ef950f59c35bdd6eff37cb64"
 dependencies = [
  "byteorder",
  "flat_map",
  "flate2",
  "par-map",
- "protobuf 2.28.0",
- "protobuf-codegen-pure",
+ "protobuf",
+ "protobuf-codegen",
  "pub-iterator-type",
  "self_cell",
  "serde",
@@ -3613,12 +3613,6 @@ dependencies = [
 
 [[package]]
 name = "protobuf"
-version = "2.28.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "106dd99e98437432fed6519dedecfade6a06a73bb7b2a1e019fdd2bee5778d94"
-
-[[package]]
-name = "protobuf"
 version = "3.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a3a7c64d9bf75b1b8d981124c14c179074e8caa7dfe7b6a12e6222ddcd0c8f72"
@@ -3630,21 +3624,33 @@ dependencies = [
 
 [[package]]
 name = "protobuf-codegen"
-version = "2.28.0"
+version = "3.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "033460afb75cf755fcfc16dfaed20b86468082a2ea24e05ac35ab4a099a017d6"
+checksum = "e26b833f144769a30e04b1db0146b2aaa53fd2fd83acf10a6b5f996606c18144"
 dependencies = [
- "protobuf 2.28.0",
+ "anyhow",
+ "once_cell",
+ "protobuf",
+ "protobuf-parse",
+ "regex",
+ "tempfile",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
-name = "protobuf-codegen-pure"
-version = "2.28.0"
+name = "protobuf-parse"
+version = "3.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "95a29399fc94bcd3eeaa951c715f7bea69409b2445356b00519740bcd6ddd865"
+checksum = "322330e133eab455718444b4e033ebfac7c6528972c784fcde28d2cc783c6257"
 dependencies = [
- "protobuf 2.28.0",
- "protobuf-codegen",
+ "anyhow",
+ "indexmap 2.7.0",
+ "log",
+ "protobuf",
+ "protobuf-support",
+ "tempfile",
+ "thiserror 1.0.69",
+ "which",
 ]
 
 [[package]]

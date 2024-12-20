@@ -8,8 +8,8 @@ edition.workspace = true
 editoast_schemas.workspace = true
 geo-types = "0.7.14"
 geos.workspace = true
-osm4routing = "0.7.0"
-osmpbfreader = "0.16.1"
+osm4routing = "0.7.2"
+osmpbfreader = "0.17.0"
 serde_json.workspace = true
 tracing.workspace = true
 
