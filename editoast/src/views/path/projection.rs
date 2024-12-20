@@ -482,7 +482,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn projection_get_invalid_location() {
+    fn projection_get_out_of_bound_location() {
         let path = vec![TrackRange::new("A", 50, 100, Direction::StartToStop)];
 
         let projection = PathProjection::new(&path);
