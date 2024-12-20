@@ -136,7 +136,6 @@ export function getOperationalPointsWithTimes(
       name: op.name,
       ch: op.ch,
       duration: durationInSeconds,
-      departureTime,
       stopEndTime,
       trackName: op.metadata?.trackName,
     };
