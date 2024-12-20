@@ -172,6 +172,7 @@ pub struct TrackRange {
 
 impl From<editoast_schemas::infra::DirectionalTrackRange> for TrackRange {
     fn from(value: editoast_schemas::infra::DirectionalTrackRange) -> Self {
+        assert!(value.begin <= value.end);
         TrackRange {
             track_section: value.track,
             begin: (value.begin * 1000.).round() as u64,
@@ -201,6 +202,7 @@ impl std::str::FromStr for TrackRange {
         let Ok(end) = end.parse() else {
             return Err(format!("{end} in track range should be an integer"));
         };
+        assert!(begin != end); // Impossible to determine direction in this case
         let (begin, end, direction) = if begin < end {
             (begin, end, Direction::StartToStop)
         } else {
@@ -224,6 +226,7 @@ impl TrackRange {
         end: u64,
         direction: Direction,
     ) -> Self {
+        assert!(begin <= end);
         Self {
             track_section: track_section.as_ref().into(),
             begin,
