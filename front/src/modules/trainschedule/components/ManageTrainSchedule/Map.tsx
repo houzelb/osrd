@@ -44,7 +44,7 @@ import { computeBBoxViewport } from 'common/Map/WarpedMap/core/helpers';
 import { useInfraID, useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import { LAYER_GROUPS_ORDER, LAYERS } from 'config/layerOrder';
 import VirtualLayers from 'modules/simulationResult/components/SimulationResultsMap/VirtualLayers';
-import RenderPopup from 'modules/trainschedule/components/ManageTrainSchedule/ManageTrainScheduleMap/RenderPopup';
+import AddPathStepPopup from 'modules/trainschedule/components/ManageTrainSchedule/ManageTrainScheduleMap/AddPathStepPopup';
 import { updateViewport } from 'reducers/map';
 import type { Viewport } from 'reducers/map';
 import { getMap, getTerrain3DExaggeration } from 'reducers/map/selectors';
@@ -391,7 +391,7 @@ const Map = ({
               layerOrder={LAYER_GROUPS_ORDER[LAYERS.LINE_SEARCH.GROUP]}
               infraID={infraID}
             />
-            {!showStdcmAssets && <RenderPopup pathProperties={pathProperties} />}
+            {!showStdcmAssets && <AddPathStepPopup pathProperties={pathProperties} />}
           </>
         )}
         <ItineraryLayer
