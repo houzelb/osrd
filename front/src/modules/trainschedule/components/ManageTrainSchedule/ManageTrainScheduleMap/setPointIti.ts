@@ -5,13 +5,11 @@ import type { PathStep } from 'reducers/osrdconf/types';
 import { store } from 'store';
 import { addElementAtIndex, replaceElementAtIndex } from 'utils/array';
 
-import type { FeatureInfoClick } from '../types';
-
 export function setPointIti(
   pointType: 'origin' | 'destination' | 'via',
   pathStep: PathStep,
   launchPathfinding: (newPathSteps: (PathStep | null)[]) => void,
-  setFeatureInfoClick: React.Dispatch<React.SetStateAction<FeatureInfoClick>>,
+  resetFeatureInfoClick: () => void,
   pathProperties?: ManageTrainSchedulePathProperties
 ) {
   const { pathSteps } = store.getState().operationalStudiesConf;
@@ -32,6 +30,6 @@ export function setPointIti(
         newPathSteps = addElementAtIndex(pathSteps, pathSteps.length - 1, pathStep);
       }
   }
-  setFeatureInfoClick({ displayPopup: false });
+  resetFeatureInfoClick();
   launchPathfinding(newPathSteps);
 }

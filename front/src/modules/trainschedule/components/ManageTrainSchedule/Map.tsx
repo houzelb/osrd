@@ -119,16 +119,15 @@ const Map = ({
     bottom: 20,
   };
 
-  const [featureInfoClick, setFeatureInfoClick] = useState<FeatureInfoClick>({
-    displayPopup: false,
-  });
+  const [featureInfoClick, setFeatureInfoClick] = useState<FeatureInfoClick>();
+
+  const resetFeatureInfoClick = useCallback(() => {
+    setFeatureInfoClick(undefined);
+  }, []);
 
   const closeFeatureInfoClickPopup = useCallback(() => {
-    if (featureInfoClick.displayPopup) {
-      setFeatureInfoClick({
-        displayPopup: false,
-        feature: undefined,
-      });
+    if (featureInfoClick) {
+      setFeatureInfoClick(undefined);
     }
   }, [featureInfoClick]);
 
@@ -150,15 +149,11 @@ const Map = ({
       result.feature.geometry.type === 'LineString'
     ) {
       setFeatureInfoClick({
-        displayPopup: true,
         feature: result.feature,
         coordinates: result.nearest,
       });
     } else {
-      setFeatureInfoClick({
-        displayPopup: false,
-        feature: undefined,
-      });
+      setFeatureInfoClick(undefined);
     }
     removeSearchItemMarkersOnMap(dispatch);
   };
@@ -385,11 +380,11 @@ const Map = ({
               layerOrder={LAYER_GROUPS_ORDER[LAYERS.LINE_SEARCH.GROUP]}
               infraID={infraID}
             />
-            {!showStdcmAssets && (
+            {!showStdcmAssets && featureInfoClick && (
               <AddPathStepPopup
                 pathProperties={pathProperties}
                 featureInfoClick={featureInfoClick}
-                setFeatureInfoClick={setFeatureInfoClick}
+                resetFeatureInfoClick={resetFeatureInfoClick}
               />
             )}
           </>
