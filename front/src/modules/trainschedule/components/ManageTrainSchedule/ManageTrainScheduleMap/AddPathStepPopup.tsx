@@ -25,11 +25,11 @@ type FeatureInfoClickType = {
   feature?: any;
 };
 
-type RenderPopupProps = {
+type AddPathStepPopupProps = {
   pathProperties?: ManageTrainSchedulePathProperties;
 };
 
-function RenderPopup({ pathProperties }: RenderPopupProps) {
+function AddPathStepPopup({ pathProperties }: AddPathStepPopupProps) {
   const { getFeatureInfoClick, getInfraID, getOrigin, getDestination } = useOsrdConfSelectors();
   const { launchPathfinding } = useManageTrainScheduleContext();
   const osrdConfActions = useOsrdConfActions();
@@ -167,4 +167,4 @@ function RenderPopup({ pathProperties }: RenderPopupProps) {
   );
 }
 
-export default React.memo(RenderPopup);
+export default React.memo(AddPathStepPopup);
