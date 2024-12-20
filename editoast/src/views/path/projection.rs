@@ -28,7 +28,7 @@ impl<'a> PathProjection<'a> {
     /// Retrieve a track range from the path given the track section identifier.
     fn get_track_range(&self, track_section: &Identifier) -> Option<&TrackRange> {
         let index = *self.track_index.get(track_section)?;
-        Some(&self.path[index])
+        self.path.get(index)
     }
 
     /// Create a new projection from a path.
