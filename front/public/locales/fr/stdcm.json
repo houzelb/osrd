@@ -49,7 +49,7 @@
       "displayMain": "Afficher les jalons principaux",
       "downloadSimulationSheet": "Télécharger la fiche de simulation",
       "formatCreationDate": "{{day}}/{{month}}/{{year}} {{hours}}:{{minutes}}",
-      "gesicoRequest": "et joignez ce document à votre demande GESICO DSDM",
+      "gesicoRequest": "et joignez ce document à votre demande GESICO.",
       "notFound": "Aucun passage n'a été trouvé pour cette configuration",
       "conflictsTitle": "Voici les problèmes rencontrés au moment du calcul sur le chemin le plus court :",
       "trackConflict": "conflit avec un autre sillon entre <strong>{{waypointBefore}}</strong> et <strong>{{waypointAfter}}</strong> du {{startDate}} à {{startTime}} au {{endDate}} à {{endTime}}",

@@ -49,7 +49,7 @@
       "displayMain": "Display main operational points",
       "downloadSimulationSheet": "Download simulation report sheet",
       "formatCreationDate": "{{month}}/{{day}}/{{year}} {{hours}}:{{minutes}}",
-      "gesicoRequest": "and attach this document to your GESICO DSDM request.",
+      "gesicoRequest": "and attach this document to your GESICO request.",
       "notFound": "No path was found for this configuration",
       "conflictsTitle": "Here are the problems encountered when calculating the shortest path:",
       "trackConflict": "conflict with a train path between <strong>{{waypointBefore}}</strong> and <strong>{{waypointAfter}}</strong> from {{startDate}} at {{startTime}} to {{endDate}} at {{endTime}}",
