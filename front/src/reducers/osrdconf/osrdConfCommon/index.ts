@@ -1,6 +1,5 @@
 import type { CaseReducer, PayloadAction } from '@reduxjs/toolkit';
 import type { Draft } from 'immer';
-import { omit } from 'lodash';
 
 import { type StdcmStopTypes } from 'applications/stdcm/types';
 import { type InfraStateReducers, buildInfraStateReducers, infraState } from 'reducers/infra';
@@ -33,7 +32,6 @@ export const defaultCommonConf: OsrdConfState = {
   gridMarginBefore: undefined,
   gridMarginAfter: undefined,
   ...infraState,
-  featureInfoClick: { displayPopup: false },
   // Corresponds to origin and destination not defined
   pathSteps: [null, null],
   rollingStockComfort: 'STANDARD' as const,
@@ -62,7 +60,6 @@ interface CommonConfReducers<S extends OsrdConfState> extends InfraStateReducers
   >;
   ['updateGridMarginBefore']: CaseReducer<S, PayloadAction<S['gridMarginBefore']>>;
   ['updateGridMarginAfter']: CaseReducer<S, PayloadAction<S['gridMarginAfter']>>;
-  ['updateFeatureInfoClick']: CaseReducer<S, PayloadAction<S['featureInfoClick']>>;
   ['updatePathSteps']: CaseReducer<S, PayloadAction<S['pathSteps']>>;
   ['replaceItinerary']: CaseReducer<S, PayloadAction<S['pathSteps']>>;
   ['deleteItinerary']: CaseReducer<S>;
@@ -145,10 +142,6 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
     },
     updateGridMarginAfter(state: Draft<S>, action: PayloadAction<S['gridMarginAfter']>) {
       state.gridMarginAfter = action.payload;
-    },
-    updateFeatureInfoClick(state: Draft<S>, action: PayloadAction<S['featureInfoClick']>) {
-      const feature = omit(action.payload.feature, ['_vectorTileFeature']);
-      state.featureInfoClick = { ...action.payload, feature };
     },
     // update path steps without changing the itinerary (only add vias on the existing pathfinding,
     // add schedules, margins or power restrictions)

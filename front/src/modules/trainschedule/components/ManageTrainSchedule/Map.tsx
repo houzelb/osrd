@@ -41,7 +41,7 @@ import TracksGeographic from 'common/Map/Layers/TracksGeographic';
 import TracksOSM from 'common/Map/Layers/TracksOSM';
 import { removeSearchItemMarkersOnMap } from 'common/Map/utils';
 import { computeBBoxViewport } from 'common/Map/WarpedMap/core/helpers';
-import { useInfraID, useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
+import { useInfraID } from 'common/osrdContext';
 import { LAYER_GROUPS_ORDER, LAYERS } from 'config/layerOrder';
 import VirtualLayers from 'modules/simulationResult/components/SimulationResultsMap/VirtualLayers';
 import AddPathStepPopup from 'modules/trainschedule/components/ManageTrainSchedule/ManageTrainScheduleMap/AddPathStepPopup';
@@ -55,6 +55,7 @@ import ItineraryLayer from './ManageTrainScheduleMap/ItineraryLayer';
 import ItineraryMarkers, {
   type MarkerInformation,
 } from './ManageTrainScheduleMap/ItineraryMarkers';
+import type { FeatureInfoClick } from './types';
 
 type MapProps = {
   pathProperties?: ManageTrainSchedulePathProperties;
@@ -118,19 +119,16 @@ const Map = ({
     bottom: 20,
   };
 
-  const { getFeatureInfoClick } = useOsrdConfSelectors();
-  const featureInfoClick = useSelector(getFeatureInfoClick);
-
-  const { updateFeatureInfoClick } = useOsrdConfActions();
+  const [featureInfoClick, setFeatureInfoClick] = useState<FeatureInfoClick>({
+    displayPopup: false,
+  });
 
   const closeFeatureInfoClickPopup = useCallback(() => {
     if (featureInfoClick.displayPopup) {
-      dispatch(
-        updateFeatureInfoClick({
-          displayPopup: false,
-          feature: undefined,
-        })
-      );
+      setFeatureInfoClick({
+        displayPopup: false,
+        feature: undefined,
+      });
     }
   }, [featureInfoClick]);
 
@@ -151,20 +149,16 @@ const Map = ({
       result.feature.properties.id &&
       result.feature.geometry.type === 'LineString'
     ) {
-      dispatch(
-        updateFeatureInfoClick({
-          displayPopup: true,
-          feature: result.feature,
-          coordinates: result.nearest,
-        })
-      );
+      setFeatureInfoClick({
+        displayPopup: true,
+        feature: result.feature,
+        coordinates: result.nearest,
+      });
     } else {
-      dispatch(
-        updateFeatureInfoClick({
-          displayPopup: false,
-          feature: undefined,
-        })
-      );
+      setFeatureInfoClick({
+        displayPopup: false,
+        feature: undefined,
+      });
     }
     removeSearchItemMarkersOnMap(dispatch);
   };
@@ -391,7 +385,13 @@ const Map = ({
               layerOrder={LAYER_GROUPS_ORDER[LAYERS.LINE_SEARCH.GROUP]}
               infraID={infraID}
             />
-            {!showStdcmAssets && <AddPathStepPopup pathProperties={pathProperties} />}
+            {!showStdcmAssets && (
+              <AddPathStepPopup
+                pathProperties={pathProperties}
+                featureInfoClick={featureInfoClick}
+                setFeatureInfoClick={setFeatureInfoClick}
+              />
+            )}
           </>
         )}
         <ItineraryLayer

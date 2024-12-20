@@ -85,7 +85,6 @@ const buildOsrdConfPersistConfig = <T extends OsrdConfState>(
   key: slice.name,
   storage,
   transforms: [stdcmPathStepsDateTransform, operationalStudiesDateTransform],
-  blacklist: ['featureInfoClick'],
 });
 
 export const persistConfig = {

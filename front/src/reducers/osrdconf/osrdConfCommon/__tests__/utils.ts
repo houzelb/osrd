@@ -1,4 +1,3 @@
-import { omit } from 'lodash';
 import { describe, beforeEach, it, expect } from 'vitest';
 
 import { StdcmStopTypes } from 'applications/stdcm/types';
@@ -205,15 +204,6 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
     const state = store.getState()[slice.name];
     expect(state.pathSteps[1]?.stopFor).toEqual('PT60S');
     expect(state.pathSteps[1]?.stopType).toEqual('serviceStop');
-  });
-
-  it('should handle updateFeatureInfoClick', () => {
-    const newFeatureClick = testDataBuilder.buildFeatureInfoClick();
-    defaultStore.dispatch(slice.actions.updateFeatureInfoClick(newFeatureClick));
-    const state = defaultStore.getState()[slice.name];
-    const feature = omit(newFeatureClick.feature, ['_vectorTileFeature']);
-    const expected = { ...newFeatureClick, feature };
-    expect(state.featureInfoClick).toStrictEqual(expected);
   });
 
   it('should handle updateGridMarginBefore', () => {

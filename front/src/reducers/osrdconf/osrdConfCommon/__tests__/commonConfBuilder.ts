@@ -1,37 +1,8 @@
-import type { Feature } from 'geojson';
-
 import type { ManageTrainSchedulePathProperties } from 'applications/operationalStudies/types';
-import type { OsrdConfState, PathStep } from 'reducers/osrdconf/types';
+import type { PathStep } from 'reducers/osrdconf/types';
 
 export default function commonConfBuilder() {
   return {
-    buildFeatureInfoClick: (
-      featureInfoClickFields?: Partial<OsrdConfState['featureInfoClick']>
-    ): OsrdConfState['featureInfoClick'] => ({
-      displayPopup: true,
-      feature: {
-        type: 'Feature',
-        _geometry: {
-          type: 'LineString',
-          coordinates: [12, 45],
-        },
-        properties: {
-          title: 'test',
-          toto: 'toto',
-        },
-        id: 'test',
-        _vectorTileFeature: {
-          id: 10,
-          type: 1,
-          extent: 15,
-          properties: {
-            name: 'test',
-          },
-        },
-      } as unknown as Feature,
-      ...featureInfoClickFields,
-    }),
-
     buildPathSteps: (): PathStep[] => [
       {
         uic: 474007,

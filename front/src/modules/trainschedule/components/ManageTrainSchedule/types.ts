@@ -1,4 +1,4 @@
-import type { Position } from 'geojson';
+import type { Feature, Position } from 'geojson';
 
 import type { ReceptionSignal, TrainScheduleBase } from 'common/api/osrdEditoastApi';
 import type { IsoDurationString } from 'common/types';
@@ -68,3 +68,5 @@ export type ValidConfig = {
   firstStartTime: string;
   speedLimitByTag?: string;
 };
+
+export type FeatureInfoClick = { displayPopup: boolean; feature?: Feature; coordinates?: number[] };

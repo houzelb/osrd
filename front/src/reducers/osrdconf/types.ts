@@ -1,4 +1,4 @@
-import type { Feature, Position } from 'geojson';
+import type { Position } from 'geojson';
 
 import type { PowerRestriction } from 'applications/operationalStudies/types';
 import type {
@@ -39,7 +39,6 @@ export interface OsrdConfState extends InfraState {
   initialSpeed?: number;
   gridMarginBefore?: number;
   gridMarginAfter?: number;
-  featureInfoClick: { displayPopup: boolean; feature?: Feature; coordinates?: number[] };
   pathSteps: (PathStep | null)[];
   rollingStockComfort: Comfort;
   startTime: Date;
