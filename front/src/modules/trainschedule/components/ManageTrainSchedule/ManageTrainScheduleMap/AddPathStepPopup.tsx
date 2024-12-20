@@ -15,26 +15,26 @@ import { calculateDistanceAlongTrack } from 'applications/editor/tools/utils';
 import { useManageTrainScheduleContext } from 'applications/operationalStudies/hooks/useManageTrainScheduleContext';
 import type { ManageTrainSchedulePathProperties } from 'applications/operationalStudies/types';
 import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
-import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
+import { useOsrdConfSelectors } from 'common/osrdContext';
 import { setPointIti } from 'modules/trainschedule/components/ManageTrainSchedule/ManageTrainScheduleMap/setPointIti';
 import type { PathStep } from 'reducers/osrdconf/types';
 
-type FeatureInfoClickType = {
-  displayPopup: boolean;
-  coordinates?: number[];
-  feature?: any;
-};
+import type { FeatureInfoClick } from '../types';
 
 type AddPathStepPopupProps = {
   pathProperties?: ManageTrainSchedulePathProperties;
+  featureInfoClick: FeatureInfoClick;
+  setFeatureInfoClick: React.Dispatch<React.SetStateAction<FeatureInfoClick>>;
 };
 
-function AddPathStepPopup({ pathProperties }: AddPathStepPopupProps) {
-  const { getFeatureInfoClick, getInfraID, getOrigin, getDestination } = useOsrdConfSelectors();
+function AddPathStepPopup({
+  pathProperties,
+  featureInfoClick,
+  setFeatureInfoClick,
+}: AddPathStepPopupProps) {
+  const { getInfraID, getOrigin, getDestination } = useOsrdConfSelectors();
   const { launchPathfinding } = useManageTrainScheduleContext();
-  const osrdConfActions = useOsrdConfActions();
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
-  const featureInfoClick: FeatureInfoClickType = useSelector(getFeatureInfoClick);
   const infraId = useSelector(getInfraID);
   const origin = useSelector(getOrigin);
   const destination = useSelector(getDestination);
@@ -127,7 +127,7 @@ function AddPathStepPopup({ pathProperties }: AddPathStepPopupProps) {
           className="btn btn-sm btn-success"
           type="button"
           onClick={() =>
-            setPointIti('origin', pathStepProperties, osrdConfActions, launchPathfinding)
+            setPointIti('origin', pathStepProperties, launchPathfinding, setFeatureInfoClick)
           }
         >
           <RiMapPin2Fill />
@@ -141,8 +141,8 @@ function AddPathStepPopup({ pathProperties }: AddPathStepPopupProps) {
               setPointIti(
                 'via',
                 pathStepProperties,
-                osrdConfActions,
                 launchPathfinding,
+                setFeatureInfoClick,
                 pathProperties
               )
             }
@@ -156,7 +156,7 @@ function AddPathStepPopup({ pathProperties }: AddPathStepPopupProps) {
           className="btn btn-sm btn-warning"
           type="button"
           onClick={() =>
-            setPointIti('destination', pathStepProperties, osrdConfActions, launchPathfinding)
+            setPointIti('destination', pathStepProperties, launchPathfinding, setFeatureInfoClick)
           }
         >
           <IoFlag />

@@ -1,19 +1,19 @@
 /* eslint-disable import/prefer-default-export */
 import type { ManageTrainSchedulePathProperties } from 'applications/operationalStudies/types';
 import { insertViaFromMap } from 'reducers/osrdconf/helpers';
-import type { ConfSliceActions } from 'reducers/osrdconf/osrdConfCommon';
 import type { PathStep } from 'reducers/osrdconf/types';
 import { store } from 'store';
 import { addElementAtIndex, replaceElementAtIndex } from 'utils/array';
 
+import type { FeatureInfoClick } from '../types';
+
 export function setPointIti(
   pointType: 'origin' | 'destination' | 'via',
   pathStep: PathStep,
-  actions: ConfSliceActions,
   launchPathfinding: (newPathSteps: (PathStep | null)[]) => void,
+  setFeatureInfoClick: React.Dispatch<React.SetStateAction<FeatureInfoClick>>,
   pathProperties?: ManageTrainSchedulePathProperties
 ) {
-  const { updateFeatureInfoClick } = actions;
   const { pathSteps } = store.getState().operationalStudiesConf;
 
   let newPathSteps: (PathStep | null)[];
@@ -32,6 +32,6 @@ export function setPointIti(
         newPathSteps = addElementAtIndex(pathSteps, pathSteps.length - 1, pathStep);
       }
   }
-  store.dispatch(updateFeatureInfoClick({ displayPopup: false }));
+  setFeatureInfoClick({ displayPopup: false });
   launchPathfinding(newPathSteps);
 }

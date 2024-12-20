@@ -47,7 +47,6 @@ const buildCommonConfSelectors = <ConfState extends OsrdConfState>(
     getGridMarginBefore: makeOsrdConfSelector('gridMarginBefore'),
     getGridMarginAfter: makeOsrdConfSelector('gridMarginAfter'),
     getPowerRestriction: makeOsrdConfSelector('powerRestriction'),
-    getFeatureInfoClick: makeOsrdConfSelector('featureInfoClick'),
     getPathSteps,
     getOrigin: (state: RootState) => {
       const pathSteps = getPathSteps(state);
