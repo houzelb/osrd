@@ -68,7 +68,6 @@ export type StdcmResultsOperationalPoint = {
   ch?: string;
   stop?: string | null;
   duration: number;
-  departureTime: string;
   stopEndTime: string;
   trackName?: string;
 };
