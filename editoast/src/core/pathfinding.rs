@@ -9,6 +9,7 @@ use utoipa::ToSchema;
 
 use crate::core::{AsCoreRequest, Json};
 use crate::error::InternalError;
+use crate::views::path::projection::Intersection;
 
 editoast_common::schemas! {
     IncompatibleConstraints,
@@ -260,6 +261,23 @@ impl TrackRange {
 
     pub fn length(&self) -> u64 {
         self.end - self.begin
+    }
+
+    // Check if the 2 track ranges overlap.
+    // Intersection have non-null length and are offsets from the beginning
+    // of the `self` track range.
+    pub fn overlap(&self, track_range: &TrackRange) -> Option<Intersection> {
+        if self.track_section != track_range.track_section {
+            return None;
+        }
+        let begin = std::cmp::max(self.begin, track_range.begin);
+        let end = std::cmp::min(self.end, track_range.end);
+        // In case of equality, we don't consider it an overlap
+        if begin < self.end && end > self.begin {
+            Some(Intersection::from((begin, end)))
+        } else {
+            None
+        }
     }
 }
 
