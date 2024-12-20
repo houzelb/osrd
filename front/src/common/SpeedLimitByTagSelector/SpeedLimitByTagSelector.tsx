@@ -14,7 +14,7 @@ type SpeedLimitByTagSelectorProps = {
   speedLimitsByTags: string[];
   dispatchUpdateSpeedLimitByTag: (newTag: string | null) => void;
   className?: string;
-  isStdcm?: boolean;
+  showPlaceHolder?: boolean;
 };
 
 export default function SpeedLimitByTagSelector({
@@ -24,7 +24,7 @@ export default function SpeedLimitByTagSelector({
   speedLimitsByTags,
   dispatchUpdateSpeedLimitByTag,
   className = '',
-  isStdcm = false,
+  showPlaceHolder = false,
 }: SpeedLimitByTagSelectorProps) {
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
 
@@ -34,7 +34,6 @@ export default function SpeedLimitByTagSelector({
   );
 
   if (!speedLimitsTagsList.length) return null;
-
   return (
     <div className="osrd-config-item">
       <div
@@ -50,7 +49,7 @@ export default function SpeedLimitByTagSelector({
           id="speed-limit-by-tag-selector"
           value={speedLimitByTag || ''}
           label={t('speedLimitByTagAbbrev')}
-          placeholder={isStdcm ? undefined : t('noSpeedLimitByTag')}
+          placeholder={showPlaceholder ? t('noSpeedLimitByTag') : undefined}
           onChange={(e) => {
             if (e) {
               dispatchUpdateSpeedLimitByTag(e);

@@ -25,6 +25,7 @@ const SimulationSettings = ({
         selectedSpeedLimitByTag={speedLimitByTag}
         speedLimitsByTags={speedLimitsByTags}
         dispatchUpdateSpeedLimitByTag={dispatchUpdateSpeedLimitByTag}
+        showPlaceHolder={true}
       />
     </div>
   </div>

@@ -39,7 +39,11 @@ const ConsistCardTitle = ({
   );
 };
 
-const StdcmConsist = ({ consistErrors = {}, disabled = false }: StdcmConfigCardProps) => {
+const StdcmConsist = ({
+  consistErrors = {},
+  disabled = false,
+  isDebugMode,
+}: StdcmConfigCardProps) => {
   const { t } = useTranslation('stdcm');
   const { speedLimitByTag, speedLimitsByTags, dispatchUpdateSpeedLimitByTag } =
     useStoreDataForSpeedLimitByTagSelector({ isStdcm: true });
@@ -216,7 +220,7 @@ const StdcmConsist = ({ consistErrors = {}, disabled = false }: StdcmConfigCardP
           selectedSpeedLimitByTag={speedLimitByTag}
           speedLimitsByTags={speedLimitsByTags}
           dispatchUpdateSpeedLimitByTag={onSpeedLimitByTagChange}
-          isStdcm
+          showPlaceholder={isDebugMode}
         />
         <Input
           id="maxSpeed"
