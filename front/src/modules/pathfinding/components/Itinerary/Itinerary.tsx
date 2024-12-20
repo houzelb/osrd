@@ -24,6 +24,7 @@ import Destination from './DisplayItinerary/Destination';
 import Origin from './DisplayItinerary/Origin';
 import Vias from './DisplayItinerary/Vias';
 import ModalSuggestedVias from './ModalSuggestedVias';
+import type { PathStep } from 'reducers/osrdconf/types';
 
 type ItineraryProps = {
   shouldManageStopDuration?: boolean;
@@ -74,9 +75,22 @@ const Itinerary = ({ shouldManageStopDuration }: ItineraryProps) => {
     }
   };
 
+  // Note: Maybe better to Reverse the itinerary: keep stop times but reset timings to preserve stops,
+  // and ensure margins are adapted correctly
+
   const inverseOD = () => {
     notifyRestrictionResetWarning();
-    const newPathSteps = [...pathSteps].reverse();
+
+    const newPathSteps = [...pathSteps].reverse().map(
+      (step) =>
+        ({
+          ...step,
+          stopFor: undefined,
+          theoreticalMargin: undefined,
+          arrival: undefined,
+          receptionSignal: undefined,
+        }) as PathStep
+    );
     launchPathfinding(newPathSteps);
   };
 
