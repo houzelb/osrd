@@ -29,12 +29,12 @@ const computeOpSchedules = (startTime: Date, msFromStartTime: number) => {
     origin: {
       date: originDate,
       time: originTime,
-      isoArrivalTime: subtractDurationFromDate(startTime, 1800).toISOString(),
+      arrivalDate: subtractDurationFromDate(startTime, 1800),
     },
     destination: {
       date: destinationDate,
       time: destinationTime,
-      isoArrivalTime: addDurationToDate(destinationArrivalTime, 1800).toISOString(),
+      arrivalDate: addDurationToDate(destinationArrivalTime, 1800),
     },
   };
 };

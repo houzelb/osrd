@@ -183,7 +183,7 @@ export type StdcmLinkedTrainExtremity = {
   ch: string;
   date: string;
   geographic: GeoJsonPoint;
-  isoArrivalTime: string;
+  arrivalDate: Date;
   name: string;
   obj_id: string;
   time: string;
