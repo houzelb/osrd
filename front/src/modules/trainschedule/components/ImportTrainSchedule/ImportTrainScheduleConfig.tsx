@@ -327,30 +327,30 @@ const ImportTrainScheduleConfig = ({
       return;
     }
 
-    try {
-      processJsonFile(fileContent, setTrainsJsonData, dispatch, t);
-    } catch {
-      // if file was json, display error message immidiately and return
-      if (file.type === 'application/json') {
-        dispatch(
-          setFailure({
-            name: t('errorMessages.error'),
-            message: t('errorMessages.errorInvalidFile'),
-          })
-        );
-        return;
-      }
+    const fileHasBeenParsed = processJsonFile(
+      fileContent,
+      file.type,
+      setTrainsJsonData,
+      dispatch,
+      t
+    );
 
-      try {
-        await processXmlFile(fileContent, parseRailML, updateTrainSchedules);
-      } catch {
-        dispatch(
-          setFailure({
-            name: t('errorMessages.error'),
-            message: t('errorMessages.errorUnsupportedFileType'),
-          })
-        );
-      }
+    // the file has been processed, return
+    if (fileHasBeenParsed) {
+      return;
+    }
+
+    // try to parse the file as an XML file
+    try {
+      await processXmlFile(fileContent, parseRailML, updateTrainSchedules);
+    } catch {
+      // the file is not supported or is an invalid XML file
+      dispatch(
+        setFailure({
+          name: t('errorMessages.error'),
+          message: t('errorMessages.errorInvalidFile'),
+        })
+      );
     }
   };
   return (
