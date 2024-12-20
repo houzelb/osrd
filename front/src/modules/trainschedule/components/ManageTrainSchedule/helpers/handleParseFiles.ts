@@ -9,23 +9,83 @@ export const handleFileReadingError = (error: Error) => {
   console.error('File reading error:', error);
 };
 
+const TRAIN_SCHEDULE_COMPULSORY_KEYS: (keyof TrainScheduleBase)[] = [
+  'constraint_distribution',
+  'path',
+  'rolling_stock_name',
+  'start_time',
+  'train_name',
+];
+
+const validateTrainSchedules = (
+  importedTrainSchedules: Partial<TrainScheduleBase>[]
+): TrainScheduleBase[] => {
+  const isInvalidTrainSchedules = importedTrainSchedules.some((trainSchedule) => {
+    if (
+      TRAIN_SCHEDULE_COMPULSORY_KEYS.some((key) => !(key in trainSchedule)) ||
+      !Array.isArray(trainSchedule.path)
+    ) {
+      return true;
+    }
+    const hasInvalidSteps = trainSchedule.path.some((step) => !('id' in step));
+    return hasInvalidSteps;
+  });
+
+  if (isInvalidTrainSchedules) {
+    throw new Error('Invalid train schedules: some compulsory keys are missing');
+  }
+  return importedTrainSchedules as TrainScheduleBase[];
+};
+
 export const processJsonFile = (
   fileContent: string,
+  fileExtension: string,
   setTrainsJsonData: (data: TrainScheduleBase[]) => void,
   dispatch: Dispatch,
   t: TFunction
 ) => {
-  const importedTrainSchedules: TrainScheduleBase[] = JSON.parse(fileContent);
-  if (importedTrainSchedules && importedTrainSchedules.length > 0) {
-    setTrainsJsonData(importedTrainSchedules);
-  } else {
+  const isJsonFile = fileExtension === 'application/json';
+
+  // try to parse the file content
+  let rawContent;
+  try {
+    rawContent = JSON.parse(fileContent);
+  } catch {
+    if (isJsonFile) {
+      dispatch(
+        setFailure({
+          name: t('errorMessages.error'),
+          message: t('errorMessages.errorInvalidFile'),
+        })
+      );
+    }
+    return isJsonFile;
+  }
+
+  // validate the trainSchedules
+  try {
+    const importedTrainSchedules = validateTrainSchedules(rawContent);
+    if (importedTrainSchedules.length > 0) {
+      setTrainsJsonData(importedTrainSchedules);
+    } else {
+      dispatch(
+        setFailure({
+          name: t('errorMessages.error'),
+          message: t('errorMessages.errorEmptyFile'),
+        })
+      );
+    }
+  } catch {
     dispatch(
       setFailure({
         name: t('errorMessages.error'),
-        message: t('errorMessages.errorEmptyFile'),
+        message: t('errorMessages.errorInvalidFile'),
       })
     );
   }
+
+  // file has been parsed successfully
+  return true;
 };
 
 export const processXmlFile = async (
