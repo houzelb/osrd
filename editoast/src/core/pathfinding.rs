@@ -157,7 +157,7 @@ pub enum PathfindingNotFound {
 
 /// An oriented range on a track section.
 /// `begin` is always less than `end`.
-#[derive(Serialize, Deserialize, Clone, Debug, ToSchema, Hash, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, ToSchema, Hash, PartialEq, Eq)]
 pub struct TrackRange {
     /// The track section identifier.
     #[schema(inline)]
@@ -178,6 +178,17 @@ impl From<editoast_schemas::infra::DirectionalTrackRange> for TrackRange {
             begin: (value.begin * 1000.).round() as u64,
             end: (value.end * 1000.).round() as u64,
             direction: value.direction,
+        }
+    }
+}
+
+impl std::fmt::Debug for TrackRange {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "'{}+", self.track_section)?;
+        if matches!(self.direction, Direction::StartToStop) {
+            write!(f, "{}-{}'", self.begin, self.end)
+        } else {
+            write!(f, "{}-{}'", self.end, self.begin)
         }
     }
 }
