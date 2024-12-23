@@ -181,7 +181,8 @@ const StdcmView = () => {
   if (error && error.message !== NO_CONFIG_FOUND_MSG) throw error;
 
   return (
-    <div role="button" tabIndex={0} className="stdcm" onClick={() => setShowStatusBanner(false)}>
+    // eslint-disable-next-line jsx-a11y/interactive-supports-focus
+    <div role="button" className="stdcm" onClick={() => setShowStatusBanner(false)}>
       <StdcmHeader
         isDebugMode={isDebugMode}
         onDebugModeToggle={setIsDebugMode}
