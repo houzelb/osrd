@@ -12,7 +12,6 @@ import { getSupportedElectrification, isThermal } from 'modules/rollingStock/hel
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import type { PathStep } from 'reducers/osrdconf/types';
 import { addElementAtIndex } from 'utils/array';
-import { Duration } from 'utils/duration';
 import { getPointCoordinates } from 'utils/geometry';
 
 import getStepLocation from './helpers/getStepLocation';
@@ -94,8 +93,7 @@ export const getPathfindingQuery = ({
 export const upsertPathStepsInOPs = (ops: SuggestedOP[], pathSteps: PathStep[]): SuggestedOP[] => {
   let updatedOPs = [...ops];
   pathSteps.forEach((step) => {
-    const { stopFor, receptionSignal, theoreticalMargin } = step;
-    const arrival = step.arrival ? Duration.parse(step.arrival) : null;
+    const { arrival, stopFor, receptionSignal, theoreticalMargin } = step;
     // We check only for pathSteps added by map click
     if ('track' in step) {
       const formattedStep: SuggestedOP = {

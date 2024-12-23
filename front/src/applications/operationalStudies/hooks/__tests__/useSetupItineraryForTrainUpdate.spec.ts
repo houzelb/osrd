@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
 import type { PathfindingResult } from 'common/api/osrdEditoastApi';
+import { Duration } from 'utils/duration';
 
 import { updatePathStepsFromOperationalPoints } from '../useSetupItineraryForTrainUpdate';
 
@@ -154,7 +155,7 @@ describe('updatePathStepsFrom', () => {
           uic: 87747006,
           secondary_code: 'P2',
           name: '87747006',
-          arrival: '15:00:00',
+          arrival: Duration.parse('PT60S'),
           stopFor: null,
         },
         {
@@ -198,7 +199,7 @@ describe('updatePathStepsFrom', () => {
           uic: 87747006,
           secondary_code: 'P2', // should not be BV here, it has the same uic but not the same ch
           name: 'Grenadille',
-          arrival: '15:00:00',
+          arrival: Duration.parse('PT60S'),
           stopFor: null,
           kp: '129+952',
           positionOnPath: 586000,
@@ -234,7 +235,7 @@ describe('updatePathStepsFrom', () => {
           trigram: 'GE',
           secondary_code: 'P2',
           name: '87747006',
-          arrival: '15:00:00',
+          arrival: Duration.parse('PT60S'),
         },
         {
           id: 'who-0',
@@ -272,7 +273,7 @@ describe('updatePathStepsFrom', () => {
           trigram: 'GE',
           secondary_code: 'P2',
           name: 'Grenadille',
-          arrival: '15:00:00',
+          arrival: Duration.parse('PT60S'),
           kp: '129+952',
           positionOnPath: 586000,
           coordinates: [5.711846462951984, 45.19643525506182],
@@ -303,7 +304,7 @@ describe('updatePathStepsFrom', () => {
           trigram: 'GE',
           secondary_code: 'P2',
           name: '87747006',
-          arrival: '15:00:00',
+          arrival: Duration.parse('PT60S'),
         },
         {
           id: 'who-0',
@@ -341,7 +342,7 @@ describe('updatePathStepsFrom', () => {
           secondary_code: 'P2',
           trigram: 'GE',
           name: '87747006',
-          arrival: '15:00:00',
+          arrival: Duration.parse('PT60S'),
           kp: undefined,
           positionOnPath: 586000,
           coordinates: [5.711846462951984, 45.19643525506182],

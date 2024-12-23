@@ -13,8 +13,8 @@ import type {
   PathItemLocation,
   ReceptionSignal,
 } from 'common/api/osrdEditoastApi';
-import type { IsoDurationString } from 'common/types';
 import type { InfraState } from 'reducers/infra';
+import type { Duration } from 'utils/duration';
 
 export type OsrdConfState = InfraState & {
   projectID?: number;
@@ -56,7 +56,7 @@ export type PathStep = PathItemLocation & {
         It's useful for soft deleting the point (waiting to fix / remove all references)
         If true, the train schedule is consider as invalid and must be edited */
   deleted?: boolean;
-  arrival?: IsoDurationString | null;
+  arrival?: Duration | null;
   locked?: boolean;
   stopFor?: string | null;
   theoreticalMargin?: string;

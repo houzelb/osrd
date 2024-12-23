@@ -32,6 +32,7 @@ import simulationReducer, {
 import type { SimulationResultsState } from 'reducers/simulationResults/types';
 import userReducer, { userInitialState, userSlice } from 'reducers/user';
 import type { UserState } from 'reducers/user';
+import { Duration } from 'utils/duration';
 
 import type { ConfSlice } from './osrdconf/osrdConfCommon';
 
@@ -79,6 +80,15 @@ const operationalStudiesDateTransform = createTransform(
   }),
   { whitelist: ['operationalStudiesConf'] }
 );
+const pathStepsTransform = createTransform(
+  null,
+  (pathSteps: ({ arrival: string } | null)[]) =>
+    pathSteps.map((pathStep) => {
+      if (!pathStep) return null;
+      return { ...pathStep, arrival: pathStep.arrival ? Duration.parse(pathStep.arrival) : null };
+    }),
+  { whitelist: ['pathSteps'] }
+);
 
 // Useful to only blacklist a sub-propertie of osrdconf
 const buildOsrdConfPersistConfig = <T extends OperationalStudiesConfState | OsrdStdcmConfState>(
@@ -86,7 +96,7 @@ const buildOsrdConfPersistConfig = <T extends OperationalStudiesConfState | Osrd
 ): PersistConfig<T> => ({
   key: slice.name,
   storage,
-  transforms: [stdcmPathStepsDateTransform, operationalStudiesDateTransform],
+  transforms: [stdcmPathStepsDateTransform, operationalStudiesDateTransform, pathStepsTransform],
 });
 
 export const persistConfig = {
