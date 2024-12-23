@@ -9,7 +9,7 @@ const formatSchedule = (pathSteps: PathStep[]): TrainScheduleBase['schedule'] =>
     if (step?.arrival || step.stopFor) {
       return {
         at: step.id,
-        arrival: step.arrival ?? undefined,
+        arrival: step.arrival?.toString() ?? undefined,
         locked: step.locked,
         reception_signal: step.receptionSignal,
         stop_for:
