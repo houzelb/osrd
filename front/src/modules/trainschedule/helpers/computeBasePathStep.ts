@@ -1,5 +1,3 @@
-import { omit } from 'lodash';
-
 import type { TrainScheduleResult } from 'common/api/osrdEditoastApi';
 import type { PathStep } from 'reducers/osrdconf/types';
 import { mmToM } from 'utils/physics';
@@ -35,12 +33,6 @@ const computeBasePathStep = (
     reception_signal: receptionSignal,
   } = correspondingSchedule || {};
 
-  const stepWithoutSecondaryCode = omit(step, ['secondary_code']);
-
-  if ('track' in stepWithoutSecondaryCode) {
-    stepWithoutSecondaryCode.offset = mmToM(stepWithoutSecondaryCode.offset!);
-  }
-
   let name;
   if ('trigram' in step) {
     name = step.trigram + (step.secondary_code ? `/${step.secondary_code}` : '');
@@ -56,8 +48,8 @@ const computeBasePathStep = (
   }
 
   return {
-    ...stepWithoutSecondaryCode,
-    secondary_code: 'secondary_code' in step ? step.secondary_code : undefined,
+    ...step,
+    ...('track' in step ? { offset: mmToM(step.offset) } : null),
     name,
     arrival, // ISODurationString
     stopFor: stopFor ? ISO8601Duration2sec(stopFor).toString() : stopFor,
