@@ -148,7 +148,6 @@ describe('simulationConfReducer', () => {
         offset: 426.443,
         stopFor: 'PT5M',
         coordinates: [47.99542250806296, 0.1918181738752042],
-        arrival: newVia.arrival,
         locked: newVia.locked,
         deleted: newVia.deleted,
         name: newVia.name,
