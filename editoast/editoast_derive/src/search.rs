@@ -16,6 +16,8 @@ use syn::DeriveInput;
 )]
 struct SearchParams {
     table: String,
+    #[darling(default)]
+    distinct_on: Option<String>,
     migration: Option<Migration>,
     #[darling(default)]
     joins: String,
@@ -165,6 +167,9 @@ pub fn expand_search(input: &DeriveInput) -> Result<TokenStream> {
 
     let struct_name = &input.ident;
     let table = params.table;
+    let distinct_on = params
+        .distinct_on
+        .map_or_else(|| quote! { None }, |d| quote! { Some(#d.to_owned()) });
     let joins = match params.joins {
         ref joins if !joins.is_empty() => quote! { Some(#joins.to_owned()) },
         _ => quote! { None },
@@ -286,6 +291,7 @@ pub fn expand_search(input: &DeriveInput) -> Result<TokenStream> {
             fn search_config() -> editoast_search::SearchConfig {
                 editoast_search::SearchConfig {
                     table: #table.to_owned(),
+                    distinct_on: #distinct_on,
                     joins: #joins,
                     criterias: Vec::from([#criterias]),
                     properties: Vec::from([#properties]),
