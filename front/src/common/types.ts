@@ -15,12 +15,6 @@ export const DATA_TYPES = {
  */
 export type TimeString = string;
 
-/**
- * A ISO 8601 duration string
- * @example "PT3600S"
- */
-export type IsoDurationString = string;
-
 export type RangedValue = {
   begin: number;
   end: number;
