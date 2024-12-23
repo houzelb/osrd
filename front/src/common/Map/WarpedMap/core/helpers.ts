@@ -28,6 +28,7 @@ export type Grids = {
   original: GridFeature;
 };
 export type PointsGrid = Record<number, Position>[];
+export type BBox2d = [number, number, number, number];
 
 /*
  * Path manipulation helpers:

@@ -1,6 +1,5 @@
 import bbox from '@turf/bbox';
 import { lineString } from '@turf/helpers';
-import type { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
 import simplify from '@turf/simplify';
 import type { Feature, FeatureCollection, Geometry, LineString, Position } from 'geojson';
 
@@ -11,7 +10,7 @@ import {
   pointsGridToZone,
   straightenGrid,
 } from 'common/Map/WarpedMap/core/grids';
-import { extendLine, getSamples } from 'common/Map/WarpedMap/core/helpers';
+import { extendLine, getSamples, type BBox2d } from 'common/Map/WarpedMap/core/helpers';
 import { clipAndProjectGeoJSON, projectBetweenGrids } from 'common/Map/WarpedMap/core/projection';
 import { getQuadTree } from 'common/Map/WarpedMap/core/quadtree';
 

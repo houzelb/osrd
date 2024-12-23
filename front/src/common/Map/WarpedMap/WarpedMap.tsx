@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { featureCollection } from '@turf/helpers';
-import type { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
 import type { Feature, FeatureCollection, LineString } from 'geojson';
 import { groupBy, map, omit } from 'lodash';
 import type { LngLatBoundsLike } from 'maplibre-gl';
@@ -16,6 +15,7 @@ import { EditorSource, SourcesDefinitionsIndex } from 'common/Map/Layers/GeoJSON
 import OrderedLayer, { type OrderedLayerProps } from 'common/Map/Layers/OrderedLayer';
 import { genOSMLayerProps } from 'common/Map/Layers/OSM';
 import type { LayerContext } from 'common/Map/Layers/types';
+import type { BBox2d } from 'common/Map/WarpedMap/core/helpers';
 import { LAYERS, LAYER_ENTITIES_ORDERS, LAYER_GROUPS_ORDER } from 'config/layerOrder';
 import RenderItinerary from 'modules/simulationResult/components/SimulationResultsMap/RenderItinerary';
 import TrainHoverPosition from 'modules/simulationResult/components/SimulationResultsMap/TrainHoverPosition';
