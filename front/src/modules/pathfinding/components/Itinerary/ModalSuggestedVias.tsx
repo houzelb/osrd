@@ -27,7 +27,7 @@ const ModalSuggestedVias = ({ suggestedVias, launchPathfinding }: ModalSuggested
   const dispatch = useAppDispatch();
   const vias = useSelector(getVias());
   const destination = useSelector(getDestination);
-  const pathSteps = useSelector(getPathSteps) as PathStep[]; // this modal can't be open if we miss origin or destination;
+  const pathSteps = useSelector(getPathSteps);
   const { t } = useTranslation('operationalStudies/manageTrainSchedule');
 
   const isOriginOrDestination = useCallback(
@@ -37,7 +37,7 @@ const ModalSuggestedVias = ({ suggestedVias, launchPathfinding }: ModalSuggested
   );
 
   const removeViaFromPath = (op: SuggestedOP) => {
-    const newPathSteps = pathSteps.filter((step) => !matchPathStepAndOp(step, op));
+    const newPathSteps = pathSteps.filter((step) => !matchPathStepAndOp(step!, op));
     launchPathfinding(newPathSteps);
   };
 
