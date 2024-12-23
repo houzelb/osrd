@@ -35,7 +35,7 @@ type ManageTrainScheduleProps = {
 
 const ManageTrainSchedule = ({ trainIdToEdit }: ManageTrainScheduleProps) => {
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
-  const { pathProperties, voltageRanges } = useManageTrainScheduleContext();
+  const { pathProperties, voltageRanges, allWaypoints } = useManageTrainScheduleContext();
 
   const { getOrigin, getDestination, getPathSteps } = useOsrdConfSelectors();
   const origin = useSelector(getOrigin);
@@ -120,7 +120,7 @@ const ManageTrainSchedule = ({ trainIdToEdit }: ManageTrainScheduleProps) => {
     // If pathProperties is defined we know that pathSteps won't have any null values
     content: (
       <TimesStopsInput
-        allWaypoints={pathProperties?.allWaypoints}
+        allWaypoints={allWaypoints}
         startTime={new Date(startTime)}
         pathSteps={compact(pathSteps)}
       />
