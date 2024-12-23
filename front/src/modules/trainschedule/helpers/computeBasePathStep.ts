@@ -22,7 +22,7 @@ const findCorrespondingMargin = (
 const computeBasePathStep = (
   trainSchedule: Pick<TrainScheduleResult, 'path' | 'schedule' | 'margins'>,
   pathItemIndex: number
-) => {
+): PathStep => {
   const step = trainSchedule.path[pathItemIndex];
   const correspondingSchedule = trainSchedule.schedule?.find((schedule) => schedule.at === step.id);
 
@@ -56,7 +56,7 @@ const computeBasePathStep = (
     locked,
     receptionSignal,
     theoreticalMargin,
-  } as PathStep;
+  };
 };
 
 export default computeBasePathStep;
