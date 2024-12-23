@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { PathStep } from 'reducers/osrdconf/types';
+import { Duration } from 'utils/duration';
 
 import formatSchedule from '../formatSchedule';
 
@@ -31,7 +32,7 @@ describe('formatSchedule', () => {
           kp: '117+422',
           name: 'V',
           positionOnPath: 13116000,
-          arrival: 'PT60S',
+          arrival: Duration.parse('PT60S'),
           stopFor: '0',
           locked: false,
           receptionSignal: 'OPEN',
@@ -40,7 +41,7 @@ describe('formatSchedule', () => {
       const result = formatSchedule(pathSteps);
       expect(result).toEqual([
         {
-          arrival: 'PT60S',
+          arrival: 'PT1M',
           at: 'id332',
           locked: false,
           reception_signal: 'OPEN',

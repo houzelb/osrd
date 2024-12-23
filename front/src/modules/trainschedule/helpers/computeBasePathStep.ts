@@ -1,5 +1,6 @@
 import type { TrainScheduleResult } from 'common/api/osrdEditoastApi';
 import type { PathStep } from 'reducers/osrdconf/types';
+import { Duration } from 'utils/duration';
 import { mmToM } from 'utils/physics';
 import { ISO8601Duration2sec } from 'utils/timeManipulation';
 
@@ -51,7 +52,7 @@ const computeBasePathStep = (
     ...step,
     ...('track' in step ? { offset: mmToM(step.offset) } : null),
     name,
-    arrival, // ISODurationString
+    arrival: arrival ? Duration.parse(arrival) : null,
     stopFor: stopFor ? ISO8601Duration2sec(stopFor).toString() : stopFor,
     locked,
     receptionSignal,

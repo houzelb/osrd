@@ -71,13 +71,13 @@ export function upsertPathStep(statePathSteps: (PathStep | null)[], op: Suggeste
       'name',
       'kp',
       'stopFor',
+      'arrival',
       'locked',
       'deleted',
       'receptionSignal',
       'theoreticalMargin',
     ]),
     id: nextId(),
-    arrival: op.arrival?.toISOString(),
     ...(op.uic
       ? { uic: op.uic, secondary_code: op.ch }
       : {

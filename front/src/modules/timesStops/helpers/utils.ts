@@ -79,12 +79,7 @@ export const formatSuggestedViasToRowVias = (
     const { arrival, receptionSignal, stopFor, theoreticalMargin } = objectToUse || {};
 
     const isMarginValid = theoreticalMargin ? marginRegExValidation.test(theoreticalMargin) : true;
-    const rawArrivalDuration = i === 0 ? Duration.zero : arrival;
-    // TODO: turn PathStep.arrival into a Duration instead of a string
-    const arrivalDuration =
-      typeof rawArrivalDuration === 'string'
-        ? Duration.parse(rawArrivalDuration)
-        : rawArrivalDuration;
+    const arrivalDuration = i === 0 ? Duration.zero : arrival;
     const arrivalInSeconds = arrivalDuration ? msToS(arrivalDuration.ms) : null;
 
     const formattedArrival = calculateStepTimeAndDays(startTime, arrivalDuration);
