@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
 import { type TimesStopsInputRow } from 'modules/timesStops/types';
+import { Duration } from 'utils/duration';
 
 import {
   updateRowTimesAndMargin,
@@ -820,7 +821,7 @@ describe('durationSinceStartTime', () => {
 
     const result = durationSinceStartTime(startTime, stepTimeDays);
 
-    expect(result).toBe('PT36000S');
+    expect(result).toEqual(Duration.parse('PT36000S'));
   });
 
   it('should return the correct duration. daySinceDeparture 1', () => {
@@ -832,14 +833,14 @@ describe('durationSinceStartTime', () => {
 
     const result = durationSinceStartTime(startTime, stepTimeDays);
 
-    expect(result).toBe('PT90000S');
+    expect(result).toEqual(Duration.parse('PT90000S'));
   });
 });
 
 describe('calculateStepTimeDays', () => {
   it('should return correct time and daySinceDeparture', () => {
     const startTime = new Date('2023-09-01T10:00:00Z');
-    const isoDuration = 'PT36000S'; // 10 hours
+    const isoDuration = Duration.parse('PT36000S'); // 10 hours
 
     const result = calculateStepTimeAndDays(startTime, isoDuration);
 
@@ -851,7 +852,7 @@ describe('calculateStepTimeDays', () => {
 
   it('should return correct time and daySinceDeparture, daySinceDeparture 1', () => {
     const startTime = new Date('2023-09-01T10:00:00Z');
-    const isoDuration = 'PT122400S'; // 1 day 10 hours
+    const isoDuration = Duration.parse('PT122400S'); // 1 day 10 hours
 
     const result = calculateStepTimeAndDays(startTime, isoDuration);
 

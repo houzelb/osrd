@@ -1,7 +1,7 @@
 import type { Feature, Position } from 'geojson';
 
 import type { ReceptionSignal, TrainScheduleBase } from 'common/api/osrdEditoastApi';
-import type { IsoDurationString } from 'common/types';
+import type { Duration } from 'utils/duration';
 
 export type SuggestedOP = {
   pathStepId?: string;
@@ -24,7 +24,7 @@ export type SuggestedOP = {
         It's useful for soft deleting the point (waiting to fix / remove all references)
         If true, the train schedule is consider as invalid and must be edited */
   deleted?: boolean;
-  arrival?: IsoDurationString | null; // value asked by user, number of seconds since departure
+  arrival?: Duration | null; // value asked by user, number of seconds since departure
   locked?: boolean;
   stopFor?: string | null; // value asked by user
   theoreticalMargin?: string; // value asked by user

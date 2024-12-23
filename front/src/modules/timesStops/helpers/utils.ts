@@ -5,16 +5,16 @@ import { round, isEqual, isNil } from 'lodash';
 import { keyColumn, createTextColumn } from 'react-datasheet-grid';
 
 import type { ReceptionSignal } from 'common/api/osrdEditoastApi';
-import type { IsoDurationString, TimeString } from 'common/types';
+import type { TimeString } from 'common/types';
 import { matchPathStepAndOp } from 'modules/pathfinding/utils';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import type { PathStep } from 'reducers/osrdconf/types';
+import { Duration } from 'utils/duration';
+import { msToS } from 'utils/physics';
 import { NO_BREAK_SPACE } from 'utils/strings';
 import {
-  calculateTimeDifferenceInSeconds,
   datetime2sec,
   durationInSeconds,
-  formatDurationAsISO8601,
   sec2time,
   SECONDS_IN_A_DAY,
   secToHoursString,
@@ -79,10 +79,15 @@ export const formatSuggestedViasToRowVias = (
     const { arrival, receptionSignal, stopFor, theoreticalMargin } = objectToUse || {};
 
     const isMarginValid = theoreticalMargin ? marginRegExValidation.test(theoreticalMargin) : true;
-    const durationArrivalTime = i === 0 ? 'PT0S' : arrival;
-    const arrivalInSeconds = durationArrivalTime ? time2sec(durationArrivalTime) : null;
+    const rawArrivalDuration = i === 0 ? Duration.zero : arrival;
+    // TODO: turn PathStep.arrival into a Duration instead of a string
+    const arrivalDuration =
+      typeof rawArrivalDuration === 'string'
+        ? Duration.parse(rawArrivalDuration)
+        : rawArrivalDuration;
+    const arrivalInSeconds = arrivalDuration ? msToS(arrivalDuration.ms) : null;
 
-    const formattedArrival = calculateStepTimeAndDays(startTime, durationArrivalTime);
+    const formattedArrival = calculateStepTimeAndDays(startTime, arrivalDuration);
 
     const departureTime =
       stopFor && arrivalInSeconds
@@ -282,7 +287,7 @@ export function updateDaySinceDeparture(
 export function durationSinceStartTime(
   startTime?: Date,
   stepTimeDays?: TimeExtraDays
-): IsoDurationString | null {
+): Duration | null {
   if (!startTime || !stepTimeDays?.time || stepTimeDays?.daySinceDeparture === undefined) {
     return null;
   }
@@ -291,23 +296,21 @@ export function durationSinceStartTime(
     stepTimeDays.daySinceDeparture,
     'day'
   );
-  return formatDurationAsISO8601(
-    calculateTimeDifferenceInSeconds(start.toISOString(), step.toISOString())
-  );
+  return Duration.subtractDate(step.toDate(), startTime);
 }
 
 export function calculateStepTimeAndDays(
   startTime?: Date | null,
-  isoDuration?: IsoDurationString | null
+  duration?: Duration | null
 ): TimeExtraDays | undefined {
-  if (!startTime || !isoDuration) {
+  if (!startTime || !duration) {
     return undefined;
   }
 
   const start = dayjs(startTime);
-  const duration = dayjs.duration(isoDuration);
+  const dur = dayjs.duration(duration.ms);
 
-  const waypointArrivalTime = start.add(duration);
+  const waypointArrivalTime = start.add(dur);
   const daySinceDeparture = waypointArrivalTime.diff(start, 'day');
   const time: TimeString = waypointArrivalTime.format('HH:mm:ss');
 
