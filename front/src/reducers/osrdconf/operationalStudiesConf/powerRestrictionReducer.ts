@@ -129,7 +129,7 @@ export function builPowerRestrictionReducer<S extends OsrdConfState>(): PowerRes
         (restriction) => restriction.from !== from.id && restriction.to !== to.id
       );
 
-      const newPathSteps = [...state.pathSteps] as PathStep[];
+      const newPathSteps = [...state.pathSteps].map((step) => step!);
       state.pathSteps = cleanPathSteps(newPathSteps, newPowerRestrictionRanges);
       state.powerRestriction = newPowerRestrictionRanges;
     },
@@ -146,7 +146,7 @@ export function builPowerRestrictionReducer<S extends OsrdConfState>(): PowerRes
 
       // pathSteps should not be undefined or have null values
       if (state.pathSteps && !state.pathSteps.some((pathStep) => !pathStep)) {
-        let newPathSteps = [...state.pathSteps] as PathStep[];
+        let newPathSteps = [...state.pathSteps].map((step) => step!);
         let newPowerRestrictionRanges = state.powerRestriction.filter(
           (restriction) =>
             !isEqual(restriction, firstRestriction) || !isEqual(restriction, secondRestriction)
@@ -196,7 +196,7 @@ export function builPowerRestrictionReducer<S extends OsrdConfState>(): PowerRes
 
       // pathSteps should not be undefined or have null values
       if (state.pathSteps && !state.pathSteps.some((pathStep) => !pathStep)) {
-        let newPathSteps = [...state.pathSteps] as PathStep[];
+        let newPathSteps = [...state.pathSteps].map((step) => step!);
         let newPowerRestrictionRanges = state.powerRestriction.filter(
           (restriction) =>
             !isEqual(restriction, firstRestriction) || !isEqual(restriction, secondRestriction)
