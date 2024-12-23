@@ -1,11 +1,9 @@
 import { useEffect } from 'react';
 
 import { type Position } from '@turf/helpers';
-import { omit } from 'lodash';
 
 import {
   osrdEditoastApi,
-  type PathItemLocation,
   type PostInfraByInfraIdPathPropertiesApiArg,
   type PostInfraByInfraIdPathfindingBlocksApiArg,
   type RollingStockWithLiveries,
@@ -145,9 +143,8 @@ const useSetupItineraryForTrainUpdate = (trainIdToEdit: number) => {
       const params: PostInfraByInfraIdPathfindingBlocksApiArg = {
         infraId,
         pathfindingInput: {
-          path_items: trainSchedule.path.map((item) =>
-            omit(item, ['id', 'deleted'])
-          ) as PathItemLocation[],
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          path_items: trainSchedule.path.map(({ id, deleted, ...item }) => item),
           rolling_stock_is_thermal: isThermal(rollingStock.effort_curves.modes),
           rolling_stock_loading_gauge: rollingStock.loading_gauge,
           rolling_stock_supported_electrifications: getSupportedElectrification(
