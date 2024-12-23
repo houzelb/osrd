@@ -25,7 +25,6 @@ export type SuggestedOP = {
         If true, the train schedule is consider as invalid and must be edited */
   deleted?: boolean;
   arrival?: IsoDurationString | null; // value asked by user, number of seconds since departure
-  departure?: IsoDurationString | null; // value asked by user, number of seconds since departure
   locked?: boolean;
   stopFor?: string | null; // value asked by user
   theoreticalMargin?: string; // value asked by user
