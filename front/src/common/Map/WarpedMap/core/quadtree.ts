@@ -1,7 +1,8 @@
 /* eslint-disable prefer-destructuring, no-plusplus */
 import bbox from '@turf/bbox';
-import type { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
 import type { Feature, FeatureCollection, GeoJsonProperties, Geometry, Position } from 'geojson';
+
+import type { BBox2d } from 'common/Map/WarpedMap/core/helpers';
 
 // The following types help describing a full QuadTree:
 export type Leaf<T> = {

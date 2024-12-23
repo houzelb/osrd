@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 
 import bbox from '@turf/bbox';
 import { lineString } from '@turf/helpers';
-import type { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
 import length from '@turf/length';
 import type { Feature, FeatureCollection, LineString } from 'geojson';
 import { clamp, first, isEmpty, isNil, last, mapValues, omitBy } from 'lodash';
@@ -13,7 +12,7 @@ import { useSelector } from 'react-redux';
 import type { Layer } from 'applications/editor/consts';
 import { type GeoJsonLineStringValue, type PathProperties } from 'common/api/osrdEditoastApi';
 import { LoaderFill } from 'common/Loaders';
-import { getImprovedOSRDData } from 'common/Map/WarpedMap/core/helpers';
+import { getImprovedOSRDData, type BBox2d } from 'common/Map/WarpedMap/core/helpers';
 import DataLoader from 'common/Map/WarpedMap/DataLoader';
 import type { WarpingFunction } from 'common/Map/WarpedMap/getWarping';
 import getWarping from 'common/Map/WarpedMap/getWarping';

@@ -2,7 +2,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { featureCollection } from '@turf/helpers';
-import type { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
 import type { FeatureCollection } from 'geojson';
 import { uniqBy } from 'lodash';
 import { createPortal } from 'react-dom';
@@ -17,7 +16,7 @@ import colors from 'common/Map/Consts/colors';
 import { useMapBlankStyle } from 'common/Map/Layers/blankStyle';
 import GeoJSONs from 'common/Map/Layers/GeoJSONs';
 import OrderedLayer from 'common/Map/Layers/OrderedLayer';
-import { simplifyFeature } from 'common/Map/WarpedMap/core/helpers';
+import { simplifyFeature, type BBox2d } from 'common/Map/WarpedMap/core/helpers';
 import { useInfraID } from 'common/osrdContext';
 import { getMap } from 'reducers/map/selectors';
 

@@ -1,9 +1,8 @@
 import turfBbox from '@turf/bbox';
 import { featureCollection, type Units } from '@turf/helpers';
-import type { BBox2d } from '@turf/helpers/dist/js/lib/geojson';
 import length from '@turf/length';
 import type { NearestPoint } from '@turf/nearest-point';
-import type { Feature, LineString, Point } from 'geojson';
+import type { Feature, LineString, Point, BBox } from 'geojson';
 import { uniq } from 'lodash';
 import type { LngLatBoundsLike, MapLayerMouseEvent } from 'maplibre-gl';
 import type { MapRef } from 'react-map-gl/maplibre';
@@ -245,7 +244,7 @@ export function openEntityEditionPanel(
 /**
  * Given an array of editor entities, return the bbox which fits all of their geo elements.
  */
-function getLargestBbox(entities: EditorEntity[]): BBox2d {
+function getLargestBbox(entities: EditorEntity[]): BBox {
   const bboxList = entities.map((entity) => turfBbox(entity.geometry));
 
   let [minLeft, minBottom, minRight, minTop] = bboxList[0];
@@ -256,7 +255,7 @@ function getLargestBbox(entities: EditorEntity[]): BBox2d {
     if (right > minRight) minRight = right;
     if (top > minTop) minTop = top;
   });
-  return [minLeft, minBottom, minRight, minTop] as BBox2d;
+  return [minLeft, minBottom, minRight, minTop];
 }
 
 /**
