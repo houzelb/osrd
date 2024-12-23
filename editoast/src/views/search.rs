@@ -430,11 +430,11 @@ pub(super) struct SearchResultItemTrack {
 #[derive(Search, Serialize, ToSchema)]
 #[search(
     table = "search_operational_point",
+    distinct_on = "(infra_id, obj_id)",
     migration(src_table = "infra_object_operational_point"),
     joins = "
         INNER JOIN infra_object_operational_point AS OP ON OP.id = search_operational_point.id
-        INNER JOIN (SELECT DISTINCT ON (infra_id, obj_id) * FROM infra_layer_operational_point)
-            AS lay ON OP.obj_id = lay.obj_id AND OP.infra_id = lay.infra_id",
+        INNER JOIN infra_layer_operational_point AS lay ON OP.obj_id = lay.obj_id AND OP.infra_id = lay.infra_id",
     column(
         name = "obj_id",
         data_type = "varchar(255)",

@@ -71,13 +71,17 @@ pub fn query_into_sql(
     }
     let where_expression = context.search_ast_to_sql(&ast)?;
     let table = &search_config.table;
+    let select = search_config.distinct_on.as_ref().map_or_else(
+        || "SELECT".to_owned(),
+        |columns| format!("SELECT DISTINCT ON {columns}"),
+    );
     let joins = search_config.joins.as_ref().cloned().unwrap_or_default();
     let result_columns = search_config.result_columns();
     let mut bindings = Default::default();
     let constraints = where_expression.to_sql(&mut bindings);
     let sql_code = format!(
         "WITH _RESULT AS (
-            SELECT {result_columns}
+            {select} {result_columns}
             FROM {table}
             {joins}
             WHERE {constraints}

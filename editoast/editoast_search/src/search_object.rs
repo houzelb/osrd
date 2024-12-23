@@ -18,6 +18,7 @@ pub struct Property {
 
 pub struct SearchConfig {
     pub table: String,
+    pub distinct_on: Option<String>,
     pub criterias: Vec<Criteria>,
     pub properties: Vec<Property>,
     pub joins: Option<String>,
