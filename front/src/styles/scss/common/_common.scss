@@ -1,7 +1,6 @@
-@import 'map/map';
-@import 'map/popup';
-@import 'map/popup';
-@import 'rc-slider';
+@use 'map/map';
+@use 'map/popup';
+@use 'rc-slider';
 
 .osrd-config-item {
   position: relative;

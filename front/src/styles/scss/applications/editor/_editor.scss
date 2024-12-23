@@ -1,5 +1,5 @@
-@import './editorForm';
-@import './speedSection';
+@use 'editorForm';
+@use 'speedSection';
 
 .editor-root {
   $blue: var(--primary);
