@@ -99,7 +99,7 @@ class OperationalStudiesPage extends CommonPage {
   }
 
   async checkTrainHasBeenAdded() {
-    this.checkLastToastTitle(trainAddedTranslation);
+    await this.checkLastToastTitle(trainAddedTranslation);
   }
 
   async returnSimulationResult() {
