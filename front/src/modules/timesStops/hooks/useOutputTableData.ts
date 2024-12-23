@@ -88,7 +88,6 @@ const useOutputTableData = (
         pathStepId: pathStep.id,
         name: t('waypoint', { id: pathStep.id }),
         ch: undefined,
-        isWaypoint: true,
 
         arrival,
         departure,
@@ -144,7 +143,6 @@ const useOutputTableData = (
         const calculatedArrival = new Date(startDatetime.getTime() + time);
 
         return {
-          isWaypoint: false,
           opId: op.id,
           name: op.extensions?.identifier?.name,
           ch: op.extensions?.sncf?.ch,

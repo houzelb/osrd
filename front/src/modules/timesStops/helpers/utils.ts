@@ -37,7 +37,7 @@ const matchPathStepAndOpWithKP = (step: PathStep, op: SuggestedOP) => {
 };
 
 export const formatSuggestedViasToRowVias = (
-  operationalPoints: (SuggestedOP & { isWaypoint?: boolean })[],
+  operationalPoints: SuggestedOP[],
   pathSteps: PathStep[],
   t: TFunction<'timesStops', undefined>,
   startTime?: Date,
@@ -103,7 +103,6 @@ export const formatSuggestedViasToRowVias = (
       shortSlipDistance,
       stopFor,
       theoreticalMargin,
-      isWaypoint: op.isWaypoint || pathStep !== undefined,
     };
   });
 };

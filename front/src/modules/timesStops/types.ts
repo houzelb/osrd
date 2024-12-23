@@ -15,7 +15,6 @@ export type TimesStopsRow = {
   name?: string;
   ch?: string;
   trackName?: string;
-  isWaypoint: boolean;
 
   arrival?: TimeExtraDays; // value asked by user
   departure?: TimeExtraDays; // value asked by user

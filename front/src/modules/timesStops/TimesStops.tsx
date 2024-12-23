@@ -63,7 +63,7 @@ const TimesStops = <T extends TimesStopsRow>({
       headerRowHeight={headerRowHeight}
       rowClassName={({ rowData, rowIndex }) =>
         cx({
-          activeRow: rowData.isWaypoint,
+          activeRow: Boolean(rowData.pathStepId),
           oddRow: (rowIndex + 1) % 2,
         })
       }
