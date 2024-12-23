@@ -304,7 +304,7 @@ private fun parseSteps(
     return pathItems
         .map {
             STDCMStep(
-                findWaypointBlocks(infra, it.locations),
+                findWaypointBlocks(infra, it.locations), // TODO: use moveWaypointBlockToNextSignal()
                 it.stopDuration?.seconds,
                 it.stopDuration != null,
                 if (it.stepTimingData != null)
@@ -369,7 +369,7 @@ private fun checkForConflicts(
 
 private fun findWaypointBlocks(
     infra: FullInfra,
-    waypoints: Collection<TrackLocation>
+    waypoints: Collection<TrackLocation>,
 ): Set<PathfindingEdgeLocationId<Block>> {
     val waypointBlocks = HashSet<PathfindingEdgeLocationId<Block>>()
     for (waypoint in waypoints) {
