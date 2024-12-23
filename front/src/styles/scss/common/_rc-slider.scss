@@ -1,12 +1,15 @@
+@use 'sass:color';
+@use '../variables';
+
 @use 'sass:map';
 
 $prefixClass: rc-slider;
 
 $disabledColor: #ccc;
 $border-radius-base: 6px;
-$primary-color: map.get($colors, 'green');
+$primary-color: map.get(variables.$colors, 'green');
 $tooltip-color: #fff;
-$tooltip-bg: mix(white, #666, 4%);
+$tooltip-bg: color.mix(white, #666, 4%);
 $tooltip-arrow-width: 4px;
 $tooltip-distance: $tooltip-arrow-width + 4;
 $tooltip-arrow-color: $tooltip-bg;
@@ -43,7 +46,7 @@ $ease-in-quint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
   &-track {
     position: absolute;
     height: 4px;
-    background-color: mix(white, $primary-color, 0%);
+    background-color: color.mix(white, $primary-color, 0%);
     border-radius: $border-radius-base;
   }
 
@@ -63,7 +66,7 @@ $ease-in-quint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
     height: 14px;
     margin-top: -5px;
     background-color: #fff;
-    border: solid 2px mix(white, $primary-color, 0%);
+    border: solid 2px color.mix(white, $primary-color, 0%);
     border-radius: 50%;
     cursor: pointer;
     cursor: -webkit-grab;
@@ -72,8 +75,8 @@ $ease-in-quint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
     touch-action: pan-x;
 
     &-dragging {
-      border-color: mix(white, $primary-color, 0%);
-      box-shadow: 0 0 0 5px mix(white, $primary-color, 0%);
+      border-color: color.mix(white, $primary-color, 0%);
+      box-shadow: 0 0 0 5px color.mix(white, $primary-color, 0%);
     }
 
     &:focus {
@@ -83,21 +86,21 @@ $ease-in-quint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
 
     &:focus-visible {
       border-color: $primary-color;
-      box-shadow: 0 0 0 3px mix(white, $primary-color, 0%);
+      box-shadow: 0 0 0 3px color.mix(white, $primary-color, 0%);
     }
 
     &-click-focused:focus {
-      border-color: mix(white, $primary-color, 0%);
+      border-color: color.mix(white, $primary-color, 0%);
       box-shadow: unset;
     }
 
     &:hover {
-      border-color: mix(white, $primary-color, 0%);
+      border-color: color.mix(white, $primary-color, 0%);
     }
 
     &:active {
-      border-color: mix(white, $primary-color, 20%);
-      box-shadow: 0 0 5px mix(white, $primary-color, 20%);
+      border-color: color.mix(white, $primary-color, 20%);
+      box-shadow: 0 0 5px color.mix(white, $primary-color, 20%);
       cursor: -webkit-grabbing;
       cursor: grabbing;
     }
@@ -114,13 +117,13 @@ $ease-in-quint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
   &-mark-text {
     position: absolute;
     display: inline-block;
-    color: map.get($colors, 'coolgray9');
+    color: map.get(variables.$colors, 'coolgray9');
     text-align: center;
     vertical-align: middle;
     cursor: pointer;
     font-weight: 500;
     &-active {
-      color: map.get($colors, 'coolgray11');
+      color: map.get(variables.$colors, 'coolgray11');
     }
   }
 
@@ -142,7 +145,7 @@ $ease-in-quint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
     border-radius: 50%;
     cursor: pointer;
     &-active {
-      border-color: mix(white, $primary-color, 0%);
+      border-color: color.mix(white, $primary-color, 0%);
     }
     &-reverse {
       margin-right: -4px;

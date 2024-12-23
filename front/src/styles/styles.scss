@@ -1,19 +1,19 @@
 @use '../modules/modules.scss';
 @use '../common/common.scss';
 
-@import 'scss/fonts';
-@import 'scss/variables';
-@import 'scss/overrideBootstrapSNCF';
-@import 'scss/body';
-@import 'scss/home';
-@import 'scss/common/common';
-@import 'scss/common/components';
+@use 'scss/fonts';
+@use 'scss/variables';
+@use 'scss/overrideBootstrapSNCF';
+@use 'scss/body';
+@use 'scss/home';
+@use 'scss/common/common' as common2;
+@use 'scss/common/components';
 
-@import 'scss/applications/editor/editor';
-@import 'scss/applications/operationalStudies';
-@import 'scss/applications/rollingStockEditor/rollingStockForm';
-@import 'scss/applications/stdcm';
-@import 'scss/_uiManchette.scss';
-@import 'scss/uiSpeedSpaceChart.scss';
-@import 'scss/uiSpaceTimeChart';
-@import 'scss/_uiCoreIntegration.scss';
+@use 'scss/applications/editor/editor';
+@use 'scss/applications/operationalStudies';
+@use 'scss/applications/rollingStockEditor/rollingStockForm';
+@use 'scss/applications/stdcm';
+@use 'scss/_uiManchette.scss';
+@use 'scss/uiSpeedSpaceChart.scss';
+@use 'scss/uiSpaceTimeChart';
+@use 'scss/_uiCoreIntegration.scss';

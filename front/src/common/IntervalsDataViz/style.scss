@@ -1,3 +1,4 @@
+@use 'sass:string';
 // SNCF color blue green
 $color: var(--primary);
 // SNCF color green
@@ -15,7 +16,7 @@ $resize-width: 3px;
 
 // lighten ~ mix with white function
 @function mixw($variable, $opacity) {
-  @return unquote(
+  @return string.unquote(
     'linear-gradient(to top,rgba(255, 255, 255,' + $opacity + '),rgba(255, 255, 255,' + $opacity +
       ')) ' + $variable
   );
