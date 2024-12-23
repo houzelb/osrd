@@ -1,10 +1,16 @@
 import { createContext, useContext, useMemo, type ReactNode, useState } from 'react';
 
+import { compact } from 'lodash';
+import { useSelector } from 'react-redux';
+
 import type { InfraWithState } from 'common/api/osrdEditoastApi';
+import { useOsrdConfSelectors } from 'common/osrdContext';
 import type { RangedValue } from 'common/types';
 import getPathVoltages from 'modules/pathfinding/helpers/getPathVoltages';
 import usePathfinding from 'modules/pathfinding/hooks/usePathfinding';
 import type { PathfindingState } from 'modules/pathfinding/types';
+import { upsertPathStepsInOPs } from 'modules/pathfinding/utils';
+import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import type { PathStep } from 'reducers/osrdconf/types';
 
 import type { ManageTrainSchedulePathProperties } from '../types';
@@ -16,6 +22,8 @@ type ManageTrainScheduleContextType = {
   launchPathfinding: (pathSteps: (PathStep | null)[]) => void;
   pathfindingState: PathfindingState;
   infraInfo: { infra?: InfraWithState; reloadCount: number };
+  /** Operational points along the path (including origin and destination) and vias added by clicking on map */
+  allWaypoints?: SuggestedOP[];
 } | null;
 
 const ManageTrainScheduleContext = createContext<ManageTrainScheduleContextType>(null);
@@ -25,6 +33,9 @@ type ManageTrainScheduleContextProviderProps = { children: ReactNode };
 export const ManageTrainScheduleContextProvider = ({
   children,
 }: ManageTrainScheduleContextProviderProps) => {
+  const { getPathSteps } = useOsrdConfSelectors();
+  const pathSteps = useSelector(getPathSteps);
+
   const [pathProperties, setPathProperties] = useState<ManageTrainSchedulePathProperties>();
 
   const { launchPathfinding, pathfindingState, infraInfo } = usePathfinding(setPathProperties);
@@ -34,6 +45,11 @@ export const ManageTrainScheduleContextProvider = ({
     [pathProperties]
   );
 
+  const allWaypoints = useMemo(() => {
+    if (!pathProperties) return undefined;
+    return upsertPathStepsInOPs(pathProperties.suggestedOperationalPoints, compact(pathSteps));
+  }, [pathProperties?.suggestedOperationalPoints, pathSteps]);
+
   const providedContext = useMemo(
     () => ({
       pathProperties,
@@ -42,6 +58,7 @@ export const ManageTrainScheduleContextProvider = ({
       launchPathfinding,
       pathfindingState,
       infraInfo,
+      allWaypoints,
     }),
     [
       pathProperties,
@@ -50,6 +67,7 @@ export const ManageTrainScheduleContextProvider = ({
       launchPathfinding,
       pathfindingState,
       infraInfo,
+      allWaypoints,
     ]
   );
 

@@ -38,7 +38,8 @@ const Itinerary = () => {
   const { t } = useTranslation('operationalStudies/manageTrainSchedule');
   const { openModal } = useModal();
 
-  const { pathProperties, setPathProperties, launchPathfinding } = useManageTrainScheduleContext();
+  const { pathProperties, setPathProperties, launchPathfinding, allWaypoints } =
+    useManageTrainScheduleContext();
 
   const zoomToFeaturePoint = (lngLat?: Position) => {
     if (lngLat) {
@@ -118,7 +119,7 @@ const Itinerary = () => {
           >
             <Route />
           </button>
-          {pathProperties && pathProperties.suggestedOperationalPoints && (
+          {allWaypoints && (
             <button
               data-testid="add-waypoints-button"
               className="col ml-1 my-1 text-white btn bg-info btn-sm"
@@ -126,7 +127,7 @@ const Itinerary = () => {
               onClick={() =>
                 openModal(
                   <ModalSuggestedVias
-                    suggestedVias={pathProperties.allWaypoints}
+                    suggestedVias={allWaypoints}
                     launchPathfinding={launchPathfinding}
                   />
                 )

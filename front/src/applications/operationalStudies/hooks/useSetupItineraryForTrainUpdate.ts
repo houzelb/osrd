@@ -15,11 +15,7 @@ import {
 } from 'common/api/osrdEditoastApi';
 import { useOsrdConfActions } from 'common/osrdContext';
 import buildOpSearchQuery from 'modules/operationalPoint/helpers/buildOpSearchQuery';
-import {
-  formatSuggestedOperationalPoints,
-  matchPathStepAndOp,
-  upsertPathStepsInOPs,
-} from 'modules/pathfinding/utils';
+import { formatSuggestedOperationalPoints, matchPathStepAndOp } from 'modules/pathfinding/utils';
 import { getSupportedElectrification, isThermal } from 'modules/rollingStock/helpers/electric';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import computeBasePathStep from 'modules/trainschedule/helpers/computeBasePathStep';
@@ -213,14 +209,11 @@ const useSetupItineraryForTrainUpdate = (trainIdToEdit: number) => {
         });
       }
 
-      const allWaypoints = upsertPathStepsInOPs(suggestedOperationalPoints, updatedPathSteps);
-
       return {
         pathProperties: {
           electrifications,
           geometry,
           suggestedOperationalPoints,
-          allWaypoints,
           length: pathfindingResult.length,
           trackSectionRanges: pathfindingResult.track_section_ranges,
         },

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { compact, isObject } from 'lodash';
+import { isObject } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
@@ -18,7 +18,6 @@ import {
   formatSuggestedOperationalPoints,
   getPathfindingQuery,
   matchPathStepAndOp,
-  upsertPathStepsInOPs,
 } from 'modules/pathfinding/utils';
 import { useStoreDataForRollingStockSelector } from 'modules/rollingStock/components/RollingStockSelector/useStoreDataForRollingStockSelector';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
@@ -161,16 +160,10 @@ const usePathfinding = (
     }
     dispatch(updatePathSteps(updatedPathSteps));
 
-    const allWaypoints = upsertPathStepsInOPs(
-      suggestedOperationalPoints,
-      compact(updatedPathSteps)
-    );
-
     setPathProperties({
       electrifications,
       geometry,
       suggestedOperationalPoints,
-      allWaypoints,
       length: pathResult.length,
       trackSectionRanges: pathResult.track_section_ranges,
       incompatibleConstraints,
