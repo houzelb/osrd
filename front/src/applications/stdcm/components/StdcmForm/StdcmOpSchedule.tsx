@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { DatePicker, Select, TimePicker, TolerancePicker } from '@osrd-project/ui-core';
 import { useTranslation } from 'react-i18next';
@@ -106,20 +106,6 @@ const StdcmOpSchedule = ({
   const onArrivalTypeChange = (arrivalType: ArrivalTimeTypes) => {
     dispatch(updateStdcmPathStep({ id: pathStep.id, updates: { arrivalType } }));
   };
-
-  useEffect(() => {
-    if (
-      (!isArrivalDateInSearchTimeWindow(arrivalDate, searchDatetimeWindow) ||
-        !opTimingData?.arrivalDate) &&
-      pathStep.arrivalType === 'preciseTime'
-    ) {
-      onArrivalChange({
-        date: defaultDate(searchDatetimeWindow?.begin),
-        hours: arrivalTimeHours || 0,
-        minutes: arrivalTimeMinutes || 0,
-      });
-    }
-  }, [searchDatetimeWindow, pathStep.arrivalType]);
 
   return (
     <>
