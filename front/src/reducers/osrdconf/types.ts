@@ -97,6 +97,7 @@ export type StdcmPathStep = {
   | {
       isVia: false;
       arrivalType: ArrivalTimeTypes;
+      // TODO: make arrival non nullable (/!\ store migration)
       arrival?: Date;
       tolerances: { before: number; after: number };
     }

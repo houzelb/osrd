@@ -11,6 +11,7 @@ import {
 import { defaultCommonConf, buildCommonConfReducers } from 'reducers/osrdconf/osrdConfCommon';
 import type { OsrdStdcmConfState, StdcmPathStep } from 'reducers/osrdconf/types';
 import { addElementAtIndex } from 'utils/array';
+import { isArrivalDateInSearchTimeWindow } from 'utils/date';
 import type { ArrayElement } from 'utils/types';
 
 const DEFAULT_TOLERANCE = 1800; // 30min
@@ -134,28 +135,48 @@ export const stdcmConfSlice = createSlice({
     },
     updateStdcmEnvironment(
       state: Draft<OsrdStdcmConfState>,
-      action: PayloadAction<
-        Pick<
-          OsrdStdcmConfState,
-          | 'infraID'
-          | 'timetableID'
-          | 'electricalProfileSetId'
-          | 'workScheduleGroupId'
-          | 'temporarySpeedLimitGroupId'
-          | 'searchDatetimeWindow'
-        >
-      >
+      action: PayloadAction<{
+        infraID: number;
+        timetableID: number;
+        searchDatetimeWindow?: {
+          begin: Date;
+          end: Date;
+        };
+        electricalProfileSetId?: number;
+        temporarySpeedLimitGroupId?: number;
+        workScheduleGroupId?: number;
+      }>
     ) {
+      const { searchDatetimeWindow } = action.payload;
       state.infraID = action.payload.infraID;
       state.timetableID = action.payload.timetableID;
       state.electricalProfileSetId = action.payload.electricalProfileSetId;
-      state.searchDatetimeWindow = action.payload.searchDatetimeWindow;
-      if (action.payload.workScheduleGroupId) {
-        state.workScheduleGroupId = action.payload.workScheduleGroupId;
+      state.searchDatetimeWindow = searchDatetimeWindow;
+      state.workScheduleGroupId = action.payload.workScheduleGroupId;
+      state.temporarySpeedLimitGroupId = action.payload.temporarySpeedLimitGroupId;
+
+      // check that the arrival dates are in the search time window
+      const origin = state.stdcmPathSteps.at(0) as Extract<StdcmPathStep, { isVia: false }>;
+      const destination = state.stdcmPathSteps.at(-1) as Extract<StdcmPathStep, { isVia: false }>;
+      let newOrigin = origin;
+      let newDestination = destination;
+
+      if (searchDatetimeWindow) {
+        if (
+          !origin.arrival ||
+          !isArrivalDateInSearchTimeWindow(origin.arrival, searchDatetimeWindow)
+        ) {
+          newOrigin = { ...origin, arrival: searchDatetimeWindow.begin };
+        }
+        if (
+          !destination.arrival ||
+          !isArrivalDateInSearchTimeWindow(destination.arrival, searchDatetimeWindow)
+        ) {
+          newDestination = { ...destination, arrival: searchDatetimeWindow.begin };
+        }
       }
-      if (action.payload.temporarySpeedLimitGroupId) {
-        state.temporarySpeedLimitGroupId = action.payload.temporarySpeedLimitGroupId;
-      }
+
+      state.stdcmPathSteps = [newOrigin, ...state.stdcmPathSteps.slice(1, -1), newDestination];
     },
     updateStdcmPathSteps(
       state: Draft<OsrdStdcmConfState>,
