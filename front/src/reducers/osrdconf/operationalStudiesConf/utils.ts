@@ -95,7 +95,7 @@ export const cleanPathSteps = (
   powerRestrictions: PowerRestriction[]
 ): PathStep[] =>
   pathSteps.reduce((acc, pathStep, index) => {
-    if (index === 0 || index === pathSteps.length - 1) {
+    if (index === 0 || index === pathSteps.length - 1 || !pathStep.isFromPowerRestriction) {
       acc.push(pathStep);
       return acc;
     }
