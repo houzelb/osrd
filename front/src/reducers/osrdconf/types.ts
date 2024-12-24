@@ -98,6 +98,6 @@ export type StdcmPathStep = {
       isVia: false;
       arrivalType: ArrivalTimeTypes;
       arrival?: Date;
-      tolerances?: { before: number; after: number };
+      tolerances: { before: number; after: number };
     }
 );

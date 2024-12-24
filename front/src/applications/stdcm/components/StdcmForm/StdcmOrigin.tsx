@@ -19,13 +19,9 @@ const StdcmOrigin = ({ disabled = false }: StdcmConfigCardProps) => {
   const { getStdcmOrigin } = useOsrdConfSelectors() as StdcmConfSelectors;
   const origin = useSelector(getStdcmOrigin);
 
-  const { originArrival, originToleranceValues } = useMemo(
+  const { originArrival } = useMemo(
     () => ({
       originArrival: getTimesInfoFromDate(origin.arrival),
-      originToleranceValues: {
-        arrivalToleranceBefore: origin.tolerances?.before || 0,
-        arrivalToleranceAfter: origin.tolerances?.after || 0,
-      },
     }),
     [origin]
   );
@@ -46,7 +42,6 @@ const StdcmOrigin = ({ disabled = false }: StdcmConfigCardProps) => {
       <StdcmOpSchedule
         pathStep={origin}
         opTimingData={originArrival}
-        opToleranceValues={originToleranceValues}
         opScheduleTimeType={origin.arrivalType}
         disabled={disabled}
         opId="origin-arrival"

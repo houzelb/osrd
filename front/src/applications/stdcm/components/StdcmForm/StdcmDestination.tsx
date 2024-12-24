@@ -20,13 +20,9 @@ const StdcmDestination = ({ disabled = false }: StdcmConfigCardProps) => {
 
   const destination = useSelector(getStdcmDestination);
 
-  const { destinationArrival, destinationToleranceValues } = useMemo(
+  const { destinationArrival } = useMemo(
     () => ({
       destinationArrival: getTimesInfoFromDate(destination.arrival),
-      destinationToleranceValues: {
-        arrivalToleranceBefore: destination.tolerances?.before || 0,
-        arrivalToleranceAfter: destination.tolerances?.after || 0,
-      },
     }),
     [destination]
   );
@@ -47,7 +43,6 @@ const StdcmDestination = ({ disabled = false }: StdcmConfigCardProps) => {
       <StdcmOpSchedule
         pathStep={destination}
         opTimingData={destinationArrival}
-        opToleranceValues={destinationToleranceValues}
         opScheduleTimeType={destination.arrivalType}
         disabled={disabled}
         opId="destination-arrival"
