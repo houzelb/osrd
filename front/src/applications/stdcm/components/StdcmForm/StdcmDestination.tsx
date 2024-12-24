@@ -5,25 +5,20 @@ import { useSelector } from 'react-redux';
 
 import { getTimesInfoFromDate } from 'applications/stdcm/utils';
 import DestinationIcon from 'assets/pictures/mapMarkers/destination.svg';
-import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
-import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
+import { useOsrdConfSelectors } from 'common/osrdContext';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
-import { useAppDispatch } from 'store';
 
 import StdcmCard from './StdcmCard';
 import StdcmOperationalPoint from './StdcmOperationalPoint';
 import StdcmOpSchedule from './StdcmOpSchedule';
-import type { ArrivalTimeTypes, ScheduleConstraint, StdcmConfigCardProps } from '../../types';
+import type { StdcmConfigCardProps } from '../../types';
 
 const StdcmDestination = ({ disabled = false }: StdcmConfigCardProps) => {
   const { t } = useTranslation('stdcm');
-  const dispatch = useAppDispatch();
 
   const { getStdcmDestination } = useOsrdConfSelectors() as StdcmConfSelectors;
 
   const destination = useSelector(getStdcmDestination);
-
-  const { updateStdcmPathStep } = useOsrdConfActions() as StdcmConfSliceActions;
 
   const { destinationArrival, destinationToleranceValues } = useMemo(
     () => ({
@@ -35,35 +30,6 @@ const StdcmDestination = ({ disabled = false }: StdcmConfigCardProps) => {
     }),
     [destination]
   );
-
-  const onArrivalChange = ({ date, hours, minutes }: ScheduleConstraint) => {
-    date.setHours(hours, minutes);
-    dispatch(
-      updateStdcmPathStep({
-        id: destination.id,
-        updates: { arrival: date },
-      })
-    );
-  };
-
-  const onArrivalTypeChange = (arrivalType: ArrivalTimeTypes) => {
-    dispatch(updateStdcmPathStep({ id: destination.id, updates: { arrivalType } }));
-  };
-
-  const onToleranceChange = ({
-    toleranceBefore,
-    toleranceAfter,
-  }: {
-    toleranceBefore: number;
-    toleranceAfter: number;
-  }) => {
-    dispatch(
-      updateStdcmPathStep({
-        id: destination.id,
-        updates: { tolerances: { before: toleranceBefore, after: toleranceAfter } },
-      })
-    );
-  };
 
   return (
     <StdcmCard
@@ -79,9 +45,7 @@ const StdcmDestination = ({ disabled = false }: StdcmConfigCardProps) => {
         disabled={disabled}
       />
       <StdcmOpSchedule
-        onArrivalChange={onArrivalChange}
-        onArrivalTypeChange={onArrivalTypeChange}
-        onArrivalToleranceChange={onToleranceChange}
+        pathStep={destination}
         opTimingData={destinationArrival}
         opToleranceValues={destinationToleranceValues}
         opScheduleTimeType={destination.arrivalType}
