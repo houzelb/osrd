@@ -86,7 +86,7 @@ async fn list_errors(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let (page, page_size) = pagination_params

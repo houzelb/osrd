@@ -179,7 +179,7 @@ impl Authentication {
         match self {
             Authentication::Authenticated(authorizer) => Ok(authorizer),
             Authentication::Unauthenticated | Authentication::SkipAuthorization => {
-                Err(AuthorizationError::Unauthenticated)
+                Err(AuthorizationError::Unauthorized)
             }
         }
     }
@@ -241,12 +241,12 @@ async fn authentication_middleware(
 #[derive(Debug, Error, EditoastError)]
 #[editoast_error(base_id = "authz")]
 pub enum AuthorizationError {
-    #[error("Unauthenticated")]
+    #[error("Unauthorized — user must be authenticated")]
     #[editoast_error(status = 401)]
-    Unauthenticated,
-    #[error("Unauthorized")]
-    #[editoast_error(status = 403)]
     Unauthorized,
+    #[error("Forbidden — user has insufficient privileges")]
+    #[editoast_error(status = 403)]
+    Forbidden,
     #[error(transparent)]
     #[editoast_error(status = 500)]
     AuthError(

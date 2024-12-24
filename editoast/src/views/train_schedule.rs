@@ -178,7 +178,7 @@ async fn get(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let conn = &mut db_pool.get().await?;
@@ -213,7 +213,7 @@ async fn get_batch(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let conn = &mut db_pool.get().await?;
@@ -246,7 +246,7 @@ async fn delete(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     use crate::models::DeleteBatch;
@@ -282,7 +282,7 @@ async fn put(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let conn = &mut db_pool.get().await?;
@@ -338,7 +338,7 @@ async fn simulation(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     // Retrieve infra or fail
@@ -671,7 +671,7 @@ async fn simulation_summary(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let conn = &mut db_pool.get().await?;
@@ -774,7 +774,7 @@ async fn get_path(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let conn = &mut db_pool.get().await?;

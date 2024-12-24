@@ -32,7 +32,7 @@ async fn speed_limit_tags(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     Ok(Json(speed_limit_tag_ids.as_ref().clone()))

@@ -147,7 +147,7 @@ async fn post(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let conn = &mut db_pool.get().await?;
     let rolling_stock_changeset: Changeset<TowedRollingStockModel> =
@@ -185,7 +185,7 @@ async fn get_list(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let settings = page_settings
         .validate(50)?
@@ -228,7 +228,7 @@ async fn get_by_id(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let towed_rolling_stock = TowedRollingStockModel::retrieve_or_fail(
@@ -264,7 +264,7 @@ async fn patch_by_id(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let new_towed_rolling_stock = db_pool
@@ -336,7 +336,7 @@ async fn patch_by_id_locked(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let conn = &mut db_pool.get().await?;

@@ -63,7 +63,7 @@ async fn get_railjson(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let infra_id = infra.infra_id;
@@ -182,7 +182,7 @@ async fn post_railjson(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     if railjson.version != RAILJSON_VERSION {

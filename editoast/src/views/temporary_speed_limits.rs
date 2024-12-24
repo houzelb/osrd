@@ -147,7 +147,7 @@ async fn create_temporary_speed_limit_group(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let conn = &mut db_pool.get().await?;

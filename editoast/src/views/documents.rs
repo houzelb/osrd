@@ -63,7 +63,7 @@ async fn get(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let conn = &mut db_pool.get().await?;
     let doc = Document::retrieve_or_fail(conn, document_id, || DocumentErrors::NotFound {
@@ -108,7 +108,7 @@ async fn post(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let content_type = content_type.to_string();
 
@@ -151,7 +151,7 @@ async fn delete(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let conn = &mut db_pool.get().await?;
     Document::delete_static_or_fail(conn, document_id, || DocumentErrors::NotFound {

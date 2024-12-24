@@ -251,7 +251,7 @@ async fn project_path(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     // get all work_schedule of the group
@@ -325,7 +325,7 @@ async fn create_group(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let conn = &mut db_pool.get().await?;
@@ -362,7 +362,7 @@ async fn delete_group(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let conn = &mut db_pool.get().await?;
@@ -390,7 +390,7 @@ async fn list_groups(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let conn = &mut db_pool.get().await?;
@@ -426,7 +426,7 @@ async fn put_in_group(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let conn = &mut db_pool.get().await?;
@@ -490,7 +490,7 @@ async fn get_group(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let ordering = ordering_params.ordering;

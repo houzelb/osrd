@@ -113,7 +113,7 @@ async fn list(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let settings = page_settings
         .validate(1000)?
@@ -156,7 +156,7 @@ async fn get(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let rolling_stock = RollingStockModel::retrieve_or_fail(
         &mut db_pool.get().await?,
@@ -190,7 +190,7 @@ async fn get_by_name(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let rolling_stock = RollingStockModel::retrieve_or_fail(
         &mut db_pool.get().await?,

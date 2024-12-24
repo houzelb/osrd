@@ -66,7 +66,7 @@ async fn list(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let mut conn = db_pool.get().await?;
     Ok(Json(ElectricalProfileSet::list_light(&mut conn).await?))
@@ -92,7 +92,7 @@ async fn get(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let conn = &mut db_pool.get().await?;
     let ep_set = ElectricalProfileSet::retrieve_or_fail(conn, electrical_profile_set_id, || {
@@ -131,7 +131,7 @@ async fn get_level_order(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let conn = &mut db_pool.get().await?;
     let ep_set = ElectricalProfileSet::retrieve_or_fail(conn, electrical_profile_set_id, || {
@@ -163,7 +163,7 @@ async fn delete(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let conn = &mut db_pool.get().await?;
     let deleted = ElectricalProfileSet::delete_static(conn, electrical_profile_set_id).await?;
@@ -201,7 +201,7 @@ async fn post_electrical_profile(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let ep_set = ElectricalProfileSet::changeset()
         .name(ep_set_name.name)

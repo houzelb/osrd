@@ -47,7 +47,7 @@ async fn signaling_systems(Extension(auth): AuthenticationExt) -> Result<Json<Ve
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let sprite_configs = SpriteConfig::load();
@@ -78,7 +78,7 @@ async fn sprites(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let sprite_configs = SpriteConfig::load();

@@ -104,7 +104,7 @@ async fn list_user_roles(
         .await
         .map_err(AuthorizationError::from)?
     {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let authorizer = auth.authorizer()?;
@@ -142,7 +142,7 @@ async fn grant_roles(
         .await
         .map_err(AuthorizationError::from)?
     {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let mut authorizer = auth.authorizer()?;
@@ -174,7 +174,7 @@ async fn strip_roles(
         .await
         .map_err(AuthorizationError::from)?
     {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let mut authorizer = auth.authorizer()?;

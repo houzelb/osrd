@@ -67,7 +67,7 @@ async fn get_objects(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let infra_id = infra_id_param.infra_id;
