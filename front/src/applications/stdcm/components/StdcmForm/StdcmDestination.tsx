@@ -1,9 +1,6 @@
-import { useMemo } from 'react';
-
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
-import { getTimesInfoFromDate } from 'applications/stdcm/utils';
 import DestinationIcon from 'assets/pictures/mapMarkers/destination.svg';
 import { useOsrdConfSelectors } from 'common/osrdContext';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
@@ -20,13 +17,6 @@ const StdcmDestination = ({ disabled = false }: StdcmConfigCardProps) => {
 
   const destination = useSelector(getStdcmDestination);
 
-  const { destinationArrival } = useMemo(
-    () => ({
-      destinationArrival: getTimesInfoFromDate(destination.arrival),
-    }),
-    [destination]
-  );
-
   return (
     <StdcmCard
       data-testid="destination-card"
@@ -40,12 +30,7 @@ const StdcmDestination = ({ disabled = false }: StdcmConfigCardProps) => {
         pathStepId={destination.id}
         disabled={disabled}
       />
-      <StdcmOpSchedule
-        pathStep={destination}
-        opTimingData={destinationArrival}
-        disabled={disabled}
-        opId="destination-arrival"
-      />
+      <StdcmOpSchedule pathStep={destination} disabled={disabled} opId="destination-arrival" />
     </StdcmCard>
   );
 };

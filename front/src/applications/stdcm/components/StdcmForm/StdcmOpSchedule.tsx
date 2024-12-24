@@ -8,7 +8,7 @@ import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmPathStep } from 'reducers/osrdconf/types';
 import { useAppDispatch } from 'store';
-import { formatDateString, isArrivalDateInSearchTimeWindow } from 'utils/date';
+import { dateToHHMMSS, formatDateString } from 'utils/date';
 import { createStringSelectOptions } from 'utils/uiCoreHelpers';
 
 import type { ArrivalTimeTypes, ScheduleConstraint } from '../../types';
@@ -16,30 +16,11 @@ import type { ArrivalTimeTypes, ScheduleConstraint } from '../../types';
 type StdcmOpScheduleProps = {
   disabled: boolean;
   pathStep: Extract<StdcmPathStep, { isVia: false }>;
-  opTimingData?: {
-    date: Date;
-    arrivalDate: string;
-    arrivalTime: string;
-    arrivalTimeHours: number;
-    arrivalTimeMinutes: number;
-  };
   opId: string;
   isOrigin?: boolean;
 };
 
-const defaultDate = (date?: Date) => {
-  const newDate = date ? new Date(date) : new Date();
-  newDate.setHours(0, 0, 0);
-  return newDate;
-};
-
-const StdcmOpSchedule = ({
-  disabled,
-  pathStep,
-  opTimingData,
-  opId,
-  isOrigin = false,
-}: StdcmOpScheduleProps) => {
+const StdcmOpSchedule = ({ disabled, pathStep, opId, isOrigin = false }: StdcmOpScheduleProps) => {
   const { t } = useTranslation('stdcm');
   const dispatch = useAppDispatch();
 
@@ -47,21 +28,20 @@ const StdcmOpSchedule = ({
   const { getSearchDatetimeWindow } = useOsrdConfSelectors();
   const searchDatetimeWindow = useSelector(getSearchDatetimeWindow);
 
-  const { arrivalDate, arrivalTime, arrivalTimeHours, arrivalTimeMinutes } = useMemo(() => {
-    const isArrivalDateValid =
-      opTimingData?.arrivalDate &&
-      isArrivalDateInSearchTimeWindow(opTimingData.date, searchDatetimeWindow);
-
+  const { arrivalTime, arrivalTimeHours, arrivalTimeMinutes } = useMemo(() => {
+    if (!pathStep.arrival) {
+      return {
+        arrivalTime: undefined,
+        arrivalTimeHours: undefined,
+        arrivalTimeMinutes: undefined,
+      };
+    }
     return {
-      arrivalDate:
-        opTimingData && isArrivalDateValid
-          ? opTimingData.date
-          : defaultDate(searchDatetimeWindow?.begin),
-      arrivalTime: opTimingData?.arrivalTime,
-      arrivalTimeHours: opTimingData?.arrivalTimeHours,
-      arrivalTimeMinutes: opTimingData?.arrivalTimeMinutes,
+      arrivalTime: dateToHHMMSS(pathStep.arrival, { withoutSeconds: true }),
+      arrivalTimeHours: pathStep.arrival.getHours(),
+      arrivalTimeMinutes: pathStep.arrival.getMinutes(),
     };
-  }, [opTimingData, searchDatetimeWindow]);
+  }, [pathStep.arrival]);
 
   const tolerances = useMemo(
     () => ({
@@ -94,11 +74,14 @@ const StdcmOpSchedule = ({
   );
 
   const onArrivalChange = ({ date, hours, minutes }: ScheduleConstraint) => {
-    date.setHours(hours, minutes);
+    // We need to create a new date object to avoid mutating the original one
+    // otherwise the useEffect/useMemo will not be triggered
+    const newDate = new Date(date);
+    newDate.setHours(hours, minutes);
     dispatch(
       updateStdcmPathStep({
         id: pathStep.id,
-        updates: { arrival: date },
+        updates: { arrival: newDate },
       })
     );
   };
@@ -137,7 +120,7 @@ const StdcmOpSchedule = ({
               disabled,
             }}
             selectableSlot={selectableSlot}
-            value={arrivalDate}
+            value={pathStep.arrival}
             onDateChange={(e) => {
               onArrivalChange({
                 date: e,
@@ -153,7 +136,11 @@ const StdcmOpSchedule = ({
             hours={arrivalTimeHours}
             minutes={arrivalTimeMinutes}
             onTimeChange={({ hours, minutes }) => {
-              onArrivalChange({ date: arrivalDate, hours, minutes });
+              onArrivalChange({
+                date: pathStep.arrival || searchDatetimeWindow!.begin,
+                hours,
+                minutes,
+              });
             }}
             disabled={disabled}
             value={arrivalTime}

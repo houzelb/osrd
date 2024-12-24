@@ -1,3 +1,7 @@
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+
 import type {
   Infra,
   PostInfraRailjsonApiResponse,
@@ -29,6 +33,9 @@ import {
   trainScheduleStudyName,
 } from '../assets/project-const';
 import { logger } from '../test-logger';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 /**
  * Helper function to create infrastructure using RailJson.
@@ -137,6 +144,10 @@ export async function createStudy(projectId: number, studyName = globalStudyName
 
   return study;
 }
+
+const createDateInSpecialTimeZone = (dateString: string, timeZone: string) =>
+  dayjs.tz(dateString, timeZone);
+
 /**
  * Main function to create all necessary test data including infrastructure, rolling stocks,
  * project, study, and scenario.
@@ -174,11 +185,16 @@ export async function createDataForTests(): Promise<void> {
     await sendTrainSchedules(scenarioTrainSchedule.timetable_id, trainSchedulesJson);
 
     // Configure STDCM search environment for the tests
-
     const stdcmEnvironment = {
       infra_id: smallInfra.id,
-      search_window_begin: '2024-10-17T00:00:00Z',
-      search_window_end: '2024-10-18T23:59:59Z',
+      search_window_begin: createDateInSpecialTimeZone(
+        '2024-10-17T00:00:00',
+        'Europe/Paris'
+      ).toISOString(),
+      search_window_end: createDateInSpecialTimeZone(
+        '2024-10-18T23:59:59',
+        'Europe/Paris'
+      ).toISOString(),
       timetable_id: scenarioTrainSchedule.timetable_id,
     } as StdcmSearchEnvironment;
 
