@@ -1,7 +1,8 @@
-use editoast_models::DbConnection;
+use std::result::Result;
+
+use editoast_models::{model, DbConnection};
 
 use crate::error::EditoastError;
-use crate::error::Result;
 
 /// Describes how a [Model](super::Model) can be deleted from the database
 ///
@@ -12,19 +13,12 @@ pub trait Delete: Sized {
     /// Deletes the row corresponding to this model instance
     ///
     /// Returns `true` if the row was deleted, `false` if it didn't exist
-    async fn delete(
-        &self,
-        conn: &mut DbConnection,
-    ) -> std::result::Result<bool, editoast_models::model::Error>;
+    async fn delete(&self, conn: &mut DbConnection) -> Result<bool, model::Error>;
 
     /// Just like [Delete::delete] but returns `Err(fail())` if the row didn't exist
-    async fn delete_or_fail<E, F>(
-        &self,
-        conn: &mut DbConnection,
-        fail: F,
-    ) -> std::result::Result<(), E>
+    async fn delete_or_fail<E, F>(&self, conn: &mut DbConnection, fail: F) -> Result<(), E>
     where
-        E: From<editoast_models::model::Error>,
+        E: From<model::Error>,
         F: FnOnce() -> E + Send + 'async_trait,
     {
         match self.delete(conn).await {
@@ -48,19 +42,12 @@ where
     for<'async_trait> K: Send + 'async_trait,
 {
     /// Deletes the row #`id` from the database
-    async fn delete_static(
-        conn: &mut DbConnection,
-        id: K,
-    ) -> std::result::Result<bool, editoast_models::model::Error>;
+    async fn delete_static(conn: &mut DbConnection, id: K) -> Result<bool, model::Error>;
 
     /// Just like [DeleteStatic::delete_static] but returns `Err(fail())` if the row didn't exist
-    async fn delete_static_or_fail<E, F>(
-        conn: &mut DbConnection,
-        id: K,
-        fail: F,
-    ) -> std::result::Result<(), E>
+    async fn delete_static_or_fail<E, F>(conn: &mut DbConnection, id: K, fail: F) -> Result<(), E>
     where
-        E: From<editoast_models::model::Error>,
+        E: From<model::Error>,
         F: FnOnce() -> E + Send + 'async_trait,
     {
         match Self::delete_static(conn, id).await {
@@ -86,21 +73,25 @@ where
     async fn delete_batch<I: IntoIterator<Item = K> + Send + 'async_trait>(
         conn: &mut DbConnection,
         ids: I,
-    ) -> Result<usize>;
+    ) -> Result<usize, model::Error>;
 
     /// Just like [DeleteBatch::delete_batch] but returns `Err(fail(missing))` where `missing`
     /// is the number of rows that were not deleted
-    async fn delete_batch_or_fail<I, E, F>(conn: &mut DbConnection, ids: I, fail: F) -> Result<()>
+    async fn delete_batch_or_fail<I, E, F>(
+        conn: &mut DbConnection,
+        ids: I,
+        fail: F,
+    ) -> Result<(), E>
     where
         I: Send + IntoIterator<Item = K> + 'async_trait,
-        E: EditoastError,
+        E: From<model::Error>,
         F: FnOnce(usize) -> E + Send + 'async_trait,
     {
         let ids = ids.into_iter().collect::<Vec<_>>();
         let expected_count = ids.len();
         let count = Self::delete_batch(conn, ids).await?;
         if count != expected_count {
-            Err(fail(expected_count - count).into())
+            Err(fail(expected_count - count))
         } else {
             Ok(())
         }

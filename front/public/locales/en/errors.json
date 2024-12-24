@@ -213,6 +213,7 @@
     "train_schedule": {
       "BatchShouldHaveSameTimetable": "Batch should have the same timetable",
       "BatchTrainScheduleNotFound": "Some Train Schedules could not be found",
+      "Database": "Internal error (database)",
       "NoSimulation": "No simulation given",
       "NoTrainSchedules": "No train schedules given",
       "NotFound": "Train Schedule '{{train_schedule_id}}' could not be found",

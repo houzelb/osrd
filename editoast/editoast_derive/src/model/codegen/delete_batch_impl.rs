@@ -52,7 +52,7 @@ impl ToTokens for DeleteBatchImpl {
                 async fn delete_batch<I: std::iter::IntoIterator<Item = #ty> + Send + 'async_trait>(
                     conn: &mut editoast_models::DbConnection,
                     ids: I,
-                ) -> crate::error::Result<usize> {
+                ) -> std::result::Result<usize, editoast_models::model::Error> {
                     use #table_mod::dsl;
                     use diesel::prelude::*;
                     use diesel_async::RunQueryDsl;

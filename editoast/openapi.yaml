@@ -4770,6 +4770,7 @@ components:
       - $ref: '#/components/schemas/EditoastTowedRollingStockErrorIdNotFound'
       - $ref: '#/components/schemas/EditoastTowedRollingStockErrorIsLocked'
       - $ref: '#/components/schemas/EditoastTrainScheduleErrorBatchTrainScheduleNotFound'
+      - $ref: '#/components/schemas/EditoastTrainScheduleErrorDatabase'
       - $ref: '#/components/schemas/EditoastTrainScheduleErrorInfraNotFound'
       - $ref: '#/components/schemas/EditoastTrainScheduleErrorNotFound'
       - $ref: '#/components/schemas/EditoastWorkScheduleErrorDatabase'
@@ -6264,6 +6265,25 @@ components:
           type: string
           enum:
           - editoast:train_schedule:BatchTrainScheduleNotFound
+    EditoastTrainScheduleErrorDatabase:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 500
+        type:
+          type: string
+          enum:
+          - editoast:train_schedule:Database
     EditoastTrainScheduleErrorInfraNotFound:
       type: object
       required:
