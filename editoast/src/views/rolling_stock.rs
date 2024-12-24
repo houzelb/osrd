@@ -220,7 +220,7 @@ async fn get(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let rolling_stock = retrieve_existing_rolling_stock(
         &mut db_pool.get().await?,
@@ -251,7 +251,7 @@ async fn get_by_name(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let rolling_stock = retrieve_existing_rolling_stock(
@@ -281,7 +281,7 @@ async fn get_power_restrictions(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let conn = &mut db_pool.get().await?;
     let power_restrictions = RollingStockModel::get_power_restrictions(conn).await?;
@@ -321,7 +321,7 @@ async fn create(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     rolling_stock_form.validate()?;
     let conn = &mut db_pool.get().await?;
@@ -359,7 +359,7 @@ async fn update(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     rolling_stock_form.validate()?;
     let name = rolling_stock_form.name.clone();
@@ -438,7 +438,7 @@ async fn delete(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let conn = &mut db_pool.get().await?;
 
@@ -505,7 +505,7 @@ async fn update_locked(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let conn = &mut db_pool.get().await?;
@@ -587,7 +587,7 @@ async fn create_livery(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let conn = &mut db_pool.get().await?;
 

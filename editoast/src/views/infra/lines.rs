@@ -55,7 +55,7 @@ async fn get_line_bbox(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let line_code: i32 = line_code.try_into().unwrap();

@@ -155,7 +155,7 @@ async fn create(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let conn = &mut db_pool.get().await?;
     if let Some(image) = project_create_form.image {
@@ -197,7 +197,7 @@ async fn list(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let ordering = ordering_params.ordering;
@@ -249,7 +249,7 @@ async fn get(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let conn = &mut db_pool.get().await?;
     let project =
@@ -278,7 +278,7 @@ async fn delete(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let conn = &mut db_pool.get().await?;
     if Project::delete_and_prune_document(conn, project_id).await? {
@@ -345,7 +345,7 @@ async fn patch(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
     let conn = &mut db_pool.get().await?;
     if let Some(image) = form.image {

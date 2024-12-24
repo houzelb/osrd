@@ -75,7 +75,7 @@ async fn get_routes_from_waypoint(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let conn = &mut db_pool.get().await?;
@@ -159,7 +159,7 @@ async fn get_routes_track_ranges(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let db_pool = db_pool.clone();
@@ -224,7 +224,7 @@ async fn get_routes_nodes(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let infra = Infra::retrieve_or_fail(&mut db_pool.get().await?, params.infra_id, || {

@@ -367,7 +367,7 @@ async fn search(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let (page, per_page) = query_params.validate(1000)?.warn_page_size(100).unpack();

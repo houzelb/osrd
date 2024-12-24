@@ -124,7 +124,7 @@ async fn layer_view(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let layer = match map_layers.layers.get(&layer_slug) {
@@ -192,7 +192,7 @@ async fn cache_and_get_mvt_tile(
         .await
         .map_err(AuthorizationError::AuthError)?;
     if !authorized {
-        return Err(AuthorizationError::Unauthorized.into());
+        return Err(AuthorizationError::Forbidden.into());
     }
 
     let layer = match map_layers.layers.get(&layer_slug) {
