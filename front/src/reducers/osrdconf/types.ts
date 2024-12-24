@@ -78,6 +78,14 @@ export type PathStep = PathItemLocation & {
     trackNumber: number;
   };
   isInvalid?: boolean;
+  /** Flag specifying whether the pathStep was created from the power restriction selector or not
+   *
+   * If true, the pathStep might be cleaned if its power restriction is removed (except if it has time, stop or margin constraints)
+   *
+   * This flag will only work if the user has not saved their change. Once the change is saved, the flag will be removed and the pathStep
+   * will become permanent.
+   */
+  isFromPowerRestriction?: boolean;
 };
 
 export type StdcmPathStep = {
