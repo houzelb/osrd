@@ -1,7 +1,6 @@
 import type { CaseReducer, PayloadAction } from '@reduxjs/toolkit';
 import type { Draft } from 'immer';
 
-import { type StdcmStopTypes } from 'applications/stdcm/types';
 import { type InfraStateReducers, buildInfraStateReducers, infraState } from 'reducers/infra';
 import type {
   OperationalStudiesConfSlice,
@@ -10,7 +9,7 @@ import type {
 import type { OperationalStudiesConfSelectors } from 'reducers/osrdconf/operationalStudiesConf/selectors';
 import type { StdcmConfSlice, StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
-import type { OsrdConfState, PathStep } from 'reducers/osrdconf/types';
+import type { OsrdConfState } from 'reducers/osrdconf/types';
 
 export const defaultCommonConf: OsrdConfState = {
   projectID: undefined,
@@ -36,10 +35,6 @@ interface CommonConfReducers<S extends OsrdConfState> extends InfraStateReducers
   ['updateElectricalProfileSetId']: CaseReducer<S, PayloadAction<S['electricalProfileSetId']>>;
   ['updateRollingStockID']: CaseReducer<S, PayloadAction<S['rollingStockID']>>;
   ['updateSpeedLimitByTag']: CaseReducer<S, PayloadAction<S['speedLimitByTag'] | null>>;
-  ['updateViaStopTime']: CaseReducer<
-    S,
-    PayloadAction<{ via: PathStep; duration: string; stopType?: StdcmStopTypes }>
-  >;
   ['updateGridMarginBefore']: CaseReducer<S, PayloadAction<S['gridMarginBefore']>>;
   ['updateGridMarginAfter']: CaseReducer<S, PayloadAction<S['gridMarginAfter']>>;
   ['updatePathSteps']: CaseReducer<S, PayloadAction<S['pathSteps']>>;
@@ -73,22 +68,6 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
     },
     updateSpeedLimitByTag(state: Draft<S>, action: PayloadAction<S['speedLimitByTag'] | null>) {
       state.speedLimitByTag = action.payload === null ? undefined : action.payload;
-    },
-    // TODO: Change the type of duration to number. It is preferable to keep this value in seconds in the store
-    //* to avoid multiple conversions between seconds and ISO8601 format across the front.
-    updateViaStopTime(
-      state: Draft<S>,
-      action: PayloadAction<{ via: PathStep; duration: string; stopType?: StdcmStopTypes }>
-    ) {
-      const {
-        payload: { via, duration, stopType },
-      } = action;
-      state.pathSteps = state.pathSteps.map((pathStep) => {
-        if (pathStep && pathStep.id === via.id) {
-          return { ...pathStep, stopFor: duration, stopType };
-        }
-        return pathStep;
-      });
     },
     updateGridMarginBefore(state: Draft<S>, action: PayloadAction<S['gridMarginBefore']>) {
       state.gridMarginBefore = action.payload;

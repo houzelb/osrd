@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { XCircle } from '@osrd-project/ui-icons';
 import cx from 'classnames';
 import type { Position } from 'geojson';
@@ -13,20 +11,16 @@ import { isPathStepInvalid } from 'modules/pathfinding/utils';
 import { moveElement, removeElementAtIndex } from 'utils/array';
 import { formatUicToCi } from 'utils/strings';
 
-import ViaStopDurationSelector from './ViaStopDurationSelector';
-
 type ViasProps = {
-  shouldManageStopDuration?: boolean;
   zoomToFeaturePoint: (lngLat?: Position, id?: string) => void;
 };
 
-const Vias = ({ zoomToFeaturePoint, shouldManageStopDuration }: ViasProps) => {
+const Vias = ({ zoomToFeaturePoint }: ViasProps) => {
   const { t } = useTranslation('operationalStudies/manageTrainSchedule');
   const { getVias, getPathSteps } = useOsrdConfSelectors();
   const vias = useSelector(getVias());
   const pathSteps = useSelector(getPathSteps);
   const { launchPathfinding } = useManageTrainScheduleContext();
-  const [focusedViaId, setFocusedViaId] = useState<string>();
 
   return (
     <DragDropContext
@@ -80,13 +74,6 @@ const Vias = ({ zoomToFeaturePoint, shouldManageStopDuration }: ViasProps) => {
                           </small>
                         )}
                       </div>
-                      {shouldManageStopDuration && (
-                        <ViaStopDurationSelector
-                          via={via}
-                          focusedViaId={focusedViaId}
-                          setFocusedViaId={setFocusedViaId}
-                        />
-                      )}
                       <button
                         data-testid="delete-via-button"
                         className="btn btn-sm btn-only-icon btn-white ml-auto"

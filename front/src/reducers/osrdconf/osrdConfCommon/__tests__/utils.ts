@@ -1,6 +1,5 @@
 import { describe, beforeEach, it, expect } from 'vitest';
 
-import { StdcmStopTypes } from 'applications/stdcm/types';
 import type { Infra } from 'common/api/osrdEditoastApi';
 import type { OperationalStudiesConfSlice } from 'reducers/osrdconf/operationalStudiesConf';
 import { defaultCommonConf } from 'reducers/osrdconf/osrdConfCommon';
@@ -120,25 +119,6 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
       const state = testSpeedLimitByTag(slice, newSpeedLimitByTag);
       expect(state.speedLimitByTag).toBe(undefined);
     });
-  });
-
-  it('should handle updateViaStopTime', () => {
-    const pathSteps = testDataBuilder.buildPathSteps();
-    const via = pathSteps[1];
-    const store = createStore(slice, {
-      pathSteps,
-    });
-
-    store.dispatch(
-      slice.actions.updateViaStopTime({
-        via,
-        duration: 'PT60S',
-        stopType: StdcmStopTypes.SERVICE_STOP,
-      })
-    );
-    const state = store.getState()[slice.name];
-    expect(state.pathSteps[1]?.stopFor).toEqual('PT60S');
-    expect(state.pathSteps[1]?.stopType).toEqual('serviceStop');
   });
 
   it('should handle updateGridMarginBefore', () => {
