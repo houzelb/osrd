@@ -43,7 +43,6 @@ const StdcmDestination = ({ disabled = false }: StdcmConfigCardProps) => {
       <StdcmOpSchedule
         pathStep={destination}
         opTimingData={destinationArrival}
-        opScheduleTimeType={destination.arrivalType}
         disabled={disabled}
         opId="destination-arrival"
       />
