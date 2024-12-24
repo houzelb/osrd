@@ -4,7 +4,10 @@ import { DatePicker, Select, TimePicker, TolerancePicker } from '@osrd-project/u
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
-import { useOsrdConfSelectors } from 'common/osrdContext';
+import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
+import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
+import type { StdcmPathStep } from 'reducers/osrdconf/types';
+import { useAppDispatch } from 'store';
 import { formatDateString, isArrivalDateInSearchTimeWindow } from 'utils/date';
 import { createStringSelectOptions } from 'utils/uiCoreHelpers';
 
@@ -12,15 +15,7 @@ import type { ArrivalTimeTypes, ScheduleConstraint } from '../../types';
 
 type StdcmOpScheduleProps = {
   disabled: boolean;
-  onArrivalChange: ({ date, hours, minutes }: ScheduleConstraint) => void;
-  onArrivalTypeChange: (arrivalType: ArrivalTimeTypes) => void;
-  onArrivalToleranceChange: ({
-    toleranceBefore,
-    toleranceAfter,
-  }: {
-    toleranceBefore: number;
-    toleranceAfter: number;
-  }) => void;
+  pathStep: Extract<StdcmPathStep, { isVia: false }>;
   opScheduleTimeType: ArrivalTimeTypes;
   opTimingData?: {
     date: Date;
@@ -45,9 +40,7 @@ const defaultDate = (date?: Date) => {
 
 const StdcmOpSchedule = ({
   disabled,
-  onArrivalChange,
-  onArrivalTypeChange,
-  onArrivalToleranceChange,
+  pathStep,
   opTimingData,
   opScheduleTimeType,
   opToleranceValues,
@@ -55,6 +48,9 @@ const StdcmOpSchedule = ({
   isOrigin = false,
 }: StdcmOpScheduleProps) => {
   const { t } = useTranslation('stdcm');
+  const dispatch = useAppDispatch();
+
+  const { updateStdcmPathStep } = useOsrdConfActions() as StdcmConfSliceActions;
   const { getSearchDatetimeWindow } = useOsrdConfSelectors();
   const searchDatetimeWindow = useSelector(getSearchDatetimeWindow);
 
@@ -100,6 +96,20 @@ const StdcmOpSchedule = ({
     }),
     [t, searchDatetimeWindow]
   );
+
+  const onArrivalChange = ({ date, hours, minutes }: ScheduleConstraint) => {
+    date.setHours(hours, minutes);
+    dispatch(
+      updateStdcmPathStep({
+        id: pathStep.id,
+        updates: { arrival: date },
+      })
+    );
+  };
+
+  const onArrivalTypeChange = (arrivalType: ArrivalTimeTypes) => {
+    dispatch(updateStdcmPathStep({ id: pathStep.id, updates: { arrivalType } }));
+  };
 
   useEffect(() => {
     if (
@@ -174,10 +184,12 @@ const StdcmOpSchedule = ({
               toleranceValues={arrivalToleranceValues}
               onChange={() => {}}
               onToleranceChange={({ minusTolerance, plusTolerance }) => {
-                onArrivalToleranceChange({
-                  toleranceBefore: minusTolerance,
-                  toleranceAfter: plusTolerance,
-                });
+                dispatch(
+                  updateStdcmPathStep({
+                    id: pathStep.id,
+                    updates: { tolerances: { before: minusTolerance, after: plusTolerance } },
+                  })
+                );
               }}
               disabled={disabled}
             />
