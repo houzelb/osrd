@@ -16,7 +16,6 @@ import type { ArrivalTimeTypes, ScheduleConstraint } from '../../types';
 type StdcmOpScheduleProps = {
   disabled: boolean;
   pathStep: Extract<StdcmPathStep, { isVia: false }>;
-  opScheduleTimeType: ArrivalTimeTypes;
   opTimingData?: {
     date: Date;
     arrivalDate: string;
@@ -38,7 +37,6 @@ const StdcmOpSchedule = ({
   disabled,
   pathStep,
   opTimingData,
-  opScheduleTimeType,
   opId,
   isOrigin = false,
 }: StdcmOpScheduleProps) => {
@@ -113,7 +111,7 @@ const StdcmOpSchedule = ({
     if (
       (!isArrivalDateInSearchTimeWindow(arrivalDate, searchDatetimeWindow) ||
         !opTimingData?.arrivalDate) &&
-      opScheduleTimeType === 'preciseTime'
+      pathStep.arrivalType === 'preciseTime'
     ) {
       onArrivalChange({
         date: defaultDate(searchDatetimeWindow?.begin),
@@ -121,14 +119,14 @@ const StdcmOpSchedule = ({
         minutes: arrivalTimeMinutes || 0,
       });
     }
-  }, [searchDatetimeWindow, opScheduleTimeType]);
+  }, [searchDatetimeWindow, pathStep.arrivalType]);
 
   return (
     <>
       <div className="arrival-type-select">
         <Select
           id={`select-${opId}`}
-          value={opScheduleTimeType}
+          value={pathStep.arrivalType}
           onChange={(e) => {
             if (e) {
               onArrivalTypeChange(e as ArrivalTimeTypes);
@@ -143,7 +141,7 @@ const StdcmOpSchedule = ({
           disabled={disabled}
         />
       </div>
-      {opScheduleTimeType === 'preciseTime' && (
+      {pathStep.arrivalType === 'preciseTime' && (
         <div className="schedule">
           <DatePicker
             inputProps={{

@@ -42,7 +42,6 @@ const StdcmOrigin = ({ disabled = false }: StdcmConfigCardProps) => {
       <StdcmOpSchedule
         pathStep={origin}
         opTimingData={originArrival}
-        opScheduleTimeType={origin.arrivalType}
         disabled={disabled}
         opId="origin-arrival"
         isOrigin
