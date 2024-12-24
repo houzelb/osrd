@@ -423,7 +423,7 @@ impl crate::models::DeleteStatic<(String)> for Document {
     async fn delete_static(
         conn: &mut editoast_models::DbConnection,
         content_type: (String),
-    ) -> crate::error::Result<bool> {
+    ) -> std::result::Result<bool, editoast_models::model::Error> {
         use diesel::prelude::*;
         use diesel_async::RunQueryDsl;
         use std::ops::DerefMut;
@@ -452,7 +452,7 @@ impl crate::models::DeleteStatic<(i64)> for Document {
     async fn delete_static(
         conn: &mut editoast_models::DbConnection,
         id_: (i64),
-    ) -> crate::error::Result<bool> {
+    ) -> std::result::Result<bool, editoast_models::model::Error> {
         use diesel::prelude::*;
         use diesel_async::RunQueryDsl;
         use std::ops::DerefMut;

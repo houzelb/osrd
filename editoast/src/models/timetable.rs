@@ -62,12 +62,14 @@ impl Timetable {
 impl DeleteStatic<i64> for Timetable {
     #[allow(clippy::blocks_in_conditions)] // TODO: Remove this once using clippy 0.1.80
     #[tracing::instrument(name = "model:delete_static<Timetable>", skip_all, ret, err)]
-    async fn delete_static(conn: &mut DbConnection, id: i64) -> Result<bool> {
-        diesel::delete(dsl::timetable.filter(dsl::id.eq(id)))
+    async fn delete_static(
+        conn: &mut DbConnection,
+        id: i64,
+    ) -> std::result::Result<bool, editoast_models::model::Error> {
+        let n = diesel::delete(dsl::timetable.filter(dsl::id.eq(id)))
             .execute(conn.write().await.deref_mut())
-            .await
-            .map(|n| n == 1)
-            .map_err(Into::into)
+            .await?;
+        Ok(n == 1)
     }
 }
 

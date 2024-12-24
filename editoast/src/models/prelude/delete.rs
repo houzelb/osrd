@@ -48,18 +48,25 @@ where
     for<'async_trait> K: Send + 'async_trait,
 {
     /// Deletes the row #`id` from the database
-    async fn delete_static(conn: &mut DbConnection, id: K) -> Result<bool>;
+    async fn delete_static(
+        conn: &mut DbConnection,
+        id: K,
+    ) -> std::result::Result<bool, editoast_models::model::Error>;
 
     /// Just like [DeleteStatic::delete_static] but returns `Err(fail())` if the row didn't exist
-    async fn delete_static_or_fail<E, F>(conn: &mut DbConnection, id: K, fail: F) -> Result<()>
+    async fn delete_static_or_fail<E, F>(
+        conn: &mut DbConnection,
+        id: K,
+        fail: F,
+    ) -> std::result::Result<(), E>
     where
-        E: EditoastError,
+        E: From<editoast_models::model::Error>,
         F: FnOnce() -> E + Send + 'async_trait,
     {
         match Self::delete_static(conn, id).await {
             Ok(true) => Ok(()),
-            Ok(false) => Err(fail().into()),
-            Err(e) => Err(e),
+            Ok(false) => Err(fail()),
+            Err(e) => Err(E::from(e)),
         }
     }
 }
