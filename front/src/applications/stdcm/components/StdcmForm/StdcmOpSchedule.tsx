@@ -24,10 +24,6 @@ type StdcmOpScheduleProps = {
     arrivalTimeHours: number;
     arrivalTimeMinutes: number;
   };
-  opToleranceValues: {
-    arrivalToleranceBefore: number;
-    arrivalToleranceAfter: number;
-  };
   opId: string;
   isOrigin?: boolean;
 };
@@ -43,7 +39,6 @@ const StdcmOpSchedule = ({
   pathStep,
   opTimingData,
   opScheduleTimeType,
-  opToleranceValues,
   opId,
   isOrigin = false,
 }: StdcmOpScheduleProps) => {
@@ -54,26 +49,29 @@ const StdcmOpSchedule = ({
   const { getSearchDatetimeWindow } = useOsrdConfSelectors();
   const searchDatetimeWindow = useSelector(getSearchDatetimeWindow);
 
-  const { arrivalDate, arrivalTime, arrivalTimeHours, arrivalTimeMinutes, arrivalToleranceValues } =
-    useMemo(() => {
-      const isArrivalDateValid =
-        opTimingData?.arrivalDate &&
-        isArrivalDateInSearchTimeWindow(opTimingData.date, searchDatetimeWindow);
+  const { arrivalDate, arrivalTime, arrivalTimeHours, arrivalTimeMinutes } = useMemo(() => {
+    const isArrivalDateValid =
+      opTimingData?.arrivalDate &&
+      isArrivalDateInSearchTimeWindow(opTimingData.date, searchDatetimeWindow);
 
-      return {
-        arrivalDate:
-          opTimingData && isArrivalDateValid
-            ? opTimingData.date
-            : defaultDate(searchDatetimeWindow?.begin),
-        arrivalTime: opTimingData?.arrivalTime,
-        arrivalTimeHours: opTimingData?.arrivalTimeHours,
-        arrivalTimeMinutes: opTimingData?.arrivalTimeMinutes,
-        arrivalToleranceValues: {
-          minusTolerance: opToleranceValues.arrivalToleranceBefore,
-          plusTolerance: opToleranceValues.arrivalToleranceAfter,
-        },
-      };
-    }, [opTimingData, opToleranceValues, searchDatetimeWindow]);
+    return {
+      arrivalDate:
+        opTimingData && isArrivalDateValid
+          ? opTimingData.date
+          : defaultDate(searchDatetimeWindow?.begin),
+      arrivalTime: opTimingData?.arrivalTime,
+      arrivalTimeHours: opTimingData?.arrivalTimeHours,
+      arrivalTimeMinutes: opTimingData?.arrivalTimeMinutes,
+    };
+  }, [opTimingData, searchDatetimeWindow]);
+
+  const tolerances = useMemo(
+    () => ({
+      minusTolerance: pathStep.tolerances.before,
+      plusTolerance: pathStep.tolerances.after,
+    }),
+    [pathStep.tolerances]
+  );
 
   const selectableSlot = useMemo(
     () =>
@@ -181,7 +179,7 @@ const StdcmOpSchedule = ({
             <TolerancePicker
               id={`stdcm-tolerance-${opId}`}
               label={t('trainPath.tolerance')}
-              toleranceValues={arrivalToleranceValues}
+              toleranceValues={tolerances}
               onChange={() => {}}
               onToleranceChange={({ minusTolerance, plusTolerance }) => {
                 dispatch(
