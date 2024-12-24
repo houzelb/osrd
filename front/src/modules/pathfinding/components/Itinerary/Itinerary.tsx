@@ -25,11 +25,7 @@ import Origin from './DisplayItinerary/Origin';
 import Vias from './DisplayItinerary/Vias';
 import ModalSuggestedVias from './ModalSuggestedVias';
 
-type ItineraryProps = {
-  shouldManageStopDuration?: boolean;
-};
-
-const Itinerary = ({ shouldManageStopDuration }: ItineraryProps) => {
+const Itinerary = () => {
   const { getPathSteps, getOrigin, getDestination, getPowerRestriction } = useOsrdConfSelectors();
   const origin = useSelector(getOrigin);
   const destination = useSelector(getDestination);
@@ -168,10 +164,7 @@ const Itinerary = ({ shouldManageStopDuration }: ItineraryProps) => {
           <Origin zoomToFeaturePoint={zoomToFeaturePoint} />
           <div className="vias-list mb-2" data-testid="itinerary-vias">
             {pathSteps.length > 2 ? (
-              <Vias
-                zoomToFeaturePoint={zoomToFeaturePoint}
-                shouldManageStopDuration={shouldManageStopDuration}
-              />
+              <Vias zoomToFeaturePoint={zoomToFeaturePoint} />
             ) : (
               <small data-testid="no-waypoint-chosen-text" className="ml-4">
                 {t('noPlaceChosen')}
