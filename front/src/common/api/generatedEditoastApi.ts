@@ -1700,7 +1700,8 @@ export type PostTimetableByIdStdcmApiArg = {
     loading_gauge_type?: LoadingGaugeType | null;
     /** Can be a percentage `X%`, a time in minutes per 100 kilometer `Xmin/100km` */
     margin?: string | null;
-    /** Maximum speed of the consist in km/h */
+    /** Maximum speed of the consist in km/h
+        Velocity in m·s⁻¹ */
     max_speed?: number | null;
     /** By how long we can shift the departure time in milliseconds
         Deprecated, first step data should be used instead */
@@ -1725,9 +1726,11 @@ export type PostTimetableByIdStdcmApiArg = {
         Enforces that the path used by the train should be free and
         available at least that many milliseconds before its passage. */
     time_gap_before?: number;
-    /** Total length of the consist in meters */
+    /** Total length of the consist in meters
+        Length in m */
     total_length?: number | null;
-    /** Total mass of the consist in kg */
+    /** Total mass of the consist
+        Mass in kg */
     total_mass?: number | null;
     towed_rolling_stock_id?: number | null;
     work_schedule_group_id?: number | null;
@@ -2826,28 +2829,37 @@ export type RollingStockMetadata = {
   unit: string;
 };
 export type RollingResistance = {
-  /** Solid friction in N */
+  /** Solid friction
+    Solid Friction in N */
   A: number;
-  /** Viscosity friction in N/(m/s) */
+  /** Viscosity friction in N·(m/s)⁻¹; N = kg⋅m⋅s⁻²
+    Viscosity friction in kg·s⁻¹ */
   B: number;
-  /** Aerodynamic drag in N/(m/s)² */
+  /** Aerodynamic drag in N·(m/s)⁻²; N = kg⋅m⋅s⁻²
+    Aerodynamic drag in kg·m⁻¹ */
   C: number;
   type: string;
 };
 export type RollingStockSupportedSignalingSystems = string[];
 export type LightRollingStock = {
   base_power_class: string | null;
+  /** Acceleration in m·s⁻² */
   comfort_acceleration: number;
+  /** Acceleration in m·s⁻² */
   const_gamma: number;
   effort_curves: LightEffortCurves;
   energy_sources: EnergySource[];
   etcs_brake_params: EtcsBrakeParams | null;
   id: number;
+  /** Ratio 1:1 */
   inertia_coefficient: number;
+  /** Length in m */
   length: number;
   loading_gauge: LoadingGaugeType;
   locked: boolean;
+  /** Mass in kg */
   mass: number;
+  /** Velocity in m·s⁻¹ */
   max_speed: number;
   metadata: RollingStockMetadata | null;
   name: string;
@@ -2856,7 +2868,9 @@ export type LightRollingStock = {
   };
   railjson_version: string;
   rolling_resistance: RollingResistance;
+  /** Acceleration in m·s⁻² */
   startup_acceleration: number;
+  /** Duration in s */
   startup_time: number;
   supported_signaling_systems: RollingStockSupportedSignalingSystems;
 };
@@ -3048,18 +3062,25 @@ export type EffortCurves = {
 };
 export type RollingStock = {
   base_power_class: string | null;
+  /** Acceleration in m·s⁻² */
   comfort_acceleration: number;
+  /** Acceleration in m·s⁻² */
   const_gamma: number;
   effort_curves: EffortCurves;
+  /** Duration in s */
   electrical_power_startup_time: number | null;
   energy_sources: EnergySource[];
   etcs_brake_params: EtcsBrakeParams | null;
   id: number;
+  /** Ratio 1:1 */
   inertia_coefficient: number;
+  /** Length in m */
   length: number;
   loading_gauge: LoadingGaugeType;
   locked: boolean;
+  /** Mass in kg */
   mass: number;
+  /** Velocity in m·s⁻¹ */
   max_speed: number;
   metadata: RollingStockMetadata | null;
   name: string;
@@ -3067,26 +3088,36 @@ export type RollingStock = {
     [key: string]: string;
   };
   railjson_version: string;
+  /** Duration in s */
   raise_pantograph_time: number | null;
   rolling_resistance: RollingResistance;
+  /** Acceleration in m·s⁻² */
   startup_acceleration: number;
+  /** Duration in s */
   startup_time: number;
   supported_signaling_systems: string[];
   version: number;
 };
 export type RollingStockForm = {
   base_power_class: string | null;
+  /** Acceleration in m·s⁻² */
   comfort_acceleration: number;
+  /** Acceleration in m·s⁻² */
   const_gamma: number;
   effort_curves: EffortCurves;
-  /** The time the train takes before actually using electrical power (in seconds). Is null if the train is not electric. */
+  /** The time the train takes before actually using electrical power (in seconds). Is null if the train is not electric.
+    Duration in s */
   electrical_power_startup_time?: number | null;
   energy_sources?: EnergySource[];
+  /** Ratio 1:1 */
   inertia_coefficient: number;
+  /** Length in m */
   length: number;
   loading_gauge: LoadingGaugeType;
   locked?: boolean | null;
+  /** Mass in kg */
   mass: number;
+  /** Velocity in m·s⁻¹ */
   max_speed: number;
   metadata?: RollingStockMetadata | null;
   name: string;
@@ -3094,10 +3125,13 @@ export type RollingStockForm = {
   power_restrictions: {
     [key: string]: string;
   };
-  /** The time it takes to raise this train's pantograph in seconds. Is null if the train is not electric. */
+  /** The time it takes to raise this train's pantograph in seconds. Is null if the train is not electric.
+    Duration in s */
   raise_pantograph_time?: number | null;
   rolling_resistance: RollingResistance;
+  /** Acceleration in m·s⁻² */
   startup_acceleration: number;
+  /** Duration in s */
   startup_time: number;
   supported_signaling_systems: RollingStockSupportedSignalingSystems;
 };
@@ -3505,40 +3539,57 @@ export type TrainScheduleResult = TrainScheduleBase & {
   timetable_id: number;
 };
 export type RollingResistancePerWeight = {
-  /** Solid friction in N/kg */
+  /** Solid friction in N·kg⁻¹; N = kg⋅m⋅s⁻²
+    Acceleration in m·s⁻² */
   A: number;
-  /** Viscosity friction in (N/kg)/(m/s) */
+  /** Viscosity friction in (N·kg⁻¹)·(m/s)⁻¹; N = kg⋅m⋅s⁻²
+    Viscosity friction per weight in s⁻¹ */
   B: number;
-  /** Aerodynamic drag in (N/kg)/(m/s)² */
+  /** Aerodynamic drag per kg in (N·kg⁻¹)·(m/s)⁻²; N = kg⋅m⋅s⁻²
+    Aerodynamic drag per kg in m⁻¹ */
   C: number;
   type: string;
 };
 export type TowedRollingStock = {
+  /** Acceleration in m·s⁻² */
   comfort_acceleration: number;
+  /** Acceleration in m·s⁻² */
   const_gamma: number;
   id: number;
+  /** Ratio 1:1 */
   inertia_coefficient: number;
   label: string;
+  /** Length in m */
   length: number;
   locked: boolean;
+  /** Mass in kg */
   mass: number;
-  max_speed?: number | null;
+  /** Velocity in m·s⁻¹ */
+  max_speed: number | null;
   name: string;
   railjson_version: string;
   rolling_resistance: RollingResistancePerWeight;
+  /** Acceleration in m·s⁻² */
   startup_acceleration: number;
 };
 export type TowedRollingStockForm = {
+  /** Acceleration in m·s⁻² */
   comfort_acceleration: number;
+  /** Acceleration in m·s⁻² */
   const_gamma: number;
+  /** Ratio 1:1 */
   inertia_coefficient: number;
   label: string;
+  /** Length in m */
   length: number;
   locked: boolean;
+  /** Mass in kg */
   mass: number;
+  /** Velocity in m·s⁻¹ */
   max_speed?: number | null;
   name: string;
   rolling_resistance: RollingResistancePerWeight;
+  /** Acceleration in m·s⁻² */
   startup_acceleration: number;
 };
 export type TowedRollingStockLockedForm = {
