@@ -27,7 +27,6 @@ use thiserror::Error;
 use tracing::Instrument;
 use utoipa::IntoParams;
 use utoipa::ToSchema;
-use validator::Validate;
 
 use crate::core::conflict_detection::Conflict;
 use crate::core::conflict_detection::TrainRequirements;
@@ -143,7 +142,6 @@ async fn stdcm(
         return Err(AuthorizationError::Forbidden.into());
     }
 
-    stdcm_request.validate()?;
     let mut conn = db_pool.get().await?;
 
     let timetable_id = id;
