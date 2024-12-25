@@ -10,9 +10,9 @@ use editoast_schemas::train_schedule::PathItem;
 use editoast_schemas::train_schedule::PathItemLocation;
 use itertools::Itertools;
 use serde::Deserialize;
+use serde::Deserializer;
 use serde::Serialize;
 use utoipa::ToSchema;
-use validator::Validate;
 
 use crate::core::pathfinding::PathfindingInputError;
 use crate::error::Result;
@@ -68,7 +68,8 @@ struct StepTimingData {
 
 /// An STDCM request
 #[editoast_derive::annotate_units]
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Validate, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, ToSchema)]
+#[serde(remote = "Self")]
 pub(super) struct Request {
     /// Deprecated, first step arrival time should be used instead
     pub(super) start_time: Option<DateTime<Utc>>,
@@ -105,7 +106,6 @@ pub(super) struct Request {
     #[schema(value_type = Option<String>, example = json!(["5%", "2min/100km"]))]
     pub(super) margin: Option<MarginValue>,
     /// Total mass of the consist
-    //#[validate(range(exclusive_min = 0.0))] TODOUOM
     #[serde(default, with = "kilogram::option")]
     pub(super) total_mass: Option<Mass>,
     /// Total length of the consist in meters
@@ -290,5 +290,48 @@ impl Request {
             })
             .await?;
         Ok(Some(towed_rolling_stock))
+    }
+}
+
+impl<'de> Deserialize<'de> for Request {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let request = Request::deserialize(deserializer)?;
+        if let Some(mass) = request.total_mass {
+            if mass <= kilogram::new(0.0) {
+                return Err(serde::de::Error::custom(
+                    "the total mass must be strictly positive",
+                ));
+            }
+        }
+
+        if let Some(total_length) = request.total_length {
+            if total_length <= meter::new(0.0) {
+                return Err(serde::de::Error::custom(
+                    "the length mass must be strictly positive",
+                ));
+            }
+        }
+
+        if let Some(max_speed) = request.max_speed {
+            if max_speed <= meter_per_second::new(0.0) {
+                return Err(serde::de::Error::custom(
+                    "the max_speed must be strictly positive",
+                ));
+            }
+        }
+
+        Ok(request)
+    }
+}
+
+impl Serialize for Request {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        Request::serialize(self, serializer)
     }
 }
