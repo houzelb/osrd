@@ -4,6 +4,7 @@ use axum::Extension;
 use chrono::NaiveDateTime;
 use chrono::Utc;
 use editoast_derive::EditoastError;
+use editoast_models::model;
 use editoast_models::DbConnectionPoolV2;
 use editoast_schemas::infra::DirectionalTrackRange;
 use serde::de::Error as SerdeError;
@@ -12,7 +13,6 @@ use std::result::Result as StdResult;
 use thiserror::Error;
 use utoipa::ToSchema;
 
-use crate::error::InternalError;
 use crate::error::Result;
 use crate::models::temporary_speed_limits::TemporarySpeedLimit;
 use crate::models::temporary_speed_limits::TemporarySpeedLimitGroup;
@@ -111,18 +111,32 @@ enum TemporarySpeedLimitError {
     #[error("Name '{name}' already used")]
     #[editoast_error(status = 400)]
     NameAlreadyUsed { name: String },
+    #[error(transparent)]
+    #[editoast_error(status = 500)]
+    Database(model::Error),
 }
 
-fn map_diesel_error(e: InternalError, name: impl AsRef<str>) -> InternalError {
-    if e.message.contains(
-        r#"duplicate key value violates unique constraint "temporary_speed_limit_group_name_key""#,
-    ) {
-        TemporarySpeedLimitError::NameAlreadyUsed {
-            name: name.as_ref().to_string(),
+impl From<model::Error> for TemporarySpeedLimitError {
+    fn from(e: model::Error) -> Self {
+        match e {
+            model::Error::UniqueViolation { constraint }
+                if constraint == "temporary_speed_limit_group_name_key" =>
+            {
+                Self::NameAlreadyUsed {
+                    name: "unknown".to_string(),
+                }
+            }
+            e => Self::Database(e),
         }
-        .into()
-    } else {
-        e
+    }
+}
+
+impl TemporarySpeedLimitError {
+    fn with_name(self, name: String) -> Self {
+        match self {
+            Self::NameAlreadyUsed { .. } => Self::NameAlreadyUsed { name },
+            e => e,
+        }
     }
 }
 
@@ -158,7 +172,7 @@ async fn create_temporary_speed_limit_group(
         .creation_date(Utc::now().naive_utc())
         .create(conn)
         .await
-        .map_err(|e| map_diesel_error(e, speed_limit_group_name))?;
+        .map_err(|e| TemporarySpeedLimitError::from(e).with_name(speed_limit_group_name))?;
 
     // Create the speed limits
     let speed_limits_changesets = speed_limits

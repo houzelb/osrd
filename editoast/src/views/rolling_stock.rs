@@ -2,6 +2,7 @@ pub mod form;
 pub mod light;
 mod towed;
 
+use editoast_models::model;
 pub use form::RollingStockForm;
 
 use std::io::Cursor;
@@ -147,7 +148,7 @@ pub enum RollingStockError {
 
     #[error(transparent)]
     #[editoast_error(status = 500)]
-    Database(#[from] editoast_models::model::Error),
+    Database(model::Error),
 }
 
 #[derive(Debug, Error)]
@@ -178,6 +179,7 @@ pub(crate) enum LiveryMultipartError {
     },
 }
 
+// Still used to parse the error of `Update` and `Save`. Will be removed soon.
 pub fn map_diesel_error(e: InternalError, name: impl AsRef<str>) -> InternalError {
     if e.message
         .contains(r#"duplicate key value violates unique constraint "rolling_stock_name_key""#)
@@ -187,6 +189,35 @@ pub fn map_diesel_error(e: InternalError, name: impl AsRef<str>) -> InternalErro
         RollingStockError::BasePowerClassEmpty.into()
     } else {
         e
+    }
+}
+
+impl From<model::Error> for RollingStockError {
+    fn from(e: model::Error) -> Self {
+        match e {
+            model::Error::UniqueViolation { constraint }
+                if constraint == "rolling_stock_name_key" =>
+            {
+                Self::NameAlreadyUsed {
+                    name: String::default(),
+                }
+            }
+            model::Error::CheckViolation { constraint, .. }
+                if constraint == "base_power_class_null_or_non_empty" =>
+            {
+                Self::BasePowerClassEmpty
+            }
+            e => Self::Database(e),
+        }
+    }
+}
+
+impl RollingStockError {
+    fn with_name(self, name: String) -> Self {
+        match self {
+            Self::NameAlreadyUsed { .. } => Self::NameAlreadyUsed { name },
+            e => e,
+        }
     }
 }
 
@@ -334,7 +365,7 @@ async fn create(
         .version(0)
         .create(conn)
         .await
-        .map_err(|e| map_diesel_error(e, rolling_stock_name))?;
+        .map_err(|e| RollingStockError::from(e).with_name(rolling_stock_name))?;
 
     Ok(Json(rolling_stock))
 }
