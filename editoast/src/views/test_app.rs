@@ -2,17 +2,22 @@
 //! test actix server, database connection pool, and different mocking
 //! components.
 
+use std::collections::HashSet;
 use std::sync::Arc;
 
 use axum::Router;
 use axum_tracing_opentelemetry::middleware::OtelAxumLayer;
 use dashmap::DashMap;
+use editoast_authz::authorizer::StorageDriver;
+use editoast_authz::authorizer::UserInfo;
+use editoast_authz::BuiltinRole;
 use editoast_common::tracing::create_tracing_subscriber;
 use editoast_common::tracing::Stream;
 use editoast_common::tracing::Telemetry;
 use editoast_common::tracing::TracingConfig;
 use editoast_models::DbConnectionPoolV2;
 use editoast_osrdyne_client::OsrdyneClient;
+use futures::executor::block_on;
 use futures::future::BoxFuture;
 use opentelemetry_sdk::export::trace::ExportResult;
 use opentelemetry_sdk::export::trace::SpanData;
@@ -26,6 +31,7 @@ use crate::{
     generated_data::speed_limit_tags_config::SpeedLimitTagIds,
     infra_cache::InfraCache,
     map::MapLayers,
+    models::auth::PgAuthDriver,
     valkey_utils::ValkeyConfig,
     AppState, ValkeyClient,
 };
@@ -56,6 +62,9 @@ pub(crate) struct TestAppBuilder {
     db_pool: Option<DbConnectionPoolV2>,
     core_client: Option<CoreClient>,
     osrdyne_client: Option<OsrdyneClient>,
+    enable_authorization: bool,
+    user: Option<UserInfo>,
+    roles: HashSet<BuiltinRole>,
 }
 
 impl TestAppBuilder {
@@ -64,6 +73,9 @@ impl TestAppBuilder {
             db_pool: None,
             core_client: None,
             osrdyne_client: None,
+            enable_authorization: false,
+            user: None,
+            roles: HashSet::new(),
         }
     }
 
@@ -85,6 +97,23 @@ impl TestAppBuilder {
         self
     }
 
+    pub fn enable_authorization(mut self, enable_authorization: bool) -> Self {
+        self.enable_authorization = enable_authorization;
+        self
+    }
+
+    pub fn user(mut self, user: UserInfo) -> Self {
+        assert!(self.user.is_none());
+        self.user = Some(user);
+        self
+    }
+
+    pub fn roles(mut self, roles: HashSet<BuiltinRole>) -> Self {
+        assert!(self.roles.is_empty());
+        self.roles = roles;
+        self
+    }
+
     pub fn default_app() -> TestApp {
         let pool = DbConnectionPoolV2::for_tests();
         let core_client = CoreClient::Mocked(MockingClient::default());
@@ -100,7 +129,7 @@ impl TestAppBuilder {
             port: 0,
             address: String::default(),
             health_check_timeout: chrono::Duration::milliseconds(500),
-            disable_authorization: true,
+            disable_authorization: !self.enable_authorization,
             map_layers_max_zoom: 18,
             postgres_config: PostgresConfig {
                 database_url: Url::parse("postgres://osrd:password@localhost:5432/osrd").unwrap(),
@@ -168,7 +197,6 @@ impl TestAppBuilder {
             infra_caches,
             map_layers: Arc::new(MapLayers::default()),
             speed_limit_tag_ids,
-            disable_authorization: true,
             health_check_timeout: config.health_check_timeout,
             config: Arc::new(config),
         };
@@ -186,6 +214,23 @@ impl TestAppBuilder {
 
         // Run server
         let server = TestServer::new(router).expect("test server should build properly");
+
+        // Setup user and roles
+        let driver = PgAuthDriver::<BuiltinRole>::new(db_pool_v2.clone());
+        if let Some(ref user) = self.user {
+            let uid = block_on(async {
+                driver
+                    .ensure_user(user)
+                    .await
+                    .expect("User should be created successfully")
+            });
+            block_on(async {
+                driver
+                    .ensure_subject_roles(uid, self.roles)
+                    .await
+                    .expect("Roles should be updated successfully")
+            });
+        };
 
         TestApp {
             server,
@@ -229,17 +274,32 @@ impl TestApp {
     pub fn get(&self, path: &str) -> TestRequest {
         self.server.get(&trim_path(path))
     }
+
     pub fn post(&self, path: &str) -> TestRequest {
         self.server.post(&trim_path(path))
     }
+
     pub fn put(&self, path: &str) -> TestRequest {
         self.server.put(&trim_path(path))
     }
+
     pub fn patch(&self, path: &str) -> TestRequest {
         self.server.patch(&trim_path(path))
     }
+
     pub fn delete(&self, path: &str) -> TestRequest {
         self.server.delete(&trim_path(path))
+    }
+}
+
+pub trait TestRequestExt {
+    fn by_user(self, user: UserInfo) -> Self;
+}
+
+impl TestRequestExt for TestRequest {
+    fn by_user(self, user: UserInfo) -> Self {
+        self.add_header("x-remote-user-identity", user.identity)
+            .add_header("x-remote-user-name", user.name)
     }
 }
 

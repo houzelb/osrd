@@ -359,15 +359,21 @@ async fn patch(
 #[cfg(test)]
 pub mod tests {
 
+    use std::collections::HashSet;
+
     use axum::http::StatusCode;
+    use editoast_authz::authorizer::UserInfo;
     use pretty_assertions::assert_eq;
     use rstest::rstest;
     use serde_json::json;
 
     use super::*;
+    use crate::core::mocking::MockingClient;
+    use crate::core::CoreClient;
     use crate::models::fixtures::create_project;
     use crate::models::prelude::*;
     use crate::views::test_app::TestAppBuilder;
+    use crate::views::test_app::TestRequestExt;
 
     #[rstest]
     async fn project_post() {
@@ -392,6 +398,32 @@ pub mod tests {
             .expect("Project not found");
 
         assert_eq!(project.name, project_name);
+    }
+
+    #[rstest]
+    async fn project_post_should_fail_when_authorization_is_enabled() {
+        let pool = DbConnectionPoolV2::for_tests();
+        let user = UserInfo {
+            identity: "user_identity".to_string(),
+            name: "user_name".to_string(),
+        };
+        let app = TestAppBuilder::new()
+            .db_pool(pool)
+            .core_client(CoreClient::Mocked(MockingClient::default()))
+            .enable_authorization(true)
+            .user(user.clone())
+            .roles(HashSet::from([BuiltinRole::OpsRead]))
+            .build();
+
+        let request = app.post("/projects").by_user(user).json(&json!({
+            "name": "test_project_failed",
+            "description": "",
+            "objectives": "",
+            "funders": "",
+        }));
+
+        // OpsWrite is required to complete this request successfully.
+        app.fetch(request).assert_status(StatusCode::FORBIDDEN);
     }
 
     #[rstest]
