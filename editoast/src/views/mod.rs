@@ -225,15 +225,13 @@ async fn authenticate(
 
 async fn authentication_middleware(
     State(AppState {
-        db_pool,
-        disable_authorization,
-        ..
+        db_pool, config, ..
     }): State<AppState>,
     mut req: Request,
     next: Next,
 ) -> Result<Response> {
     let headers = req.headers();
-    let authorizer = authenticate(disable_authorization, headers, db_pool).await?;
+    let authorizer = authenticate(config.disable_authorization, headers, db_pool).await?;
     req.extensions_mut().insert(authorizer);
     Ok(next.run(req).await)
 }
@@ -365,7 +363,6 @@ pub struct ServerConfig {
     pub health_check_timeout: Duration,
     pub map_layers_max_zoom: u8,
     pub disable_authorization: bool,
-
     pub postgres_config: PostgresConfig,
     pub osrdyne_config: OsrdyneConfig,
     pub valkey_config: ValkeyConfig,
@@ -382,13 +379,11 @@ pub struct Server {
 #[derive(Clone)]
 pub struct AppState {
     pub config: Arc<ServerConfig>,
-
     pub db_pool: Arc<DbConnectionPoolV2>,
     pub valkey: Arc<ValkeyClient>,
     pub infra_caches: Arc<DashMap<i64, InfraCache>>,
     pub map_layers: Arc<MapLayers>,
     pub speed_limit_tag_ids: Arc<SpeedLimitTagIds>,
-    pub disable_authorization: bool,
     pub core_client: Arc<CoreClient>,
     pub osrdyne_client: Arc<OsrdyneClient>,
     pub health_check_timeout: Duration,
@@ -458,7 +453,6 @@ impl AppState {
             osrdyne_client,
             map_layers: Arc::new(MapLayers::default()),
             speed_limit_tag_ids,
-            disable_authorization: config.disable_authorization,
             health_check_timeout: config.health_check_timeout,
             config: Arc::new(config),
         })
