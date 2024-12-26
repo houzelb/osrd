@@ -58,7 +58,7 @@ impl ToTokens for CreateBatchImpl {
                 >(
                     conn: &mut editoast_models::DbConnection,
                     values: I,
-                ) -> crate::error::Result<C> {
+                ) -> std::result::Result<C, editoast_models::model::Error> {
                     use crate::models::Model;
                     use #table_mod::dsl;
                     use std::ops::DerefMut;

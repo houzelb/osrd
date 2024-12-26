@@ -612,7 +612,10 @@ impl crate::models::CreateBatch<DocumentChangeset> for Document {
     async fn create_batch<
         I: std::iter::IntoIterator<Item = DocumentChangeset> + Send + 'async_trait,
         C: Default + std::iter::Extend<Self> + Send + std::fmt::Debug,
-    >(conn: &mut editoast_models::DbConnection, values: I) -> crate::error::Result<C> {
+    >(
+        conn: &mut editoast_models::DbConnection,
+        values: I,
+    ) -> std::result::Result<C, editoast_models::model::Error> {
         use crate::models::Model;
         use editoast_models::tables::osrd_infra_document::dsl;
         use std::ops::DerefMut;
@@ -653,7 +656,10 @@ impl crate::models::CreateBatchWithKey<DocumentChangeset, (String)> for Document
     async fn create_batch_with_key<
         I: std::iter::IntoIterator<Item = DocumentChangeset> + Send + 'async_trait,
         C: Default + std::iter::Extend<((String), Self)> + Send + std::fmt::Debug,
-    >(conn: &mut editoast_models::DbConnection, values: I) -> crate::error::Result<C> {
+    >(
+        conn: &mut editoast_models::DbConnection,
+        values: I,
+    ) -> std::result::Result<C, editoast_models::model::Error> {
         use crate::models::Identifiable;
         use crate::models::Model;
         use std::ops::DerefMut;
@@ -697,7 +703,10 @@ impl crate::models::CreateBatchWithKey<DocumentChangeset, (i64)> for Document {
     async fn create_batch_with_key<
         I: std::iter::IntoIterator<Item = DocumentChangeset> + Send + 'async_trait,
         C: Default + std::iter::Extend<((i64), Self)> + Send + std::fmt::Debug,
-    >(conn: &mut editoast_models::DbConnection, values: I) -> crate::error::Result<C> {
+    >(
+        conn: &mut editoast_models::DbConnection,
+        values: I,
+    ) -> std::result::Result<C, editoast_models::model::Error> {
         use crate::models::Identifiable;
         use crate::models::Model;
         use std::ops::DerefMut;

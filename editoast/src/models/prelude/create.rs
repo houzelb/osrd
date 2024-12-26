@@ -1,10 +1,10 @@
 use std::fmt::Debug;
+use std::result::Result;
 
 use editoast_models::model;
 use editoast_models::DbConnection;
 
 use crate::error::EditoastError;
-use crate::error::Result;
 
 /// Describes how a [Model](super::Model) can be created in the database
 ///
@@ -14,14 +14,14 @@ use crate::error::Result;
 pub trait Create<Row: Send>: Sized {
     /// Creates a new row in the database with the values of the changeset and
     /// returns the created model instance
-    async fn create(self, conn: &mut DbConnection) -> std::result::Result<Row, model::Error>;
+    async fn create(self, conn: &mut DbConnection) -> Result<Row, model::Error>;
 
     /// Just like [Create::create] but discards the error if any and returns `Err(fail())` instead
     async fn create_or_fail<E: From<model::Error>, F: FnOnce() -> E + Send>(
         self,
         conn: &'async_trait mut DbConnection,
         fail: F,
-    ) -> std::result::Result<Row, E> {
+    ) -> Result<Row, E> {
         match self.create(conn).await {
             Ok(obj) => Ok(obj),
             Err(_) => Err(fail()),
@@ -56,7 +56,7 @@ where
     >(
         conn: &mut DbConnection,
         values: I,
-    ) -> Result<C>;
+    ) -> Result<C, model::Error>;
 }
 
 /// Describes how a [Model](super::Model) can be created in the database given a batch of its changesets
@@ -80,5 +80,5 @@ where
     >(
         conn: &mut DbConnection,
         values: I,
-    ) -> Result<C>;
+    ) -> Result<C, model::Error>;
 }

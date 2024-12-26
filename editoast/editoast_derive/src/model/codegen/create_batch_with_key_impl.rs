@@ -69,7 +69,7 @@ impl ToTokens for CreateBatchWithKeyImpl {
                 >(
                     conn: &mut editoast_models::DbConnection,
                     values: I,
-                ) -> crate::error::Result<C> {
+                ) -> std::result::Result<C, editoast_models::model::Error> {
                     use crate::models::Identifiable;
                     use crate::models::Model;
                     use std::ops::DerefMut;
