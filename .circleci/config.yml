@@ -44,7 +44,7 @@ jobs:
     docker:
       - image: postgis/postgis
         environment:
-          POSTGRES_USER: postgres
+          POSTGRES_USER: osrd
           POSTGRES_PASSWORD: password
       - image: valkey/valkey
     steps:
@@ -55,12 +55,12 @@ jobs:
       - run:
           name: Setup Database
           command: |
-            psql postgresql://postgres:password@localhost:5432 -f docker/init_db.sql
+            psql postgres://osrd:password@postgis:5432 -f docker/init_db.sql
       - run:
           name: Run Editoast Tests
           working_directory: editoast
           environment:
-            DATABASE_URL: postgres://osrd:password@localhost:5432/osrd
+            DATABASE_URL: postgres://osrd:password@postgis:5432/osrd
             CI: "true"
           command: |
             cargo install diesel_cli --no-default-features --features postgres
