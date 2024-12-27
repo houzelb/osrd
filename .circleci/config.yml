@@ -204,9 +204,11 @@ jobs:
           key: npm-{{ checksum "front/package-lock.json" }}
 
   docker-bake:
-    executor: docker/default
+    docker:
+      - image: cimg/base:2024.12
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: Prepare Docker processed bakefile
           command: |
