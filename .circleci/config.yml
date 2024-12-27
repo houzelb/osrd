@@ -49,8 +49,8 @@ jobs:
       - image: cimg/rust:<< pipeline.parameters.rust-version >>
       - image: cimg/postgres:17.0-postgis
         environment:
-          POSTGRES_DB: osrd
-          POSTGRES_USER: osrd
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
       - image: cimg/redis:7.2.4 # Exact version used by the valkey fork, should be compatible.
     steps:
@@ -61,12 +61,12 @@ jobs:
       - run:
           name: Setup Database
           command: |
-            psql postgresql://osrd:passord@localhost/osrd -f docker/init_db.sql
+            psql postgresql://postgres:password@localhost/osrd -f docker/init_db.sql
       - run:
           name: Run Editoast Tests
           working_directory: editoast
           environment:
-            DATABASE_URL: postgres://osrd:passord@localhost/osrd
+            DATABASE_URL: postgres://osrd:password@localhost/osrd
             CI: "true"
           command: |
             cargo install diesel_cli --no-default-features --features postgres
