@@ -14,7 +14,7 @@ executors:
       - image: cimg/python:3.9
   rust:
     docker:
-      - image: cimg/rust:<< parameters.rust-version >>
+      - image: cimg/rust:<< pipeline.parameters.rust-version >>
   node:
     docker:
       - image: cimg/node:20.5
@@ -46,7 +46,7 @@ jobs:
 
   check-editoast:
     docker:
-      - image: cimg/rust:<< parameters.rust-version >>
+      - image: cimg/rust:<< pipeline.parameters.rust-version >>
       - image: cimg/postgres:17.0-postgis
         environment:
           POSTGRES_DB: osrd
