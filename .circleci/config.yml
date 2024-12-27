@@ -55,18 +55,32 @@ jobs:
       - image: cimg/redis:7.2.4 # Exact version used by the valkey fork, should be compatible.
     steps:
       - checkout
+
+      - run:
+          name: Calculate source checksum
+          command: |
+            # Create checksum of the entire editoast directory
+            find editoast -type f -exec sha256sum {} \; | sort > /tmp/src_checksum
+
       - restore_cache:
           keys:
             - cargo-editoast-{{ checksum "editoast/Cargo.lock" }}
+
+      - restore_cache:
+          keys:
+            - tests-editoast-{{ checksum "/tmp/src_checksum" }}
+
       - run:
           name: Setup Database
           command: |
             psql postgresql://postgres:password@localhost -f docker/init_db.sql
+
       - run:
           name: Install system dependencies
           command: |
             sudo apt-get update
             sudo apt-get install -y libgeos-dev libpq-dev
+
       - run:
           name: Run Editoast Tests
           working_directory: editoast
@@ -74,14 +88,25 @@ jobs:
             DATABASE_URL: postgres://osrd:password@localhost/osrd
             CI: "true"
           command: |
-            cargo install diesel_cli --no-default-features --features postgres
-            diesel migration run --locked-schema
-            cargo test --workspace --verbose
+            if [ ! -f "/tmp/tests_passed" ]; then
+              cargo install diesel_cli --no-default-features --features postgres
+              diesel migration run --locked-schema
+              cargo test --workspace --verbose
+              touch /tmp/tests_passed
+            else
+              echo "Tests already passed for this source code version, skipping..."
+            fi
+
       - save_cache:
           paths:
             - ~/.cargo
             - editoast/target
           key: cargo-editoast-{{ checksum "editoast/Cargo.lock" }}
+
+      - save_cache:
+          paths:
+            - /tmp/tests_passed
+          key: tests-editoast-{{ checksum "/tmp/src_checksum" }}
 
   check-gateway:
     executor: rust
