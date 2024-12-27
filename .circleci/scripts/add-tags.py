@@ -45,10 +45,10 @@ def generate_tags(target: str, ci_context: Dict[str, Optional[str]]) -> List[str
         ])
 
     # Dev branch context
-    elif ci_context['branch'] == 'dev':
+    elif ci_context['branch']:
         tags.extend([
             generate_tag(base_edge, ci_context['sha'], flavor),
-            generate_tag(base_edge, "dev", flavor)
+            generate_tag(base_edge, ci_context['branch'], flavor)
         ])
 
     # Tagged context
