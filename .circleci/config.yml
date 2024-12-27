@@ -39,8 +39,8 @@ jobs:
       - run:
           name: Calculate source checksum
           command: |
-            # Create checksum of the entire editoast directory
-            find editoast -type f -exec sha256sum {} \; | sort > /tmp/src_checksum
+            # Create checksum of the entire core directory
+            find core -type f -exec sha256sum {} \; | sort > /tmp/src_checksum
       - restore_cache:
           keys:
             - tests-core-{{ checksum "/tmp/src_checksum" }}
