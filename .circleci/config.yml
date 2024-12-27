@@ -4,6 +4,15 @@ parameters:
   rust-version:
     type: string
     default: "1.82"
+  node-version:
+    type: string
+    default: "20.5"
+  java-version:
+    type: string
+    default: "17.0"
+  python-version:
+    type: string
+    default: "3.12"
 
 orbs:
   docker: circleci/docker@2.4.0
@@ -11,16 +20,16 @@ orbs:
 executors:
   python:
     docker:
-      - image: cimg/python:3.9
+      - image: cimg/python:<< pipeline.parameters.python-version >>
   rust:
     docker:
       - image: cimg/rust:<< pipeline.parameters.rust-version >>
   node:
     docker:
-      - image: cimg/node:20.5
+      - image: cimg/node:<< pipeline.parameters.node-version >>
   java:
     docker:
-      - image: cimg/openjdk:17.0
+      - image: cimg/openjdk:<< pipeline.parameters.java-version >>
 
 jobs:
   check-core:
@@ -34,10 +43,10 @@ jobs:
             find editoast -type f -exec sha256sum {} \; | sort > /tmp/src_checksum
       - restore_cache:
           keys:
-            - gradle-core-{{ checksum "core/build.gradle" }}
+            - tests-core-{{ checksum "/tmp/src_checksum" }}
       - restore_cache:
           keys:
-            - tests-core-{{ checksum "/tmp/src_checksum" }}
+            - gradle-core-{{ checksum "core/build.gradle" }}
       - run:
           name: Run Core Tests
           command: |
@@ -56,10 +65,6 @@ jobs:
           paths:
             - /tmp/tests_passed
           key: tests-core-{{ checksum "/tmp/src_checksum" }}
-      - store_test_results:
-          path: core/build/test-results
-      - store_artifacts:
-          path: core/build/reports
 
   check-editoast:
     docker:
@@ -79,10 +84,10 @@ jobs:
             find editoast -type f -exec sha256sum {} \; | sort > /tmp/src_checksum
       - restore_cache:
           keys:
-            - cargo-editoast-{{ checksum "editoast/Cargo.lock" }}
+            - tests-editoast-{{ checksum "/tmp/src_checksum" }}
       - restore_cache:
           keys:
-            - tests-editoast-{{ checksum "/tmp/src_checksum" }}
+            - cargo-editoast-{{ checksum "editoast/Cargo.lock" }}
       - run:
           name: Setup Database
           command: |
@@ -104,13 +109,11 @@ jobs:
             else
               echo "Tests already passed for this source code version, skipping..."
             fi
-
       - save_cache:
           paths:
             - ~/.cargo
             - editoast/target
           key: cargo-editoast-{{ checksum "editoast/Cargo.lock" }}
-
       - save_cache:
           paths:
             - /tmp/tests_passed
@@ -200,6 +203,19 @@ jobs:
             - front/node_modules
           key: npm-{{ checksum "front/package-lock.json" }}
 
+  docker-bake:
+    executor: docker/default
+    steps:
+      - checkout
+      - run:
+          name: Prepare Docker processed bakefile
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y jq
+            docker buildx bake --file docker/docker-bake.hcl --print | tee bakefile.json
+            ./.circleci/scripts/add-tags.sh bakefile.json
+            docker buildx bake --file bakefile.json
+
 workflows:
   version: 2
   tests:
@@ -209,3 +225,10 @@ workflows:
       - check-gateway
       - check-osrdyne
       - check-front
+      - docker-bake:
+          requires:
+            - check-core
+            - check-editoast
+            - check-gateway
+            - check-osrdyne
+            - check-front

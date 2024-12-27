@@ -1,0 +1,95 @@
+{
+  "group": {
+    "default": {
+      "targets": [
+        "core",
+        "editoast",
+        "gateway-front",
+        "osrdyne"
+      ]
+    }
+  },
+  "target": {
+    "core": {
+      "context": "core",
+      "contexts": {
+        "static_assets": "./assets",
+        "test_data": "./tests/data"
+      },
+      "dockerfile": "Dockerfile",
+      "args": {
+        "OSRD_GIT_DESCRIBE": ""
+      },
+      "target": "running_env",
+      "tags": [
+        "ghcr.io/openrailassociation/osrd-edge/core:foobar",
+        "ghcr.io/openrailassociation/osrd-edge/core:pr-2142"
+      ]
+    },
+    "editoast": {
+      "context": "editoast",
+      "contexts": {
+        "static_assets": "./assets"
+      },
+      "dockerfile": "Dockerfile",
+      "args": {
+        "OSRD_GIT_DESCRIBE": ""
+      },
+      "target": "running_env",
+      "tags": [
+        "ghcr.io/openrailassociation/osrd-edge/editoast:foobar",
+        "ghcr.io/openrailassociation/osrd-edge/editoast:pr-2142"
+      ]
+    },
+    "front-build": {
+      "context": "front",
+      "dockerfile": "Dockerfile",
+      "args": {
+        "OSRD_GIT_DESCRIBE": ""
+      },
+      "target": "build",
+      "output": [
+        "type=cacheonly"
+      ]
+    },
+    "gateway-front": {
+      "context": "docker",
+      "contexts": {
+        "front_build": "target:front-build",
+        "gateway_build": "target:gateway-standalone",
+        "gateway_src": "./gateway"
+      },
+      "dockerfile": "gateway-front.dockerfile",
+      "args": {
+        "OSRD_GIT_DESCRIBE": ""
+      },
+      "tags": [
+        "ghcr.io/openrailassociation/osrd-edge/gateway:foobar-front",
+        "ghcr.io/openrailassociation/osrd-edge/gateway:pr-2142-front"
+      ]
+    },
+    "gateway-standalone": {
+      "context": "gateway",
+      "dockerfile": "Dockerfile",
+      "args": {
+        "OSRD_GIT_DESCRIBE": ""
+      },
+      "target": "running_env",
+      "output": [
+        "type=cacheonly"
+      ]
+    },
+    "osrdyne": {
+      "context": "osrdyne",
+      "dockerfile": "Dockerfile",
+      "args": {
+        "OSRD_GIT_DESCRIBE": ""
+      },
+      "target": "running_env",
+      "tags": [
+        "ghcr.io/openrailassociation/osrd-edge/osrdyne:foobar",
+        "ghcr.io/openrailassociation/osrd-edge/osrdyne:pr-2142"
+      ]
+    }
+  }
+}

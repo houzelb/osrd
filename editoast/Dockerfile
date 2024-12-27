@@ -20,22 +20,6 @@ ENV RUSTFLAGS="-C target-feature=-crt-static -C link-arg=-fuse-ld=mold"
 RUN cargo install diesel_cli --no-default-features --features postgres
 COPY --from=static_assets . /assets
 
-######################
-# Testing env: build #
-######################
-FROM base_builder AS test_builder
-RUN rustup component add llvm-tools && \
-    rustup component add rustfmt && \
-    rustup component add clippy && \
-    cargo install grcov
-COPY --from=planner /editoast/recipe.json recipe.json
-COPY --from=planner /editoast/editoast_derive/ editoast_derive
-COPY --from=test_data . /tests/data
-ENV RUSTFLAGS="-Cinstrument-coverage -C target-feature=-crt-static -C link-arg=-fuse-ld=mold"
-ENV LLVM_PROFILE_FILE="editoast-%p-%m.profraw"
-RUN cargo chef cook --tests --recipe-path recipe.json
-COPY . .
-
 #######################
 # Running env : build #
 #######################

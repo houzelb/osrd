@@ -29,21 +29,6 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/gateway/target \
     cargo install --profile ${CARGO_PROFILE} --locked --path .
 
-######################
-# Testing env: build #
-######################
-FROM chef AS testing_env
-RUN rustup component add llvm-tools && \
-    rustup component add rustfmt && \
-    rustup component add clippy && \
-    cargo install grcov
-COPY --from=planner /gateway/recipe.json recipe.json
-
-ENV RUSTFLAGS="-Cinstrument-coverage"
-ENV LLVM_PROFILE_FILE="gateway-%p-%m.profraw"
-RUN cargo chef cook --tests --recipe-path recipe.json
-COPY . .
-
 #######################
 # Running env : build #
 #######################
