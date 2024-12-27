@@ -61,7 +61,7 @@ jobs:
       - run:
           name: Setup Database
           command: |
-            psql postgresql://postgres:password@localhost/osrd -f docker/init_db.sql
+            psql postgresql://postgres:password@localhost -f docker/init_db.sql
       - run:
           name: Run Editoast Tests
           working_directory: editoast
