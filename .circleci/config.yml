@@ -46,7 +46,7 @@ jobs:
         environment:
           POSTGRES_USER: osrd
           POSTGRES_PASSWORD: password
-      - image: valkey/valkey
+      - image: cimg/redis:7.2.4 # Exact version used by the valkey fork, should be compatible.
     steps:
       - checkout
       - restore_cache:
