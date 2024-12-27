@@ -1,122 +1,169 @@
-# This config was automatically generated from your source code
-# Stacks detected: cicd:github-actions:.github/workflows,deps:java:core,deps:node:front,deps:python:tests,deps:rust:osrdyne,package_manager:poetry:tests,tool:gradle:
 version: 2.1
+
 orbs:
-  node: circleci/node@5
-  python: circleci/python@2
-jobs:
-  test-node:
-    # Install node dependencies and run tests
-    executor: node/default
-    working_directory: ~/project/front
-    steps:
-      - checkout:
-          path: ~/project
-      - node/install-packages:
-          pkg-manager: npm
-      - run:
-          name: Run tests
-          command: npm test --passWithNoTests
-  build-node:
-    # Build node project
-    executor: node/default
-    working_directory: ~/project/front
-    steps:
-      - checkout:
-          path: ~/project
-      - node/install-packages:
-          pkg-manager: npm
-      - run:
-          command: npm run build
-      - run:
-          name: Create the ~/artifacts directory if it doesn't exist
-          command: mkdir -p ~/artifacts
-      # Copy output to artifacts dir
-      - run:
-          name: Copy artifacts
-          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
-      - store_artifacts:
-          path: ~/artifacts
-          destination: node-build
-  test-java:
+  docker: circleci/docker@2.4.0
+
+executors:
+  python:
+    docker:
+      - image: cimg/python:3.9
+  rust:
+    docker:
+      - image: cimg/rust:1.82
+  node:
+    docker:
+      - image: cimg/node:20.5
+  java:
     docker:
       - image: cimg/openjdk:17.0
-    working_directory: ~/project/core
+
+jobs:
+  check-core:
+    executor: java
     steps:
-      - checkout:
-          path: ~/project
-      - run:
-          name: Calculate cache key
-          command: |-
-            find . -name 'pom.xml' -o -name 'gradlew*' -o -name '*.gradle*' | \
-                    sort | xargs cat > /tmp/CIRCLECI_CACHE_KEY
+      - checkout
       - restore_cache:
-          key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
+          keys:
+            - gradle-core-{{ checksum "core/build.gradle" }}
       - run:
-          command: ./gradlew check
-      - store_test_results:
-          path: build/test-results
+          name: Run Core Tests
+          command: |
+            cd core
+            ./gradlew check
       - save_cache:
-          key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
           paths:
-            - ~/.gradle/caches
-      - store_artifacts:
-          path: build/reports
-  test-python:
-    # Install dependencies and run tests
-    docker:
-      - image: cimg/python:3.9-node
-    working_directory: ~/project/tests
-    steps:
-      - checkout:
-          path: ~/project
-      - python/install-packages:
-          pkg-manager: poetry
-      - run:
-          name: Run tests
-          command: poetry run pytest --junitxml=junit.xml || ((($? == 5)) && echo 'Did not find any tests to run.')
+            - ~/.gradle
+          key: gradle-core-{{ checksum "core/build.gradle" }}
       - store_test_results:
-          path: junit.xml
-  test-rust:
+          path: core/build/test-results
+      - store_artifacts:
+          path: core/build/reports
+
+  check-editoast:
+    executor: rust
     docker:
       - image: cimg/rust:1.70
-    working_directory: ~/project/osrdyne
+      - image: postgis/postgis
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+      - image: valkey/valkey
     steps:
-      - checkout:
-          path: ~/project
+      - checkout
       - restore_cache:
-          key: cargo-{{ checksum "Cargo.lock" }}
+          keys:
+            - cargo-editoast-{{ checksum "editoast/Cargo.lock" }}
       - run:
-          command: cargo test
+          name: Setup Database
+          command: |
+            psql postgresql://postgres:password@localhost:5432 -f docker/init_db.sql
+      - run:
+          name: Run Editoast Tests
+          working_directory: editoast
+          environment:
+            DATABASE_URL: postgres://osrd:password@localhost:5432/osrd
+            CI: "true"
+          command: |
+            cargo install diesel_cli --no-default-features --features postgres
+            diesel migration run --locked-schema
+            cargo test --workspace --verbose
       - save_cache:
-          key: cargo-{{ checksum "Cargo.lock" }}
           paths:
             - ~/.cargo
-  deploy:
-    # This is an example deploy job, not actually used by the workflow
-    docker:
-      - image: cimg/base:stable
+            - editoast/target
+          key: cargo-editoast-{{ checksum "editoast/Cargo.lock" }}
+
+  check-gateway:
+    executor: rust
     steps:
-      # Replace this with steps to deploy to users
+      - checkout
+      - restore_cache:
+          keys:
+            - cargo-gateway-{{ checksum "gateway/Cargo.lock" }}
       - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+          name: Run Gateway Tests
+          working_directory: gateway
+          command: |
+            cargo test --verbose
       - run:
-          name: found github actions config
-          command: ':'
+          name: Check Gateway Format
+          working_directory: gateway
+          command: |
+            cargo fmt --check
+      - run:
+          name: Run Gateway Clippy
+          working_directory: gateway
+          command: |
+            cargo clippy --all-features --all-targets -- -D warnings
+      - save_cache:
+          paths:
+            - ~/.cargo
+            - gateway/target
+          key: cargo-gateway-{{ checksum "gateway/Cargo.lock" }}
+
+  check-osrdyne:
+    executor: rust
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - cargo-osrdyne-{{ checksum "osrdyne/Cargo.lock" }}
+      - run:
+          name: Run OSRDyne Tests
+          working_directory: osrdyne
+          command: |
+            cargo test --verbose
+      - run:
+          name: Check OSRDyne Format
+          working_directory: osrdyne
+          command: |
+            cargo fmt --check
+      - run:
+          name: Run OSRDyne Clippy
+          working_directory: osrdyne
+          command: |
+            cargo clippy --all-features --all-targets -- -D warnings
+      - save_cache:
+          paths:
+            - ~/.cargo
+            - osrdyne/target
+          key: cargo-osrdyne-{{ checksum "osrdyne/Cargo.lock" }}
+
+  check-front:
+    executor: node
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - npm-{{ checksum "front/package-lock.json" }}
+      - run:
+          name: Install Dependencies
+          working_directory: front
+          command: npm ci
+      - run:
+          name: Check Code Formatting
+          working_directory: front
+          command: npx prettier . --check
+      - run:
+          name: Check i18n Keys
+          working_directory: front
+          command: npm run i18n-checker
+      - run:
+          name: Run Tests
+          working_directory: front
+          command: npm run test
+      - save_cache:
+          paths:
+            - front/node_modules
+          key: npm-{{ checksum "front/package-lock.json" }}
+
 workflows:
-  build-and-test:
+  version: 2
+  tests:
     jobs:
-      - test-node
-      - build-node:
-          requires:
-            - test-node
-            - test-java
-            - test-python
-            - test-rust
-      - test-java
-      - test-python
-      - test-rust
-    # - deploy:
-    #     requires:
-    #       - build-node
+      - check-core
+      - check-editoast
+      - check-gateway
+      - check-osrdyne
+      - check-front
+      - integration-tests
