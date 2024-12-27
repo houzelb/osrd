@@ -1,5 +1,10 @@
 version: 2.1
 
+parameters:
+  rust-version:
+    type: string
+    default: "1.82"
+
 orbs:
   docker: circleci/docker@2.4.0
 
@@ -9,7 +14,7 @@ executors:
       - image: cimg/python:3.9
   rust:
     docker:
-      - image: cimg/rust:1.82
+      - image: cimg/rust:<< parameters.rust-version >>
   node:
     docker:
       - image: cimg/node:20.5
@@ -40,10 +45,11 @@ jobs:
           path: core/build/reports
 
   check-editoast:
-    executor: rust
     docker:
+      - image: cimg/rust:<< parameters.rust-version >>
       - image: cimg/postgres:17.0-postgis
         environment:
+          POSTGRES_DB: osrd
           POSTGRES_USER: osrd
           POSTGRES_PASSWORD: password
       - image: cimg/redis:7.2.4 # Exact version used by the valkey fork, should be compatible.
@@ -55,12 +61,12 @@ jobs:
       - run:
           name: Setup Database
           command: |
-            psql postgres://postgres@localhost -f docker/init_db.sql
+            psql postgresql://osrd:passord@localhost/osrd -f docker/init_db.sql
       - run:
           name: Run Editoast Tests
           working_directory: editoast
           environment:
-            DATABASE_URL: postgres://postgres@localhost/osrd
+            DATABASE_URL: postgres://osrd:passord@localhost/osrd
             CI: "true"
           command: |
             cargo install diesel_cli --no-default-features --features postgres
