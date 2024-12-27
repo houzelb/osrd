@@ -42,7 +42,7 @@ jobs:
   check-editoast:
     executor: rust
     docker:
-      - image: postgis/postgis
+      - image: cimg/postgres:17.0-postgis
         environment:
           POSTGRES_USER: osrd
           POSTGRES_PASSWORD: password
@@ -55,12 +55,12 @@ jobs:
       - run:
           name: Setup Database
           command: |
-            psql postgres://osrd:password@localhost:5432 -f docker/init_db.sql
+            psql postgres://postgres@localhost -f docker/init_db.sql
       - run:
           name: Run Editoast Tests
           working_directory: editoast
           environment:
-            DATABASE_URL: postgres://osrd:password@localhost:5432/osrd
+            DATABASE_URL: postgres://postgres@localhost/osrd
             CI: "true"
           command: |
             cargo install diesel_cli --no-default-features --features postgres
