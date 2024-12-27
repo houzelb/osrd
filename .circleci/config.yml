@@ -42,7 +42,6 @@ jobs:
   check-editoast:
     executor: rust
     docker:
-      - image: cimg/rust:1.70
       - image: postgis/postgis
         environment:
           POSTGRES_USER: postgres
