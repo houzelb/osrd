@@ -208,29 +208,26 @@ jobs:
       - image: cimg/base:2024.12
     steps:
       - checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Prepare Docker processed bakefile
           command: |
             sudo apt-get update
             sudo apt-get install -y jq
-            docker buildx bake --file docker/docker-bake.hcl --print | tee bakefile.json
+            docker buildx bake --file docker/docker-bake.hcl --print > bakefile.json
             ./.circleci/scripts/add-tags.py bakefile.json
             docker buildx bake --file bakefile.json
 
 workflows:
   version: 2
-  tests:
+  check:
     jobs:
       - check-core
       - check-editoast
       - check-gateway
       - check-osrdyne
       - check-front
-      - docker-bake:
-          requires:
-            - check-core
-            - check-editoast
-            - check-gateway
-            - check-osrdyne
-            - check-front
+  build:
+    jobs:
+      - docker-bake
