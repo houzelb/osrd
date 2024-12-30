@@ -15,11 +15,13 @@ const buildStdcmConfSelectors = () => {
   return {
     ...commonConfSelectors,
     getStdcmConf,
-    getStandardStdcmAllowance: makeOsrdConfSelector('standardStdcmAllowance'),
+
+    getMargins: makeOsrdConfSelector('margins'),
     getTotalMass: makeOsrdConfSelector('totalMass'),
     getTotalLength: makeOsrdConfSelector('totalLength'),
     getMaxSpeed: makeOsrdConfSelector('maxSpeed'),
     getTowedRollingStockID: makeOsrdConfSelector('towedRollingStockID'),
+
     getStdcmPathSteps,
     getStdcmOrigin: (state: RootState) => {
       const pathSteps = getStdcmPathSteps(state);
@@ -43,7 +45,7 @@ const buildStdcmConfSelectors = () => {
 
 const selectors = buildStdcmConfSelectors();
 
-export const { getStdcmConf } = selectors;
+export const { getStdcmConf, getMargins } = selectors;
 
 export type StdcmConfSelectors = typeof selectors;
 

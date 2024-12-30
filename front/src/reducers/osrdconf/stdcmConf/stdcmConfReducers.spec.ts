@@ -71,20 +71,38 @@ describe('stdcmConfReducers', () => {
     expect(state).toEqual(stdcmConfInitialState);
   });
 
-  it('should handle updateStdcmStandardAllowance', () => {
-    const initialTimeStandardAllowance = testDataBuilder.buildTimeStandardAllowance(10);
-    const store = createStore({
-      standardStdcmAllowance: initialTimeStandardAllowance,
+  it('should handle margins update', () => {
+    it('should handle updateStandardAllowance', () => {
+      const initialTimeStandardAllowance = testDataBuilder.buildTimeStandardAllowance(10);
+      const store = createStore({
+        margins: { standardAllowance: initialTimeStandardAllowance },
+      });
+
+      const stateBefore = store.getState()[stdcmConfSlice.name];
+      expect(stateBefore.margins.standardAllowance).toBe(initialTimeStandardAllowance);
+
+      const newStandardAllowance = testDataBuilder.buildPercentageStandardAllowance(5);
+      store.dispatch(stdcmConfSliceActions.updateStandardAllowance(newStandardAllowance));
+
+      const stateAfter = store.getState()[stdcmConfSlice.name];
+      expect(stateAfter.margins.standardAllowance).toBe(newStandardAllowance);
     });
 
-    const stateBefore = store.getState()[stdcmConfSlice.name];
-    expect(stateBefore.standardStdcmAllowance).toBe(initialTimeStandardAllowance);
+    it('should handle updateGridMarginBefore', () => {
+      const newGridMarginBefore = 5;
+      const store = createStore(initialStateSTDCMConfig);
+      store.dispatch(stdcmConfSliceActions.updateGridMarginBefore(newGridMarginBefore));
+      const state = store.getState()[stdcmConfSlice.name];
+      expect(state.margins.gridMarginBefore).toStrictEqual(newGridMarginBefore);
+    });
 
-    const newStandardAllowance = testDataBuilder.buildPercentageStandardAllowance(5);
-    store.dispatch(stdcmConfSliceActions.updateStdcmStandardAllowance(newStandardAllowance));
-
-    const stateAfter = store.getState()[stdcmConfSlice.name];
-    expect(stateAfter.standardStdcmAllowance).toBe(newStandardAllowance);
+    it('should handle updateGridMarginAfter', () => {
+      const newGridMarginAfter = 5;
+      const store = createStore(initialStateSTDCMConfig);
+      store.dispatch(stdcmConfSliceActions.updateGridMarginAfter(newGridMarginAfter));
+      const state = store.getState()[stdcmConfSlice.name];
+      expect(state.margins.gridMarginAfter).toStrictEqual(newGridMarginAfter);
+    });
   });
 
   it('should handle resetStdcmConfig', () => {

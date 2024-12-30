@@ -37,8 +37,6 @@ export type OsrdConfState = InfraState & {
   speedLimitByTag?: string;
   powerRestriction: PowerRestriction[];
   initialSpeed?: number;
-  gridMarginBefore?: number;
-  gridMarginAfter?: number;
   pathSteps: (PathStep | null)[];
   rollingStockComfort: Comfort;
   startTime: Date;
@@ -51,7 +49,11 @@ export interface StandardAllowance {
 
 export type OsrdStdcmConfState = OsrdConfState & {
   stdcmPathSteps: StdcmPathStep[];
-  standardStdcmAllowance?: StandardAllowance;
+  margins: {
+    standardAllowance?: StandardAllowance;
+    gridMarginBefore?: number;
+    gridMarginAfter?: number;
+  };
   totalMass?: number;
   totalLength?: number;
   maxSpeed?: number;

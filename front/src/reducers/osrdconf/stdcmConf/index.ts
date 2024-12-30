@@ -30,7 +30,11 @@ export const stdcmConfInitialState: OsrdStdcmConfState = {
       tolerances: { before: DEFAULT_TOLERANCE, after: DEFAULT_TOLERANCE },
     },
   ],
-  standardStdcmAllowance: undefined,
+  margins: {
+    standardAllowance: undefined,
+    gridMarginBefore: undefined,
+    gridMarginAfter: undefined,
+  },
   totalMass: undefined,
   totalLength: undefined,
   maxSpeed: undefined,
@@ -103,11 +107,23 @@ export const stdcmConfSlice = createSlice({
       state.stdcmPathSteps = action.payload.stdcmPathSteps;
       state.speedLimitByTag = action.payload.speedLimitByTag;
     },
-    updateStdcmStandardAllowance(
+    updateStandardAllowance(
       state: Draft<OsrdStdcmConfState>,
-      action: PayloadAction<OsrdStdcmConfState['standardStdcmAllowance']>
+      action: PayloadAction<OsrdStdcmConfState['margins']['standardAllowance']>
     ) {
-      state.standardStdcmAllowance = action.payload;
+      state.margins = { ...state.margins, standardAllowance: action.payload };
+    },
+    updateGridMarginBefore(
+      state: Draft<OsrdStdcmConfState>,
+      action: PayloadAction<OsrdStdcmConfState['margins']['gridMarginBefore']>
+    ) {
+      state.margins = { ...state.margins, gridMarginBefore: action.payload };
+    },
+    updateGridMarginAfter(
+      state: Draft<OsrdStdcmConfState>,
+      action: PayloadAction<OsrdStdcmConfState['margins']['gridMarginAfter']>
+    ) {
+      state.margins = { ...state.margins, gridMarginAfter: action.payload };
     },
     updateStdcmEnvironment(
       state: Draft<OsrdStdcmConfState>,
@@ -206,6 +222,9 @@ export const stdcmConfSlice = createSlice({
 });
 
 export const stdcmConfSliceActions = stdcmConfSlice.actions;
+
+export const { updateGridMarginAfter, updateGridMarginBefore, updateStandardAllowance } =
+  stdcmConfSliceActions;
 
 export type StdcmConfSlice = typeof stdcmConfSlice;
 

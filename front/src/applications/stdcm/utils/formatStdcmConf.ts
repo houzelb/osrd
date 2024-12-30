@@ -8,7 +8,6 @@ import type {
   TrainScheduleBase,
 } from 'common/api/osrdEditoastApi';
 import getStepLocation from 'modules/pathfinding/helpers/getStepLocation';
-import type { InfraState } from 'reducers/infra';
 import { setFailure } from 'reducers/main';
 import type { OsrdStdcmConfState, StandardAllowance } from 'reducers/osrdconf/types';
 import { dateTimeFormatting } from 'utils/date';
@@ -40,7 +39,7 @@ type ValidStdcmConfig = {
 export const checkStdcmConf = (
   dispatch: Dispatch,
   t: TFunction,
-  osrdconf: OsrdStdcmConfState & InfraState
+  osrdconf: OsrdStdcmConfState
 ): ValidStdcmConfig | null => {
   const {
     stdcmPathSteps: pathSteps,
@@ -50,9 +49,7 @@ export const checkStdcmConf = (
     infraID,
     rollingStockID,
     towedRollingStockID,
-    standardStdcmAllowance,
-    gridMarginBefore,
-    gridMarginAfter,
+    margins: { standardAllowance, gridMarginBefore, gridMarginAfter },
     searchDatetimeWindow,
     workScheduleGroupId,
     temporarySpeedLimitGroupId,
@@ -198,7 +195,7 @@ export const checkStdcmConf = (
     totalLength,
     maxSpeed,
     towedRollingStockID,
-    margin: standardStdcmAllowance,
+    margin: standardAllowance,
     gridMarginBefore,
     gridMarginAfter,
     workScheduleGroupId,
