@@ -21,6 +21,10 @@ import TimesStopsInput from 'modules/timesStops/TimesStopsInput';
 import { Map } from 'modules/trainschedule/components/ManageTrainSchedule';
 import SimulationSettings from 'modules/trainschedule/components/ManageTrainSchedule/SimulationSettings';
 import TrainSettings from 'modules/trainschedule/components/ManageTrainSchedule/TrainSettings';
+import {
+  getConstraintDistribution,
+  getStartTime,
+} from 'reducers/osrdconf/operationalStudiesConf/selectors';
 import { formatKmValue } from 'utils/strings';
 
 import { useManageTrainScheduleContext } from '../hooks/useManageTrainScheduleContext';
@@ -33,8 +37,7 @@ const ManageTrainSchedule = ({ trainIdToEdit }: ManageTrainScheduleProps) => {
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
   const { pathProperties, voltageRanges } = useManageTrainScheduleContext();
 
-  const { getOrigin, getDestination, getPathSteps, getConstraintDistribution, getStartTime } =
-    useOsrdConfSelectors();
+  const { getOrigin, getDestination, getPathSteps } = useOsrdConfSelectors();
   const origin = useSelector(getOrigin);
   const destination = useSelector(getDestination);
   const pathSteps = useSelector(getPathSteps);

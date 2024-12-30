@@ -1,5 +1,6 @@
 import { createSlice, type Draft, type PayloadAction } from '@reduxjs/toolkit';
 
+import type { Comfort, Distribution } from 'common/api/osrdEditoastApi';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import type { TrainScheduleWithDetails } from 'modules/trainschedule/components/Timetable/types';
 import computeBasePathStep from 'modules/trainschedule/helpers/computeBasePathStep';
@@ -8,16 +9,43 @@ import type { OsrdConfState } from 'reducers/osrdconf/types';
 import { msToKmh } from 'utils/physics';
 
 import { builPowerRestrictionReducer } from './powerRestrictionReducer';
+import buildTrainSettingsReducer from './trainSettingsReducer';
 import { upsertPathStep } from '../helpers';
 
-export type OperationalStudiesConfState = OsrdConfState;
+export type OperationalStudiesConfState = OsrdConfState & {
+  name: string;
+  startTime: Date;
+  initialSpeed?: number;
+  labels: string[];
+  rollingStockComfort: Comfort;
+  constraintDistribution: Distribution;
+  usingElectricalProfiles: boolean;
+  trainCount: number;
+  trainStep: number;
+  trainDelta: number;
+};
+
+export const operationalStudiesInitialConf: OperationalStudiesConfState = {
+  ...defaultCommonConf,
+  name: '',
+  startTime: new Date(),
+  initialSpeed: 0,
+  labels: [],
+  rollingStockComfort: 'STANDARD',
+  constraintDistribution: 'MARECO',
+  usingElectricalProfiles: true,
+  trainCount: 1,
+  trainDelta: 15,
+  trainStep: 2,
+};
 
 export const operationalStudiesConfSlice = createSlice({
   name: 'operationalStudiesConf',
-  initialState: defaultCommonConf,
+  initialState: operationalStudiesInitialConf,
   reducers: {
     ...buildCommonConfReducers<OperationalStudiesConfState>(),
     ...builPowerRestrictionReducer<OperationalStudiesConfState>(),
+    ...buildTrainSettingsReducer(),
     selectTrainToEdit(
       state: Draft<OperationalStudiesConfState>,
       action: PayloadAction<TrainScheduleWithDetails>
@@ -68,6 +96,19 @@ export const operationalStudiesConfSlice = createSlice({
 });
 
 export const operationalStudiesConfSliceActions = operationalStudiesConfSlice.actions;
+
+export const {
+  updateName,
+  updateStartTime,
+  updateInitialSpeed,
+  updateLabels,
+  updateRollingStockComfort,
+  updateConstraintDistribution,
+  toggleUsingElectricalProfiles,
+  updateTrainCount,
+  updateTrainDelta,
+  updateTrainStep,
+} = operationalStudiesConfSliceActions;
 
 export type OperationalStudiesConfSlice = typeof operationalStudiesConfSlice;
 

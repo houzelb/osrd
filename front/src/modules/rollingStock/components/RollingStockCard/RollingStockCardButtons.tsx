@@ -7,8 +7,10 @@ import type { Comfort } from 'common/api/osrdEditoastApi';
 import { ModalContext } from 'common/BootstrapSNCF/ModalSNCF/ModalProvider';
 import OptionsSNCF from 'common/BootstrapSNCF/OptionsSNCF';
 import type { Option } from 'common/BootstrapSNCF/OptionsSNCF';
-import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
+import { useOsrdConfActions } from 'common/osrdContext';
 import { comfort2pictogram } from 'modules/rollingStock/components/RollingStockSelector/RollingStockHelpers';
+import { updateRollingStockComfort } from 'reducers/osrdconf/operationalStudiesConf';
+import { getRollingStockComfort } from 'reducers/osrdconf/operationalStudiesConf/selectors';
 import { useAppDispatch } from 'store';
 
 interface RollingStockCardButtonsProps {
@@ -26,11 +28,10 @@ const RollingStockCardButtons = ({
   const { t } = useTranslation(['rollingstock']);
   const { closeModal } = useContext(ModalContext);
 
-  const { getRollingStockComfort } = useOsrdConfSelectors();
   const currentComfortInStore = useSelector(getRollingStockComfort);
   const [comfort, setComfort] = useState<string>(currentComfortInStore);
 
-  const { updateRollingStockComfort, updateRollingStockID } = useOsrdConfActions();
+  const { updateRollingStockID } = useOsrdConfActions();
 
   const selectRollingStock = () => {
     setOpenedRollingStockCardId(undefined);
