@@ -3,11 +3,14 @@ import { useSelector } from 'react-redux';
 
 import { MANAGE_TRAIN_SCHEDULE_TYPES } from 'applications/operationalStudies/consts';
 import { osrdEditoastApi, type TrainScheduleResult } from 'common/api/osrdEditoastApi';
-import { useOsrdConfSelectors } from 'common/osrdContext';
 import { useStoreDataForRollingStockSelector } from 'modules/rollingStock/components/RollingStockSelector/useStoreDataForRollingStockSelector';
 import checkCurrentConfig from 'modules/trainschedule/components/ManageTrainSchedule/helpers/checkCurrentConfig';
 import { setFailure, setSuccess } from 'reducers/main';
-import { getOperationalStudiesConf } from 'reducers/osrdconf/operationalStudiesConf/selectors';
+import {
+  getName,
+  getStartTime,
+  getOperationalStudiesConf,
+} from 'reducers/osrdconf/operationalStudiesConf/selectors';
 import { updateSelectedTrainId } from 'reducers/simulationResults';
 import { useAppDispatch } from 'store';
 import { formatToIsoDate } from 'utils/date';
@@ -26,7 +29,6 @@ const useUpdateTrainSchedule = (
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
   const [putTrainScheduleById] = osrdEditoastApi.endpoints.putTrainScheduleById.useMutation();
   const dispatch = useAppDispatch();
-  const { getName, getStartTime } = useOsrdConfSelectors();
   const confName = useSelector(getName);
   const simulationConf = useSelector(getOperationalStudiesConf);
   const startTime = useSelector(getStartTime);

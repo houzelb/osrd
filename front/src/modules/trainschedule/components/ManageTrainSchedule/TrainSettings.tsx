@@ -9,7 +9,18 @@ import { useSelector } from 'react-redux';
 import { isInvalidName } from 'applications/operationalStudies/utils';
 import ChipsSNCF from 'common/BootstrapSNCF/ChipsSNCF';
 import InputSNCF from 'common/BootstrapSNCF/InputSNCF';
-import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
+import {
+  updateLabels,
+  updateName,
+  updateStartTime,
+  updateInitialSpeed,
+} from 'reducers/osrdconf/operationalStudiesConf';
+import {
+  getLabels,
+  getName,
+  getInitialSpeed,
+  getStartTime,
+} from 'reducers/osrdconf/operationalStudiesConf/selectors';
 import { useAppDispatch } from 'store';
 import { parseLocalDateTime, formatLocalDateTime } from 'utils/date';
 import { useDebounce } from 'utils/helpers';
@@ -17,9 +28,6 @@ import { isInvalidFloatNumber } from 'utils/numbers';
 
 export default function TrainSettings() {
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
-
-  const { getLabels, getInitialSpeed, getName, getStartTime } = useOsrdConfSelectors();
-  const { updateLabels, updateInitialSpeed, updateName, updateStartTime } = useOsrdConfActions();
 
   const labels = useSelector(getLabels);
   const nameFromStore = useSelector(getName);

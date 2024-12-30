@@ -22,13 +22,6 @@ const buildCommonConfSelectors = (slice: OperationalStudiesConfSlice | StdcmConf
 
   return {
     ...buildInfraStateSelectors(slice),
-    getConstraintDistribution: makeOsrdConfSelector('constraintDistribution'),
-    getName: makeOsrdConfSelector('name'),
-    getTrainCount: makeOsrdConfSelector('trainCount'),
-    getTrainDelta: makeOsrdConfSelector('trainDelta'),
-    getTrainStep: makeOsrdConfSelector('trainStep'),
-    getUsingElectricalProfiles: makeOsrdConfSelector('usingElectricalProfiles'),
-    getLabels: makeOsrdConfSelector('labels'),
     getProjectID: makeOsrdConfSelector('projectID'),
     getStudyID: makeOsrdConfSelector('studyID'),
     getScenarioID: makeOsrdConfSelector('scenarioID'),
@@ -38,7 +31,6 @@ const buildCommonConfSelectors = (slice: OperationalStudiesConfSlice | StdcmConf
     getSearchDatetimeWindow: makeOsrdConfSelector('searchDatetimeWindow'),
     getRollingStockID: makeOsrdConfSelector('rollingStockID'),
     getSpeedLimitByTag: makeOsrdConfSelector('speedLimitByTag'),
-    getInitialSpeed: makeOsrdConfSelector('initialSpeed'),
     getGridMarginBefore: makeOsrdConfSelector('gridMarginBefore'),
     getGridMarginAfter: makeOsrdConfSelector('gridMarginAfter'),
     getPowerRestriction: makeOsrdConfSelector('powerRestriction'),
@@ -53,8 +45,6 @@ const buildCommonConfSelectors = (slice: OperationalStudiesConfSlice | StdcmConf
     },
     /** To use this action, do useSelector(getVias()) */
     getVias: () => viasSelector,
-    getRollingStockComfort: makeOsrdConfSelector('rollingStockComfort'),
-    getStartTime: makeOsrdConfSelector('startTime'),
   };
 };
 

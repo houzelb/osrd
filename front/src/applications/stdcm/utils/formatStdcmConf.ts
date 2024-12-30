@@ -2,11 +2,7 @@ import type { TFunction } from 'i18next';
 import { compact } from 'lodash';
 import type { Dispatch } from 'redux';
 
-import type {
-  PathfindingItem,
-  PostTimetableByIdStdcmApiArg,
-  TrainScheduleBase,
-} from 'common/api/osrdEditoastApi';
+import type { PathfindingItem, PostTimetableByIdStdcmApiArg } from 'common/api/osrdEditoastApi';
 import getStepLocation from 'modules/pathfinding/helpers/getStepLocation';
 import type { InfraState } from 'reducers/infra';
 import { setFailure } from 'reducers/main';
@@ -23,7 +19,6 @@ type ValidStdcmConfig = {
   towedRollingStockID?: number;
   timetableId: number;
   infraId: number;
-  rollingStockComfort: TrainScheduleBase['comfort'];
   path: PathfindingItem[];
   speedLimitByTag?: string;
   totalMass?: number;
@@ -46,7 +41,6 @@ export const checkStdcmConf = (
     stdcmPathSteps: pathSteps,
     timetableID,
     speedLimitByTag,
-    rollingStockComfort,
     infraID,
     rollingStockID,
     towedRollingStockID,
@@ -191,7 +185,6 @@ export const checkStdcmConf = (
     infraId: infraID!,
     rollingStockId: rollingStockID!,
     timetableId: timetableID!,
-    rollingStockComfort,
     path,
     speedLimitByTag,
     totalMass,
@@ -216,7 +209,7 @@ export const formatStdcmPayload = (
   infra: validConfig.infraId,
   id: validConfig.timetableId,
   body: {
-    comfort: validConfig.rollingStockComfort || 'STANDARD',
+    comfort: 'STANDARD',
     margin: createMargin(validConfig.margin),
     rolling_stock_id: validConfig.rollingStockId,
     towed_rolling_stock_id: validConfig.towedRollingStockID,

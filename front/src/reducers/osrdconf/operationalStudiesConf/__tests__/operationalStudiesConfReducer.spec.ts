@@ -5,19 +5,20 @@ import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSc
 import type { TrainScheduleWithDetails } from 'modules/trainschedule/components/Timetable/types';
 import {
   operationalStudiesConfSlice,
+  operationalStudiesInitialConf,
   type OperationalStudiesConfState,
 } from 'reducers/osrdconf/operationalStudiesConf';
-import { defaultCommonConf } from 'reducers/osrdconf/osrdConfCommon';
+import commonConfBuilder from 'reducers/osrdconf/osrdConfCommon/__tests__/commonConfBuilder';
 import testCommonConfReducers from 'reducers/osrdconf/osrdConfCommon/__tests__/utils';
+import type { PathStep } from 'reducers/osrdconf/types';
 import { createStoreWithoutMiddleware } from 'store';
 
-import commonConfBuilder from '../osrdConfCommon/__tests__/commonConfBuilder';
-import type { PathStep } from '../types';
+import testTrainSettingsReducer from './trainSettingsReducer';
 
 const createStore = (extraInitialState?: Partial<OperationalStudiesConfState>) =>
   createStoreWithoutMiddleware({
     [operationalStudiesConfSlice.name]: {
-      ...defaultCommonConf,
+      ...operationalStudiesInitialConf,
       ...extraInitialState,
     },
   });
@@ -26,7 +27,7 @@ describe('simulationConfReducer', () => {
   it('should return initial state', () => {
     const store = createStore();
     const state = store.getState()[operationalStudiesConfSlice.name];
-    expect(state).toEqual(defaultCommonConf);
+    expect(state).toEqual(operationalStudiesInitialConf);
   });
 
   it('selectTrainToEdit', () => {
@@ -57,7 +58,7 @@ describe('simulationConfReducer', () => {
 
     const state = store.getState()[operationalStudiesConfSlice.name];
     expect(state).toEqual({
-      ...defaultCommonConf,
+      ...operationalStudiesInitialConf,
       usingElectricalProfiles: false,
       labels: ['label1'],
       rollingStockID: 1,
@@ -160,4 +161,5 @@ describe('simulationConfReducer', () => {
   });
 
   testCommonConfReducers(operationalStudiesConfSlice);
+  testTrainSettingsReducer();
 });
