@@ -48,7 +48,7 @@ const Vias = ({ zoomToFeaturePoint }: ViasProps) => {
                     {...providedDraggable.draggableProps}
                     {...providedDraggable.dragHandleProps}
                     className={cx('place via', {
-                      'is-a-stop': via.arrival || via.stopFor,
+                      'is-a-stop': via.arrival || via.stopFor !== undefined,
                       'invalid-path-item': isPathStepInvalid(via),
                     })}
                   >

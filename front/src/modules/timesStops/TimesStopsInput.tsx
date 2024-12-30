@@ -118,8 +118,9 @@ const TimesStopsInput = ({ allWaypoints, startTime, pathSteps }: TimesStopsInput
           (row, index) =>
             !isEqual(normalizeNullablesInRow(row), normalizeNullablesInRow(rows[index]))
         )
-        .map(({ shortSlipDistance, onStopSignal, arrival, departure, ...row }) => ({
+        .map(({ shortSlipDistance, onStopSignal, arrival, departure, stopFor, ...row }) => ({
           ...row,
+          stopFor: stopFor !== '' ? Number(stopFor) : undefined,
           arrival: durationSinceStartTime(startTime, arrival),
           departure: durationSinceStartTime(startTime, departure),
           receptionSignal: onStopSignalToReceptionSignal(onStopSignal, shortSlipDistance),

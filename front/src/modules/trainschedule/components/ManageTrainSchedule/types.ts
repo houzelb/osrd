@@ -26,7 +26,8 @@ export type SuggestedOP = {
   deleted?: boolean;
   arrival?: IsoDurationString | null; // value asked by user, number of seconds since departure
   locked?: boolean;
-  stopFor?: string | null; // value asked by user
+  /** Duration in seconds */
+  stopFor?: number; // value asked by user
   theoreticalMargin?: string; // value asked by user
   theoreticalMarginSeconds?: string;
   calculatedMargin?: string;

@@ -52,7 +52,8 @@ export type PathStep = PathItemLocation & {
   deleted?: boolean;
   arrival?: IsoDurationString | null;
   locked?: boolean;
-  stopFor?: string | null;
+  /** Duration in seconds */
+  stopFor?: number;
   theoreticalMargin?: string;
   receptionSignal?: ReceptionSignal;
   kp?: string;

@@ -60,7 +60,7 @@ const computeBasePathStep = (
     secondary_code: 'secondary_code' in step ? step.secondary_code : undefined,
     name,
     arrival, // ISODurationString
-    stopFor: stopFor ? ISO8601Duration2sec(stopFor).toString() : stopFor,
+    stopFor: stopFor ? ISO8601Duration2sec(stopFor) : undefined,
     locked,
     receptionSignal,
     theoreticalMargin,

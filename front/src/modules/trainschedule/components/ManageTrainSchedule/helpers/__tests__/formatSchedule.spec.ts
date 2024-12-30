@@ -32,7 +32,7 @@ describe('formatSchedule', () => {
           name: 'V',
           positionOnPath: 13116000,
           arrival: 'PT60S',
-          stopFor: '0',
+          stopFor: 0,
           locked: false,
           receptionSignal: 'OPEN',
         },

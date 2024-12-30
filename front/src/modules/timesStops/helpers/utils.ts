@@ -86,7 +86,7 @@ export const formatSuggestedViasToRowVias = (
 
     const departureTime =
       stopFor && arrivalInSeconds
-        ? secToHoursString(arrivalInSeconds + Number(stopFor), { withSeconds: true })
+        ? secToHoursString(arrivalInSeconds + stopFor, { withSeconds: true })
         : undefined;
     const formattedDeparture: TimeExtraDays | undefined = departureTime
       ? { time: departureTime }
@@ -101,7 +101,7 @@ export const formatSuggestedViasToRowVias = (
       onStopSignal,
       name: name || t('waypoint', { id: filteredOp.pathStepId }),
       shortSlipDistance,
-      stopFor,
+      stopFor: stopFor !== undefined ? `${stopFor}` : undefined,
       theoreticalMargin,
       isWaypoint: op.isWaypoint || pathStep !== undefined,
     };

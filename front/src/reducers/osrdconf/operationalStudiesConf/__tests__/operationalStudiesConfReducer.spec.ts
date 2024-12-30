@@ -72,7 +72,6 @@ describe('simulationConfReducer', () => {
           theoreticalMargin: '10%',
           ch: undefined,
           arrival: undefined,
-          stopFor: undefined,
           locked: undefined,
           receptionSignal: undefined,
         },
@@ -83,7 +82,6 @@ describe('simulationConfReducer', () => {
           theoreticalMargin: undefined,
           ch: undefined,
           arrival: undefined,
-          stopFor: undefined,
           locked: undefined,
           receptionSignal: undefined,
         },
@@ -137,7 +135,7 @@ describe('simulationConfReducer', () => {
         track: '60ca8dda-6667-11e3-81ff-01f464e0362d',
         offsetOnTrack: 426.443,
         positionOnPath: 200,
-        stopFor: 'PT5M',
+        stopFor: 5 * 60,
         coordinates: [47.99542250806296, 0.1918181738752042],
       };
 
@@ -146,7 +144,7 @@ describe('simulationConfReducer', () => {
         positionOnPath: 200,
         track: '60ca8dda-6667-11e3-81ff-01f464e0362d',
         offset: 426.443,
-        stopFor: 'PT5M',
+        stopFor: 5 * 60,
         coordinates: [47.99542250806296, 0.1918181738752042],
         arrival: newVia.arrival,
         locked: newVia.locked,

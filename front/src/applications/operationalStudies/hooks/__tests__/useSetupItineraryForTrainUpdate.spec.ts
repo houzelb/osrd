@@ -155,7 +155,6 @@ describe('updatePathStepsFrom', () => {
           secondary_code: 'P2',
           name: '87747006',
           arrival: '15:00:00',
-          stopFor: null,
         },
         {
           id: 'id80',
@@ -164,7 +163,7 @@ describe('updatePathStepsFrom', () => {
           secondary_code: 'BV',
           name: '87747337',
           arrival: null,
-          stopFor: '0',
+          stopFor: 0,
         },
       ];
       const pathFindingResult = {
@@ -199,7 +198,6 @@ describe('updatePathStepsFrom', () => {
           secondary_code: 'P2', // should not be BV here, it has the same uic but not the same ch
           name: 'Grenadille',
           arrival: '15:00:00',
-          stopFor: null,
           kp: '129+952',
           positionOnPath: 586000,
           coordinates: [5.711846462951984, 45.19643525506182],
@@ -211,7 +209,7 @@ describe('updatePathStepsFrom', () => {
           secondary_code: 'BV',
           name: 'Voreppe',
           arrival: null,
-          stopFor: '0',
+          stopFor: 0,
           kp: '117+422',
           positionOnPath: 13116000,
           coordinates: [5.631369628448958, 45.29094364381627],

@@ -134,7 +134,7 @@ const usePathfinding = (
 
       const theoreticalMargin = i === 0 ? step.theoreticalMargin || '0%' : step.theoreticalMargin;
 
-      const stopFor = i === pathStepsInput.length - 1 && !step.stopFor ? '0' : step.stopFor;
+      const stopFor = i === pathStepsInput.length - 1 && !step.stopFor ? 0 : step.stopFor;
 
       return {
         ...step,
