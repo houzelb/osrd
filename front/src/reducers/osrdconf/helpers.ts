@@ -8,13 +8,14 @@ import { pathStepMatchesOp } from 'modules/pathfinding/utils';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import { addElementAtIndex } from 'utils/array';
 
-import type { OsrdConfState, PathStep } from './types';
+import type { OperationalStudiesConfState } from './operationalStudiesConf';
+import type { PathStep } from './types';
 
 export const insertViaFromMap = (
-  pathSteps: OsrdConfState['pathSteps'],
+  pathSteps: OperationalStudiesConfState['pathSteps'],
   newVia: PathStep,
   pathProperties: ManageTrainSchedulePathProperties
-): OsrdConfState['pathSteps'] => {
+): OperationalStudiesConfState['pathSteps'] => {
   // If one of these is missing, via is not valid (it hasn't been added via click on map) and we return the same array
   if (!('track' in newVia) || !newVia.coordinates) return pathSteps;
 

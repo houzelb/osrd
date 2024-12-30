@@ -17,7 +17,7 @@ import type {
 import type { IsoDurationString } from 'common/types';
 import type { InfraState } from 'reducers/infra';
 
-export interface OsrdConfState extends InfraState {
+export type OsrdConfState = InfraState & {
   constraintDistribution: Distribution;
   name: string;
   trainCount: number;
@@ -42,7 +42,7 @@ export interface OsrdConfState extends InfraState {
   pathSteps: (PathStep | null)[];
   rollingStockComfort: Comfort;
   startTime: Date;
-}
+};
 
 export interface StandardAllowance {
   type: AllowanceValue['value_type'];

@@ -4,12 +4,13 @@ import { compact, isEqual, keyBy, sortBy } from 'lodash';
 
 import type { PowerRestriction } from 'applications/operationalStudies/types';
 import { NO_POWER_RESTRICTION } from 'modules/powerRestriction/consts';
-import type { OsrdConfState, PathStep } from 'reducers/osrdconf/types';
+import type { PathStep } from 'reducers/osrdconf/types';
 import { addElementAtIndex } from 'utils/array';
 
+import type { OperationalStudiesConfState } from '.';
 import { addPathStep, cleanPathSteps, isRangeCovered, updateRestrictions } from './utils';
 
-export type PowerRestrictionReducer<S extends OsrdConfState> = {
+export type PowerRestrictionReducer<S extends OperationalStudiesConfState> = {
   ['updatePowerRestrictionRanges']: CaseReducer<S, PayloadAction<PowerRestriction[]>>;
   ['upsertPowerRestrictionRanges']: CaseReducer<
     S,
@@ -35,7 +36,9 @@ export type PowerRestrictionReducer<S extends OsrdConfState> = {
   >;
 };
 
-export function builPowerRestrictionReducer<S extends OsrdConfState>(): PowerRestrictionReducer<S> {
+export function builPowerRestrictionReducer<
+  S extends OperationalStudiesConfState,
+>(): PowerRestrictionReducer<S> {
   return {
     updatePowerRestrictionRanges(state: Draft<S>, action: PayloadAction<PowerRestriction[]>) {
       state.powerRestriction = action.payload;

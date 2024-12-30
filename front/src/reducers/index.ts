@@ -17,12 +17,13 @@ import type { MapViewerState, MapViewerSlice } from 'reducers/mapViewer';
 import mapViewerReducer, { mapViewerInitialState, mapViewerSlice } from 'reducers/mapViewer';
 import operationalStudiesConfReducer, {
   operationalStudiesConfSlice,
+  type OperationalStudiesConfState,
 } from 'reducers/osrdconf/operationalStudiesConf';
 import stdcmConfReducer, {
   stdcmConfInitialState,
   stdcmConfSlice,
 } from 'reducers/osrdconf/stdcmConf';
-import type { OsrdConfState, OsrdStdcmConfState } from 'reducers/osrdconf/types';
+import type { OsrdStdcmConfState } from 'reducers/osrdconf/types';
 import simulationReducer, {
   simulationResultsInitialState,
   simulationResultsSlice,
@@ -79,7 +80,7 @@ const operationalStudiesDateTransform = createTransform(
 );
 
 // Useful to only blacklist a sub-propertie of osrdconf
-const buildOsrdConfPersistConfig = <T extends OsrdConfState>(
+const buildOsrdConfPersistConfig = <T extends OperationalStudiesConfState | OsrdStdcmConfState>(
   slice: ConfSlice
 ): PersistConfig<T> => ({
   key: slice.name,
@@ -106,7 +107,7 @@ export interface RootState {
   [editorSlice.name]: EditorState;
   [mainSlice.name]: MainState;
   [stdcmConfSlice.name]: OsrdStdcmConfState;
-  [operationalStudiesConfSlice.name]: OsrdConfState;
+  [operationalStudiesConfSlice.name]: OperationalStudiesConfState;
   [simulationResultsSlice.name]: SimulationResultsState;
   [osrdEditoastApi.reducerPath]: ReturnType<typeof osrdEditoastApi.reducer>;
   [osrdGatewayApi.reducerPath]: ReturnType<typeof osrdGatewayApi.reducer>;
@@ -132,7 +133,7 @@ export type AnyReducerState =
   | EditorState
   | MainState
   | OsrdStdcmConfState
-  | OsrdConfState
+  | OperationalStudiesConfState
   | SimulationResultsState;
 
 export const rootReducer: ReducersMapObject<RootState> = {
@@ -146,9 +147,9 @@ export const rootReducer: ReducersMapObject<RootState> = {
     stdcmConfReducer
   ) as unknown as Reducer<OsrdStdcmConfState, AnyAction>,
   [operationalStudiesConfSlice.name]: persistReducer(
-    buildOsrdConfPersistConfig<OsrdConfState>(operationalStudiesConfSlice),
+    buildOsrdConfPersistConfig<OperationalStudiesConfState>(operationalStudiesConfSlice),
     operationalStudiesConfReducer
-  ) as unknown as Reducer<OsrdConfState, AnyAction>,
+  ) as unknown as Reducer<OperationalStudiesConfState, AnyAction>,
   [simulationResultsSlice.name]: simulationReducer,
   [osrdEditoastApi.reducerPath]: osrdEditoastApi.reducer,
   [osrdGatewayApi.reducerPath]: osrdGatewayApi.reducer,
