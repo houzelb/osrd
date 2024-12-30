@@ -31,7 +31,7 @@ export default function useStdcmEnvironment() {
           workScheduleGroupId: data.work_schedule_group_id,
           temporarySpeedLimitGroupId: data.temporary_speed_limit_group_id,
           searchDatetimeWindow: {
-            begin: new Date(`${data.search_window_begin}Z`), // TODO: Remove this temporary fix when editoast returns the date in UTC
+            begin: new Date(data.search_window_begin),
             end: new Date(data.search_window_end),
           },
         })
