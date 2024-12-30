@@ -2,15 +2,12 @@ import { useEffect, useMemo } from 'react';
 
 import { Select, ComboBox } from '@osrd-project/ui-core';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 
-import CI_CH_OPERATIONAL_POINTS_ON_DPY_MAS from 'assets/operationStudies/ciChOperationalPointsOnDPYMAS';
 import { type SearchResultItemOperationalPoint } from 'common/api/osrdEditoastApi';
 import useSearchOperationalPoint from 'common/Map/Search/useSearchOperationalPoint';
 import { useOsrdConfActions } from 'common/osrdContext';
 import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmPathStep } from 'reducers/osrdconf/types';
-import { userHasOnlyStdcmRoles } from 'reducers/user/userSelectors';
 import { useAppDispatch } from 'store';
 import { normalized } from 'utils/strings';
 import { createFixedSelectOptions } from 'utils/uiCoreHelpers';
@@ -35,9 +32,8 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
     useSearchOperationalPoint({
       initialSearchTerm: location?.name,
       initialChCodeFilter: location?.secondary_code,
+      isStdcm: true,
     });
-
-  const hasOnlyStdcmRoles = useSelector(userHasOnlyStdcmRoles);
 
   const { updateStdcmPathStep } = useOsrdConfActions() as StdcmConfSliceActions;
 
@@ -45,19 +41,11 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
     () =>
       // Temporary filter added to show a more restrictive list of suggestions inside the stdcm app.
       sortedSearchResults
-        .filter((op) => {
-          const isNameMatch = normalized(op.name).startsWith(normalized(searchTerm));
-          const isTrigramMatch = op.trigram === searchTerm.toUpperCase();
-
-          if (hasOnlyStdcmRoles) {
-            return (
-              CI_CH_OPERATIONAL_POINTS_ON_DPY_MAS[op.ci]?.includes(op.ch) &&
-              (isNameMatch || isTrigramMatch)
-            );
-          }
-
-          return isNameMatch || isTrigramMatch;
-        })
+        .filter(
+          (op) =>
+            normalized(op.name).startsWith(normalized(searchTerm)) ||
+            op.trigram === searchTerm.toUpperCase()
+        )
         .reduce((acc, p) => {
           const newObject = {
             label: [p.trigram, p.name].join(' '),

@@ -1,10 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
 
 import { isEmpty } from 'lodash';
+import { useSelector } from 'react-redux';
 
+import DPY_TO_MAS_OPERATIONAL_POINTS from 'assets/operationStudies/DPYToMASOperationalPoints';
 import { type SearchResultItemOperationalPoint, osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import { useInfraID } from 'common/osrdContext';
 import { setFailure } from 'reducers/main';
+import { userHasOnlyStdcmRoles } from 'reducers/user/userSelectors';
 import { castErrorToFailure } from 'utils/error';
 import { useDebounce } from 'utils/helpers';
 
@@ -14,18 +17,21 @@ type SearchOperationalPoint = {
   debounceDelay?: number;
   initialSearchTerm?: string;
   initialChCodeFilter?: string;
+  isStdcm?: boolean;
 };
 
 export default function useSearchOperationalPoint({
   debounceDelay = 150,
   initialSearchTerm = '',
   initialChCodeFilter,
+  isStdcm = false,
 }: SearchOperationalPoint = {}) {
   const infraID = useInfraID();
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const [chCodeFilter, setChCodeFilter] = useState(initialChCodeFilter);
   const [searchResults, setSearchResults] = useState<SearchResultItemOperationalPoint[]>([]);
   const [mainOperationalPointsOnly, setMainOperationalPointsOnly] = useState(false);
+  const hasOnlyStdcmRoles = useSelector(userHasOnlyStdcmRoles);
 
   const debouncedSearchTerm = useDebounce(searchTerm, debounceDelay);
   const [postSearch] = osrdEditoastApi.endpoints.postSearch.useMutation();
@@ -41,9 +47,26 @@ export default function useSearchOperationalPoint({
           ['search', ['name'], debouncedSearchTerm],
           ['like', ['to_string', ['uic']], `%${debouncedSearchTerm}%`],
         ];
+
+    const dpyToMasOperationalpointsFilter =
+      isStdcm && hasOnlyStdcmRoles
+        ? [
+            'or',
+            ...DPY_TO_MAS_OPERATIONAL_POINTS.map(([ci, ch]) => [
+              'and',
+              ['=', ['ci'], ci],
+              ['=', ['ch'], ch],
+            ]),
+          ]
+        : true;
     const payload = {
       object: 'operationalpoint',
-      query: ['and', searchQuery, infraID !== undefined ? ['=', ['infra_id'], infraID] : true],
+      query: [
+        'and',
+        searchQuery,
+        infraID !== undefined ? ['=', ['infra_id'], infraID] : true,
+        dpyToMasOperationalpointsFilter,
+      ],
     };
 
     try {
