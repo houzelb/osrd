@@ -17,6 +17,7 @@ import type { ManageTrainSchedulePathProperties } from 'applications/operational
 import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import { useOsrdConfSelectors } from 'common/osrdContext';
 import { setPointIti } from 'modules/trainschedule/components/ManageTrainSchedule/ManageTrainScheduleMap/setPointIti';
+import { getOrigin, getDestination } from 'reducers/osrdconf/operationalStudiesConf/selectors';
 import type { PathStep } from 'reducers/osrdconf/types';
 
 import type { FeatureInfoClick } from '../types';
@@ -32,7 +33,7 @@ function AddPathStepPopup({
   featureInfoClick,
   resetFeatureInfoClick,
 }: AddPathStepPopupProps) {
-  const { getInfraID, getOrigin, getDestination } = useOsrdConfSelectors();
+  const { getInfraID } = useOsrdConfSelectors();
   const { launchPathfinding } = useManageTrainScheduleContext();
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
   const infraId = useSelector(getInfraID);
