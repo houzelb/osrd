@@ -121,20 +121,6 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
     });
   });
 
-  it('should handle updateGridMarginBefore', () => {
-    const newGridMarginBefore = 5;
-    defaultStore.dispatch(slice.actions.updateGridMarginBefore(newGridMarginBefore));
-    const state = defaultStore.getState()[slice.name];
-    expect(state.gridMarginBefore).toStrictEqual(newGridMarginBefore);
-  });
-
-  it('should handle updateGridMarginAfter', () => {
-    const newGridMarginAfter = 5;
-    defaultStore.dispatch(slice.actions.updateGridMarginAfter(newGridMarginAfter));
-    const state = defaultStore.getState()[slice.name];
-    expect(state.gridMarginAfter).toStrictEqual(newGridMarginAfter);
-  });
-
   it('should handle updatePathSteps', () => {
     const pathSteps = testDataBuilder.buildPathSteps();
     defaultStore.dispatch(slice.actions.updatePathSteps(pathSteps));

@@ -5,10 +5,13 @@ import type { AllowanceValue } from 'applications/stdcm/types';
 import InputGroupSNCF from 'common/BootstrapSNCF/InputGroupSNCF';
 import type { InputGroupSNCFValue } from 'common/BootstrapSNCF/InputGroupSNCF';
 import InputSNCF from 'common/BootstrapSNCF/InputSNCF';
-import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import { ALLOWANCE_UNITS_KEYS } from 'modules/stdcmAllowances/allowancesConsts';
-import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
-import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
+import {
+  updateGridMarginAfter,
+  updateGridMarginBefore,
+  updateStandardAllowance,
+} from 'reducers/osrdconf/stdcmConf';
+import { getMargins } from 'reducers/osrdconf/stdcmConf/selectors';
 import type { StandardAllowance } from 'reducers/osrdconf/types';
 import { useAppDispatch } from 'store';
 import { convertInputStringToNumber } from 'utils/strings';
@@ -16,13 +19,7 @@ import { convertInputStringToNumber } from 'utils/strings';
 const StdcmAllowances = ({ disabled = false }: { disabled?: boolean }) => {
   const { t } = useTranslation('allowances');
   const dispatch = useAppDispatch();
-  const { getGridMarginBefore, getGridMarginAfter, getStandardStdcmAllowance } =
-    useOsrdConfSelectors() as StdcmConfSelectors;
-  const { updateGridMarginAfter, updateGridMarginBefore, updateStdcmStandardAllowance } =
-    useOsrdConfActions() as StdcmConfSliceActions;
-  const gridMarginBefore = useSelector(getGridMarginBefore);
-  const gridMarginAfter = useSelector(getGridMarginAfter);
-  const stdcmStandardAllowance = useSelector(getStandardStdcmAllowance);
+  const { gridMarginAfter, gridMarginBefore, standardAllowance } = useSelector(getMargins);
   const standardAllowanceTypes = [
     {
       id: 'percentage',
@@ -40,7 +37,7 @@ const StdcmAllowances = ({ disabled = false }: { disabled?: boolean }) => {
       value: newTypeValue.value === undefined ? undefined : Math.abs(newTypeValue.value),
     };
 
-    dispatch(updateStdcmStandardAllowance(processedType));
+    dispatch(updateStandardAllowance(processedType));
   };
 
   return (
@@ -93,8 +90,8 @@ const StdcmAllowances = ({ disabled = false }: { disabled?: boolean }) => {
           options={standardAllowanceTypes}
           onChange={onchangeType}
           currentValue={{
-            unit: stdcmStandardAllowance?.type || 'percentage',
-            value: stdcmStandardAllowance?.value,
+            unit: standardAllowance?.type || 'percentage',
+            value: standardAllowance?.value,
           }}
           disabled={disabled}
         />
