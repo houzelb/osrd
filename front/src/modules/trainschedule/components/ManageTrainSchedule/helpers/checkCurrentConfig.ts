@@ -4,7 +4,7 @@ import type { Dispatch } from 'redux';
 import getStepLocation from 'modules/pathfinding/helpers/getStepLocation';
 import type { ValidConfig } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import { setFailure } from 'reducers/main';
-import type { OsrdConfState } from 'reducers/osrdconf/types';
+import type { OperationalStudiesConfState } from 'reducers/osrdconf/operationalStudiesConf';
 import { isInvalidFloatNumber } from 'utils/numbers';
 import { kmhToMs } from 'utils/physics';
 
@@ -12,7 +12,7 @@ import formatMargin from './formatMargin';
 import formatSchedule from './formatSchedule';
 
 const checkCurrentConfig = (
-  osrdconf: OsrdConfState,
+  osrdconf: OperationalStudiesConfState,
   t: (arg0: string) => string,
   dispatch: Dispatch,
   // TODO TS2 : remove this when rollingStockName will replace rollingStockId in the store
