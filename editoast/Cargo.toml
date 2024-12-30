@@ -158,7 +158,7 @@ opentelemetry_sdk.workspace = true
 ordered-float = { version = "4.6.0", features = ["serde"] }
 osm_to_railjson = { path = "./osm_to_railjson" }
 paste.workspace = true
-pathfinding = "4.12.0"
+pathfinding = "4.13.0"
 postgis_diesel.workspace = true
 rand.workspace = true
 rangemap.workspace = true
