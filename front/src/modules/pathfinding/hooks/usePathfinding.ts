@@ -135,13 +135,11 @@ const usePathfinding = (
       const theoreticalMargin = i === 0 ? step.theoreticalMargin || '0%' : step.theoreticalMargin;
 
       const stopFor = i === pathStepsInput.length - 1 && !step.stopFor ? '0' : step.stopFor;
-      const stopType = i === pathStepsInput.length - 1 && !step.stopFor ? undefined : step.stopType;
 
       return {
         ...step,
         positionOnPath: pathResult.path_item_positions[i],
         stopFor,
-        stopType,
         theoreticalMargin,
         ...(correspondingOp && {
           name: correspondingOp.name,
