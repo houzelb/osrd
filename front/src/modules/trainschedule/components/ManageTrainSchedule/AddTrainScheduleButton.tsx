@@ -8,10 +8,10 @@ import type {
   TrainScheduleBase,
   TrainScheduleResult,
 } from 'common/api/osrdEditoastApi';
-import { useOsrdConfSelectors } from 'common/osrdContext';
 import { useStoreDataForRollingStockSelector } from 'modules/rollingStock/components/RollingStockSelector/useStoreDataForRollingStockSelector';
 import trainNameWithNum from 'modules/trainschedule/components/ManageTrainSchedule/helpers/trainNameHelper';
 import { setFailure, setSuccess } from 'reducers/main';
+import { getOperationalStudiesConf } from 'reducers/osrdconf/operationalStudiesConf/selectors';
 import { useAppDispatch } from 'store';
 import { isoDateToMs, isoDateWithTimezoneToSec } from 'utils/date';
 import { castErrorToFailure } from 'utils/error';
@@ -38,8 +38,7 @@ const AddTrainScheduleButton = ({
   const dispatch = useAppDispatch();
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);
 
-  const { getConf } = useOsrdConfSelectors();
-  const simulationConf = useSelector(getConf);
+  const simulationConf = useSelector(getOperationalStudiesConf);
 
   // TODO TS2 : remove this when rollingStockName will replace rollingStockId in the store
   const { rollingStock } = useStoreDataForRollingStockSelector();

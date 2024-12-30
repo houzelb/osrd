@@ -49,7 +49,7 @@ export interface StandardAllowance {
   value?: number;
 }
 
-export interface OsrdStdcmConfState extends OsrdConfState {
+export type OsrdStdcmConfState = OsrdConfState & {
   stdcmPathSteps: StdcmPathStep[];
   standardStdcmAllowance?: StandardAllowance;
   totalMass?: number;
@@ -57,7 +57,7 @@ export interface OsrdStdcmConfState extends OsrdConfState {
   maxSpeed?: number;
   towedRollingStockID?: number;
   linkedTrains: LinkedTrains;
-}
+};
 
 export type PathStep = PathItemLocation & {
   id: string;

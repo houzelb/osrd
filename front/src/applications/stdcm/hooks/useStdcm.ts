@@ -20,7 +20,7 @@ import {
 import { useOsrdConfSelectors } from 'common/osrdContext';
 import { useStoreDataForSpeedLimitByTagSelector } from 'common/SpeedLimitByTagSelector/useStoreDataForSpeedLimitByTagSelector';
 import { setFailure } from 'reducers/main';
-import type { OsrdStdcmConfState } from 'reducers/osrdconf/types';
+import { getStdcmConf } from 'reducers/osrdconf/stdcmConf/selectors';
 import { updateSelectedTrainId } from 'reducers/simulationResults';
 import { useAppDispatch } from 'store';
 import { castErrorToFailure } from 'utils/error';
@@ -49,8 +49,8 @@ const useStdcm = ({
 
   const dispatch = useAppDispatch();
   const { t } = useTranslation(['translation', 'stdcm']);
-  const { getConf, getTimetableID } = useOsrdConfSelectors();
-  const osrdconf = useSelector(getConf) as OsrdStdcmConfState;
+  const { getTimetableID } = useOsrdConfSelectors();
+  const osrdconf = useSelector(getStdcmConf);
   const timetableId = useSelector(getTimetableID);
   const requestPromise = useRef<ReturnType<typeof postTimetableByIdStdcm>>();
 

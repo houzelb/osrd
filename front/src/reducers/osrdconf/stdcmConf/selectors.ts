@@ -5,13 +5,16 @@ import type { OsrdStdcmConfState } from 'reducers/osrdconf/types';
 import { makeSubSelector } from 'utils/selectors';
 
 const buildStdcmConfSelectors = () => {
-  const commonConfSelectors = buildCommonConfSelectors<OsrdStdcmConfState>(stdcmConfSlice);
-  const makeOsrdConfSelector = makeSubSelector<OsrdStdcmConfState>(commonConfSelectors.getConf);
+  const commonConfSelectors = buildCommonConfSelectors(stdcmConfSlice);
+
+  const getStdcmConf = (state: RootState) => state[stdcmConfSlice.name];
+  const makeOsrdConfSelector = makeSubSelector<OsrdStdcmConfState>(getStdcmConf);
 
   const getStdcmPathSteps = makeOsrdConfSelector('stdcmPathSteps');
 
   return {
     ...commonConfSelectors,
+    getStdcmConf,
     getStandardStdcmAllowance: makeOsrdConfSelector('standardStdcmAllowance'),
     getTotalMass: makeOsrdConfSelector('totalMass'),
     getTotalLength: makeOsrdConfSelector('totalLength'),
@@ -39,6 +42,8 @@ const buildStdcmConfSelectors = () => {
 };
 
 const selectors = buildStdcmConfSelectors();
+
+export const { getStdcmConf } = selectors;
 
 export type StdcmConfSelectors = typeof selectors;
 
