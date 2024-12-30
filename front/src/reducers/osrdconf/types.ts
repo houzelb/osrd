@@ -8,8 +8,6 @@ import type {
   StdcmStopTypes,
 } from 'applications/stdcm/types';
 import type {
-  Comfort,
-  Distribution,
   OperationalPointReference,
   PathItemLocation,
   ReceptionSignal,
@@ -18,13 +16,6 @@ import type { IsoDurationString } from 'common/types';
 import type { InfraState } from 'reducers/infra';
 
 export type OsrdConfState = InfraState & {
-  constraintDistribution: Distribution;
-  name: string;
-  trainCount: number;
-  trainStep: number;
-  trainDelta: number;
-  usingElectricalProfiles: boolean;
-  labels: string[];
   projectID?: number;
   studyID?: number;
   scenarioID?: number;
@@ -36,12 +27,9 @@ export type OsrdConfState = InfraState & {
   rollingStockID?: number;
   speedLimitByTag?: string;
   powerRestriction: PowerRestriction[];
-  initialSpeed?: number;
   gridMarginBefore?: number;
   gridMarginAfter?: number;
   pathSteps: (PathStep | null)[];
-  rollingStockComfort: Comfort;
-  startTime: Date;
 };
 
 export interface StandardAllowance {

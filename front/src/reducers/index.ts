@@ -17,6 +17,7 @@ import type { MapViewerState, MapViewerSlice } from 'reducers/mapViewer';
 import mapViewerReducer, { mapViewerInitialState, mapViewerSlice } from 'reducers/mapViewer';
 import operationalStudiesConfReducer, {
   operationalStudiesConfSlice,
+  operationalStudiesInitialConf,
   type OperationalStudiesConfState,
 } from 'reducers/osrdconf/operationalStudiesConf';
 import stdcmConfReducer, {
@@ -32,7 +33,7 @@ import type { SimulationResultsState } from 'reducers/simulationResults/types';
 import userReducer, { userInitialState, userSlice } from 'reducers/user';
 import type { UserState } from 'reducers/user';
 
-import { type ConfSlice, defaultCommonConf } from './osrdconf/osrdConfCommon';
+import type { ConfSlice } from './osrdconf/osrdConfCommon';
 
 const compressor = createCompressor({
   whitelist: ['rollingstock'],
@@ -120,7 +121,7 @@ export const rootInitialState: RootState = {
   [editorSlice.name]: editorInitialState,
   [mainSlice.name]: mainInitialState,
   [stdcmConfSlice.name]: stdcmConfInitialState,
-  [operationalStudiesConfSlice.name]: defaultCommonConf,
+  [operationalStudiesConfSlice.name]: operationalStudiesInitialConf,
   [simulationResultsSlice.name]: simulationResultsInitialState,
   [osrdEditoastApi.reducerPath]: {} as ReturnType<typeof osrdEditoastApi.reducer>,
   [osrdGatewayApi.reducerPath]: {} as ReturnType<typeof osrdGatewayApi.reducer>,

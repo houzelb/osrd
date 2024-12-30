@@ -4,14 +4,13 @@ import { useTranslation } from 'react-i18next';
 
 import type { Distribution } from 'common/api/osrdEditoastApi';
 import OptionsSNCF from 'common/BootstrapSNCF/OptionsSNCF';
-import { useOsrdConfActions } from 'common/osrdContext';
+import { updateConstraintDistribution } from 'reducers/osrdconf/operationalStudiesConf';
 import { useAppDispatch } from 'store';
 
 type Props = {
   constraintDistribution: Distribution;
 };
 const ConstraintDistributionSwitch = ({ constraintDistribution }: Props) => {
-  const { updateConstraintDistribution } = useOsrdConfActions();
   const dispatch = useAppDispatch();
   const [constraint, setConstraint] = useState(constraintDistribution);
   const { t } = useTranslation(['operationalStudies/allowances', 'translation']);

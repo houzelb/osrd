@@ -13,13 +13,6 @@ import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
 import type { OsrdConfState, PathStep } from 'reducers/osrdconf/types';
 
 export const defaultCommonConf: OsrdConfState = {
-  constraintDistribution: 'MARECO',
-  name: '',
-  trainCount: 1,
-  trainDelta: 15,
-  trainStep: 2,
-  usingElectricalProfiles: true,
-  labels: [],
   projectID: undefined,
   studyID: undefined,
   scenarioID: undefined,
@@ -28,24 +21,14 @@ export const defaultCommonConf: OsrdConfState = {
   rollingStockID: undefined,
   powerRestriction: [],
   speedLimitByTag: undefined,
-  initialSpeed: 0,
   gridMarginBefore: undefined,
   gridMarginAfter: undefined,
   ...infraState,
   // Corresponds to origin and destination not defined
   pathSteps: [null, null],
-  rollingStockComfort: 'STANDARD' as const,
-  startTime: new Date(),
 };
 
 interface CommonConfReducers<S extends OsrdConfState> extends InfraStateReducers<S> {
-  ['updateConstraintDistribution']: CaseReducer<S, PayloadAction<S['constraintDistribution']>>;
-  ['updateName']: CaseReducer<S, PayloadAction<S['name']>>;
-  ['updateTrainCount']: CaseReducer<S, PayloadAction<S['trainCount']>>;
-  ['updateTrainDelta']: CaseReducer<S, PayloadAction<OsrdConfState['trainDelta']>>;
-  ['updateTrainStep']: CaseReducer<S, PayloadAction<S['trainStep']>>;
-  ['toggleUsingElectricalProfiles']: CaseReducer<S>;
-  ['updateLabels']: CaseReducer<S, PayloadAction<S['labels']>>;
   ['updateProjectID']: CaseReducer<S, PayloadAction<S['projectID']>>;
   ['updateStudyID']: CaseReducer<S, PayloadAction<S['studyID']>>;
   ['updateScenarioID']: CaseReducer<S, PayloadAction<S['scenarioID']>>;
@@ -53,7 +36,6 @@ interface CommonConfReducers<S extends OsrdConfState> extends InfraStateReducers
   ['updateElectricalProfileSetId']: CaseReducer<S, PayloadAction<S['electricalProfileSetId']>>;
   ['updateRollingStockID']: CaseReducer<S, PayloadAction<S['rollingStockID']>>;
   ['updateSpeedLimitByTag']: CaseReducer<S, PayloadAction<S['speedLimitByTag'] | null>>;
-  ['updateInitialSpeed']: CaseReducer<S, PayloadAction<S['initialSpeed']>>;
   ['updateViaStopTime']: CaseReducer<
     S,
     PayloadAction<{ via: PathStep; duration: string; stopType?: StdcmStopTypes }>
@@ -63,37 +45,11 @@ interface CommonConfReducers<S extends OsrdConfState> extends InfraStateReducers
   ['updatePathSteps']: CaseReducer<S, PayloadAction<S['pathSteps']>>;
   ['replaceItinerary']: CaseReducer<S, PayloadAction<S['pathSteps']>>;
   ['deleteItinerary']: CaseReducer<S>;
-  ['updateRollingStockComfort']: CaseReducer<S, PayloadAction<S['rollingStockComfort']>>;
-  ['updateStartTime']: CaseReducer<S, PayloadAction<S['startTime']>>;
 }
 
 export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfReducers<S> {
   return {
     ...buildInfraStateReducers<S>(),
-    updateConstraintDistribution(
-      state: Draft<S>,
-      action: PayloadAction<S['constraintDistribution']>
-    ) {
-      state.constraintDistribution = action.payload;
-    },
-    updateName(state: Draft<S>, action: PayloadAction<S['name']>) {
-      state.name = action.payload;
-    },
-    updateTrainCount(state: Draft<S>, action: PayloadAction<S['trainCount']>) {
-      state.trainCount = action.payload;
-    },
-    updateTrainDelta(state: Draft<S>, action: PayloadAction<OsrdConfState['trainDelta']>) {
-      state.trainDelta = action.payload;
-    },
-    updateTrainStep(state: Draft<S>, action: PayloadAction<S['trainStep']>) {
-      state.trainStep = action.payload;
-    },
-    toggleUsingElectricalProfiles(state: Draft<S>) {
-      state.usingElectricalProfiles = !state.usingElectricalProfiles;
-    },
-    updateLabels(state: Draft<S>, action: PayloadAction<S['labels']>) {
-      state.labels = action.payload;
-    },
     updateProjectID(state: Draft<S>, action: PayloadAction<S['projectID']>) {
       state.projectID = action.payload;
     },
@@ -117,9 +73,6 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
     },
     updateSpeedLimitByTag(state: Draft<S>, action: PayloadAction<S['speedLimitByTag'] | null>) {
       state.speedLimitByTag = action.payload === null ? undefined : action.payload;
-    },
-    updateInitialSpeed(state: Draft<S>, action: PayloadAction<S['initialSpeed']>) {
-      state.initialSpeed = action.payload;
     },
     // TODO: Change the type of duration to number. It is preferable to keep this value in seconds in the store
     //* to avoid multiple conversions between seconds and ISO8601 format across the front.
@@ -155,12 +108,6 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
     replaceItinerary(state: Draft<S>, action: PayloadAction<S['pathSteps']>) {
       state.pathSteps = action.payload;
       state.powerRestriction = [];
-    },
-    updateRollingStockComfort(state: Draft<S>, action: PayloadAction<S['rollingStockComfort']>) {
-      state.rollingStockComfort = action.payload;
-    },
-    updateStartTime(state: Draft<S>, action: PayloadAction<S['startTime']>) {
-      state.startTime = action.payload;
     },
   };
 }

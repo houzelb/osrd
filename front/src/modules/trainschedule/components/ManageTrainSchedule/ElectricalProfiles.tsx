@@ -3,12 +3,11 @@ import { useSelector } from 'react-redux';
 
 import electricalProfilesIcon from 'assets/pictures/components/electricalProfiles.svg';
 import SwitchSNCF, { SWITCH_TYPES } from 'common/BootstrapSNCF/SwitchSNCF/SwitchSNCF';
-import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
+import { toggleUsingElectricalProfiles } from 'reducers/osrdconf/operationalStudiesConf';
+import { getUsingElectricalProfiles } from 'reducers/osrdconf/operationalStudiesConf/selectors';
 import { useAppDispatch } from 'store';
 
 export default function ElectricalProfiles() {
-  const { getUsingElectricalProfiles } = useOsrdConfSelectors();
-  const { toggleUsingElectricalProfiles } = useOsrdConfActions();
   const dispatch = useAppDispatch();
   const usingElectricalProfiles = useSelector(getUsingElectricalProfiles);
   const { t } = useTranslation(['operationalStudies/manageTrainSchedule']);

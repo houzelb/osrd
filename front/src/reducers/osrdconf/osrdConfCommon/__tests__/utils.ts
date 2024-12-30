@@ -1,7 +1,7 @@
 import { describe, beforeEach, it, expect } from 'vitest';
 
 import { StdcmStopTypes } from 'applications/stdcm/types';
-import type { Distribution, Infra, TrainScheduleBase } from 'common/api/osrdEditoastApi';
+import type { Infra } from 'common/api/osrdEditoastApi';
 import type { OperationalStudiesConfSlice } from 'reducers/osrdconf/operationalStudiesConf';
 import { defaultCommonConf } from 'reducers/osrdconf/osrdConfCommon';
 import commonConfBuilder from 'reducers/osrdconf/osrdConfCommon/__tests__/commonConfBuilder';
@@ -33,64 +33,6 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
 
   beforeEach(() => {
     defaultStore = createStore(slice);
-  });
-
-  it('should handle updateConstraintDistribution', () => {
-    const newConstraintDistribution: Distribution = 'STANDARD';
-    defaultStore.dispatch(slice.actions.updateConstraintDistribution(newConstraintDistribution));
-
-    const state = defaultStore.getState()[slice.name];
-    expect(state.constraintDistribution).toBe(newConstraintDistribution);
-  });
-
-  it('should handle updateName', () => {
-    const newName = 'New Simulation Name';
-    defaultStore.dispatch(slice.actions.updateName(newName));
-
-    const state = defaultStore.getState()[slice.name];
-    expect(state.name).toBe(newName);
-  });
-
-  it('should handle updateTrainCount', () => {
-    const newTrainCount = 5;
-    defaultStore.dispatch(slice.actions.updateTrainCount(newTrainCount));
-
-    const state = defaultStore.getState()[slice.name];
-    expect(state.trainCount).toBe(newTrainCount);
-  });
-
-  it('should handle update', () => {
-    const newTrainDelta = 5;
-    defaultStore.dispatch(slice.actions.updateTrainDelta(newTrainDelta));
-
-    const state = defaultStore.getState()[slice.name];
-    expect(state.trainDelta).toBe(newTrainDelta);
-  });
-
-  it('should handle updateTrainStep', () => {
-    const newTrainStep = 5;
-    defaultStore.dispatch(slice.actions.updateTrainStep(newTrainStep));
-
-    const state = defaultStore.getState()[slice.name];
-    expect(state.trainStep).toBe(newTrainStep);
-  });
-
-  it('should handle toggleUsingElectricalProfiles', () => {
-    defaultStore.dispatch(slice.actions.toggleUsingElectricalProfiles());
-
-    let state = defaultStore.getState()[slice.name];
-    expect(state.usingElectricalProfiles).toBe(false);
-
-    defaultStore.dispatch(slice.actions.toggleUsingElectricalProfiles());
-    state = defaultStore.getState()[slice.name];
-    expect(state.usingElectricalProfiles).toBe(true);
-  });
-
-  it('should handle updateLabels', () => {
-    const newLabels = ['A', 'B'];
-    defaultStore.dispatch(slice.actions.updateLabels(newLabels));
-    const state = defaultStore.getState()[slice.name];
-    expect(state.labels).toBe(newLabels);
   });
 
   it('should handle updateProjectID', () => {
@@ -180,13 +122,6 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
     });
   });
 
-  it('should handle updateInitialSpeed', () => {
-    const newInitialSpeed = 50;
-    defaultStore.dispatch(slice.actions.updateInitialSpeed(newInitialSpeed));
-    const state = defaultStore.getState()[slice.name];
-    expect(state.initialSpeed).toBe(newInitialSpeed);
-  });
-
   it('should handle updateViaStopTime', () => {
     const pathSteps = testDataBuilder.buildPathSteps();
     const via = pathSteps[1];
@@ -235,20 +170,6 @@ const testCommonConfReducers = (slice: OperationalStudiesConfSlice | StdcmConfSl
     store.dispatch(slice.actions.deleteItinerary());
     const state = store.getState()[slice.name];
     expect(state.pathSteps).toEqual([null, null]);
-  });
-
-  it('should handle updateRollingStockComfort', () => {
-    const newRollingStockComfort: TrainScheduleBase['comfort'] = 'AIR_CONDITIONING';
-    defaultStore.dispatch(slice.actions.updateRollingStockComfort(newRollingStockComfort));
-    const state = defaultStore.getState()[slice.name];
-    expect(state.rollingStockComfort).toBe(newRollingStockComfort);
-  });
-
-  it('should handle updateStartTime', () => {
-    const newStartTime = new Date('2024-05-01T11:08:00.000+01:00');
-    defaultStore.dispatch(slice.actions.updateStartTime(newStartTime));
-    const state = defaultStore.getState()[slice.name];
-    expect(state.startTime).toBe(newStartTime);
   });
 };
 

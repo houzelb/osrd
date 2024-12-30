@@ -7,13 +7,20 @@ import { RxSpaceEvenlyHorizontally } from 'react-icons/rx';
 import { useSelector } from 'react-redux';
 
 import InputSNCF from 'common/BootstrapSNCF/InputSNCF';
-import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
+import {
+  updateTrainStep,
+  updateTrainCount,
+  updateTrainDelta,
+} from 'reducers/osrdconf/operationalStudiesConf';
+import {
+  getTrainStep,
+  getTrainCount,
+  getTrainDelta,
+} from 'reducers/osrdconf/operationalStudiesConf/selectors';
 import { useAppDispatch } from 'store';
 import { useDebounce } from 'utils/helpers';
 
 export default function TrainAddingSettings() {
-  const { getTrainStep, getTrainCount, getTrainDelta } = useOsrdConfSelectors();
-  const { updateTrainStep, updateTrainCount, updateTrainDelta } = useOsrdConfActions();
   const [trainStep, setTrainStep] = useState(useSelector(getTrainStep));
   const [trainCount, setTrainCount] = useState(useSelector(getTrainCount));
   const [trainDelta, setTrainDelta] = useState(useSelector(getTrainDelta));
