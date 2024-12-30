@@ -5,14 +5,10 @@ import type { RootState } from 'reducers';
 import buildInfraStateSelectors from 'reducers/infra/selectors';
 import type { OperationalStudiesConfSlice } from 'reducers/osrdconf/operationalStudiesConf';
 import type { StdcmConfSlice } from 'reducers/osrdconf/stdcmConf';
-import type { OsrdConfState } from 'reducers/osrdconf/types';
 import { makeSubSelector } from 'utils/selectors';
 
-const buildCommonConfSelectors = <ConfState extends OsrdConfState>(
-  slice: OperationalStudiesConfSlice | StdcmConfSlice
-) => {
-  const getConf = (state: RootState) => state[slice.name] as ConfState;
-  const makeOsrdConfSelector = makeSubSelector<ConfState>(getConf);
+const buildCommonConfSelectors = (slice: OperationalStudiesConfSlice | StdcmConfSlice) => {
+  const makeOsrdConfSelector = makeSubSelector((state: RootState) => state[slice.name]);
 
   const getPathSteps = makeOsrdConfSelector('pathSteps');
 
@@ -26,7 +22,6 @@ const buildCommonConfSelectors = <ConfState extends OsrdConfState>(
 
   return {
     ...buildInfraStateSelectors(slice),
-    getConf,
     getConstraintDistribution: makeOsrdConfSelector('constraintDistribution'),
     getName: makeOsrdConfSelector('name'),
     getTrainCount: makeOsrdConfSelector('trainCount'),
