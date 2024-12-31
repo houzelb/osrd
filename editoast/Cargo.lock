@@ -1324,7 +1324,6 @@ dependencies = [
  "opentelemetry-semantic-conventions",
  "opentelemetry_sdk",
  "ordered-float",
- "osm_to_railjson",
  "paste",
  "pathfinding",
  "postgis_diesel",
@@ -3066,6 +3065,7 @@ dependencies = [
 name = "osm_to_railjson"
 version = "0.1.0"
 dependencies = [
+ "clap",
  "editoast_schemas",
  "geo-types",
  "geos",

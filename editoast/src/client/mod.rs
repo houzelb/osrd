@@ -16,7 +16,6 @@ mod valkey_config;
 use std::env;
 use std::path::PathBuf;
 
-use clap::Args;
 use clap::Parser;
 use clap::Subcommand;
 use clap::ValueEnum;
@@ -77,7 +76,6 @@ pub enum Commands {
     ElectricalProfiles(electrical_profiles_commands::ElectricalProfilesCommands),
     ImportRollingStock(ImportRollingStockArgs),
     ImportTowedRollingStock(ImportRollingStockArgs),
-    OsmToRailjson(OsmToRailjsonArgs),
     #[command(about, long_about = "Prints the OpenApi of the service")]
     Openapi,
     #[command(subcommand, about, long_about = "Search engine related commands")]
@@ -100,15 +98,6 @@ pub enum Commands {
     User(UserCommand),
     #[command(about, long_about = "Healthcheck")]
     Healthcheck(CoreArgs),
-}
-
-#[derive(Args, Debug)]
-#[command(about, long_about = "Extracts a railjson from OpenStreetMap data")]
-pub struct OsmToRailjsonArgs {
-    /// Input file in the OSM PBF format
-    pub osm_pbf_in: PathBuf,
-    /// Output file in Railjson format
-    pub railjson_out: PathBuf,
 }
 
 /// Prints the OpenApi to stdout

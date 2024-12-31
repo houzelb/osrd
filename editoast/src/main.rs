@@ -138,9 +138,6 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
         Commands::ImportTowedRollingStock(args) => {
             import_towed_rolling_stock(args, db_pool.into()).await
         }
-        Commands::OsmToRailjson(args) => {
-            osm_to_railjson::osm_to_railjson(args.osm_pbf_in, args.railjson_out)
-        }
         Commands::Openapi => {
             print_openapi();
             Ok(())
