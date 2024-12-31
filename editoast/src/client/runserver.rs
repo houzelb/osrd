@@ -43,6 +43,10 @@ pub struct RunserverArgs {
     // only recieve 401 responses.
     #[clap(long, env = "EDITOAST_DISABLE_AUTHORIZATION", default_value_t = true)]
     disable_authorization: bool,
+    /// If this option is set, logging for the STDCM will be enabled.
+    /// When enabled, relevant logs will be captured to aid in debugging and monitoring.
+    #[clap(long, env = "ENABLE_STDCM_LOGGING", default_value_t = true)]
+    enable_stdcm_logging: bool,
     #[clap(long, env = "OSRDYNE_API_URL", default_value_t = Url::parse("http://127.0.0.1:4242/").unwrap())]
     osrdyne_api_url: Url,
     /// The timeout to use when performing the healthcheck, in milliseconds
@@ -64,6 +68,7 @@ pub async fn runserver(
                 core_client_channels_size,
             },
         disable_authorization,
+        enable_stdcm_logging,
         osrdyne_api_url,
         health_check_timeout_ms,
     }: RunserverArgs,
@@ -76,6 +81,7 @@ pub async fn runserver(
         health_check_timeout: Duration::milliseconds(health_check_timeout_ms as i64),
         map_layers_max_zoom: map_layers_config.max_zoom as u8,
         disable_authorization,
+        enable_stdcm_logging,
         postgres_config: postgres.into(),
         osrdyne_config: views::OsrdyneConfig {
             mq_url,

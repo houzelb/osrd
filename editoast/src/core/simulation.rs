@@ -38,7 +38,7 @@ editoast_common::schemas! {
     SimulationResponse,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Derivative)]
+#[derive(Debug, Clone, Serialize, Deserialize, Derivative, ToSchema)]
 #[derivative(Hash)]
 pub struct PhysicsConsist {
     pub effort_curves: EffortCurves,
@@ -46,32 +46,40 @@ pub struct PhysicsConsist {
     /// Length of the rolling stock
     #[derivative(Hash(hash_with = "units::millimeter::hash"))]
     #[serde(with = "units::millimeter::u64")]
+    #[schema(value_type = u64)]
     pub length: Length,
     /// Maximum speed of the rolling stock
     #[derivative(Hash(hash_with = "units::meter_per_second::hash"))]
     #[serde(with = "units::meter_per_second")]
+    #[schema(value_type = f64)]
     pub max_speed: Velocity,
     #[derivative(Hash(hash_with = "units::millisecond::hash"))]
     #[serde(with = "units::millisecond::u64")]
+    #[schema(value_type = u64)]
     pub startup_time: Time,
     #[derivative(Hash(hash_with = "units::meter_per_second_squared::hash"))]
     #[serde(with = "units::meter_per_second_squared")]
+    #[schema(value_type = f64)]
     pub startup_acceleration: Acceleration,
     #[derivative(Hash(hash_with = "units::meter_per_second_squared::hash"))]
     #[serde(with = "units::meter_per_second_squared")]
+    #[schema(value_type = f64)]
     pub comfort_acceleration: Acceleration,
     /// The constant gamma braking coefficient used when NOT circulating
     /// under ETCS/ERTMS signaling system
     #[derivative(Hash(hash_with = "units::meter_per_second_squared::hash"))]
     #[serde(with = "units::meter_per_second_squared")]
+    #[schema(value_type = f64)]
     pub const_gamma: Deceleration,
     pub etcs_brake_params: Option<EtcsBrakeParams>,
     #[derivative(Hash(hash_with = "units::basis_point::hash"))]
     #[serde(with = "units::basis_point")]
+    #[schema(value_type = f64)]
     pub inertia_coefficient: Ratio,
     /// Mass of the rolling stock
     #[derivative(Hash(hash_with = "units::kilogram::hash"))]
     #[serde(with = "units::kilogram::u64")]
+    #[schema(value_type = u64)]
     pub mass: Mass,
     pub rolling_resistance: RollingResistance,
     /// Mapping of power restriction code to power class
@@ -81,11 +89,13 @@ pub struct PhysicsConsist {
     /// Is null if the train is not electric or the value not specified.
     #[derivative(Hash(hash_with = "units::millisecond::option::hash"))]
     #[serde(default, with = "units::millisecond::u64::option")]
+    #[schema(value_type = Option<u64>)]
     pub electrical_power_startup_time: Option<Time>,
     /// The time it takes to raise this train's pantograph.
     /// Is null if the train is not electric or the value not specified.
     #[derivative(Hash(hash_with = "units::millisecond::option::hash"))]
     #[serde(default, with = "units::millisecond::u64::option")]
+    #[schema(value_type = Option<u64>)]
     pub raise_pantograph_time: Option<Time>,
 }
 

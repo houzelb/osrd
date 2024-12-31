@@ -103,6 +103,10 @@ impl<S: StorageDriver> Authorizer<S> {
         self.user_roles.contains(&S::BuiltinRole::superuser())
     }
 
+    pub fn is_superuser_stub(&self) -> bool {
+        self.user_roles.contains(&S::BuiltinRole::superuser()) && self.user_id == -1
+    }
+
     /// Returns whether a user with some id exists
     #[tracing::instrument(skip_all, fields(user_id = %user_id), ret(level = Level::DEBUG), err)]
     pub async fn user_exists(&self, user_id: i64) -> Result<bool, S::Error> {

@@ -186,6 +186,11 @@
     "stdcm": {
       "InfraNotFound": "Infrastructure '{{infra_id}}' does not exist"
     },
+    "stdcm_log": {
+      "NotFound": "STDCM log entry '{{id}}' could not be found",
+      "TraceIdNotFound": "STDCM log entry '{{trace_id}}' could not be found",
+      "MissingIdAndTraceId": "STDCM log entry could not be found without specifying an 'id' or 'trace_id'"
+    },
     "stdcm_v2": {
       "InfraNotFound": "Infrastructure '{{infra_id}}' does not exist",
       "InvalidPathItems": "Invalid waypoint(s) {{items}}",

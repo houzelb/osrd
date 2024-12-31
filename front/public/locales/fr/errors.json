@@ -188,6 +188,11 @@
     "stdcm": {
       "InfraNotFound": "Infrastructure {{infra_id}} non trouvée"
     },
+    "stdcm_log": {
+      "NotFound": "STDCM Log '{{id}}' n'a pas pu être trouvée",
+      "TraceIdNotFound": "STDCM Log '{{trace_id}}' n'a pas pu être trouvée",
+      "MissingIdAndTraceId": "STDCM Log n'a pas pu être trouvée sans spécifier un 'id' ou un 'trace_id'"
+    },
     "stdcm_v2": {
       "InfraNotFound": "Infrastructure '{{infra_id}}' non trouvée",
       "InvalidPathItems": "Point(s) de passage {{items}} invalide(s)",

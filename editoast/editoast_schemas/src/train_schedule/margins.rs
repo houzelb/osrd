@@ -44,7 +44,7 @@ impl<'de> Deserialize<'de> for Margins {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Derivative)]
+#[derive(Debug, Copy, Clone, PartialEq, Derivative, ToSchema)]
 #[derivative(Hash, Default)]
 pub enum MarginValue {
     #[derivative(Default)]

@@ -29,7 +29,7 @@ pub struct ConflictDetectionRequest {
     pub work_schedules: Option<WorkSchedulesRequest>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct TrainRequirements {
     pub start_time: DateTime<Utc>,
     pub spacing_requirements: Vec<SpacingRequirement>,

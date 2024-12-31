@@ -31,11 +31,12 @@ pub struct TracingConfig {
 
 pub fn create_tracing_subscriber<T: SpanExporter + 'static>(
     tracing_config: TracingConfig,
+    log_level: tracing_subscriber::filter::LevelFilter,
     exporter: T,
 ) -> impl tracing::Subscriber {
     let env_filter_layer = tracing_subscriber::EnvFilter::builder()
         // Set the default log level to 'info'
-        .with_default_directive(tracing_subscriber::filter::LevelFilter::INFO.into())
+        .with_default_directive(log_level.into())
         .from_env_lossy();
     let fmt_layer = tracing_subscriber::fmt::layer()
         .pretty()

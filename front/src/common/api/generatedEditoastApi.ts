@@ -18,6 +18,7 @@ export const addTagTypes = [
   'speed_limit_tags',
   'sprites',
   'stdcm_search_environment',
+  'stdcm_log',
   'temporary_speed_limits',
   'timetable',
   'stdcm',
@@ -768,6 +769,20 @@ const injectedRtkApi = api
           body: queryArg.stdcmSearchEnvironmentCreateForm,
         }),
         invalidatesTags: ['stdcm_search_environment'],
+      }),
+      getStdcmLog: build.query<GetStdcmLogApiResponse, GetStdcmLogApiArg>({
+        query: (queryArg) => ({
+          url: `/stdcm_log`,
+          params: { trace_id: queryArg.traceId, id: queryArg.id },
+        }),
+        providesTags: ['stdcm_log'],
+      }),
+      getStdcmLogs: build.query<GetStdcmLogsApiResponse, GetStdcmLogsApiArg>({
+        query: (queryArg) => ({
+          url: `/stdcm_logs`,
+          params: { page: queryArg.page, page_size: queryArg.pageSize },
+        }),
+        providesTags: ['stdcm_log'],
       }),
       postTemporarySpeedLimitGroup: build.mutation<
         PostTemporarySpeedLimitGroupApiResponse,
@@ -1635,6 +1650,18 @@ export type GetStdcmSearchEnvironmentApiArg = void;
 export type PostStdcmSearchEnvironmentApiResponse = /** status 201  */ StdcmSearchEnvironment;
 export type PostStdcmSearchEnvironmentApiArg = {
   stdcmSearchEnvironmentCreateForm: StdcmSearchEnvironmentCreateForm;
+};
+export type GetStdcmLogApiResponse = /** status 200 The STDCM log */ StdcmLog;
+export type GetStdcmLogApiArg = {
+  traceId?: string | null;
+  id?: number | null;
+};
+export type GetStdcmLogsApiResponse = /** status 200 The list of STDCM Logs */ PaginationStats & {
+  results: StdcmLogListItem[];
+};
+export type GetStdcmLogsApiArg = {
+  page?: number;
+  pageSize?: number | null;
 };
 export type PostTemporarySpeedLimitGroupApiResponse =
   /** status 201 The id of the created temporary speed limit group. */ {
@@ -3340,44 +3367,6 @@ export type StdcmSearchEnvironmentCreateForm = {
   timetable_id: number;
   work_schedule_group_id?: number | null;
 };
-export type TimetableResult = {
-  timetable_id: number;
-};
-export type TimetableDetailedResult = {
-  timetable_id: number;
-  train_ids: number[];
-};
-export type ConflictRequirement = {
-  end_time: string;
-  start_time: string;
-  zone: string;
-};
-export type Conflict = {
-  conflict_type: 'Spacing' | 'Routing';
-  /** Datetime of the end of the conflict */
-  end_time: string;
-  /** List of requirements causing the conflict */
-  requirements: ConflictRequirement[];
-  /** Datetime of the start of the conflict */
-  start_time: string;
-  /** List of train ids involved in the conflict */
-  train_ids: number[];
-  /** List of work schedule ids involved in the conflict */
-  work_schedule_ids: number[];
-};
-export type ReportTrain = {
-  /** Total energy consumption */
-  energy_consumption: number;
-  /** Time in ms of each path item given as input of the pathfinding
-    The first value is always `0` (beginning of the path) and the last one, the total time of the simulation (end of the path) */
-  path_item_times: number[];
-  /** List of positions of a train
-    Both positions (in mm) and times (in ms) must have the same length */
-  positions: number[];
-  /** List of speeds associated to a position */
-  speeds: number[];
-  times: number[];
-};
 export type RoutingZoneRequirement = {
   /** Time in ms */
   end_time: number;
@@ -3394,6 +3383,112 @@ export type RoutingRequirement = {
   route: string;
   zones: RoutingZoneRequirement[];
 };
+export type SpacingRequirement = {
+  begin_time: number;
+  end_time: number;
+  zone: string;
+};
+export type WorkScheduleType = 'CATENARY' | 'TRACK';
+export type WorkSchedule = {
+  end_date_time: string;
+  id: number;
+  obj_id: string;
+  start_date_time: string;
+  track_ranges: TrackRange[];
+  work_schedule_group_id: number;
+  work_schedule_type: WorkScheduleType;
+};
+export type StdcmRequest = {
+  comfort: Comfort;
+  /** Infrastructure expected version */
+  expected_version: string;
+  /** Infrastructure id */
+  infra: number;
+  margin?:
+    | (
+        | {
+            Percentage: number;
+          }
+        | {
+            MinPer100Km: number;
+          }
+      )
+    | null;
+  /** Maximum departure delay in milliseconds. */
+  maximum_departure_delay: number;
+  /** Maximum run time of the simulation in milliseconds */
+  maximum_run_time: number;
+  /** List of waypoints. Each waypoint is a list of track offset. */
+  path_items: PathItem[];
+  physics_consist: {
+    base_power_class?: string | null;
+    comfort_acceleration: number;
+    /** The constant gamma braking coefficient used when NOT circulating
+        under ETCS/ERTMS signaling system */
+    const_gamma: number;
+    effort_curves: EffortCurves;
+    /** The time the train takes before actually using electrical power.
+        Is null if the train is not electric or the value not specified. */
+    electrical_power_startup_time?: number | null;
+    etcs_brake_params?: EtcsBrakeParams | null;
+    inertia_coefficient: number;
+    /** Length of the rolling stock */
+    length: number;
+    /** Mass of the rolling stock */
+    mass: number;
+    /** Maximum speed of the rolling stock */
+    max_speed: number;
+    /** Mapping of power restriction code to power class */
+    power_restrictions?: {
+      [key: string]: string;
+    };
+    /** The time it takes to raise this train's pantograph.
+        Is null if the train is not electric or the value not specified. */
+    raise_pantograph_time?: number | null;
+    rolling_resistance: RollingResistance;
+    startup_acceleration: number;
+    startup_time: number;
+  };
+  rolling_stock_loading_gauge: LoadingGaugeType;
+  rolling_stock_supported_signaling_systems: RollingStockSupportedSignalingSystems;
+  speed_limit_tag?: string | null;
+  start_time: string;
+  /** List of applicable temporary speed limits between the train departure and arrival */
+  temporary_speed_limits: {
+    /** Speed limitation in m/s */
+    speed_limit: number;
+    /** Track ranges on which the speed limitation applies */
+    track_ranges: TrackRange[];
+  }[];
+  /** Gap between the created train and following trains in milliseconds */
+  time_gap_after: number;
+  /** Gap between the created train and previous trains in milliseconds */
+  time_gap_before: number;
+  /** Numerical integration time step in milliseconds. Use default value if not specified. */
+  time_step?: number | null;
+  trains_requirements: {
+    [key: string]: {
+      routing_requirements: RoutingRequirement[];
+      spacing_requirements: SpacingRequirement[];
+      start_time: string;
+    };
+  };
+  /** List of planned work schedules */
+  work_schedules: WorkSchedule[];
+};
+export type ReportTrain = {
+  /** Total energy consumption */
+  energy_consumption: number;
+  /** Time in ms of each path item given as input of the pathfinding
+    The first value is always `0` (beginning of the path) and the last one, the total time of the simulation (end of the path) */
+  path_item_times: number[];
+  /** List of positions of a train
+    Both positions (in mm) and times (in ms) must have the same length */
+  positions: number[];
+  /** List of speeds associated to a position */
+  speeds: number[];
+  times: number[];
+};
 export type SignalCriticalPosition = {
   /** Position in mm */
   position: number;
@@ -3401,11 +3496,6 @@ export type SignalCriticalPosition = {
   state: string;
   /** Time in ms */
   time: number;
-};
-export type SpacingRequirement = {
-  begin_time: number;
-  end_time: number;
-  zone: string;
 };
 export type ZoneUpdate = {
   is_entry: boolean;
@@ -3475,19 +3565,69 @@ export type SimulationResponse =
       core_error: InternalError;
       status: 'simulation_failed';
     };
-export type StepTimingData = {
-  /** Time at which the train should arrive at the location */
-  arrival_time: string;
-  /** The train may arrive up to this duration after the expected arrival time */
-  arrival_time_tolerance_after: number;
-  /** The train may arrive up to this duration before the expected arrival time */
-  arrival_time_tolerance_before: number;
+export type StdcmResponse =
+  | {
+      departure_time: string;
+      path: PathfindingResultSuccess;
+      simulation: SimulationResponse;
+      status: 'success';
+    }
+  | {
+      status: 'path_not_found';
+    }
+  | {
+      error: SimulationResponse;
+      status: 'preprocessing_simulation_error';
+    };
+export type StdcmLog = {
+  created: string;
+  id: number;
+  request: StdcmRequest;
+  response: StdcmResponse;
+  trace_id?: string | null;
+  user_id?: number | null;
+};
+export type StdcmLogListItem = {
+  id: number;
+  trace_id?: string | null;
+};
+export type TimetableResult = {
+  timetable_id: number;
+};
+export type TimetableDetailedResult = {
+  timetable_id: number;
+  train_ids: number[];
+};
+export type ConflictRequirement = {
+  end_time: string;
+  start_time: string;
+  zone: string;
+};
+export type Conflict = {
+  conflict_type: 'Spacing' | 'Routing';
+  /** Datetime of the end of the conflict */
+  end_time: string;
+  /** List of requirements causing the conflict */
+  requirements: ConflictRequirement[];
+  /** Datetime of the start of the conflict */
+  start_time: string;
+  /** List of train ids involved in the conflict */
+  train_ids: number[];
+  /** List of work schedule ids involved in the conflict */
+  work_schedule_ids: number[];
 };
 export type PathfindingItem = {
   /** The stop duration in milliseconds, None if the train does not stop. */
   duration?: number | null;
   location: PathItemLocation;
-  timing_data?: StepTimingData | null;
+  timing_data?: {
+    /** Time at which the train should arrive at the location */
+    arrival_time: string;
+    /** The train may arrive up to this duration after the expected arrival time */
+    arrival_time_tolerance_after: number;
+    /** The train may arrive up to this duration before the expected arrival time */
+    arrival_time_tolerance_before: number;
+  } | null;
 };
 export type Distribution = 'STANDARD' | 'MARECO';
 export type TrainScheduleBase = {
@@ -3691,16 +3831,6 @@ export type WorkScheduleItemForm = {
   start_date_time: string;
   track_ranges: TrackRange[];
   work_schedule_type: 'CATENARY' | 'TRACK';
-};
-export type WorkScheduleType = 'CATENARY' | 'TRACK';
-export type WorkSchedule = {
-  end_date_time: string;
-  id: number;
-  obj_id: string;
-  start_date_time: string;
-  track_ranges: TrackRange[];
-  work_schedule_group_id: number;
-  work_schedule_type: WorkScheduleType;
 };
 export type Intersection = {
   /** Distance of the end of the intersection relative to the beginning of the path */

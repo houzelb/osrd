@@ -115,7 +115,12 @@ async fn run() -> Result<(), Box<dyn Error + Send + Sync>> {
         stream: EditoastMode::from_client(&client).into(),
         telemetry,
     };
-    create_tracing_subscriber(tracing_config, exporter).init();
+    create_tracing_subscriber(
+        tracing_config,
+        tracing_subscriber::filter::LevelFilter::INFO,
+        exporter,
+    )
+    .init();
 
     let pg_config = client.postgres_config;
     let db_pool =
