@@ -177,8 +177,8 @@ export async function createDataForTests(): Promise<void> {
 
     const stdcmEnvironment = {
       infra_id: smallInfra.id,
-      search_window_begin: '2024-10-17T00:00:01',
-      search_window_end: '2024-10-18T23:59:59',
+      search_window_begin: '2024-10-17T00:00:00Z',
+      search_window_end: '2024-10-18T23:59:59Z',
       timetable_id: scenarioTrainSchedule.timetable_id,
     } as StdcmSearchEnvironment;
 

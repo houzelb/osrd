@@ -256,7 +256,7 @@ export async function getStdcmEnvironment(): Promise<StdcmSearchEnvironment | nu
  */
 export async function setStdcmEnvironment(stdcmEnvironment: StdcmSearchEnvironment): Promise<void> {
   // Remove the `id` field to match the StdcmSearchEnvironmentCreateForm schema
-  const { id, ...stdcmEnvironmentWithoutId } = stdcmEnvironment;
+  const { id: _id, ...stdcmEnvironmentWithoutId } = stdcmEnvironment;
   await postApiRequest(
     '/api/stdcm/search_environment',
     stdcmEnvironmentWithoutId,
