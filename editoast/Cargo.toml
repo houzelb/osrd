@@ -26,6 +26,7 @@ license = "LGPL-3.0"
 
 [workspace.dependencies]
 chrono = { version = "0.4.39", default-features = false, features = ["serde"] }
+clap = { version = "4.5.23", features = ["derive", "env"] }
 derivative = "2.2.0"
 diesel = { version = "2.2", default-features = false, features = [
   "32-column-tables",
@@ -158,7 +159,6 @@ opentelemetry-otlp = { version = "0.27.0", default-features = false, features = 
 opentelemetry-semantic-conventions.workspace = true
 opentelemetry_sdk.workspace = true
 ordered-float = { version = "4.6.0", features = ["serde"] }
-osm_to_railjson = { path = "./osm_to_railjson" }
 paste.workspace = true
 pathfinding = "4.13.0"
 postgis_diesel.workspace = true

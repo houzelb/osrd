@@ -9,7 +9,7 @@ Example for Germany:
 2. Launch conversion (release build of editoast and conversion can be long):
     ```sh
     cd ../../editoast
-    cargo run --release -- osm-to-railjson <path/to/germany-latest.osm.pbf> <path/to/germany_railjson.json>
+    cargo run --release -p osm_to_railjson -- <path/to/germany-latest.osm.pbf> <path/to/germany_railjson.json>
     ```
 3. Load railjson (also possible through [a script](../../scripts/load-railjson-infra.sh) or OSRD's web interface):
     ```sh
