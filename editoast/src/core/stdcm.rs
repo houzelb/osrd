@@ -20,10 +20,12 @@ use crate::core::AsCoreRequest;
 use crate::core::Json;
 
 editoast_common::schemas! {
+    Request,
     Response,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[schema(as = StdcmRequest)]
 pub struct Request {
     /// Infrastructure id
     pub infra: i64,
@@ -42,9 +44,11 @@ pub struct Request {
     /// The comfort of the train
     pub comfort: Comfort,
     pub speed_limit_tag: Option<String>,
+    #[schema(inline)]
     pub physics_consist: PhysicsConsist,
 
     // STDCM search parameters
+    #[schema(inline)]
     pub trains_requirements: HashMap<i64, TrainRequirements>,
     /// Numerical integration time step in milliseconds. Use default value if not specified.
     pub time_step: Option<u64>,
@@ -58,10 +62,12 @@ pub struct Request {
     /// Gap between the created train and following trains in milliseconds
     pub time_gap_after: u64,
     /// Margin to apply to the whole train
+    #[schema(inline)]
     pub margin: Option<MarginValue>,
     /// List of planned work schedules
     pub work_schedules: Vec<WorkSchedule>,
     /// List of applicable temporary speed limits between the train departure and arrival
+    #[schema(inline)]
     pub temporary_speed_limits: Vec<TemporarySpeedLimit>,
 }
 
@@ -98,7 +104,7 @@ pub struct WorkSchedule {
 }
 
 /// Lighter description of a work schedule with only the relevant information for core
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct TemporarySpeedLimit {
     /// Speed limitation in m/s
     pub speed_limit: f64,
@@ -123,6 +129,7 @@ pub struct UndirectedTrackRange {
 // We accepted the difference of memory size taken by variants
 // Since there is only on success and others are error cases
 #[allow(clippy::large_enum_variant)]
+#[schema(as = StdcmResponse)]
 pub enum Response {
     Success {
         simulation: SimulationResponse,

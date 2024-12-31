@@ -14,6 +14,7 @@ pub mod scenario;
 pub mod search;
 pub mod speed_limit_tags;
 pub mod sprites;
+pub mod stdcm_logs;
 pub mod stdcm_search_environment;
 pub mod study;
 pub mod temporary_speed_limits;
@@ -111,6 +112,7 @@ crate::routes! {
     &train_schedule,
     &timetable,
     &path,
+    &stdcm_logs,
     &scenario,
 }
 
@@ -141,6 +143,7 @@ editoast_common::schemas! {
     train_schedule::schemas(),
     timetable::schemas(),
     work_schedules::schemas(),
+    stdcm_logs::schemas(),
 }
 
 /// Represents the bundle of information about the issuer of a request
@@ -363,6 +366,7 @@ pub struct ServerConfig {
     pub health_check_timeout: Duration,
     pub map_layers_max_zoom: u8,
     pub disable_authorization: bool,
+    pub enable_stdcm_logging: bool,
     pub postgres_config: PostgresConfig,
     pub osrdyne_config: OsrdyneConfig,
     pub valkey_config: ValkeyConfig,

@@ -63,6 +63,8 @@ pub(crate) struct TestAppBuilder {
     core_client: Option<CoreClient>,
     osrdyne_client: Option<OsrdyneClient>,
     enable_authorization: bool,
+    enable_stdcm_logging: bool,
+    enable_telemetry: bool,
     user: Option<UserInfo>,
     roles: HashSet<BuiltinRole>,
 }
@@ -74,6 +76,8 @@ impl TestAppBuilder {
             core_client: None,
             osrdyne_client: None,
             enable_authorization: false,
+            enable_stdcm_logging: false,
+            enable_telemetry: true,
             user: None,
             roles: HashSet::new(),
         }
@@ -99,6 +103,16 @@ impl TestAppBuilder {
 
     pub fn enable_authorization(mut self, enable_authorization: bool) -> Self {
         self.enable_authorization = enable_authorization;
+        self
+    }
+
+    pub fn enable_stdcm_logging(mut self, enable_stdcm_logging: bool) -> Self {
+        self.enable_stdcm_logging = enable_stdcm_logging;
+        self
+    }
+
+    pub fn enable_telemetry(mut self, enable_telemetry: bool) -> Self {
+        self.enable_telemetry = enable_telemetry;
         self
     }
 
@@ -130,6 +144,7 @@ impl TestAppBuilder {
             address: String::default(),
             health_check_timeout: chrono::Duration::milliseconds(500),
             disable_authorization: !self.enable_authorization,
+            enable_stdcm_logging: self.enable_stdcm_logging,
             map_layers_max_zoom: 18,
             postgres_config: PostgresConfig {
                 database_url: Url::parse("postgres://osrd:password@localhost:5432/osrd").unwrap(),
@@ -152,14 +167,23 @@ impl TestAppBuilder {
         };
 
         // Setup tracing
-        let tracing_config = TracingConfig {
-            stream: Stream::Stdout,
-            telemetry: Some(Telemetry {
+        let telemetry = if self.enable_telemetry {
+            Some(Telemetry {
                 service_name: "osrd-editoast".into(),
                 endpoint: Url::parse("http://localhost:4317").unwrap(),
-            }),
+            })
+        } else {
+            None
         };
-        let sub = create_tracing_subscriber(tracing_config, NoopSpanExporter);
+        let tracing_config = TracingConfig {
+            stream: Stream::Stdout,
+            telemetry,
+        };
+        let sub = create_tracing_subscriber(
+            tracing_config,
+            tracing_subscriber::filter::LevelFilter::DEBUG,
+            NoopSpanExporter,
+        );
         let tracing_guard = tracing::subscriber::set_default(sub);
 
         // Config valkey

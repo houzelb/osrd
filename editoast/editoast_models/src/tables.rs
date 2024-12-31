@@ -625,7 +625,7 @@ diesel::table! {
     stdcm_logs (id) {
         id -> Int8,
         #[max_length = 32]
-        trace_id -> Varchar,
+        trace_id -> Nullable<Varchar>,
         request -> Jsonb,
         response -> Jsonb,
         created -> Timestamptz,

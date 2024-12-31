@@ -2,10 +2,8 @@ use chrono::DateTime;
 use chrono::Utc;
 use editoast_derive::Model;
 use editoast_models::DbConnection;
-use opentelemetry::trace::TraceContextExt;
 use serde::Deserialize;
 use serde::Serialize;
-use tracing_opentelemetry::OpenTelemetrySpanExt;
 use utoipa::ToSchema;
 
 use crate::core::stdcm::Request;
@@ -18,13 +16,16 @@ editoast_common::schemas! {
 
 #[derive(Clone, Debug, Serialize, Deserialize, Model, ToSchema)]
 #[model(table = editoast_models::tables::stdcm_logs)]
-#[model(gen(ops = c))]
+#[model(gen(ops = crd, list))]
 pub struct StdcmLog {
     pub id: i64,
-    pub trace_id: String,
+    #[model(identifier)]
+    pub trace_id: Option<String>,
     #[model(json)]
+    #[schema(value_type = StdcmRequest)]
     pub request: Request,
     #[model(json)]
+    #[schema(value_type = StdcmResponse)]
     pub response: Response,
     pub created: DateTime<Utc>,
     pub user_id: Option<i64>,
@@ -33,17 +34,13 @@ pub struct StdcmLog {
 impl StdcmLog {
     pub async fn log(
         mut conn: DbConnection,
+        trace_id: Option<String>,
         request: Request,
         response: Response,
         user_id: Option<i64>,
     ) {
-        let trace_id = tracing::Span::current()
-            .context()
-            .span()
-            .span_context()
-            .trace_id();
         let stdcm_log_changeset = StdcmLog::changeset()
-            .trace_id(trace_id.to_string())
+            .trace_id(trace_id)
             .request(request)
             .response(response.clone())
             .user_id(user_id);

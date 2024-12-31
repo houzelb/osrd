@@ -1,13 +1,14 @@
 mod failure_handler;
-mod request;
+pub(crate) mod request;
 
 use axum::extract::Json;
 use axum::extract::Path;
 use axum::extract::Query;
 use axum::extract::State;
 use axum::Extension;
+use chrono::DateTime;
+use chrono::Duration;
 use chrono::Utc;
-use chrono::{DateTime, Duration};
 use editoast_authz::BuiltinRole;
 use editoast_derive::EditoastError;
 use editoast_models::DbConnectionPoolV2;
@@ -17,6 +18,8 @@ use editoast_schemas::train_schedule::Margins;
 use editoast_schemas::train_schedule::ReceptionSignal;
 use editoast_schemas::train_schedule::ScheduleItem;
 use failure_handler::SimulationFailureHandler;
+use opentelemetry::trace::TraceContextExt;
+use opentelemetry::trace::TraceId;
 use request::convert_steps;
 use request::Request;
 use serde::Deserialize;
@@ -25,8 +28,10 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::Instrument;
+use tracing_opentelemetry::OpenTelemetrySpanExt;
 use utoipa::IntoParams;
 use utoipa::ToSchema;
+use validator::Validate;
 
 use crate::core::conflict_detection::Conflict;
 use crate::core::conflict_detection::TrainRequirements;
@@ -124,6 +129,7 @@ struct InfraIdQueryParam {
 )]
 async fn stdcm(
     State(AppState {
+        config,
         db_pool,
         valkey: valkey_client,
         core_client,
@@ -142,6 +148,15 @@ async fn stdcm(
         return Err(AuthorizationError::Forbidden.into());
     }
 
+    let trace_id = tracing::Span::current()
+        .context()
+        .span()
+        .span_context()
+        .trace_id();
+
+    let trace_id = Some(trace_id).filter(|trace_id| *trace_id != TraceId::INVALID);
+
+    stdcm_request.validate()?;
     let mut conn = db_pool.get().await?;
 
     let timetable_id = id;
@@ -320,20 +335,33 @@ async fn stdcm(
 
     let stdcm_response = stdcm_request.fetch(core_client.as_ref()).await?;
 
-    // 6. Check if the current tracing level is debug or greater, and if so, log STDCM request and response
-    if tracing::level_filters::LevelFilter::current() >= tracing::Level::DEBUG {
+    // 6. Log STDCM request and response if logging is enabled
+    if config.enable_stdcm_logging {
         let user_id = auth.authorizer().map_or_else(
             |e| {
                 tracing::error!("Authorization failed: {e}. Unable to retrieve user ID.");
                 None
             },
-            |auth| Some(auth.user_id()),
+            |auth| {
+                if auth.is_superuser_stub() {
+                    return None;
+                }
+                Some(auth.user_id())
+            },
         );
+
         let _ = tokio::spawn(
             // We just don't await the creation of the log entry since we want
             // the endpoint to return as soon as possible, and because failing
             // to persist a log entry is not a very important error here.
-            StdcmLog::log(conn, stdcm_request, stdcm_response.clone(), user_id).in_current_span(),
+            StdcmLog::log(
+                conn,
+                trace_id.map(|trace_id| trace_id.to_string()),
+                stdcm_request,
+                stdcm_response.clone(),
+                user_id,
+            )
+            .in_current_span(),
         )
         .await;
     }
@@ -544,6 +572,10 @@ mod tests {
     use editoast_common::units;
     use editoast_models::DbConnectionPoolV2;
     use editoast_schemas::rolling_stock::RollingResistance;
+    use editoast_schemas::train_schedule::Comfort;
+    use editoast_schemas::train_schedule::OperationalPointIdentifier;
+    use editoast_schemas::train_schedule::OperationalPointReference;
+    use editoast_schemas::train_schedule::PathItemLocation;
     use pretty_assertions::assert_eq;
     use rstest::rstest;
     use serde_json::json;
@@ -553,12 +585,10 @@ mod tests {
     use crate::core::conflict_detection::Conflict;
     use crate::core::conflict_detection::ConflictType;
     use crate::core::mocking::MockingClient;
-    use crate::core::pathfinding::PathfindingResultSuccess;
     use crate::core::simulation::CompleteReportTrain;
     use crate::core::simulation::ElectricalProfiles;
     use crate::core::simulation::PhysicsConsist;
     use crate::core::simulation::ReportTrain;
-    use crate::core::simulation::SimulationResponse;
     use crate::core::simulation::SpeedLimitProperties;
     use crate::models::fixtures::create_fast_rolling_stock;
     use crate::models::fixtures::create_simple_rolling_stock;
@@ -566,9 +596,132 @@ mod tests {
     use crate::models::fixtures::create_timetable;
     use crate::models::fixtures::create_towed_rolling_stock;
     use crate::views::test_app::TestAppBuilder;
+    use crate::views::timetable::stdcm::request::PathfindingItem;
+    use crate::views::timetable::stdcm::request::StepTimingData;
     use crate::views::timetable::stdcm::PathfindingResult;
+    use crate::views::timetable::stdcm::Request;
 
     use super::*;
+
+    fn stdcm_payload(rolling_stock_id: i64) -> Request {
+        Request {
+            start_time: None,
+            steps: vec![
+                PathfindingItem {
+                    duration: Some(0),
+                    location: PathItemLocation::OperationalPointReference(
+                        OperationalPointReference {
+                            reference: OperationalPointIdentifier::OperationalPointDescription {
+                                trigram: "WS".into(),
+                                secondary_code: Some("BV".to_string()),
+                            },
+                            track_reference: None,
+                        },
+                    ),
+                    timing_data: Some(StepTimingData {
+                        arrival_time: DateTime::from_str("2024-09-17T20:05:00+02:00")
+                            .expect("Failed to parse datetime"),
+                        arrival_time_tolerance_before: 0,
+                        arrival_time_tolerance_after: 0,
+                    }),
+                },
+                PathfindingItem {
+                    duration: Some(0),
+                    location: PathItemLocation::OperationalPointReference(
+                        OperationalPointReference {
+                            reference: OperationalPointIdentifier::OperationalPointDescription {
+                                trigram: "MWS".into(),
+                                secondary_code: Some("BV".to_string()),
+                            },
+                            track_reference: None,
+                        },
+                    ),
+                    timing_data: None,
+                },
+            ],
+            rolling_stock_id,
+            towed_rolling_stock_id: None,
+            electrical_profile_set_id: None,
+            work_schedule_group_id: None,
+            temporary_speed_limit_group_id: None,
+            comfort: Comfort::Standard,
+            maximum_departure_delay: None,
+            maximum_run_time: None,
+            speed_limit_tags: Some("AR120".to_string()),
+            time_gap_before: 35000,
+            time_gap_after: 35000,
+            margin: Some(MarginValue::MinPer100Km(4.5)),
+            total_mass: None,
+            total_length: None,
+            max_speed: None,
+            loading_gauge_type: None,
+        }
+    }
+
+    fn pathfinding_result_success() -> PathfindingResultSuccess {
+        PathfindingResultSuccess {
+            blocks: vec![],
+            routes: vec![],
+            track_section_ranges: vec![],
+            length: 0,
+            path_item_positions: vec![0, 10],
+        }
+    }
+
+    fn core_mocking_client() -> MockingClient {
+        let mut core = MockingClient::new();
+        core.stub("/v2/pathfinding/blocks")
+            .method(reqwest::Method::POST)
+            .response(StatusCode::OK)
+            .json(PathfindingResult::Success(pathfinding_result_success()))
+            .finish();
+        core.stub("/v2/standalone_simulation")
+            .method(reqwest::Method::POST)
+            .response(StatusCode::OK)
+            .json(simulation_response())
+            .finish();
+        core
+    }
+
+    fn simulation_response() -> SimulationResponse {
+        SimulationResponse::Success {
+            base: ReportTrain {
+                positions: vec![],
+                times: vec![],
+                speeds: vec![],
+                energy_consumption: 0.0,
+                path_item_times: vec![0, 10],
+            },
+            provisional: ReportTrain {
+                positions: vec![],
+                times: vec![0, 10],
+                speeds: vec![],
+                energy_consumption: 0.0,
+                path_item_times: vec![0, 10],
+            },
+            final_output: CompleteReportTrain {
+                report_train: ReportTrain {
+                    positions: vec![],
+                    times: vec![],
+                    speeds: vec![],
+                    energy_consumption: 0.0,
+                    path_item_times: vec![0, 10],
+                },
+                signal_critical_positions: vec![],
+                zone_updates: vec![],
+                spacing_requirements: vec![],
+                routing_requirements: vec![],
+            },
+            mrsp: SpeedLimitProperties {
+                boundaries: vec![],
+                values: vec![],
+            },
+            electrical_profiles: ElectricalProfiles {
+                boundaries: vec![],
+                values: vec![],
+            },
+        }
+    }
 
     #[test]
     fn simulation_with_towed_rolling_stock_parameters() {
@@ -742,94 +895,6 @@ mod tests {
         );
     }
 
-    fn pathfinding_result_success() -> PathfindingResult {
-        PathfindingResult::Success(PathfindingResultSuccess {
-            blocks: vec![],
-            routes: vec![],
-            track_section_ranges: vec![],
-            length: 0,
-            path_item_positions: vec![0, 10],
-        })
-    }
-
-    fn simulation_response() -> SimulationResponse {
-        SimulationResponse::Success {
-            base: ReportTrain {
-                positions: vec![],
-                times: vec![],
-                speeds: vec![],
-                energy_consumption: 0.0,
-                path_item_times: vec![0, 10],
-            },
-            provisional: ReportTrain {
-                positions: vec![],
-                times: vec![0, 10],
-                speeds: vec![],
-                energy_consumption: 0.0,
-                path_item_times: vec![0, 10],
-            },
-            final_output: CompleteReportTrain {
-                report_train: ReportTrain {
-                    positions: vec![],
-                    times: vec![],
-                    speeds: vec![],
-                    energy_consumption: 0.0,
-                    path_item_times: vec![0, 10],
-                },
-                signal_critical_positions: vec![],
-                zone_updates: vec![],
-                spacing_requirements: vec![],
-                routing_requirements: vec![],
-            },
-            mrsp: SpeedLimitProperties {
-                boundaries: vec![],
-                values: vec![],
-            },
-            electrical_profiles: ElectricalProfiles {
-                boundaries: vec![],
-                values: vec![],
-            },
-        }
-    }
-
-    fn stdcm_payload(rolling_stock_id: i64) -> serde_json::Value {
-        json!({
-          "comfort": "STANDARD",
-          "margin": "4.5min/100km",
-          "rolling_stock_id": rolling_stock_id,
-          "speed_limit_tags": "AR120",
-          "steps": [
-            {
-              "duration": 0,
-              "location": { "trigram": "WS", "secondary_code": "BV" },
-              "timing_data": {
-                "arrival_time": "2024-09-17T20:05:00+02:00",
-                "arrival_time_tolerance_before": 0,
-                "arrival_time_tolerance_after": 0
-              }
-            },
-            { "duration": 0, "location": { "trigram": "MWS", "secondary_code": "BV" } }
-          ],
-          "time_gap_after": 35000,
-          "time_gap_before": 35000
-        })
-    }
-
-    fn core_mocking_client() -> MockingClient {
-        let mut core = MockingClient::new();
-        core.stub("/v2/pathfinding/blocks")
-            .method(reqwest::Method::POST)
-            .response(StatusCode::OK)
-            .json(pathfinding_result_success())
-            .finish();
-        core.stub("/v2/standalone_simulation")
-            .method(reqwest::Method::POST)
-            .response(StatusCode::OK)
-            .json(serde_json::to_value(simulation_response()).unwrap())
-            .finish();
-        core
-    }
-
     fn conflict_data() -> Conflict {
         Conflict {
             train_ids: vec![0, 1],
@@ -849,12 +914,12 @@ mod tests {
         core.stub("/v2/stdcm")
             .method(reqwest::Method::POST)
             .response(StatusCode::OK)
-            .json(json!({
-                "status": "success",
-                "simulation": serde_json::to_value(simulation_response()).unwrap(),
-                "path": serde_json::to_value(pathfinding_result_success()).unwrap(),
-                "departure_time": "2024-01-02T00:00:00Z"
-            }))
+            .json(crate::core::stdcm::Response::Success {
+                simulation: simulation_response(),
+                path: pathfinding_result_success(),
+                departure_time: DateTime::from_str("2024-01-02T00:00:00Z")
+                    .expect("Failed to parse datetime"),
+            })
             .finish();
 
         let app = TestAppBuilder::new()
@@ -873,7 +938,9 @@ mod tests {
         let stdcm_response: StdcmResponse =
             app.fetch(request).assert_status(StatusCode::OK).json_into();
 
-        if let PathfindingResult::Success(path) = pathfinding_result_success() {
+        if let PathfindingResult::Success(path) =
+            PathfindingResult::Success(pathfinding_result_success())
+        {
             assert_eq!(
                 stdcm_response,
                 StdcmResponse::Success {
@@ -925,7 +992,7 @@ mod tests {
         assert_eq!(
             stdcm_response,
             StdcmResponse::Conflicts {
-                pathfinding_result: pathfinding_result_success(),
+                pathfinding_result: PathfindingResult::Success(pathfinding_result_success()),
                 conflicts: vec![conflict],
             }
         );

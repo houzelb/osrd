@@ -15,6 +15,7 @@ use serde::Serialize;
 use serde::Serializer;
 use units::quantities;
 use utoipa::ToSchema;
+use validator::Validate;
 
 use crate::core::pathfinding::PathfindingInputError;
 use crate::error::Result;
@@ -31,19 +32,18 @@ use crate::SelectionSettings;
 use super::StdcmError;
 
 editoast_common::schemas! {
-    Request,
     PathfindingItem,
-    StepTimingData,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Clone, ToSchema)]
-pub(super) struct PathfindingItem {
+pub(crate) struct PathfindingItem {
     /// The stop duration in milliseconds, None if the train does not stop.
-    duration: Option<u64>,
+    pub(crate) duration: Option<u64>,
     /// The associated location
-    location: PathItemLocation,
+    pub(crate) location: PathItemLocation,
     /// Time at which the train should arrive at the location, if specified
-    timing_data: Option<StepTimingData>,
+    #[schema(inline)]
+    pub(crate) timing_data: Option<StepTimingData>,
 }
 
 /// Convert the list of pathfinding items into a list of path item
@@ -59,64 +59,64 @@ pub(super) fn convert_steps(steps: &[PathfindingItem]) -> Vec<PathItem> {
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Clone, ToSchema)]
-struct StepTimingData {
+pub(crate) struct StepTimingData {
     /// Time at which the train should arrive at the location
-    arrival_time: DateTime<Utc>,
+    pub(crate) arrival_time: DateTime<Utc>,
     /// The train may arrive up to this duration before the expected arrival time
-    arrival_time_tolerance_before: u64,
+    pub(crate) arrival_time_tolerance_before: u64,
     /// The train may arrive up to this duration after the expected arrival time
-    arrival_time_tolerance_after: u64,
+    pub(crate) arrival_time_tolerance_after: u64,
 }
 
 /// An STDCM request
 #[editoast_derive::annotate_units]
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Validate, ToSchema)]
 #[serde(remote = "Self")]
-pub(super) struct Request {
+pub(crate) struct Request {
     /// Deprecated, first step arrival time should be used instead
-    pub(super) start_time: Option<DateTime<Utc>>,
-    pub(super) steps: Vec<PathfindingItem>,
-    pub(super) rolling_stock_id: i64,
-    pub(super) towed_rolling_stock_id: Option<i64>,
-    pub(super) electrical_profile_set_id: Option<i64>,
-    pub(super) work_schedule_group_id: Option<i64>,
-    pub(super) temporary_speed_limit_group_id: Option<i64>,
-    pub(super) comfort: Comfort,
+    pub(crate) start_time: Option<DateTime<Utc>>,
+    pub(crate) steps: Vec<PathfindingItem>,
+    pub(crate) rolling_stock_id: i64,
+    pub(crate) towed_rolling_stock_id: Option<i64>,
+    pub(crate) electrical_profile_set_id: Option<i64>,
+    pub(crate) work_schedule_group_id: Option<i64>,
+    pub(crate) temporary_speed_limit_group_id: Option<i64>,
+    pub(crate) comfort: Comfort,
     /// By how long we can shift the departure time in milliseconds
     /// Deprecated, first step data should be used instead
-    pub(super) maximum_departure_delay: Option<u64>,
+    pub(crate) maximum_departure_delay: Option<u64>,
     /// Specifies how long the total run time can be in milliseconds
     /// Deprecated, first step data should be used instead
-    pub(super) maximum_run_time: Option<u64>,
+    pub(crate) maximum_run_time: Option<u64>,
     /// Train categories for speed limits
     // TODO: rename the field and its description
-    pub(super) speed_limit_tags: Option<String>,
+    pub(crate) speed_limit_tags: Option<String>,
     /// Margin before the train passage in seconds
     ///
     /// Enforces that the path used by the train should be free and
     /// available at least that many milliseconds before its passage.
     #[serde(default)]
-    pub(super) time_gap_before: u64,
+    pub(crate) time_gap_before: u64,
     /// Margin after the train passage in milliseconds
     ///
     /// Enforces that the path used by the train should be free and
     /// available at least that many milliseconds after its passage.
     #[serde(default)]
-    pub(super) time_gap_after: u64,
+    pub(crate) time_gap_after: u64,
     /// Can be a percentage `X%`, a time in minutes per 100 kilometer `Xmin/100km`
     #[serde(default)]
     #[schema(value_type = Option<String>, example = json!(["5%", "2min/100km"]))]
-    pub(super) margin: Option<MarginValue>,
+    pub(crate) margin: Option<MarginValue>,
     /// Total mass of the consist
     #[serde(default, with = "units::kilogram::option")]
-    pub(super) total_mass: Option<quantities::Mass>,
+    pub(crate) total_mass: Option<quantities::Mass>,
     /// Total length of the consist in meters
     #[serde(default, with = "units::meter::option")]
-    pub(super) total_length: Option<quantities::Length>,
+    pub(crate) total_length: Option<quantities::Length>,
     /// Maximum speed of the consist in km/h
     #[serde(default, with = "units::meter_per_second::option")]
-    pub(super) max_speed: Option<quantities::Velocity>,
-    pub(super) loading_gauge_type: Option<LoadingGaugeType>,
+    pub(crate) max_speed: Option<quantities::Velocity>,
+    pub(crate) loading_gauge_type: Option<LoadingGaugeType>,
 }
 
 impl Request {
