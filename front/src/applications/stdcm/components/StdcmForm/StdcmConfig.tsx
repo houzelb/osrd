@@ -189,7 +189,11 @@ const StdcmConfig = ({
           />
           <div className="stdcm-simulation-inputs">
             <div className="stdcm-consist-container">
-              <StdcmConsist consistErrors={consistErrors} disabled={disabled} />
+              <StdcmConsist
+                consistErrors={consistErrors}
+                disabled={disabled}
+                isDebugMode={isDebugMode}
+              />
             </div>
             <div className="stdcm__separator" />
             <div ref={formRef} className="stdcm-simulation-itinerary">

@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { isEqual } from 'lodash';
 
+import { ALLOWED_TOWED_ROLLING_STOCKS } from 'assets/rollingStock/freightRollingStocks';
 import { osrdEditoastApi, type TowedRollingStock } from 'common/api/osrdEditoastApi';
 import { setFailure } from 'reducers/main';
 import { useAppDispatch } from 'store';
@@ -32,7 +33,7 @@ function filterTowedRollingStocks(
   });
 }
 
-const useFilterTowedRollingStock = () => {
+const useFilterTowedRollingStock = ({ isDebugMode }: { isDebugMode: boolean }) => {
   const dispatch = useAppDispatch();
   const [filters, setFilters] = useState<TowedRollingStockFilters>({ text: '' });
   const [filteredTowedRollingStockList, setFilteredTowedRollingStockList] = useState<
@@ -40,13 +41,22 @@ const useFilterTowedRollingStock = () => {
   >([]);
 
   const {
-    data: { results: allTowedRollingStocks } = { results: [] },
+    data: { results: fetchedTowedRollingStocks } = { results: [] },
     isSuccess,
     isError,
     error,
   } = osrdEditoastApi.endpoints.getTowedRollingStock.useQuery({
     pageSize: 50,
   });
+
+  const allTowedRollingStocks = useMemo(() => {
+    if (!isDebugMode) {
+      return fetchedTowedRollingStocks.filter((stock) =>
+        ALLOWED_TOWED_ROLLING_STOCKS.includes(stock.name)
+      );
+    }
+    return fetchedTowedRollingStocks;
+  }, [fetchedTowedRollingStocks, isDebugMode]);
 
   const searchTowedRollingStock = (value: string) => {
     setFilters({ id: undefined, text: value });
