@@ -71,7 +71,7 @@ describe('stdcmConfReducers', () => {
     expect(state).toEqual(stdcmConfInitialState);
   });
 
-  it('should handle margins update', () => {
+  describe('should handle margins update', () => {
     it('should handle updateStandardAllowance', () => {
       const initialTimeStandardAllowance = testDataBuilder.buildTimeStandardAllowance(10);
       const store = createStore({
