@@ -68,6 +68,14 @@ const useStdcm = ({
 
   const { speedLimitByTag } = useStoreDataForSpeedLimitByTagSelector({ isStdcm: true });
 
+  const resetStdcmState = () => {
+    setStdcmTrainResult(undefined);
+    setStdcmTrainConflicts(undefined);
+    setStdcmResponse(undefined);
+    setPathProperties(undefined);
+    setCurrentStdcmRequestStatus(STDCM_REQUEST_STATUS.idle);
+  };
+
   const triggerShowFailureNotification = (error: Error) => {
     if (showFailureNotification) {
       dispatch(setFailure(error));
@@ -163,6 +171,7 @@ const useStdcm = ({
     stdcmResults,
     launchStdcmRequest,
     cancelStdcmRequest,
+    resetStdcmState,
     pathProperties,
     setPathProperties,
     isPending,
