@@ -49,8 +49,7 @@ export function geti18nKeyForNull(str: string | null): string {
 
 /** Given a string, return a number or undefined */
 export function parseNumber(str: string) {
-  const number = Number(str);
-  return !Number.isNaN(number) ? number : undefined;
+  return str && !Number.isNaN(Number(str)) ? Number(str) : undefined;
 }
 
 /**
