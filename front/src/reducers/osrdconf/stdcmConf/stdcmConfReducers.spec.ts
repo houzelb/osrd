@@ -1,7 +1,7 @@
 import nextId from 'react-id-generator';
 import { describe, it, expect } from 'vitest';
 
-import { ArrivalTimeTypes, StdcmStopTypes } from 'applications/stdcm/types';
+import { ArrivalTimeTypes, MarginType, StdcmStopTypes } from 'applications/stdcm/types';
 import getStepLocation from 'modules/pathfinding/helpers/getStepLocation';
 import {
   stdcmConfInitialState,
@@ -26,11 +26,11 @@ function stdcmConfTestDataBuilder() {
   return {
     buildPercentageStandardAllowance: (value: number): StandardAllowance => ({
       value,
-      type: 'percentage',
+      type: MarginType.PERCENTAGE,
     }),
     buildTimeStandardAllowance: (value: number): StandardAllowance => ({
       value,
-      type: 'time',
+      type: MarginType.TIME_PER_DISTANCE,
     }),
   };
 }

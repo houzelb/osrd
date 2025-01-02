@@ -2,7 +2,7 @@ import type { Position } from 'geojson';
 
 import type { PowerRestriction } from 'applications/operationalStudies/types';
 import type {
-  AllowanceValue,
+  MarginType,
   ArrivalTimeTypes,
   LinkedTrains,
   StdcmStopTypes,
@@ -42,10 +42,10 @@ export type OsrdConfState = InfraState & {
   startTime: Date;
 };
 
-export interface StandardAllowance {
-  type: AllowanceValue['value_type'];
+export type StandardAllowance = {
+  type: MarginType;
   value?: number;
-}
+};
 
 export type OsrdStdcmConfState = OsrdConfState & {
   stdcmPathSteps: StdcmPathStep[];
