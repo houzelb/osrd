@@ -9,7 +9,7 @@ import { extractMarkersInfo } from 'applications/stdcm/utils';
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import useInfraStatus from 'modules/pathfinding/hooks/useInfraStatus';
 import { Map } from 'modules/trainschedule/components/ManageTrainSchedule';
-import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
+import { type StdcmConfSliceActions, resetMargins } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
 import { useAppDispatch } from 'store';
 
@@ -52,13 +52,7 @@ const StdcmConfig = ({
 
   const { infra } = useInfraStatus();
   const dispatch = useAppDispatch();
-  const {
-    updateGridMarginAfter,
-    updateGridMarginBefore,
-    updateStdcmStandardAllowance,
-    updateStdcmPathStep,
-    resetStdcmConfig,
-  } = useOsrdConfActions() as StdcmConfSliceActions;
+  const { updateStdcmPathStep, resetStdcmConfig } = useOsrdConfActions() as StdcmConfSliceActions;
 
   const {
     getStdcmOrigin,
@@ -120,9 +114,7 @@ const StdcmConfig = ({
 
   useEffect(() => {
     if (!isDebugMode) {
-      dispatch(updateGridMarginAfter(15));
-      dispatch(updateGridMarginBefore(15));
-      dispatch(updateStdcmStandardAllowance({ type: 'time_per_distance', value: 4.5 }));
+      dispatch(resetMargins());
     }
   }, [isDebugMode]);
 

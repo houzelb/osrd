@@ -28,8 +28,6 @@ export const defaultCommonConf: OsrdConfState = {
   powerRestriction: [],
   speedLimitByTag: undefined,
   initialSpeed: 0,
-  gridMarginBefore: undefined,
-  gridMarginAfter: undefined,
   ...infraState,
   // Corresponds to origin and destination not defined
   pathSteps: [null, null],
@@ -53,8 +51,6 @@ interface CommonConfReducers<S extends OsrdConfState> extends InfraStateReducers
   ['updateRollingStockID']: CaseReducer<S, PayloadAction<S['rollingStockID']>>;
   ['updateSpeedLimitByTag']: CaseReducer<S, PayloadAction<S['speedLimitByTag'] | null>>;
   ['updateInitialSpeed']: CaseReducer<S, PayloadAction<S['initialSpeed']>>;
-  ['updateGridMarginBefore']: CaseReducer<S, PayloadAction<S['gridMarginBefore']>>;
-  ['updateGridMarginAfter']: CaseReducer<S, PayloadAction<S['gridMarginAfter']>>;
   ['updatePathSteps']: CaseReducer<S, PayloadAction<S['pathSteps']>>;
   ['replaceItinerary']: CaseReducer<S, PayloadAction<S['pathSteps']>>;
   ['deleteItinerary']: CaseReducer<S>;
@@ -115,12 +111,6 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
     },
     updateInitialSpeed(state: Draft<S>, action: PayloadAction<S['initialSpeed']>) {
       state.initialSpeed = action.payload;
-    },
-    updateGridMarginBefore(state: Draft<S>, action: PayloadAction<S['gridMarginBefore']>) {
-      state.gridMarginBefore = action.payload;
-    },
-    updateGridMarginAfter(state: Draft<S>, action: PayloadAction<S['gridMarginAfter']>) {
-      state.gridMarginAfter = action.payload;
     },
     // update path steps without changing the itinerary (only add vias on the existing pathfinding,
     // add schedules, margins or power restrictions)

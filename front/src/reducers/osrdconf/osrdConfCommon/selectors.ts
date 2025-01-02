@@ -39,8 +39,6 @@ const buildCommonConfSelectors = (slice: OperationalStudiesConfSlice | StdcmConf
     getRollingStockID: makeOsrdConfSelector('rollingStockID'),
     getSpeedLimitByTag: makeOsrdConfSelector('speedLimitByTag'),
     getInitialSpeed: makeOsrdConfSelector('initialSpeed'),
-    getGridMarginBefore: makeOsrdConfSelector('gridMarginBefore'),
-    getGridMarginAfter: makeOsrdConfSelector('gridMarginAfter'),
     getPowerRestriction: makeOsrdConfSelector('powerRestriction'),
     getPathSteps,
     getOrigin: (state: RootState) => {

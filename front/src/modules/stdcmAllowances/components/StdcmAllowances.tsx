@@ -1,46 +1,45 @@
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
-import type { AllowanceValue } from 'applications/stdcm/types';
+import type { MarginType } from 'applications/stdcm/types';
 import InputGroupSNCF from 'common/BootstrapSNCF/InputGroupSNCF';
 import type { InputGroupSNCFValue } from 'common/BootstrapSNCF/InputGroupSNCF';
 import InputSNCF from 'common/BootstrapSNCF/InputSNCF';
-import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
-import { ALLOWANCE_UNITS_KEYS } from 'modules/stdcmAllowances/allowancesConsts';
-import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
-import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
-import type { StandardAllowance } from 'reducers/osrdconf/types';
+import {
+  updateGridMarginAfter,
+  updateGridMarginBefore,
+  updateStandardAllowance,
+} from 'reducers/osrdconf/stdcmConf';
+import { getMargins } from 'reducers/osrdconf/stdcmConf/selectors';
 import { useAppDispatch } from 'store';
 import { convertInputStringToNumber } from 'utils/strings';
+
+const STANDARD_MARGIN_UNITS = [
+  {
+    id: 'percentage',
+    label: '%',
+  },
+  {
+    id: 'time_per_distance',
+    label: 'min/100km',
+  },
+];
 
 const StdcmAllowances = ({ disabled = false }: { disabled?: boolean }) => {
   const { t } = useTranslation('allowances');
   const dispatch = useAppDispatch();
-  const { getGridMarginBefore, getGridMarginAfter, getStandardStdcmAllowance } =
-    useOsrdConfSelectors() as StdcmConfSelectors;
-  const { updateGridMarginAfter, updateGridMarginBefore, updateStdcmStandardAllowance } =
-    useOsrdConfActions() as StdcmConfSliceActions;
-  const gridMarginBefore = useSelector(getGridMarginBefore);
-  const gridMarginAfter = useSelector(getGridMarginAfter);
-  const stdcmStandardAllowance = useSelector(getStandardStdcmAllowance);
-  const standardAllowanceTypes = [
-    {
-      id: 'percentage',
-      label: ALLOWANCE_UNITS_KEYS.percentage,
-    },
-    {
-      id: 'time_per_distance',
-      label: ALLOWANCE_UNITS_KEYS.time_per_distance,
-    },
-  ];
+  const { gridMarginAfter, gridMarginBefore, standardAllowance } = useSelector(getMargins);
 
   const onchangeType = <U extends string>(newTypeValue: InputGroupSNCFValue<U>) => {
-    const processedType: StandardAllowance = {
-      type: newTypeValue.unit as AllowanceValue['value_type'],
-      value: newTypeValue.value === undefined ? undefined : Math.abs(newTypeValue.value),
-    };
+    const processedType =
+      newTypeValue.value !== undefined
+        ? {
+            type: newTypeValue.unit as MarginType,
+            value: Math.abs(newTypeValue.value),
+          }
+        : undefined;
 
-    dispatch(updateStdcmStandardAllowance(processedType));
+    dispatch(updateStandardAllowance(processedType));
   };
 
   return (
@@ -53,7 +52,7 @@ const StdcmAllowances = ({ disabled = false }: { disabled?: boolean }) => {
               id="standardAllowanceTypeGridMarginBefore"
               type="number"
               value={gridMarginBefore || ''}
-              unit={ALLOWANCE_UNITS_KEYS.time}
+              unit="s"
               onChange={(e) =>
                 dispatch(
                   updateGridMarginBefore(Math.abs(convertInputStringToNumber(e.target.value)))
@@ -71,7 +70,7 @@ const StdcmAllowances = ({ disabled = false }: { disabled?: boolean }) => {
               id="standardAllowanceTypeGridMarginAfter"
               type="number"
               value={gridMarginAfter || ''}
-              unit={ALLOWANCE_UNITS_KEYS.time}
+              unit="s"
               onChange={(e) =>
                 dispatch(
                   updateGridMarginAfter(Math.abs(convertInputStringToNumber(e.target.value)))
@@ -90,11 +89,11 @@ const StdcmAllowances = ({ disabled = false }: { disabled?: boolean }) => {
         <label htmlFor="standardAllowanceTypeSelect">{t('allowances:standardAllowance')}</label>
         <InputGroupSNCF
           id="standardAllowanceTypeSelect"
-          options={standardAllowanceTypes}
+          options={STANDARD_MARGIN_UNITS}
           onChange={onchangeType}
           currentValue={{
-            unit: stdcmStandardAllowance?.type || 'percentage',
-            value: stdcmStandardAllowance?.value,
+            unit: standardAllowance?.type || 'percentage',
+            value: standardAllowance?.value,
           }}
           disabled={disabled}
         />
