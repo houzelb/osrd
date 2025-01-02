@@ -84,16 +84,6 @@ const StdcmVias = ({ disabled = false }: StdcmConfigCardProps) => {
     };
   }, [newIntermediateOpIndex]);
 
-  const updateStopDuration = (stopTime: string, pathStep: StdcmPathStep) => {
-    const stopFor = stopTime ? Number(stopTime) : undefined;
-    dispatch(
-      updateStdcmPathStep({
-        id: pathStep.id,
-        updates: { stopFor },
-      })
-    );
-  };
-
   const deleteViaOnClick = (pathStepId: string) => {
     dispatch(deleteStdcmVia(pathStepId));
   };
@@ -147,11 +137,9 @@ const StdcmVias = ({ disabled = false }: StdcmConfigCardProps) => {
                 stopTypes={pathStep.stopType}
                 updatePathStepStopType={(newStopType) => updateStopType(newStopType, pathStep)}
               />
-              <StopDurationInput
-                stopType={pathStep.stopType}
-                stopDuration={pathStep.stopFor}
-                updatePathStepStopTime={(e) => updateStopDuration(e, pathStep)}
-              />
+              {pathStep.stopType !== StdcmStopTypes.PASSAGE_TIME && (
+                <StopDurationInput pathStep={pathStep} />
+              )}
             </StdcmCard>
           </div>
         );

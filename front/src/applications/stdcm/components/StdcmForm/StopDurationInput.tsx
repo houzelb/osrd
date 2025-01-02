@@ -1,63 +1,77 @@
 import { useMemo, useEffect, useState } from 'react';
 
 import { Input } from '@osrd-project/ui-core';
-import { debounce } from 'lodash';
+import type { Status } from '@osrd-project/ui-core/dist/components/inputs/StatusMessage';
 import { useTranslation } from 'react-i18next';
+
+import { useOsrdConfActions } from 'common/osrdContext';
+import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
+import type { StdcmPathStep } from 'reducers/osrdconf/types';
+import { useAppDispatch } from 'store';
+import { useDebounce } from 'utils/helpers';
+import { parseNumber } from 'utils/strings';
 
 import { StdcmStopTypes } from '../../types';
 
 type StopDurationInputProps = {
-  stopType: StdcmStopTypes;
-  stopDuration?: number;
-  updatePathStepStopTime: (stopTime: string) => void;
+  pathStep: Extract<StdcmPathStep, { isVia: true }>;
 };
 
-const StopDurationInput = ({
-  stopType,
-  stopDuration,
-  updatePathStepStopTime,
-}: StopDurationInputProps) => {
+const StopDurationInput = ({ pathStep }: StopDurationInputProps) => {
+  const dispatch = useAppDispatch();
   const { t } = useTranslation('stdcm');
 
-  const [pathStepStopTime, setPathStepStopTime] = useState('');
+  const { updateStdcmPathStep } = useOsrdConfActions() as StdcmConfSliceActions;
 
-  const stopWarning = stopType === StdcmStopTypes.DRIVER_SWITCH && stopDuration && stopDuration < 3;
+  const [stopDuration, setStopDuration] = useState(
+    pathStep.stopFor !== undefined ? `${pathStep.stopFor}` : ''
+  );
+  const debouncedStopDuration = useDebounce(stopDuration, 300);
 
-  const debounceUpdatePathStepStopTime = useMemo(
-    () => debounce((value) => updatePathStepStopTime(value), 300),
-    []
+  const stopWarning = useMemo(
+    () =>
+      pathStep.stopType === StdcmStopTypes.DRIVER_SWITCH &&
+      pathStep.stopFor !== undefined &&
+      pathStep.stopFor < 3
+        ? {
+            status: 'warning' as Status,
+            message: t('trainPath.warningMinStopTime'),
+          }
+        : undefined,
+    [pathStep.stopType, pathStep.stopFor]
   );
 
   useEffect(() => {
-    setPathStepStopTime(stopDuration !== undefined ? `${stopDuration}` : '');
-  }, [stopDuration]);
+    setStopDuration(pathStep.stopFor !== undefined ? `${pathStep.stopFor}` : '');
+  }, [pathStep.stopFor]);
+
+  useEffect(() => {
+    const parsedNumber = parseNumber(debouncedStopDuration);
+    const newStopDuration = parsedNumber !== undefined ? Math.round(parsedNumber) : undefined;
+    if (newStopDuration !== pathStep.stopFor) {
+      dispatch(
+        updateStdcmPathStep({
+          id: pathStep.id,
+          updates: { stopFor: newStopDuration },
+        })
+      );
+    }
+  }, [debouncedStopDuration]);
 
   return (
-    stopType !== StdcmStopTypes.PASSAGE_TIME && (
-      <div className="stop-time">
-        <Input
-          id="stdcm-via-stop-time"
-          type="text"
-          label={t('trainPath.stopFor')}
-          onChange={(e) => {
-            // TODO: Find a better way to prevent user from entering decimal values
-            const value = e.target.value.replace(/[\D.,]/g, '');
-            setPathStepStopTime(value);
-            debounceUpdatePathStepStopTime(value);
-          }}
-          value={pathStepStopTime}
-          trailingContent="minutes"
-          statusWithMessage={
-            stopWarning
-              ? {
-                  status: 'warning',
-                  message: t('trainPath.warningMinStopTime'),
-                }
-              : undefined
-          }
-        />
-      </div>
-    )
+    <div className="stop-time">
+      <Input
+        id="stdcm-via-stop-time"
+        type="text"
+        label={t('trainPath.stopFor')}
+        onChange={(e) => {
+          setStopDuration(e.target.value);
+        }}
+        value={stopDuration}
+        trailingContent="minutes"
+        statusWithMessage={stopWarning}
+      />
+    </div>
   );
 };
 
