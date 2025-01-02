@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 
-import FREIGHT_ROLLING_STOCKS from 'assets/rollingStock/freightRollingStocks';
+import { FREIGHT_ROLLING_STOCKS } from 'assets/rollingStock/freightRollingStocks';
 import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import type { LightRollingStock, LightRollingStockWithLiveries } from 'common/api/osrdEditoastApi';
 import { setFailure } from 'reducers/main';

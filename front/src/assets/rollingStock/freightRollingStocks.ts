@@ -1,4 +1,4 @@
-const FREIGHT_ROLLING_STOCKS = [
+export const FREIGHT_ROLLING_STOCKS = [
   '7200GH',
   '15000',
   '22200G',
@@ -110,4 +110,18 @@ const FREIGHT_ROLLING_STOCKS = [
   'electric_rolling_stock_test_e2e',
 ];
 
-export default FREIGHT_ROLLING_STOCKS;
+export const ALLOWED_TOWED_ROLLING_STOCKS = [
+  'AFAMOD',
+  'AFAMOD2',
+  'MA',
+  'MAL100',
+  'MALOUR',
+  'MAVIDE',
+  'ME100',
+  'ME120',
+  'ME140',
+  'ME200SER',
+  'MEPA',
+  'TRAINLOC',
+  'TOWED-TEST-E2E',
+];

@@ -4,6 +4,7 @@ import { Input, ComboBox } from '@osrd-project/ui-core';
 import { useTranslation } from 'react-i18next';
 
 import useStdcmTowedRollingStock from 'applications/stdcm/hooks/useStdcmTowedRollingStock';
+import type { ConsistErrors } from 'applications/stdcm/types';
 import {
   CONSIST_MAX_SPEED_MIN,
   CONSIST_TOTAL_LENGTH_MAX,
@@ -23,7 +24,6 @@ import { kgToT, kmhToMs, msToKmh } from 'utils/physics';
 
 import StdcmCard from './StdcmCard';
 import useStdcmConsist from '../../hooks/useStdcmConsist';
-import type { StdcmConfigCardProps } from '../../types';
 
 const ConsistCardTitle = ({
   rollingStock,
@@ -39,7 +39,13 @@ const ConsistCardTitle = ({
   );
 };
 
-const StdcmConsist = ({ consistErrors = {}, disabled = false }: StdcmConfigCardProps) => {
+export type StdcmConsistProps = {
+  isDebugMode: boolean;
+  disabled?: boolean;
+  consistErrors?: ConsistErrors;
+};
+
+const StdcmConsist = ({ isDebugMode, consistErrors = {}, disabled = false }: StdcmConsistProps) => {
   const { t } = useTranslation('stdcm');
   const { speedLimitByTag, speedLimitsByTags, dispatchUpdateSpeedLimitByTag } =
     useStoreDataForSpeedLimitByTagSelector({ isStdcm: true });
@@ -69,7 +75,7 @@ const StdcmConsist = ({ consistErrors = {}, disabled = false }: StdcmConfigCardP
     searchTowedRollingStock,
     searchTowedRollingStockById,
     filters: towedRsFilters,
-  } = useFilterTowedRollingStock();
+  } = useFilterTowedRollingStock({ isDebugMode });
 
   useEffect(() => {
     if (towedRollingStock) {
