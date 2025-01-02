@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, type ChangeEvent } from 'react';
 
 import { Image, XCircle } from '@osrd-project/ui-icons';
-import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
@@ -25,7 +24,6 @@ type PictureUploaderProps = {
 type PicturePlaceholderButtonsProps = {
   setTempProjectImage: (tempProjectImage: Blob | null | undefined) => void;
   safeWord: string;
-  t: TFunction;
   shouldDisplayBinButton: boolean;
 };
 
@@ -86,9 +84,9 @@ type Categories = {
 const PicturePlaceholderButtons = ({
   setTempProjectImage,
   safeWord,
-  t,
   shouldDisplayBinButton,
 }: PicturePlaceholderButtonsProps) => {
+  const { t } = useTranslation('operationalStudies/project');
   const [categories, setCategories] = useState<Categories>({});
   const [imageIndexes, setImageIndexes] = useState<{ [category: string]: number }>({});
 
@@ -236,7 +234,6 @@ export default function PictureUploader({
         setTempProjectImage={setTempProjectImage}
         shouldDisplayBinButton={!!image || !!tempProjectImage}
         safeWord={safeWord}
-        t={t}
       />
     </div>
   );
