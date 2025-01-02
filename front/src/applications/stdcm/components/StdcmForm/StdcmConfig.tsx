@@ -9,12 +9,7 @@ import { extractMarkersInfo } from 'applications/stdcm/utils';
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import useInfraStatus from 'modules/pathfinding/hooks/useInfraStatus';
 import { Map } from 'modules/trainschedule/components/ManageTrainSchedule';
-import {
-  updateGridMarginAfter,
-  updateGridMarginBefore,
-  updateStandardAllowance,
-  type StdcmConfSliceActions,
-} from 'reducers/osrdconf/stdcmConf';
+import { type StdcmConfSliceActions, resetMargins } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
 import { useAppDispatch } from 'store';
 
@@ -119,9 +114,7 @@ const StdcmConfig = ({
 
   useEffect(() => {
     if (!isDebugMode) {
-      dispatch(updateGridMarginAfter(15));
-      dispatch(updateGridMarginBefore(15));
-      dispatch(updateStandardAllowance({ type: 'time_per_distance', value: 4.5 }));
+      dispatch(resetMargins());
     }
   }, [isDebugMode]);
 

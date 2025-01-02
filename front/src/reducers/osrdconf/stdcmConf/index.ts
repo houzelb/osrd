@@ -31,9 +31,9 @@ export const stdcmConfInitialState: OsrdStdcmConfState = {
     },
   ],
   margins: {
-    standardAllowance: undefined,
-    gridMarginBefore: undefined,
-    gridMarginAfter: undefined,
+    standardAllowance: { type: 'time_per_distance', value: 4.5 },
+    gridMarginBefore: 15,
+    gridMarginAfter: 15,
   },
   totalMass: undefined,
   totalLength: undefined,
@@ -106,6 +106,13 @@ export const stdcmConfSlice = createSlice({
       state.maxSpeed = action.payload.maxSpeed;
       state.stdcmPathSteps = action.payload.stdcmPathSteps;
       state.speedLimitByTag = action.payload.speedLimitByTag;
+    },
+    resetMargins(state: Draft<OsrdStdcmConfState>) {
+      state.margins = {
+        standardAllowance: { type: 'time_per_distance', value: 4.5 },
+        gridMarginBefore: 15,
+        gridMarginAfter: 15,
+      };
     },
     updateStandardAllowance(
       state: Draft<OsrdStdcmConfState>,
@@ -223,8 +230,12 @@ export const stdcmConfSlice = createSlice({
 
 export const stdcmConfSliceActions = stdcmConfSlice.actions;
 
-export const { updateGridMarginAfter, updateGridMarginBefore, updateStandardAllowance } =
-  stdcmConfSliceActions;
+export const {
+  resetMargins,
+  updateGridMarginAfter,
+  updateGridMarginBefore,
+  updateStandardAllowance,
+} = stdcmConfSliceActions;
 
 export type StdcmConfSlice = typeof stdcmConfSlice;
 
