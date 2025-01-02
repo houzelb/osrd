@@ -24,9 +24,9 @@ type PictureUploaderProps = {
 
 type PicturePlaceholderButtonsProps = {
   setTempProjectImage: (tempProjectImage: Blob | null | undefined) => void;
-  tempProjectImage: Blob | null | undefined;
   safeWord: string;
   t: TFunction;
+  shouldDisplayBinButton: boolean;
 };
 
 const IMAGE_MAX_SIZE = 2 * 1024 * 1024; // 2MiB
@@ -85,9 +85,9 @@ type Categories = {
 
 const PicturePlaceholderButtons = ({
   setTempProjectImage,
-  tempProjectImage,
   safeWord,
   t,
+  shouldDisplayBinButton,
 }: PicturePlaceholderButtonsProps) => {
   const [categories, setCategories] = useState<Categories>({});
   const [imageIndexes, setImageIndexes] = useState<{ [category: string]: number }>({});
@@ -168,7 +168,7 @@ const PicturePlaceholderButtons = ({
         </>
       )}
 
-      {tempProjectImage && (
+      {shouldDisplayBinButton && (
         <button
           className="remove"
           type="button"
@@ -234,7 +234,7 @@ export default function PictureUploader({
       </label>
       <PicturePlaceholderButtons
         setTempProjectImage={setTempProjectImage}
-        tempProjectImage={tempProjectImage}
+        shouldDisplayBinButton={!!image || !!tempProjectImage}
         safeWord={safeWord}
         t={t}
       />
