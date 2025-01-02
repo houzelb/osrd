@@ -56,7 +56,6 @@ export type SimulationReportSheetProps = {
   stdcmData: StdcmSuccessResponse;
   consist: StdcmSimulationInputs['consist'];
   simulationReportSheetNumber: string;
-  mapCanvas?: string;
   operationalPointsList: StdcmResultsOperationalPoint[];
 };
 

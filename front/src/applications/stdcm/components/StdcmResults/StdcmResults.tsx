@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { Button } from '@osrd-project/ui-core';
 import { PDFDownloadLink } from '@react-pdf/renderer';
@@ -46,7 +46,6 @@ const StcdmResults = ({
   pathTrackRanges,
 }: StcdmResultsProps) => {
   const { t } = useTranslation('stdcm', { keyPrefix: 'simulation.results' });
-  const [mapCanvas, setMapCanvas] = useState<string>();
 
   const selectedSimulation = simulationsList[selectedSimulationIndex];
   const { outputs } = selectedSimulation || {};
@@ -105,7 +104,6 @@ const StcdmResults = ({
                         stdcmData={outputs.results}
                         consist={selectedSimulation.inputs.consist}
                         simulationReportSheetNumber={simulationReportSheetNumber}
-                        mapCanvas={mapCanvas}
                         operationalPointsList={operationalPointsList}
                       />
                     }
@@ -172,7 +170,6 @@ const StcdmResults = ({
             hideAttribution
             showStdcmAssets
             isFeasible={!hasConflictResults}
-            setMapCanvas={setMapCanvas}
             pathGeometry={outputs?.pathProperties?.geometry}
             simulationPathSteps={markersInfo}
           />

@@ -606,7 +606,6 @@ const styles = {
     warrantyBox: {
       height: '64',
       marginTop: '16',
-      borderTop: '1 solid #D3D1CF',
       display: 'flex',
       alignItems: 'center',
     },

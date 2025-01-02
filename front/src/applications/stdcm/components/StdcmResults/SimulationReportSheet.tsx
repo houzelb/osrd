@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react';
-
 import { Table, TR, TH, TD } from '@ag-media/react-pdf-table';
 import { Page, Text, Image, Document, View, Link } from '@react-pdf/renderer';
 import type { TFunction } from 'i18next';
@@ -14,7 +12,7 @@ import { capitalizeFirstLetter } from 'utils/strings';
 
 import styles from './SimulationReportStyleSheet';
 import type { SimulationReportSheetProps } from '../../types';
-import { base64ToJpeg, getStopDurationTime } from '../../utils/formatSimulationReportSheet';
+import { getStopDurationTime } from '../../utils/formatSimulationReportSheet';
 
 const getSecondaryCode = ({ location }: StdcmPathStep) => location!.secondary_code;
 
@@ -40,7 +38,6 @@ const SimulationReportSheet = ({
   stdcmData,
   consist,
   simulationReportSheetNumber,
-  mapCanvas,
   operationalPointsList,
 }: SimulationReportSheetProps) => {
   const { t } = useTranslation(['stdcm-simulation-report-sheet', 'stdcm']);
@@ -62,28 +59,6 @@ const SimulationReportSheet = ({
     path_number1: 'n°XXXXXX',
     path_number2: 'n°YYYYYY',
   };
-
-  const [mapImageUrl, setMapImageUrl] = useState<string | null>(null);
-
-  // Convert image to JPEG
-  useEffect(() => {
-    if (mapCanvas) {
-      base64ToJpeg(mapCanvas, 0.8).then((blob) => {
-        const objectUrl = URL.createObjectURL(blob);
-        setMapImageUrl(objectUrl);
-      });
-    }
-  }, [mapCanvas]);
-
-  // Cleanup the object URL when the component is unmounted or before a new one is created
-  useEffect(
-    () => () => {
-      if (mapImageUrl) {
-        URL.revokeObjectURL(mapImageUrl);
-      }
-    },
-    [mapImageUrl]
-  );
 
   return (
     <Document>
@@ -414,14 +389,8 @@ const SimulationReportSheet = ({
                 );
               })}
             </Table>
-            <View style={styles.simulation.horizontalBar} />
           </View>
         </View>
-        {mapCanvas && (
-          <View style={styles.map.map} id="simulationMap">
-            {mapImageUrl && <Image src={mapImageUrl} />}
-          </View>
-        )}
         <View style={styles.footer.warrantyBox}>
           <Text style={styles.footer.warrantyMessage}>{t('withoutWarranty')}</Text>
         </View>
