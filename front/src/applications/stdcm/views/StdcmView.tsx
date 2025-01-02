@@ -33,6 +33,7 @@ const StdcmView = () => {
   const {
     launchStdcmRequest,
     cancelStdcmRequest,
+    resetStdcmState,
     isPending,
     isRejected,
     isCanceled,
@@ -63,6 +64,7 @@ const StdcmView = () => {
 
   const handleStartNewQuery = () => {
     setSimulationsList([]);
+    resetStdcmState();
     setSelectedSimulationIndex(-1);
     setRetainedSimulationIndex(-1);
     dispatch(resetStdcmConfig());
