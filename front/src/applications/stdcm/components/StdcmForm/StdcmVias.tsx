@@ -13,9 +13,9 @@ import { useAppDispatch } from 'store';
 
 import StdcmCard from './StdcmCard';
 import StdcmDefaultCard from './StdcmDefaultCard';
-import StdcmInputVia from './StdcmInputVia';
 import StdcmOperationalPoint from './StdcmOperationalPoint';
 import StdcmStopType from './StdcmStopType';
+import StopDurationInput from './StopDurationInput';
 import { StdcmStopTypes } from '../../types';
 import type { StdcmConfigCardProps } from '../../types';
 
@@ -147,7 +147,7 @@ const StdcmVias = ({ disabled = false }: StdcmConfigCardProps) => {
                 stopTypes={pathStep.stopType}
                 updatePathStepStopType={(newStopType) => updateStopType(newStopType, pathStep)}
               />
-              <StdcmInputVia
+              <StopDurationInput
                 stopType={pathStep.stopType}
                 stopDuration={pathStep.stopFor}
                 updatePathStepStopTime={(e) => updateStopDuration(e, pathStep)}

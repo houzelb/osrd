@@ -6,13 +6,17 @@ import { useTranslation } from 'react-i18next';
 
 import { StdcmStopTypes } from '../../types';
 
-type StdcmInputViaProps = {
+type StopDurationInputProps = {
   stopType: StdcmStopTypes;
   stopDuration?: number;
   updatePathStepStopTime: (stopTime: string) => void;
 };
 
-const StdcmInputVia = ({ stopType, stopDuration, updatePathStepStopTime }: StdcmInputViaProps) => {
+const StopDurationInput = ({
+  stopType,
+  stopDuration,
+  updatePathStepStopTime,
+}: StopDurationInputProps) => {
   const { t } = useTranslation('stdcm');
 
   const [pathStepStopTime, setPathStepStopTime] = useState('');
@@ -57,4 +61,4 @@ const StdcmInputVia = ({ stopType, stopDuration, updatePathStepStopTime }: Stdcm
   );
 };
 
-export default StdcmInputVia;
+export default StopDurationInput;
