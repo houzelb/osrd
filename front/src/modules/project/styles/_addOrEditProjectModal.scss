@@ -85,13 +85,20 @@
             background-color: var(--coolgray11);
             color: var(--coolgray1);
           }
-          &NaNpxove {
+          &.remove {
             width: 44px;
             height: 32px;
             color: var(--red);
+
             &:hover {
               background-color: var(--red);
               color: var(--white);
+            }
+
+            span {
+              display: flex;
+              justify-content: center;
+              align-items: center;
             }
           }
         }
