@@ -36,6 +36,9 @@ updates:
       nivo:
         patterns:
           - "@nivo/*"
+      osrd-ui:
+        patterns:
+          - "@osrd-project/ui-*"
       rjsf:
         patterns:
           - "@rjsf/*"
