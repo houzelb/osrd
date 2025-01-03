@@ -122,8 +122,8 @@ function EditorForm<T extends Omit<EditorEntity, 'objType'> & { objType: string 
           }
         }}
         onChange={(event) => {
-          setFormData({ ...data.properties, ...event.formData });
-          onChange?.({ ...data, properties: { ...data.properties, ...event.formData } });
+          setFormData({ ...data.properties, ...event.formData! });
+          onChange?.({ ...data, properties: { ...data.properties, ...event.formData! } });
         }}
       >
         {children}

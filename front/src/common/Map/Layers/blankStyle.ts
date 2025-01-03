@@ -44,7 +44,7 @@ export const useMapBlankStyle = (): MapProps['mapStyle'] => {
       }),
     ]);
 
-    return sprites.filter((sprite) => sprite !== null) as Sprite[];
+    return sprites.filter((sprite) => sprite !== null);
   };
 
   const [validSprites, setValidSprites] = useState<Sprite[]>([]);

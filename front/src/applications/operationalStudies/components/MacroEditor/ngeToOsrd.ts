@@ -396,7 +396,7 @@ const castNgeNode = (
       if (ngeLabel) return ngeLabel.label;
       return null;
     })
-    .filter((n) => n !== null) as string[],
+    .filter((n) => n !== null),
 });
 
 const handleNodeOperation = async ({

@@ -83,7 +83,7 @@ const CurveSpreadsheet = ({
     const { speeds, max_efforts } = selectedCurve.curve;
 
     const filledDataSheet: DataSheetCurve[] = max_efforts.map((effort, index) => ({
-      speed: speeds[index] !== null ? Math.round(msToKmh(speeds[index]!)) : null,
+      speed: speeds[index] !== null ? Math.round(msToKmh(speeds[index])) : null,
       // Effort needs to be displayed in kN
       effort: effort !== null ? effort / 1000 : null,
     }));
