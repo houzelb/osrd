@@ -56,12 +56,8 @@ export type PathStep = PathItemLocation & {
         If true, the train schedule is consider as invalid and must be edited */
   deleted?: boolean;
   arrival?: IsoDurationString | null;
-  arrivalType?: ArrivalTimeTypes;
-  arrivalToleranceBefore?: number;
-  arrivalToleranceAfter?: number;
   locked?: boolean;
   stopFor?: string | null;
-  stopType?: StdcmStopTypes;
   theoreticalMargin?: string;
   receptionSignal?: ReceptionSignal;
   kp?: string;
