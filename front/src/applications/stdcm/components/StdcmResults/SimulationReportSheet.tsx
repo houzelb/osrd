@@ -152,9 +152,7 @@ const SimulationReportSheet = ({
                   {`${Math.floor(convoyMass)} t`}
                 </Text>
                 <Text style={styles.convoyAndRoute.convoyInfoTitles}>{t('referenceEngine')}</Text>
-                <Text style={styles.convoyAndRoute.convoyInfoData}>
-                  {rollingStock.metadata?.reference || '-'}
-                </Text>
+                <Text style={styles.convoyAndRoute.convoyInfoData}>{rollingStock.name}</Text>
                 <Text style={styles.convoyAndRoute.convoyInfoTitles}>{t('maxLength')}</Text>
                 <Text style={styles.convoyAndRoute.convoyInfoData}>{`${convoyLength} m`}</Text>
               </View>
