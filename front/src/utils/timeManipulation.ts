@@ -77,10 +77,6 @@ export function calculateTimeDifferenceInDays(datetime1?: Date, datetime2?: Date
   return dayjs.duration(date2.getTime() - date1.getTime()).asDays();
 }
 
-export function formatDurationAsISO8601(seconds: number) {
-  return `PT${Math.abs(seconds)}S`;
-}
-
 /**
  * Parse ISO8601 duration, for instance "PT11H9M8S" (11h, 9min and 8s) to seconds
  */
