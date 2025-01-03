@@ -8,7 +8,7 @@ import {
 } from 'common/api/osrdEditoastApi';
 import type { AppDispatch } from 'store';
 import { formatToIsoDate } from 'utils/date';
-import { calculateTimeDifferenceInSeconds, formatDurationAsISO8601 } from 'utils/timeManipulation';
+import { Duration } from 'utils/duration';
 
 import type MacroEditorState from './MacroEditorState';
 import type { NodeIndexed } from './MacroEditorState';
@@ -157,7 +157,7 @@ const getTimeLockDate = (
 };
 
 const formatDateDifference = (start: Date, stop: Date) =>
-  formatDurationAsISO8601(calculateTimeDifferenceInSeconds(start, stop));
+  Duration.subtractDate(stop, start).toString();
 
 const createTrainSchedulePayload = async ({
   trainrunSections,
