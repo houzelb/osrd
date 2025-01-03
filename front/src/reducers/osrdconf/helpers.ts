@@ -70,12 +70,12 @@ export function upsertPathStep(statePathSteps: (PathStep | null)[], op: Suggeste
       'positionOnPath',
       'name',
       'kp',
-      'stopFor',
       'arrival',
       'locked',
       'deleted',
       'receptionSignal',
       'theoreticalMargin',
+      'stopFor',
     ]),
     id: nextId(),
     ...(op.uic

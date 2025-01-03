@@ -2,7 +2,6 @@ import type { TrainScheduleResult } from 'common/api/osrdEditoastApi';
 import type { PathStep } from 'reducers/osrdconf/types';
 import { Duration } from 'utils/duration';
 import { mmToM } from 'utils/physics';
-import { ISO8601Duration2sec } from 'utils/timeManipulation';
 
 const findCorrespondingMargin = (
   stepId: string,
@@ -53,7 +52,7 @@ const computeBasePathStep = (
     ...('track' in step ? { offset: mmToM(step.offset) } : null),
     name,
     arrival: arrival ? Duration.parse(arrival) : null,
-    stopFor: stopFor ? ISO8601Duration2sec(stopFor).toString() : stopFor,
+    stopFor: stopFor ? Duration.parse(stopFor) : null,
     locked,
     receptionSignal,
     theoreticalMargin,

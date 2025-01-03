@@ -12,6 +12,7 @@ import commonConfBuilder from 'reducers/osrdconf/osrdConfCommon/__tests__/common
 import testCommonConfReducers from 'reducers/osrdconf/osrdConfCommon/__tests__/utils';
 import type { PathStep } from 'reducers/osrdconf/types';
 import { createStoreWithoutMiddleware } from 'store';
+import { Duration } from 'utils/duration';
 
 import testTrainSettingsReducer from './trainSettingsReducer';
 
@@ -71,7 +72,7 @@ describe('simulationConfReducer', () => {
           name: '123',
           theoreticalMargin: '10%',
           arrival: null,
-          stopFor: undefined,
+          stopFor: null,
           locked: undefined,
           receptionSignal: undefined,
         },
@@ -81,7 +82,7 @@ describe('simulationConfReducer', () => {
           name: '234',
           theoreticalMargin: undefined,
           arrival: null,
-          stopFor: undefined,
+          stopFor: null,
           locked: undefined,
           receptionSignal: undefined,
         },
@@ -135,7 +136,7 @@ describe('simulationConfReducer', () => {
         track: '60ca8dda-6667-11e3-81ff-01f464e0362d',
         offsetOnTrack: 426.443,
         positionOnPath: 200,
-        stopFor: 'PT5M',
+        stopFor: Duration.parse('PT5M'),
         coordinates: [47.99542250806296, 0.1918181738752042],
       };
 
@@ -144,7 +145,7 @@ describe('simulationConfReducer', () => {
         positionOnPath: 200,
         track: '60ca8dda-6667-11e3-81ff-01f464e0362d',
         offset: 426.443,
-        stopFor: 'PT5M',
+        stopFor: Duration.parse('PT5M'),
         coordinates: [47.99542250806296, 0.1918181738752042],
         locked: newVia.locked,
         deleted: newVia.deleted,
