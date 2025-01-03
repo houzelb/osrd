@@ -73,16 +73,41 @@ const osrdEditoastApi = generatedEditoastApi.enhanceEndpoints({
       invalidatesTags: [{ type: 'projects', id: 'LIST' }],
     },
 
-    // Invalidate the children count and last update timestamp
+    // Studies handling
+    getProjectsByProjectIdStudies: {
+      providesTags: (result) => [
+        'studies',
+        { type: 'studies', id: 'LIST' },
+        ...(result?.results || []).map(({ id }) => ({
+          type: 'studies' as const,
+          id,
+        })),
+      ],
+    },
+    getProjectsByProjectIdStudiesAndStudyId: {
+      providesTags: (_result, _error, args) => ['studies', { type: 'studies', id: args.studyId }],
+    },
     postProjectsByProjectIdStudies: {
-      invalidatesTags: ['studies', 'projects'],
+      invalidatesTags: (_result, _error, args) => [
+        { type: 'projects', id: args.projectId },
+        { type: 'studies', id: 'LIST' },
+      ],
     },
     patchProjectsByProjectIdStudiesAndStudyId: {
-      invalidatesTags: ['studies', 'projects'],
+      invalidatesTags: (_result, _error, args) => [
+        { type: 'projects', id: args.projectId },
+        { type: 'studies', id: 'LIST' },
+        { type: 'studies', id: args.studyId },
+      ],
     },
     deleteProjectsByProjectIdStudiesAndStudyId: {
-      invalidatesTags: ['studies', 'projects'],
+      invalidatesTags: (_result, _error, args) => [
+        { type: 'projects', id: args.projectId },
+        { type: 'studies', id: 'LIST' },
+      ],
     },
+
+    // Invalidate the children count and last update timestamp
     postProjectsByProjectIdStudiesAndStudyIdScenarios: {
       invalidatesTags: ['scenarios', 'studies', 'projects'],
     },
