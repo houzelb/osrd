@@ -18,7 +18,6 @@ const useWaypointMenu = (waypointsPanelData?: WaypointsPanelData) => {
   const timetableId = useSelector(getTimetableID);
 
   const [activeWaypointId, setActiveWaypointId] = useState<string>();
-  const [isClickOnWaypoint, setIsClickOnWaypoint] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -30,10 +29,6 @@ const useWaypointMenu = (waypointsPanelData?: WaypointsPanelData) => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Avoid closing the menu when clicking on another waypoint
-      if (activeWaypointId && (event.target as HTMLElement).closest('.waypoint')) {
-        setIsClickOnWaypoint(true);
-      }
       // Close the menu if the user clicks outside of it
       if (!menuRef.current?.contains(event.target as Node)) {
         closeMenu();
@@ -82,11 +77,6 @@ const useWaypointMenu = (waypointsPanelData?: WaypointsPanelData) => {
   ];
 
   const handleWaypointClick = (id: string) => {
-    // Avoid reopening the menu when clicking on another waypoint or on the same one
-    if (isClickOnWaypoint) {
-      setIsClickOnWaypoint(false);
-      return;
-    }
     setActiveWaypointId(id);
   };
 

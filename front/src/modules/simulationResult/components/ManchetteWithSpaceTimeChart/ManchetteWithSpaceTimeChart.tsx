@@ -13,6 +13,7 @@ import {
 import type { Conflict } from '@osrd-project/ui-spacetimechart';
 import cx from 'classnames';
 import { compact } from 'lodash';
+import { createPortal } from 'react-dom';
 
 import type { OperationalPoint, TrainSpaceTimeData } from 'applications/operationalStudies/types';
 import upward from 'assets/pictures/workSchedules/ScheduledMaintenanceUp.svg';
@@ -204,6 +205,20 @@ const ManchetteWithSpaceTimeChartWrapper = ({
 
   return (
     <div ref={manchetteWithSpaceTimeCharWrappertRef} className="manchette-space-time-chart-wrapper">
+      {waypointMenuData.activeWaypointId &&
+        manchetteWithSpaceTimeCharWrappertRef.current &&
+        createPortal(
+          <div
+            style={{
+              width: '100%',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              bottom: 0,
+            }}
+          />,
+          manchetteWithSpaceTimeCharWrappertRef.current
+        )}
       <div className="header">
         {waypointsPanelData && (
           <>
