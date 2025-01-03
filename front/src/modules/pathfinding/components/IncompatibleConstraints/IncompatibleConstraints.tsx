@@ -11,6 +11,7 @@ import { useMap, type MapLayerMouseEvent } from 'react-map-gl/maplibre';
 
 import type { ManageTrainSchedulePathProperties } from 'applications/operationalStudies/types';
 import Collapsable from 'common/Collapsable';
+import type { IncompatibleConstraintFeature } from 'common/Map/types';
 import { getMapMouseEventNearestFeature } from 'utils/mapHelper';
 
 import IncompatibleConstraintsFilters from './IncompatibleConstrainstFilters';
@@ -88,8 +89,10 @@ const IncompatibleConstraints = ({ pathProperties }: IncompatibleConstraintsProp
         const nearestResult = getMapMouseEventNearestFeature(e, {
           layersId: ['pathfinding-incompatible-constraints'],
         });
-        if (nearestResult?.feature && nearestResult?.feature.properties.ids) {
-          setHoveredConstraint(new Set(JSON.parse(nearestResult.feature.properties.ids)));
+        const nearestFeature = nearestResult?.feature as IncompatibleConstraintFeature | undefined;
+        if (nearestFeature && nearestFeature.properties.ids) {
+          const ids: string[] = JSON.parse(nearestFeature.properties.ids);
+          setHoveredConstraint(new Set(ids));
         } else {
           setHoveredConstraint(new Set([]));
         }
@@ -102,9 +105,10 @@ const IncompatibleConstraints = ({ pathProperties }: IncompatibleConstraintsProp
         const nearestResult = getMapMouseEventNearestFeature(e, {
           layersId: ['pathfinding-incompatible-constraints'],
         });
-        if (nearestResult?.feature && nearestResult?.feature.properties.ids) {
+        const nearestFeature = nearestResult?.feature as IncompatibleConstraintFeature | undefined;
+        if (nearestFeature && nearestFeature.properties.ids) {
           setSelectedConstraint((prev) => {
-            const nextSelected = JSON.parse(nearestResult.feature.properties.ids);
+            const nextSelected: string[] = JSON.parse(nearestFeature.properties.ids);
             if (isArray(nextSelected)) {
               // if we click on the same selected value
               // => we clear the selection
@@ -112,7 +116,7 @@ const IncompatibleConstraints = ({ pathProperties }: IncompatibleConstraintsProp
                 return new Set([]);
               }
               // select the clicked elements
-              return new Set(nextSelected as string[]);
+              return new Set(nextSelected);
             }
             return new Set([]);
           });

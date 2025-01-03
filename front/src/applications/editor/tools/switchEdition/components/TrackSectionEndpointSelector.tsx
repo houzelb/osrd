@@ -12,6 +12,7 @@ import {
   ENDPOINTS,
   type PortEndPointCandidate,
   type SwitchEditionState,
+  type TrackEndpoint,
 } from 'applications/editor/tools/switchEdition/types';
 import { FLAT_SWITCH_PORTS_PREFIX } from 'applications/editor/tools/switchEdition/utils';
 import type { ExtendedEditorContextType } from 'applications/editor/types';
@@ -26,7 +27,14 @@ const ENDPOINTS_SET = new Set(ENDPOINTS);
 const ENDPOINT_OPTIONS = ENDPOINTS.map((s) => ({ value: s, label: s }));
 const ENDPOINT_OPTIONS_DICT = keyBy(ENDPOINT_OPTIONS, 'value');
 
-const TrackSectionEndpointSelector = ({ schema, formData, onChange, name }: FieldProps) => {
+export type TrackSectionEndpointSelectorProps = FieldProps<TrackEndpoint>;
+
+const TrackSectionEndpointSelector = ({
+  schema,
+  formData,
+  onChange,
+  name,
+}: TrackSectionEndpointSelectorProps) => {
   const dispatch = useAppDispatch();
   const { state, setState } = useContext(
     EditorContext
@@ -51,7 +59,10 @@ const TrackSectionEndpointSelector = ({ schema, formData, onChange, name }: Fiel
   const infraID = useInfraID();
 
   const portId = name.replace(FLAT_SWITCH_PORTS_PREFIX, '');
-  const endpoint = ENDPOINTS_SET.has(formData?.endpoint) ? formData.endpoint : DEFAULT_ENDPOINT;
+  const endpoint =
+    formData?.endpoint && ENDPOINTS_SET.has(formData.endpoint)
+      ? formData.endpoint
+      : DEFAULT_ENDPOINT;
   const [trackSection, setTrackSection] = useState<TrackSectionEntity | null>(null);
 
   const isPicking =

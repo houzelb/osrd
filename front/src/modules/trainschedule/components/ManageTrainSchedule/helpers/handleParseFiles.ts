@@ -47,7 +47,7 @@ export const processJsonFile = (
   const isJsonFile = fileExtension === 'application/json';
 
   // try to parse the file content
-  let rawContent;
+  let rawContent: Partial<TrainScheduleBase>[];
   try {
     rawContent = JSON.parse(fileContent);
   } catch {

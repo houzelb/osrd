@@ -20,7 +20,7 @@ const StdcmInputVia = ({ stopType, stopDuration, updatePathStepStopTime }: Stdcm
   const stopWarning = stopType === StdcmStopTypes.DRIVER_SWITCH && stopDuration && stopDuration < 3;
 
   const debounceUpdatePathStepStopTime = useMemo(
-    () => debounce((value) => updatePathStepStopTime(value), 300),
+    () => debounce((value: string) => updatePathStepStopTime(value), 300),
     []
   );
 

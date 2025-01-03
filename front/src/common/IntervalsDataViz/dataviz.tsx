@@ -122,8 +122,8 @@ export const LinearMetadataDataviz = <T extends { [key: string]: any }>({
       }
       const dMin = minBy(data, field);
       const dMax = maxBy(data, field);
-      setMin(dMin && dMin[field] < 0 ? dMin[field] : 0);
-      setMax(dMax && dMax[field] > 0 ? dMax[field] : 0);
+      setMin(dMin && dMin[field] < 0 ? (dMin[field] as number) : 0);
+      setMax(dMax && dMax[field] > 0 ? (dMax[field] as number) : 0);
     } else {
       setMin(0);
       setMax(0);

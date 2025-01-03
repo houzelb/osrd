@@ -10,7 +10,9 @@ import {
 } from 'applications/editor/tools/switchEdition/utils';
 import { Loader } from 'common/Loaders';
 
-import TrackSectionEndpointSelector from './TrackSectionEndpointSelector';
+import TrackSectionEndpointSelector, {
+  type TrackSectionEndpointSelectorProps,
+} from './TrackSectionEndpointSelector';
 
 const TrackNodeTypeDiagram = lazy(() => import('./TrackNodeTypeDiagram'));
 
@@ -31,7 +33,7 @@ const CustomSchemaField = (props: FieldProps) => {
       </div>
     );
   if (name.indexOf(FLAT_SWITCH_PORTS_PREFIX) === 0)
-    return <TrackSectionEndpointSelector {...props} />;
+    return <TrackSectionEndpointSelector {...(props as TrackSectionEndpointSelectorProps)} />;
   return <SchemaField {...props} />;
 };
 

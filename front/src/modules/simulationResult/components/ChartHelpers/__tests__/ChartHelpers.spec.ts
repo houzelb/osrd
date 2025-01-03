@@ -67,6 +67,7 @@ describe('getAxis', () => {
   `(
     'should return the correct axis name (axis=$axis, rotate=$rotate, expected=$expected',
     ({ axis, rotate, expected }) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       expect(getAxis(CHART_AXES.SPACE_TIME, axis, rotate)).toBe(expected);
     }
   );

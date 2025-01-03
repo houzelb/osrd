@@ -5,16 +5,17 @@ import cx from 'classnames';
 import { toNumber } from 'lodash';
 import { useTranslation } from 'react-i18next';
 
-export const FormLineStringLength = ({ id, value, required, onChange }: WidgetProps) => {
+export const FormLineStringLength = ({ id, value: rawValue, required, onChange }: WidgetProps) => {
   const { t } = useTranslation();
+  const value = toNumber(rawValue);
 
-  const [length, setLength] = useState<number>(toNumber(value));
+  const [length, setLength] = useState<number>(value);
 
   useEffect(() => {
     setLength(value);
   }, [value]);
 
-  const hasChanged = useMemo(() => toNumber(value) !== length, [value, length]);
+  const hasChanged = useMemo(() => value !== length, [value, length]);
 
   return (
     <div>
@@ -43,7 +44,7 @@ export const FormLineStringLength = ({ id, value, required, onChange }: WidgetPr
           type="button"
           disabled={!hasChanged}
           className={cx('btn btn-sm btn-secondary', { disabled: !hasChanged })}
-          onClick={() => setLength(toNumber(value))}
+          onClick={() => setLength(value)}
         >
           {t('common.cancel')}
         </button>

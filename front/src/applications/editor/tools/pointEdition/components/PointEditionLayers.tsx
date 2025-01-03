@@ -69,7 +69,10 @@ export const BasePointEditionLayers = ({
     [renderedEntity]
   );
 
-  const type = cleanSymbolType((entity.properties || {}).extensions?.sncf?.installation_type || '');
+  const entityProps = (entity.properties || {}) as {
+    extensions?: { sncf?: { installation_type?: string } };
+  };
+  const type = cleanSymbolType(entityProps.extensions?.sncf?.installation_type || '');
   const layers = useMemo(
     () =>
       SourcesDefinitionsIndex[objType](

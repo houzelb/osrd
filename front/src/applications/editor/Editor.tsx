@@ -90,7 +90,7 @@ const Editor = () => {
         ...s,
         state: {
           ...s.state,
-          ...(typeof stateOrReducer === 'function' ? stateOrReducer(s.state) : stateOrReducer),
+          ...(typeof stateOrReducer === 'function' ? stateOrReducer(s.state as S) : stateOrReducer),
         },
       }));
     },
