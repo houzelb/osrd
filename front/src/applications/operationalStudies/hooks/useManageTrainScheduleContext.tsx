@@ -23,7 +23,7 @@ type ManageTrainScheduleContextType = {
   pathfindingState: PathfindingState;
   infraInfo: { infra?: InfraWithState; reloadCount: number };
   /** Operational points along the path (including origin and destination) and vias added by clicking on map */
-  allWaypoints?: SuggestedOP[];
+  pathStepsAndSuggestedOPs?: SuggestedOP[];
 } | null;
 
 const ManageTrainScheduleContext = createContext<ManageTrainScheduleContextType>(null);
@@ -45,7 +45,7 @@ export const ManageTrainScheduleContextProvider = ({
     [pathProperties]
   );
 
-  const allWaypoints = useMemo(() => {
+  const pathStepsAndSuggestedOPs = useMemo(() => {
     if (!pathProperties) return undefined;
     return upsertPathStepsInOPs(pathProperties.suggestedOperationalPoints, compact(pathSteps));
   }, [pathProperties?.suggestedOperationalPoints, pathSteps]);
@@ -58,7 +58,7 @@ export const ManageTrainScheduleContextProvider = ({
       launchPathfinding,
       pathfindingState,
       infraInfo,
-      allWaypoints,
+      pathStepsAndSuggestedOPs,
     }),
     [
       pathProperties,
@@ -67,7 +67,7 @@ export const ManageTrainScheduleContextProvider = ({
       launchPathfinding,
       pathfindingState,
       infraInfo,
-      allWaypoints,
+      pathStepsAndSuggestedOPs,
     ]
   );
 

@@ -28,7 +28,7 @@ type ClearButtonProps = {
   removeVia: () => void;
   rowIndex: number;
   rowData: TimesStopsInputRow;
-  allWaypoints?: SuggestedOP[];
+  pathStepsAndSuggestedOPs?: SuggestedOP[];
   pathSteps: PathStep[];
 };
 
@@ -36,13 +36,13 @@ const createClearViaButton = ({
   removeVia,
   rowIndex,
   rowData,
-  allWaypoints,
+  pathStepsAndSuggestedOPs,
   pathSteps,
 }: ClearButtonProps) => {
   const isClearBtnShown =
-    allWaypoints &&
+    pathStepsAndSuggestedOPs &&
     rowIndex > 0 &&
-    rowIndex < allWaypoints.length - 1 &&
+    rowIndex < pathStepsAndSuggestedOPs.length - 1 &&
     isVia(pathSteps || [], rowData, { withKP: true }) &&
     (!isNil(rowData.stopFor) ||
       rowData.theoreticalMargin !== undefined ||
@@ -59,12 +59,16 @@ const createClearViaButton = ({
 };
 
 type TimesStopsInputProps = {
-  allWaypoints?: SuggestedOP[];
+  pathStepsAndSuggestedOPs?: SuggestedOP[];
   startTime: Date;
   pathSteps: PathStep[];
 };
 
-const TimesStopsInput = ({ allWaypoints, startTime, pathSteps }: TimesStopsInputProps) => {
+const TimesStopsInput = ({
+  pathStepsAndSuggestedOPs,
+  startTime,
+  pathSteps,
+}: TimesStopsInputProps) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation('timesStops');
   const { updatePathSteps, upsertSeveralViasFromSuggestedOP } =
@@ -128,10 +132,10 @@ const TimesStopsInput = ({ allWaypoints, startTime, pathSteps }: TimesStopsInput
 
   useEffect(() => {
     const fetchAndFormatRows = async () => {
-      if (allWaypoints) {
-        const trackIds = allWaypoints.map((op) => op.track);
+      if (pathStepsAndSuggestedOPs) {
+        const trackIds = pathStepsAndSuggestedOPs.map((op) => op.track);
         const trackSections = await getTrackSectionsByIds(trackIds);
-        const suggestedOPsWithTrackNames = allWaypoints.map((op) => ({
+        const suggestedOPsWithTrackNames = pathStepsAndSuggestedOPs.map((op) => ({
           ...op,
           trackName: trackSections[op.track]?.extensions?.sncf?.track_name,
         }));
@@ -147,7 +151,7 @@ const TimesStopsInput = ({ allWaypoints, startTime, pathSteps }: TimesStopsInput
     };
 
     fetchAndFormatRows();
-  }, [allWaypoints, pathSteps, startTime]);
+  }, [pathStepsAndSuggestedOPs, pathSteps, startTime]);
 
   return (
     <TimesStops
@@ -159,7 +163,7 @@ const TimesStopsInput = ({ allWaypoints, startTime, pathSteps }: TimesStopsInput
             removeVia: () => clearPathStep(rowData),
             rowIndex,
             rowData,
-            allWaypoints,
+            pathStepsAndSuggestedOPs,
             pathSteps,
           }),
       }}
