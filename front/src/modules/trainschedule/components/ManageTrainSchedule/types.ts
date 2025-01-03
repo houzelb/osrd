@@ -9,9 +9,6 @@ export type SuggestedOP = {
   name?: string;
   uic?: number;
   ch?: string;
-  chLongLabel?: string;
-  chShortLabel?: string;
-  ci?: number;
   kp?: string;
   trigram?: string;
   offsetOnTrack: number;
