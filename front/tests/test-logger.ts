@@ -1,4 +1,4 @@
-import { test as baseTest } from '@playwright/test';
+import { test as baseTest, type Page } from '@playwright/test';
 
 // Simple logger
 export const logger = {
@@ -9,7 +9,7 @@ export const logger = {
 };
 
 // Extend baseTest with logging inside the test hooks
-const testWithLogging = baseTest.extend({
+const testWithLogging = baseTest.extend<{ page: Page }>({
   page: async ({ page, browserName }, use, testInfo) => {
     const startTime = Date.now(); // Record the start time
 
