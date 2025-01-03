@@ -11,8 +11,8 @@ import { type TableType, type TimesStopsRow } from './types';
 type TimesStopsProps<T extends TimesStopsRow> = {
   rows: T[];
   tableType: TableType;
-  cellClassName?: DataSheetGridProps['cellClassName'];
-  stickyRightColumn?: DataSheetGridProps['stickyRightColumn'];
+  cellClassName?: DataSheetGridProps<T>['cellClassName'];
+  stickyRightColumn?: DataSheetGridProps<T>['stickyRightColumn'];
   headerRowHeight?: number;
   onChange?: (newRows: T[], operation: Operation) => void;
   dataIsLoading: boolean;

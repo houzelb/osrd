@@ -26,6 +26,7 @@ import WebMercatorViewport from 'viewport-mercator-project';
 
 import type { Layer } from 'applications/editor/consts';
 import { getAngle } from 'applications/editor/data/utils';
+import type { TrackFeature } from 'common/Map/types';
 import type { Zone } from 'types';
 import { nearestPointOnLine } from 'utils/geometry';
 
@@ -405,10 +406,10 @@ export function getMapMouseEventNearestFeature(
 export function getNearestTrack(
   coordinates: number[] | Position,
   map: Map
-): { track: Feature<LineString>; nearest: number[]; distance: number } | null {
+): { track: TrackFeature; nearest: number[]; distance: number } | null {
   const tracks = map.queryRenderedFeatures(undefined, {
     layers: ['chartis/tracks-geo/main'],
-  }) as Feature<LineString>[];
+  }) as TrackFeature[];
   const result = head(
     sortBy(
       tracks.map((track) => {

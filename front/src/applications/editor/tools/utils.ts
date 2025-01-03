@@ -278,11 +278,13 @@ export async function getEntitiesBbox(
   }
 
   if (entities.length === 1 && entities[0].objType === 'Route') {
+    const entity = entities[0] as RouteEntity;
+
     // get start point
-    const { id: startPointId, type: startPointIdType } = entities[0].properties.entry_point;
+    const { id: startPointId, type: startPointIdType } = entity.properties.entry_point;
     const startPoint = await getEntity(infraId, startPointId, startPointIdType, dispatch);
     // get end point
-    const { id: endPointId, type: endPointIdType } = entities[0].properties.exit_point;
+    const { id: endPointId, type: endPointIdType } = entity.properties.exit_point;
     const endPoint = await getEntity(infraId, endPointId, endPointIdType, dispatch);
 
     const fc = featureCollection([startPoint, endPoint]);

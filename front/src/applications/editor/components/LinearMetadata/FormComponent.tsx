@@ -367,7 +367,7 @@ const IntervalEditorComponent = (
                 }}
                 formData={selectedData}
                 onChange={(e) => {
-                  const newItem = e.formData;
+                  const newItem: LinearMetadataItem = e.formData;
                   const oldItem = data[selected];
                   let newData = [...data];
                   // we keep the old value for begin and end

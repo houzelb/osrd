@@ -10,6 +10,7 @@ import { BiReset } from 'react-icons/bi';
 import { LAYER_TO_EDITOAST_DICT, LAYERS_SET, type Layer } from 'applications/editor/consts';
 import { NEW_ENTITY_ID } from 'applications/editor/data/utils';
 import { DEFAULT_COMMON_TOOL_STATE } from 'applications/editor/tools/consts';
+import type { SwitchEntity } from 'applications/editor/tools/switchEdition/types';
 import type { TrackSectionEntity } from 'applications/editor/tools/trackEdition/types';
 import { approximatePointDistanceForEditoast } from 'applications/editor/tools/utils';
 import type { PartialOrReducer, ReadOnlyEditorContextType, Tool } from 'applications/editor/types';
@@ -213,19 +214,20 @@ function getRangeEditionTool<T extends EditorRange>({
 
       if (interactionState.type === 'selectSwitch') {
         if (feature && feature.sourceLayer === 'switches') {
-          if (Object.keys(selectedSwitches).includes(feature.properties.id)) {
+          const featureProps = feature.properties as SwitchEntity['properties'];
+          if (Object.keys(selectedSwitches).includes(featureProps.id)) {
             setState({
               selectedSwitches: Object.fromEntries(
-                Object.entries(selectedSwitches).filter(([key]) => key !== feature.properties.id)
+                Object.entries(selectedSwitches).filter(([key]) => key !== featureProps.id)
               ),
             });
           } else
             setState({
               selectedSwitches: {
                 ...selectedSwitches,
-                [feature.properties.id]: {
+                [featureProps.id]: {
                   position: null,
-                  type: feature.properties.switch_type,
+                  type: featureProps.switch_type,
                 },
               },
             });
