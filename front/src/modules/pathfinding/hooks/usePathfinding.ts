@@ -69,7 +69,7 @@ const usePathfinding = (
   const setError = (error?: string) => setPathfindingState({ ...initialPathfindingState, error });
 
   const handleInvalidPathItems = (
-    steps: (PathStep | null)[],
+    steps: PathStep[],
     invalidPathItems: Extract<PathfindingInputError, { error_type: 'invalid_path_items' }>['items']
   ) => {
     // TODO: we currently only handle invalid pathSteps with trigram. We will have to do it for trackOffset, opId and uic too.
@@ -175,7 +175,7 @@ const usePathfinding = (
       dispatch(replaceItinerary(steps));
       setPathProperties(undefined);
 
-      if (steps.some((step) => step === null)) {
+      if (!steps.every((step) => step !== null)) {
         setIsMissingParam();
         return;
       }
@@ -188,7 +188,7 @@ const usePathfinding = (
       const pathfindingInput = getPathfindingQuery({
         infraId,
         rollingStock,
-        pathSteps: steps.filter((step) => step !== null && !step.isInvalid),
+        pathSteps: steps.filter((step) => !step.isInvalid),
       });
 
       if (!pathfindingInput) {
@@ -200,10 +200,7 @@ const usePathfinding = (
         const pathfindingResult = await postPathfindingBlocks(pathfindingInput).unwrap();
 
         if (pathfindingResult.status === 'success') {
-          await populateStoreWithPathfinding(
-            steps.map((step) => step!),
-            pathfindingResult
-          );
+          await populateStoreWithPathfinding(steps, pathfindingResult);
           setIsDone();
           return;
         }
@@ -214,7 +211,7 @@ const usePathfinding = (
 
         if (incompatibleConstraintsCheck) {
           await populateStoreWithPathfinding(
-            steps.map((step) => step!),
+            steps,
             pathfindingResult.relaxed_constraints_path,
             pathfindingResult.incompatible_constraints
           );
