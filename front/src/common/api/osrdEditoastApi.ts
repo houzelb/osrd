@@ -107,15 +107,50 @@ const osrdEditoastApi = generatedEditoastApi.enhanceEndpoints({
       ],
     },
 
-    // Invalidate the children count and last update timestamp
+    // Scenari handling
+    getProjectsByProjectIdStudiesAndStudyIdScenarios: {
+      providesTags: (result) => [
+        'scenarios',
+        { type: 'scenarios', id: 'LIST' },
+        ...(result?.results || []).map(({ id }) => ({
+          type: 'scenarios' as const,
+          id,
+        })),
+      ],
+    },
+    getProjectsByProjectIdStudiesAndStudyIdScenariosScenarioId: {
+      providesTags: (_result, _error, args) => [
+        'scenarios',
+        { type: 'scenarios', id: args.scenarioId },
+      ],
+    },
     postProjectsByProjectIdStudiesAndStudyIdScenarios: {
-      invalidatesTags: ['scenarios', 'studies', 'projects'],
+      invalidatesTags: (_result, _error, args) => [
+        { type: 'projects', id: 'LIST' },
+        { type: 'projects', id: args.projectId },
+        { type: 'studies', id: 'LIST' },
+        { type: 'studies', id: args.studyId },
+        { type: 'scenarios', id: 'LIST' },
+      ],
     },
     patchProjectsByProjectIdStudiesAndStudyIdScenariosScenarioId: {
-      invalidatesTags: ['scenarios', 'studies', 'projects'],
+      invalidatesTags: (_result, _error, args) => [
+        { type: 'projects', id: 'LIST' },
+        { type: 'projects', id: args.projectId },
+        { type: 'studies', id: 'LIST' },
+        { type: 'studies', id: args.studyId },
+        { type: 'scenarios', id: 'LIST' },
+        { type: 'scenarios', id: args.scenarioId },
+      ],
     },
     deleteProjectsByProjectIdStudiesAndStudyIdScenariosScenarioId: {
-      invalidatesTags: ['scenarios', 'studies', 'projects'],
+      invalidatesTags: (_result, _error, args) => [
+        { type: 'projects', id: 'LIST' },
+        { type: 'projects', id: args.projectId },
+        { type: 'studies', id: 'LIST' },
+        { type: 'studies', id: args.studyId },
+        { type: 'scenarios', id: 'LIST' },
+      ],
     },
   },
 });
