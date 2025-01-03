@@ -42,6 +42,37 @@ const osrdEditoastApi = generatedEditoastApi.enhanceEndpoints({
       // we don't want to invalidate the trainschedule tag here to prevent multiple calls
       invalidatesTags: ['timetable', 'scenarios'],
     },
+
+    // Project handling
+    getProjects: {
+      providesTags: (result) => [
+        'projects',
+        { type: 'projects', id: 'LIST' },
+        ...(result?.results || []).map((project) => ({
+          type: 'projects' as const,
+          id: project.id,
+        })),
+      ],
+    },
+    getProjectsByProjectId: {
+      providesTags: (_result, _error, args) => [
+        'projects',
+        { type: 'projects', id: args.projectId },
+      ],
+    },
+    postProjects: {
+      invalidatesTags: [{ type: 'projects', id: 'LIST' }],
+    },
+    patchProjectsByProjectId: {
+      invalidatesTags: (_result, _error, args) => [
+        { type: 'projects', id: 'LIST' },
+        { type: 'projects', id: args.projectId },
+      ],
+    },
+    deleteProjectsByProjectId: {
+      invalidatesTags: [{ type: 'projects', id: 'LIST' }],
+    },
+
     // Invalidate the children count and last update timestamp
     postProjectsByProjectIdStudies: {
       invalidatesTags: ['studies', 'projects'],
