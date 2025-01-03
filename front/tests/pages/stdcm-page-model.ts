@@ -93,7 +93,11 @@ class STDCMPage {
 
   readonly timeDestinationArrival: Locator;
 
+  readonly closeTimePickerButton: Locator;
+
   readonly toleranceDestinationArrival: Locator;
+
+  readonly closeTolerancePickerButton: Locator;
 
   readonly warningBox: Locator;
 
@@ -183,7 +187,9 @@ class STDCMPage {
     this.destinationArrival = page.locator('#select-destination-arrival');
     this.dateDestinationArrival = page.locator('#date-destination-arrival');
     this.timeDestinationArrival = page.locator('#time-destination-arrival');
+    this.closeTimePickerButton = page.locator('.time-picker .close-button');
     this.toleranceDestinationArrival = page.locator('#stdcm-tolerance-destination-arrival');
+    this.closeTolerancePickerButton = page.locator('.tolerance-picker .close-button');
     this.warningBox = page.getByTestId('warning-box');
     this.suggestionList = page.locator('.suggestions-list');
     this.suggestionItems = this.suggestionList.locator('.suggestion-item');
@@ -498,7 +504,7 @@ class STDCMPage {
     await this.setHourLocator(updatedDetails.hour);
     await this.setMinuteLocator(updatedDetails.minute);
     await this.incrementButton.dblclick(); // Double-click the +1 minute button to reach 37
-    await this.timeDestinationArrival.click();
+    await this.closeTimePickerButton.click();
     await expect(this.timeDestinationArrival).toHaveValue(updatedDetails.timeValue);
 
     // Update tolerance and verify warning box
@@ -541,8 +547,7 @@ class STDCMPage {
     await this.page.getByRole('button', { name: minusValue, exact: true }).click();
     await this.page.getByRole('button', { name: plusValue, exact: true }).click();
     await expect(toleranceField).toHaveValue(`${minusValue}/${plusValue}`);
-    // TODO : Add a click on the close button instead of clicking on the map when #693 is done
-    await this.mapContainer.click();
+    await this.closeTolerancePickerButton.click();
   }
 
   async fillAndVerifyViaDetails({
