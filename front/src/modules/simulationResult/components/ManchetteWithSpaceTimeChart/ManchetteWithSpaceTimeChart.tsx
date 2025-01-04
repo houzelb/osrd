@@ -5,6 +5,7 @@ import Manchette, { type WaypointMenuData } from '@osrd-project/ui-manchette';
 import { useManchettesWithSpaceTimeChart } from '@osrd-project/ui-manchette-with-spacetimechart';
 import {
   ConflictLayer,
+  ConflictTooltip,
   PathLayer,
   SpaceTimeChart,
   WorkScheduleLayer,
@@ -13,6 +14,7 @@ import {
 import type { Conflict } from '@osrd-project/ui-spacetimechart';
 import cx from 'classnames';
 import { compact } from 'lodash';
+import type { Point, DataPoint, HoveredItem } from '@osrd-project/ui-spacetimechart/dist/lib/types';
 
 import type { OperationalPoint, TrainSpaceTimeData } from 'applications/operationalStudies/types';
 import upward from 'assets/pictures/workSchedules/ScheduledMaintenanceUp.svg';
@@ -172,6 +174,24 @@ const ManchetteWithSpaceTimeChartWrapper = ({
     showSignalsStates: false,
   });
 
+  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+  const [cursorTime, setCursorTime] = useState(0);
+  const [hoveredConflict, setHoveredConflict] = useState<Conflict>();
+
+  const handleChartMouseMove = ({
+    position,
+    data,
+    hoveredItem,
+  }: {
+    position: Point;
+    data: DataPoint;
+    hoveredItem: HoveredItem | null;
+  }) => {
+    setCursorPosition(position);
+    setCursorTime(data.time);
+    setHoveredConflict(hoveredItem ? conflicts[hoveredItem.element.conflictIndex] : undefined);
+  };
+
   const occupancyBlocks = cutProjectedTrains.flatMap((train) => {
     const departureTime = train.departureTime.getTime();
 
@@ -263,6 +283,7 @@ const ManchetteWithSpaceTimeChartWrapper = ({
               (waypointsPanelData?.filteredWaypoints ?? operationalPoints).at(0)?.position || 0
             }
             timeOrigin={Math.min(...projectPathTrainResult.map((p) => +p.departureTime))}
+            onMouseMove={handleChartMouseMove}
             {...spaceTimeChartProps}
           >
             {spaceTimeChartProps.paths.map((path) => (
@@ -282,6 +303,9 @@ const ManchetteWithSpaceTimeChartWrapper = ({
             {settings.showConflicts && <ConflictLayer conflicts={cutConflicts} />}
             {settings.showSignalsStates && (
               <OccupancyBlockLayer occupancyBlocks={occupancyBlocks} />
+            )}
+            {hoveredConflict && cursorPosition && (
+              <ConflictTooltip position={cursorPosition} time={cursorTime} {...hoveredConflict} />
             )}
           </SpaceTimeChart>
         </div>
