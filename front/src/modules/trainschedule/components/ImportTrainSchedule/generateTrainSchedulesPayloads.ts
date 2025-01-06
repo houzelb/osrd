@@ -8,6 +8,9 @@ import { calculateTimeDifferenceInSeconds, formatDurationAsISO8601 } from 'utils
 
 export function generateTrainSchedulesPayloads(
   trains: ImportedTrainSchedule[],
+  uicToMainChCodes?: {
+    [key: number]: string;
+  },
   checkChAndUIC: boolean = true
 ): TrainScheduleBase[] {
   return trains.reduce((payloads, train) => {
@@ -33,7 +36,11 @@ export function generateTrainSchedulesPayloads(
           return acc; // Skip invalid step
         }
 
-        acc.path.push({ id: stepId, uic: Number(step.uic), secondary_code: step.chCode });
+        acc.path.push({
+          id: stepId,
+          uic: Number(step.uic),
+          secondary_code: step.chCode || uicToMainChCodes?.[step.uic],
+        });
 
         // Skip first step, handle time differences
         if (index !== 0) {

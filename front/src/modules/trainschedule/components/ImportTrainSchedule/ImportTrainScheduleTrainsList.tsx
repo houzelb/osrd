@@ -1,18 +1,20 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { Rocket } from '@osrd-project/ui-icons';
 import type { TFunction } from 'i18next';
 import { keyBy } from 'lodash';
 import { useTranslation } from 'react-i18next';
 
-import type { ImportedTrainSchedule } from 'applications/operationalStudies/types';
+import type { ImportedTrainSchedule, Step } from 'applications/operationalStudies/types';
 import {
   osrdEditoastApi,
   type LightRollingStockWithLiveries,
+  type SearchResultItemOperationalPoint,
   type TrainScheduleBase,
   type TrainScheduleResult,
 } from 'common/api/osrdEditoastApi';
 import { Loader } from 'common/Loaders';
+import { MAIN_OP_CH_CODES } from 'common/Map/Search/useSearchOperationalPoint';
 import { ImportTrainScheduleTrainDetail } from 'modules/trainschedule/components/ImportTrainSchedule';
 import rollingstockOpenData2OSRD from 'modules/trainschedule/components/ImportTrainSchedule/rollingstock_opendata2osrd.json';
 import { setFailure, setSuccess } from 'reducers/main';
@@ -50,6 +52,12 @@ const ImportTrainScheduleTrainsList = ({
   upsertTrainSchedules,
 }: ImportTrainScheduleTrainsListProps) => {
   const { t } = useTranslation(['operationalStudies/importTrainSchedule']);
+  const dispatch = useAppDispatch();
+
+  const [postSearch] = osrdEditoastApi.endpoints.postSearch.useMutation();
+  const [postTrainSchedule] =
+    osrdEditoastApi.endpoints.postTimetableByIdTrainSchedule.useMutation();
+
   const rollingStockDict = useMemo(
     () => keyBy(rollingStocks, (rollingStock) => rollingStock.name),
     [rollingStocks]
@@ -72,21 +80,50 @@ const ImportTrainScheduleTrainsList = ({
     [trainsList]
   );
 
-  const [postTrainSchedule] =
-    osrdEditoastApi.endpoints.postTimetableByIdTrainSchedule.useMutation();
+  const getStepsMainChCode = useCallback(
+    async (steps: Step[]) => {
+      const stepsQuery = ['or', ...steps.map((step) => ['=', ['uic'], Number(step.uic)])];
+      const mainChCodeConstraint = [
+        'or',
+        ...MAIN_OP_CH_CODES.map((chCode) => ['=', ['ch'], chCode]),
+      ];
 
-  const dispatch = useAppDispatch();
+      try {
+        const payloadSteps = {
+          object: 'operationalpoint',
+          query: ['and', stepsQuery, mainChCodeConstraint],
+        };
+        const stepsDetails = (await postSearch({
+          searchPayload: payloadSteps,
+          pageSize: 25,
+        }).unwrap()) as SearchResultItemOperationalPoint[];
+
+        const stepsChCodeByUIC = stepsDetails.reduce<{ [key: number]: string }>((acc, step) => {
+          acc[step.uic] = step.ch;
+          return acc;
+        }, {});
+
+        return stepsChCodeByUIC;
+      } catch (error) {
+        console.error('Failed to fetch operational points:', error);
+        return undefined;
+      }
+    },
+    [postSearch]
+  );
 
   async function generateTrainSchedules() {
     try {
       let payloads;
 
       if (trainsXmlData.length > 0) {
-        payloads = generateTrainSchedulesPayloads(trainsXmlData, true);
+        const uicToMainChCodes = await getStepsMainChCode(trainsXmlData[0].steps);
+        payloads = generateTrainSchedulesPayloads(trainsXmlData, uicToMainChCodes);
       } else if (trainsJsonData.length > 0) {
         payloads = trainsJsonData;
       } else {
-        payloads = generateTrainSchedulesPayloads(formattedTrainsList, false);
+        const uicToMainChCodes = await getStepsMainChCode(formattedTrainsList[0].steps);
+        payloads = generateTrainSchedulesPayloads(formattedTrainsList, uicToMainChCodes, false);
       }
 
       const trainSchedules = await postTrainSchedule({ id: timetableId, body: payloads }).unwrap();
