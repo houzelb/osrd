@@ -74,13 +74,7 @@ struct PathfindingInput {
     #[schema(value_type = f64)]
     rolling_stock_length: OrderedFloat<f64>,
     /// Stops the train at next signal instead of on path item
-    // TODO: try to set default value only at 1 location (struct)
-    #[serde(default = "default_stop_at_next_signal")]
     stop_at_next_signal: bool,
-}
-
-fn default_stop_at_next_signal() -> bool {
-    true
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, ToSchema)]

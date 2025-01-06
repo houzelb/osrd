@@ -2739,6 +2739,8 @@ export type PathfindingInput = {
   rolling_stock_supported_electrifications: string[];
   /** List of supported signaling systems */
   rolling_stock_supported_signaling_systems: string[];
+  /** Stops the train at next signal instead of on path item */
+  stop_at_next_signal: boolean;
 };
 export type RoutePath = {
   switches_directions: (string & string)[][];
@@ -3222,6 +3224,7 @@ export type Margins = {
   values: string[];
 };
 export type TrainScheduleOptions = {
+  stop_at_next_signal?: boolean;
   use_electrical_profiles?: boolean;
 };
 export type PathItem = PathItemLocation & {
@@ -3467,6 +3470,7 @@ export type TrainScheduleBase = {
     values: string[];
   };
   options?: {
+    stop_at_next_signal?: boolean;
     use_electrical_profiles?: boolean;
   };
   path: (PathItemLocation & {

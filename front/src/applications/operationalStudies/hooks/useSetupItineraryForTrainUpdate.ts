@@ -149,6 +149,7 @@ const useSetupItineraryForTrainUpdate = (trainIdToEdit: number) => {
           rolling_stock_supported_signaling_systems: rollingStock.supported_signaling_systems,
           rolling_stock_maximum_speed: rollingStock.max_speed,
           rolling_stock_length: rollingStock.length,
+          stop_at_next_signal: true, // TODO: change to false and set to true elsewhere if needed
         },
       };
       const pathfindingResult = await postPathfindingBlocks(params).unwrap();

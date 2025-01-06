@@ -16,7 +16,7 @@ pub struct TrainScheduleOptions {
     use_electrical_profiles: bool,
 
     #[derivative(Default(value = "true"))]
-    #[serde(default = "default_stop_at_next_signal")] // TODO: try to set default value only at 1 location (struct)
+    #[serde(default = "default_stop_at_next_signal")]
     stop_at_next_signal: bool,
 }
 

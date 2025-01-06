@@ -8214,6 +8214,7 @@ components:
       - path_items
       - rolling_stock_maximum_speed
       - rolling_stock_length
+      - stop_at_next_signal
       properties:
         path_items:
           type: array
