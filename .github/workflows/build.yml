@@ -215,12 +215,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install poetry
-        run: pipx install poetry
+        run: pipx install 'poetry<2.0'
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: "3.11"
           cache: "poetry"
 
       - name: Install railjson_generator dependencies
@@ -241,12 +241,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install poetry
-        run: pipx install poetry
+        run: pipx install 'poetry<2.0'
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: "3.11"
           cache: "poetry"
 
       - name: Install railjson_generator dependencies
@@ -356,11 +356,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install poetry
-        run: pipx install poetry
+        run: pipx install 'poetry<2.0'
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: "3.11"
           cache: "poetry"
       - name: Install dependencies
         run: |
@@ -389,11 +389,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install poetry
-        run: pipx install poetry
+        run: pipx install 'poetry<2.0'
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: "3.11"
           cache: "poetry"
       - name: Install dependencies
         run: |
@@ -442,7 +442,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install poetry
-        run: pipx install poetry
+        run: pipx install 'poetry<2.0'
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -946,11 +946,11 @@ jobs:
           docker load --input ./osrd-front-nginx.tar
           docker load --input ./osrd-osrdyne.tar
       - name: Install poetry
-        run: pipx install poetry
+        run: pipx install 'poetry<2.0'
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: "3.11"
           cache: "poetry"
       - name: Install dependencies
         run: |
