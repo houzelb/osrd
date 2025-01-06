@@ -152,7 +152,7 @@ class OperationalStudiesTimetablePage extends CommonPage {
   // Verify that the imported train number is correct
   async verifyTrainCount(trainCount: number): Promise<void> {
     await this.page.waitForLoadState('networkidle');
-    expect(this.timetableTrains).toHaveCount(trainCount);
+    await expect(this.timetableTrains).toHaveCount(trainCount);
   }
 
   // Filter trains validity and verify their count
