@@ -5,7 +5,7 @@ import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import i18next from 'i18next';
 
-import type { ScheduleConstraint } from 'applications/stdcm/types';
+import type { ScheduleConstraint, StdcmSearchDatetimeWindow } from 'applications/stdcm/types';
 import i18n from 'i18n';
 
 dayjs.extend(utc);
@@ -179,12 +179,12 @@ export function extractDateAndTime(arrivalTime: Date, dateFormat: string = 'YYYY
  * Checks if the given arrival date falls within the specified search time window.
  *
  * @param {Date} arrivalDate - The arrival time, which is a Date object.
- * @param {{ begin: Date; end: Date } | undefined} searchDatetimeWindow - An object containing the start and end dates of the search window. If undefined, the function will return true.
+ * @param {StdcmSearchDatetimeWindow | undefined} searchDatetimeWindow - An object containing the start and end dates of the search window. If undefined, the function will return true.
  * @returns {boolean} - Returns true if the arrival date is within the search time window, or if the search time window is undefined. Returns false otherwise.
  */
 export function isArrivalDateInSearchTimeWindow(
   arrivalDate: Date,
-  searchDatetimeWindow?: { begin: Date; end: Date }
+  searchDatetimeWindow?: StdcmSearchDatetimeWindow
 ) {
   if (!searchDatetimeWindow) {
     return true;

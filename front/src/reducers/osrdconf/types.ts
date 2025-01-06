@@ -5,6 +5,7 @@ import type {
   AllowanceValue,
   ArrivalTimeTypes,
   LinkedTrains,
+  StdcmSearchDatetimeWindow,
   StdcmStopTypes,
 } from 'applications/stdcm/types';
 import type {
@@ -23,7 +24,7 @@ export type OsrdConfState = InfraState & {
   electricalProfileSetId?: number;
   workScheduleGroupId?: number;
   temporarySpeedLimitGroupId?: number;
-  searchDatetimeWindow?: { begin: Date; end: Date };
+  searchDatetimeWindow?: StdcmSearchDatetimeWindow;
   rollingStockID?: number;
   speedLimitByTag?: string;
   powerRestriction: PowerRestriction[];
