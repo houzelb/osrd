@@ -205,3 +205,8 @@ export type LoaderStatus = {
 };
 
 export type LinkedTrainType = 'anterior' | 'posterior';
+
+export type StdcmSearchDatetimeWindow = {
+  begin: Date;
+  end: Date;
+};
