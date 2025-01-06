@@ -102,7 +102,7 @@ axum-extra = { version = "0.9.6", default-features = false, features = [
   "typed-header",
 ] }
 axum-test = { version = "16.4.1", default-features = false }
-axum-tracing-opentelemetry = { version = "0.24.1", default-features = false, features = [
+axum-tracing-opentelemetry = { version = "0.25.0", default-features = false, features = [
   "tracing_level_info",
 ] }
 chrono.workspace = true
