@@ -28,7 +28,7 @@ class OperationalStudiesSimulationSettingsPage {
   // Deactivate electrical profiles switch
   async deactivateElectricalProfile() {
     await this.electricalProfilesSwitch.setChecked(false, { force: true });
-    expect(this.electricalProfilesSwitch).not.toBeChecked();
+    await expect(this.electricalProfilesSwitch).not.toBeChecked();
   }
 
   async activateLinearMargin() {

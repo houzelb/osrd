@@ -24,7 +24,7 @@ test.describe('Validate the Scenario creation workflow', () => {
   });
 
   test.afterAll('Delete the electrical profile', async () => {
-    deleteApiRequest(`/api/electrical_profile_set/${electricalProfileSet.id}/`);
+    await deleteApiRequest(`/api/electrical_profile_set/${electricalProfileSet.id}/`);
   });
 
   /** *************** Test 1 **************** */
