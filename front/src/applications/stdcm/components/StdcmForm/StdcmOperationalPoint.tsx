@@ -28,7 +28,7 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
   const { t } = useTranslation('stdcm');
   const dispatch = useAppDispatch();
 
-  const { searchTerm, chCodeFilter, sortedSearchResults, setSearchTerm, setChCodeFilter } =
+  const { searchTerm, sortedSearchResults, setSearchTerm, setChCodeFilter } =
     useSearchOperationalPoint({
       initialSearchTerm: location?.name,
       initialChCodeFilter: location?.secondary_code,
@@ -61,7 +61,7 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
   const sortedChOptions = useMemo(
     () =>
       sortedSearchResults
-        .filter((pr) => pr.name === searchTerm)
+        .filter((pr) => (location ? pr.name === location.name : pr.name === searchTerm))
         .reduce(
           (acc, pr) => {
             const newObject = {
@@ -155,7 +155,11 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
         <Select
           label={t('trainPath.ch')}
           id={`${pathStepId}-ch`}
-          value={chCodeFilter ? { label: formatChCode(chCodeFilter), id: chCodeFilter } : undefined}
+          value={
+            location
+              ? { label: formatChCode(location.secondary_code), id: location.secondary_code }
+              : undefined
+          }
           onChange={(e) => onSelectChCodeFilter(e)}
           {...createFixedSelectOptions(sortedChOptions)}
           disabled={disabled}
