@@ -172,7 +172,11 @@ const StdcmConfig = ({
                   })}
                   label={t('simulation.getSimulation')}
                   onClick={startSimulation}
-                  isDisabled={disabled || !showBtnToLaunchSimulation}
+                  isDisabled={
+                    disabled ||
+                    !showBtnToLaunchSimulation ||
+                    formErrors?.errorType === StdcmConfigErrorTypes.INFRA_NOT_LOADED
+                  }
                 />
                 {formErrors && (
                   <StdcmWarningBox
