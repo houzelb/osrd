@@ -8,6 +8,10 @@
   justify-content: space-between;
   padding-right: 50px;
 
+  &__logo {
+    padding: 10px 0 10px 10px;
+  }
+
   &__title {
     max-height: 48px;
     color: rgba(0, 0, 0, 1);

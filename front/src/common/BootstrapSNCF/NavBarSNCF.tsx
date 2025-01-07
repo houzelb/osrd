@@ -1,6 +1,7 @@
 import { type ReactElement } from 'react';
 
 import { Gear, Info, Report, ShieldCheck, SignOut } from '@osrd-project/ui-icons';
+import cx from 'classnames';
 import getUnicodeFlagIcon from 'country-flag-icons/unicode';
 import i18n from 'i18next';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +14,7 @@ import ReleaseInformations from 'common/ReleaseInformations/ReleaseInformations'
 import UserSettings from 'common/UserSettings';
 import { getUserSafeWord } from 'reducers/user/userSelectors';
 import useAuth from 'utils/hooks/OsrdAuth';
-import { getLogo } from 'utils/logo';
+import useDeploymentSettings from 'utils/hooks/useDeploymentSettings';
 import { language2flag } from 'utils/strings';
 
 import DropdownSNCF, { DROPDOWN_STYLE_TYPES } from './DropdownSNCF';
@@ -24,17 +25,27 @@ type Props = {
   logo?: string;
 };
 
-const LegacyNavBarSNCF = ({ appName, logo = getLogo() }: Props) => {
+const LegacyNavBarSNCF = ({ appName, logo }: Props) => {
   const { openModal } = useModal();
+  const { digitalTwinLogo, digitalTwinName, isCustomizedDeployment } = useDeploymentSettings();
   const safeWord = useSelector(getUserSafeWord);
   const { t } = useTranslation('home/navbar');
   const { logout, username } = useAuth();
 
   return (
     <div className="mastheader">
-      <div className="mastheader-logo flex-grow-0">
+      <div
+        className={cx(
+          isCustomizedDeployment && logo ? `mastheader-logo__horizon` : `mastheader-logo`,
+          `flex-grow-0`
+        )}
+      >
         <Link to="/">
-          <img src={logo} data-testid="osrd-logo" alt="OSRD Logo" />
+          <img
+            src={logo ?? digitalTwinLogo}
+            data-testid={`${digitalTwinName.toLowerCase()}-logo`}
+            alt={`${digitalTwinName.toUpperCase()} Logo`}
+          />
         </Link>
       </div>
       <header role="banner" className="mastheader-title d-flex flex-grow-1">

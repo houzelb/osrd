@@ -42,6 +42,10 @@ const styles = {
       height: '24',
       marginLeft: '20',
     },
+    lmrLogo: {
+      width: 'auto',
+      marginRight: 'auto',
+    },
     simulationTitle: {
       fontSize: '28',
       fontWeight: 'semibold',
