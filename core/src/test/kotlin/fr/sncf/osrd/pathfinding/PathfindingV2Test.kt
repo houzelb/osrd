@@ -36,6 +36,7 @@ class PathfindingV2Test : ApiTest() {
                     infra = "tiny_infra/infra.json",
                     expectedVersion = "1",
                     pathItems = waypoints,
+                    stopAtNextSignal = false,
                 )
             )
         val rawResponse =
@@ -96,6 +97,7 @@ class PathfindingV2Test : ApiTest() {
                     infra = "tiny_infra/infra.json",
                     expectedVersion = "1",
                     pathItems = waypoints,
+                    stopAtNextSignal = false,
                 )
             )
         val unconstrainedRawResponse =
@@ -119,6 +121,7 @@ class PathfindingV2Test : ApiTest() {
                     infra = "tiny_infra/infra.json",
                     expectedVersion = "1",
                     pathItems = waypoints,
+                    stopAtNextSignal = false,
                 )
             )
         val rawResponse =
@@ -167,6 +170,7 @@ class PathfindingV2Test : ApiTest() {
                     infra = "small_infra/infra.json",
                     expectedVersion = "1",
                     pathItems = waypoints,
+                    stopAtNextSignal = false,
                 )
             )
         val unconstrainedRawResponse =
@@ -190,6 +194,7 @@ class PathfindingV2Test : ApiTest() {
                     infra = "small_infra/infra.json",
                     expectedVersion = "1",
                     pathItems = waypoints,
+                    stopAtNextSignal = false,
                 )
             )
         val rawResponse =
@@ -238,5 +243,105 @@ class PathfindingV2Test : ApiTest() {
                         )
                 )
         )
+    }
+
+    @Test
+    fun stopAtNextSignalTest() {
+        val waypointStart = TrackLocation("TA1", Offset(500.meters))
+        val waypointIntermediate = TrackLocation("TC1", Offset(550.meters))
+        val waypointEnd = TrackLocation("TD0", Offset(14000.meters))
+        val waypointsStart = listOf(waypointStart)
+        val waypointsIntermediate = listOf(waypointIntermediate)
+        val waypointsEnd = listOf(waypointEnd)
+        val waypoints = listOf(waypointsStart, waypointsIntermediate, waypointsEnd)
+
+        val nonStopAtNextSignalRequestBody =
+            pathfindingRequestAdapter.toJson(
+                PathfindingBlockRequest(
+                    rollingStockLoadingGauge = RJSLoadingGaugeType.G1,
+                    rollingStockIsThermal = true,
+                    rollingStockSupportedElectrifications = listOf(),
+                    rollingStockSupportedSignalingSystems = listOf("BAL"),
+                    rollingStockMaximumSpeed = 320.0,
+                    rollingStockLength = 0.0,
+                    timeout = null,
+                    infra = "small_infra/infra.json",
+                    expectedVersion = "1",
+                    pathItems = waypoints,
+                    stopAtNextSignal = true,
+                )
+            )
+
+        val shortTrainRequestBody =
+            pathfindingRequestAdapter.toJson(
+                PathfindingBlockRequest(
+                    rollingStockLoadingGauge = RJSLoadingGaugeType.G1,
+                    rollingStockIsThermal = true,
+                    rollingStockSupportedElectrifications = listOf(),
+                    rollingStockSupportedSignalingSystems = listOf("BAL"),
+                    rollingStockMaximumSpeed = 320.0,
+                    rollingStockLength = 10.0,
+                    timeout = null,
+                    infra = "small_infra/infra.json",
+                    expectedVersion = "1",
+                    pathItems = waypoints,
+                    stopAtNextSignal = true,
+                )
+            )
+
+        val longTrainRequestBody =
+            pathfindingRequestAdapter.toJson(
+                PathfindingBlockRequest(
+                    rollingStockLoadingGauge = RJSLoadingGaugeType.G1,
+                    rollingStockIsThermal = true,
+                    rollingStockSupportedElectrifications = listOf(),
+                    rollingStockSupportedSignalingSystems = listOf("BAL"),
+                    rollingStockMaximumSpeed = 320.0,
+                    rollingStockLength = 200.0,
+                    timeout = null,
+                    infra = "small_infra/infra.json",
+                    expectedVersion = "1",
+                    pathItems = waypoints,
+                    stopAtNextSignal = true,
+                )
+            )
+
+        val nonStopAtNextSignalRawResponse =
+            PathfindingBlocksEndpointV2(infraManager)
+                .act(RqFake("POST", "/v2/pathfinding/blocks", nonStopAtNextSignalRequestBody))
+        val nonStopAtNextSignalResponse =
+            TakesUtils.readBodyResponse(nonStopAtNextSignalRawResponse)
+        val nonStopAtNextSignalParsed =
+            (pathfindingResponseAdapter.fromJson(nonStopAtNextSignalResponse)
+                as? PathfindingBlockSuccess)!!
+
+        val shortTrainRawResponse =
+            PathfindingBlocksEndpointV2(infraManager)
+                .act(RqFake("POST", "/v2/pathfinding/blocks", shortTrainRequestBody))
+        val shortTrainResponse = TakesUtils.readBodyResponse(shortTrainRawResponse)
+        val shortTrainParsed =
+            (pathfindingResponseAdapter.fromJson(shortTrainResponse) as? PathfindingBlockSuccess)!!
+
+        val longTrainRawResponse =
+            PathfindingBlocksEndpointV2(infraManager)
+                .act(RqFake("POST", "/v2/pathfinding/blocks", longTrainRequestBody))
+        val longTrainResponse = TakesUtils.readBodyResponse(longTrainRawResponse)
+        val longTrainParsed =
+            (pathfindingResponseAdapter.fromJson(longTrainResponse) as? PathfindingBlockSuccess)!!
+
+        assertEquals(3, nonStopAtNextSignalParsed.pathItemPositions.size)
+        assertEquals(0.meters, nonStopAtNextSignalParsed.pathItemPositions[0].distance)
+        assertEquals(12050.meters, nonStopAtNextSignalParsed.pathItemPositions[1].distance)
+        assertEquals(26500.meters, nonStopAtNextSignalParsed.pathItemPositions[2].distance)
+
+        assertEquals(3, shortTrainParsed.pathItemPositions.size)
+        assertEquals(0.meters, shortTrainParsed.pathItemPositions[0].distance)
+        assertEquals(12060.meters, shortTrainParsed.pathItemPositions[1].distance)
+        assertEquals(26510.meters, shortTrainParsed.pathItemPositions[2].distance)
+
+        assertEquals(3, longTrainParsed.pathItemPositions.size)
+        assertEquals(0.meters, longTrainParsed.pathItemPositions[0].distance)
+        assertEquals(12250.meters, longTrainParsed.pathItemPositions[1].distance)
+        assertEquals(26516.5.meters, longTrainParsed.pathItemPositions[2].distance)
     }
 }
