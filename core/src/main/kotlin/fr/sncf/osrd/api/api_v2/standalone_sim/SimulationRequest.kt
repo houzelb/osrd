@@ -144,5 +144,4 @@ class SimulationPowerRestrictionItem(
 
 class TrainScheduleOptions(
     @Json(name = "use_electrical_profiles") val useElectricalProfiles: Boolean,
-//    @Json(name = "stop_at_next_signal") val stopAtNextSignal: Boolean // TODO: not sure it is used still
 )
