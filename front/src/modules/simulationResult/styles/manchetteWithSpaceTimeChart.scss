@@ -11,13 +11,35 @@
     right: 7px;
     top: 7px;
     z-index: 10;
+    border: 1px solid var(--black10);
+    border-radius: 5px;
 
     button {
-      border: 1px solid var(--black10);
-      border-radius: 5px;
+      outline: none;
       background: var(--white100);
       color: var(--black100);
       padding: 0 7px;
+    }
+
+    button:not(:last-child) {
+      border-radius: 5px 0 0 5px;
+      border-right: 1px solid var(--black10);
+    }
+
+    button:last-child {
+      border-radius: 5px;
+    }
+
+    .reset-button {
+      svg {
+        transform: rotate(180deg) translate(0, 2px);
+      }
+    }
+
+    .menu-button {
+      svg {
+        transform: translate(0, -1px);
+      }
     }
   }
 

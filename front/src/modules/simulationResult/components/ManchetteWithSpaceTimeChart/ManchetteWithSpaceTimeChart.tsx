@@ -1,8 +1,13 @@
 import { useMemo, useRef, useState } from 'react';
 
-import { KebabHorizontal } from '@osrd-project/ui-icons';
+import { Slider } from '@osrd-project/ui-core';
+import { KebabHorizontal, Iterations } from '@osrd-project/ui-icons';
 import Manchette, { type WaypointMenuData } from '@osrd-project/ui-manchette';
-import { useManchettesWithSpaceTimeChart } from '@osrd-project/ui-manchette-with-spacetimechart';
+import {
+  useManchettesWithSpaceTimeChart,
+  timeScaleToZoomValue,
+  DEFAULT_ZOOM_MS_PER_PX,
+} from '@osrd-project/ui-manchette-with-spacetimechart';
 import {
   ConflictLayer,
   PathLayer,
@@ -63,6 +68,7 @@ const ManchetteWithSpaceTimeChartWrapper = ({
 }: ManchetteWithSpaceTimeChartProps) => {
   const manchetteWithSpaceTimeCharWrappertRef = useRef<HTMLDivElement>(null);
   const manchetteWithSpaceTimeChartRef = useRef<HTMLDivElement>(null);
+  const spaceTimeChartRef = useRef<HTMLDivElement>(null);
 
   const [waypointsPanelIsOpen, setWaypointsPanelIsOpen] = useState(false);
 
@@ -159,13 +165,15 @@ const ManchetteWithSpaceTimeChartWrapper = ({
     }));
   }, [waypointsPanelData, operationalPoints]);
 
-  const { manchetteProps, spaceTimeChartProps, handleScroll } = useManchettesWithSpaceTimeChart(
-    manchetteWaypoints,
-    cutProjectedTrains,
-    manchetteWithSpaceTimeChartRef,
-    selectedTrainScheduleId,
-    height
-  );
+  const { manchetteProps, spaceTimeChartProps, handleScroll, handleXZoom, xZoom } =
+    useManchettesWithSpaceTimeChart(
+      manchetteWaypoints,
+      cutProjectedTrains,
+      manchetteWithSpaceTimeChartRef,
+      selectedTrainScheduleId,
+      height,
+      spaceTimeChartRef
+    );
 
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
   const [settings, setSettings] = useState({
@@ -251,6 +259,7 @@ const ManchetteWithSpaceTimeChartWrapper = ({
       >
         <Manchette {...manchettePropsWithWaypointMenu} height={height - BOTTOM_TOOLBAR_HEIGHT} />
         <div
+          ref={spaceTimeChartRef}
           className="space-time-chart-container"
           style={{
             bottom: 0,
@@ -260,7 +269,18 @@ const ManchetteWithSpaceTimeChartWrapper = ({
           }}
         >
           <div className="toolbar">
-            <button type="button" onClick={() => setShowSettingsPanel(true)}>
+            <button
+              type="button"
+              className="reset-button"
+              onClick={() => handleXZoom(timeScaleToZoomValue(DEFAULT_ZOOM_MS_PER_PX))}
+            >
+              <Iterations />
+            </button>
+            <button
+              type="button"
+              className="menu-button"
+              onClick={() => setShowSettingsPanel(true)}
+            >
               <KebabHorizontal />
             </button>
           </div>
@@ -301,7 +321,16 @@ const ManchetteWithSpaceTimeChartWrapper = ({
           </SpaceTimeChart>
         </div>
       </div>
+      <Slider
+        containerClassName="space-time-h-slider-container"
+        className="space-time-h-slider"
+        value={xZoom}
+        onChange={(e) => {
+          handleXZoom(Number(e.target.value));
+        }}
+      />
     </div>
+    /* TODO use margin or absolute to align with handle */
   );
 };
 
