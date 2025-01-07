@@ -7,7 +7,7 @@ import DPY_TO_MAS_OPERATIONAL_POINTS from 'assets/operationStudies/DPYToMASOpera
 import { type SearchResultItemOperationalPoint, osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import { useInfraID } from 'common/osrdContext';
 import { setFailure } from 'reducers/main';
-import { userHasOnlyStdcmRoles } from 'reducers/user/userSelectors';
+import { getIsSuperUser } from 'reducers/user/userSelectors';
 import { castErrorToFailure } from 'utils/error';
 import { useDebounce } from 'utils/helpers';
 
@@ -31,7 +31,7 @@ export default function useSearchOperationalPoint({
   const [chCodeFilter, setChCodeFilter] = useState(initialChCodeFilter);
   const [searchResults, setSearchResults] = useState<SearchResultItemOperationalPoint[]>([]);
   const [mainOperationalPointsOnly, setMainOperationalPointsOnly] = useState(false);
-  const hasOnlyStdcmRoles = useSelector(userHasOnlyStdcmRoles);
+  const isSuperUser = useSelector(getIsSuperUser);
 
   const debouncedSearchTerm = useDebounce(searchTerm, debounceDelay);
   const [postSearch] = osrdEditoastApi.endpoints.postSearch.useMutation();
@@ -49,7 +49,7 @@ export default function useSearchOperationalPoint({
         ];
 
     const dpyToMasOperationalpointsFilter =
-      isStdcm && hasOnlyStdcmRoles
+      isStdcm && !isSuperUser
         ? [
             'or',
             ...DPY_TO_MAS_OPERATIONAL_POINTS.map(([ci, ch]) => [
