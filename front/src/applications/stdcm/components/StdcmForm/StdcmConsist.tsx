@@ -33,7 +33,7 @@ const ConsistCardTitle = ({
   );
 };
 
-const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
+const StdcmConsist = ({ disabled = false, showErrors }: StdcmConfigCardProps) => {
   const { t } = useTranslation('stdcm');
   const { speedLimitByTag, speedLimitsByTags, dispatchUpdateSpeedLimitByTag } =
     useStoreDataForSpeedLimitByTagSelector({ isStdcm: true });
@@ -64,6 +64,12 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
     searchTowedRollingStockById,
     filters: towedRsFilters,
   } = useFilterTowedRollingStock();
+
+  const isTractionEngineEmpty = !filters.text.trim();
+  const isTowedRollingStockEmpty = !towedRsFilters.text.trim();
+  const isTotalMassEmpty = totalMass === undefined || totalMass === null;
+  const isTotalLengthEmpty = totalLength === undefined || totalLength === null;
+  const isMaxSpeedEmpty = maxSpeed === undefined || maxSpeed === null;
 
   useEffect(() => {
     if (towedRollingStock) {
@@ -128,6 +134,11 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           suggestions={filteredRollingStockList}
           getSuggestionLabel={(suggestion: LightRollingStockWithLiveries) => getLabel(suggestion)}
           onSelectSuggestion={onSelectSuggestion}
+          statusWithMessage={
+            showErrors && isTractionEngineEmpty
+              ? { tooltip: 'left', status: 'error', message: t('form.missingValue') }
+              : undefined
+          }
         />
       </div>
       <div className="towed-rolling-stock">
@@ -154,6 +165,11 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
             prefillConsist(rollingStock, towed, speedLimitByTag);
             dispatch(updateTowedRollingStockID(towed?.id));
           }}
+          statusWithMessage={
+            showErrors && isTowedRollingStockEmpty
+              ? { tooltip: 'left', status: 'error', message: t('form.missingValue') }
+              : undefined
+          }
         />
       </div>
       <div className="stdcm-consist__properties">
@@ -166,6 +182,11 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           value={totalMass ?? ''}
           onChange={onTotalMassChange}
           disabled={disabled}
+          statusWithMessage={
+            showErrors && isTotalMassEmpty
+              ? { tooltip: 'left', status: 'error', message: t('form.missingValue') }
+              : undefined
+          }
         />
         <Input
           id="length"
@@ -176,6 +197,11 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           value={totalLength ?? ''}
           onChange={onTotalLengthChange}
           disabled={disabled}
+          statusWithMessage={
+            showErrors && isTotalLengthEmpty
+              ? { tooltip: 'left', status: 'error', message: t('form.missingValue') }
+              : undefined
+          }
         />
       </div>
       <div className="stdcm-consist__properties">
@@ -194,6 +220,11 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           value={maxSpeed ?? ''}
           onChange={onMaxSpeedChange}
           disabled={disabled}
+          statusWithMessage={
+            showErrors && isMaxSpeedEmpty
+              ? { tooltip: 'left', status: 'error', message: t('form.missingValue') }
+              : undefined
+          }
         />
       </div>
     </StdcmCard>

@@ -73,12 +73,15 @@ const StdcmConfig = ({
   const formRef = useRef<HTMLDivElement>(null);
 
   const [formErrors, setFormErrors] = useState<StdcmConfigErrors>();
+  const [showErrors, setShowErrors] = useState(false);
 
   const disabled = isPending || retainedSimulationIndex > -1;
 
   const markersInfo = useMemo(() => extractMarkersInfo(pathSteps), [pathSteps]);
 
   const startSimulation = () => {
+    setShowErrors(true);
+
     const isPathfindingFailed = !!pathfinding && pathfinding.status !== 'success';
     const formErrorsStatus = checkStdcmConfigErrors(isPathfindingFailed, pathSteps, t);
     if (pathfinding?.status === 'success' && !formErrorsStatus) {
@@ -146,13 +149,13 @@ const StdcmConfig = ({
           />
           <div className="stdcm-simulation-inputs">
             <div className="stdcm-consist-container">
-              <StdcmConsist disabled={disabled} />
+              <StdcmConsist disabled={disabled} showErrors={showErrors} />
             </div>
             <div className="stdcm__separator" />
             <div ref={formRef} className="stdcm-simulation-itinerary">
-              <StdcmOrigin disabled={disabled} />
+              <StdcmOrigin disabled={disabled} showErrors={showErrors} />
               <StdcmVias disabled={disabled} />
-              <StdcmDestination disabled={disabled} />
+              <StdcmDestination disabled={disabled} showErrors={showErrors} />
               <StdcmLinkedTrainSearch
                 disabled={disabled}
                 linkedTrainType="posterior"

@@ -145,6 +145,7 @@ export type StdcmSimulation = {
 /** This type is used for StdcmConsist, StdcmOrigin, StdcmDestination and StdcmVias components */
 export type StdcmConfigCardProps = {
   disabled?: boolean;
+  showErrors?: boolean;
 };
 
 export enum ArrivalTimeTypes {

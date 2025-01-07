@@ -32,3 +32,8 @@
     line-height: 24px;
   }
 }
+
+// TODO: Should be removed when the modification on the tooltip on OSRD_UI are done
+.status-message-wrapper-tooltip.tooltip-left {
+  left: -5px !important;
+}
