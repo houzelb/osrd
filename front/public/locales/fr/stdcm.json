@@ -8,7 +8,21 @@
     "tonnage": "Tonnage",
     "maxSpeed": "Vitesse max.",
     "tractionEngine": "Engin de traction",
-    "towedRollingStock": "Matériel remorqué"
+    "towedRollingStock": "Matériel remorqué",
+    "errors": {
+      "totalMass": {
+        "negative": "Doit être positif.",
+        "range": "Le tonnage total doit être compris entre {{low}} et {{high}}t"
+      },
+      "totalLength": {
+        "negative": "Doit être positif.",
+        "range": "La longueur totale doit être comprise entre {{low}} et {{high}}m"
+      },
+      "maxSpeed": {
+        "negative": "Doit être positif.",
+        "range": "La vitesse max. doit être comprise entre {{low}} et {{high}}km/h"
+      }
+    }
   },
   "datetimeOutsideWindow": "La date et l'heure doivent être comprises entre le {{low}} et le {{high}}",
   "debug": {

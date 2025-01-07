@@ -5,9 +5,16 @@ import cx from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
+import useStdcmTowedRollingStock from 'applications/stdcm/hooks/useStdcmTowedRollingStock';
 import { extractMarkersInfo } from 'applications/stdcm/utils';
+import {
+  validateMaxSpeed,
+  validateTotalLength,
+  validateTotalMass,
+} from 'applications/stdcm/utils/consistValidation';
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import useInfraStatus from 'modules/pathfinding/hooks/useInfraStatus';
+import { useStoreDataForRollingStockSelector } from 'modules/rollingStock/components/RollingStockSelector/useStoreDataForRollingStockSelector';
 import { Map } from 'modules/trainschedule/components/ManageTrainSchedule';
 import { type StdcmConfSliceActions, resetMargins } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
@@ -61,6 +68,9 @@ const StdcmConfig = ({
     getProjectID,
     getScenarioID,
     getStudyID,
+    getTotalMass,
+    getTotalLength,
+    getMaxSpeed,
   } = useOsrdConfSelectors() as StdcmConfSelectors;
   const origin = useSelector(getStdcmOrigin);
   const pathSteps = useSelector(getStdcmPathSteps);
@@ -69,10 +79,37 @@ const StdcmConfig = ({
   const studyID = useSelector(getStudyID);
   const scenarioID = useSelector(getScenarioID);
 
+  const totalMass = useSelector(getTotalMass);
+  const totalLength = useSelector(getTotalLength);
+  const maxSpeed = useSelector(getMaxSpeed);
+
   const pathfinding = useStaticPathfinding(infra);
   const formRef = useRef<HTMLDivElement>(null);
 
   const [formErrors, setFormErrors] = useState<StdcmConfigErrors>();
+
+  const { rollingStock } = useStoreDataForRollingStockSelector();
+  const towedRollingStock = useStdcmTowedRollingStock();
+
+  const consistErrors = useMemo(() => {
+    const totalMassError = validateTotalMass({
+      tractionEngineMass: rollingStock?.mass,
+      towedMass: towedRollingStock?.mass,
+      totalMass,
+    });
+
+    const totalLengthError = validateTotalLength({
+      tractionEngineLength: rollingStock?.length,
+      towedLength: towedRollingStock?.length,
+      totalLength,
+    });
+
+    return {
+      totalMass: totalMassError,
+      totalLength: totalLengthError,
+      maxSpeed: validateMaxSpeed(maxSpeed, rollingStock?.max_speed),
+    };
+  }, [rollingStock, towedRollingStock, totalMass, totalLength, maxSpeed]);
 
   const disabled = isPending || retainedSimulationIndex > -1;
 
@@ -146,7 +183,7 @@ const StdcmConfig = ({
           />
           <div className="stdcm-simulation-inputs">
             <div className="stdcm-consist-container">
-              <StdcmConsist disabled={disabled} />
+              <StdcmConsist consistErrors={consistErrors} disabled={disabled} />
             </div>
             <div className="stdcm__separator" />
             <div ref={formRef} className="stdcm-simulation-itinerary">
@@ -175,7 +212,10 @@ const StdcmConfig = ({
                   isDisabled={
                     disabled ||
                     !showBtnToLaunchSimulation ||
-                    formErrors?.errorType === StdcmConfigErrorTypes.INFRA_NOT_LOADED
+                    formErrors?.errorType === StdcmConfigErrorTypes.INFRA_NOT_LOADED ||
+                    !!consistErrors.totalMass ||
+                    !!consistErrors.totalLength ||
+                    !!consistErrors.maxSpeed
                   }
                 />
                 {formErrors && (

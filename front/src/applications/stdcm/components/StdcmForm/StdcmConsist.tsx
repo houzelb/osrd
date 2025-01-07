@@ -4,6 +4,11 @@ import { Input, ComboBox } from '@osrd-project/ui-core';
 import { useTranslation } from 'react-i18next';
 
 import useStdcmTowedRollingStock from 'applications/stdcm/hooks/useStdcmTowedRollingStock';
+import {
+  CONSIST_MAX_SPEED_MIN,
+  CONSIST_TOTAL_LENGTH_MAX,
+  CONSIST_TOTAL_MASS_MAX,
+} from 'applications/stdcm/utils/consistValidation';
 import type { LightRollingStockWithLiveries, TowedRollingStock } from 'common/api/osrdEditoastApi';
 import { useOsrdConfActions } from 'common/osrdContext';
 import SpeedLimitByTagSelector from 'common/SpeedLimitByTagSelector/SpeedLimitByTagSelector';
@@ -14,6 +19,7 @@ import useFilterRollingStock from 'modules/rollingStock/hooks/useFilterRollingSt
 import useFilterTowedRollingStock from 'modules/towedRollingStock/hooks/useFilterTowedRollingStock';
 import { type StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
 import { useAppDispatch } from 'store';
+import { kgToT, kmhToMs, msToKmh } from 'utils/physics';
 
 import StdcmCard from './StdcmCard';
 import useStdcmConsist from '../../hooks/useStdcmConsist';
@@ -33,7 +39,7 @@ const ConsistCardTitle = ({
   );
 };
 
-const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
+const StdcmConsist = ({ consistErrors = {}, disabled = false }: StdcmConfigCardProps) => {
   const { t } = useTranslation('stdcm');
   const { speedLimitByTag, speedLimitsByTags, dispatchUpdateSpeedLimitByTag } =
     useStoreDataForSpeedLimitByTagSelector({ isStdcm: true });
@@ -166,6 +172,20 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           value={totalMass ?? ''}
           onChange={onTotalMassChange}
           disabled={disabled}
+          statusWithMessage={
+            consistErrors?.totalMass
+              ? {
+                  status: 'error',
+                  tooltip: 'left',
+                  message: t(consistErrors.totalMass, {
+                    low: Math.floor(
+                      kgToT((rollingStock?.mass ?? 0) + (towedRollingStock?.mass ?? 0))
+                    ),
+                    high: CONSIST_TOTAL_MASS_MAX,
+                  }),
+                }
+              : undefined
+          }
         />
         <Input
           id="length"
@@ -176,6 +196,18 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           value={totalLength ?? ''}
           onChange={onTotalLengthChange}
           disabled={disabled}
+          statusWithMessage={
+            consistErrors?.totalLength
+              ? {
+                  status: 'error',
+                  tooltip: 'right',
+                  message: t(consistErrors.totalLength, {
+                    low: Math.floor((rollingStock?.length ?? 0) + (towedRollingStock?.length ?? 0)),
+                    high: CONSIST_TOTAL_LENGTH_MAX,
+                  }),
+                }
+              : undefined
+          }
         />
       </div>
       <div className="stdcm-consist__properties">
@@ -194,6 +226,20 @@ const StdcmConsist = ({ disabled = false }: StdcmConfigCardProps) => {
           value={maxSpeed ?? ''}
           onChange={onMaxSpeedChange}
           disabled={disabled}
+          statusWithMessage={
+            consistErrors?.maxSpeed
+              ? {
+                  status: 'error',
+                  tooltip: 'right',
+                  message: t(consistErrors.maxSpeed, {
+                    low: CONSIST_MAX_SPEED_MIN,
+                    high: Math.floor(
+                      msToKmh(Math.min(rollingStock?.max_speed ?? kmhToMs(CONSIST_MAX_SPEED_MIN)))
+                    ),
+                  }),
+                }
+              : undefined
+          }
         />
       </div>
     </StdcmCard>

@@ -71,6 +71,12 @@ export type StdcmResultsOperationalPoint = {
   trackName?: string;
 };
 
+export type ConsistErrors = {
+  totalMass?: string;
+  totalLength?: string;
+  maxSpeed?: string;
+};
+
 export type StdcmResults = {
   stdcmResponse: StdcmSuccessResponse;
   speedSpaceChartData: SpeedSpaceChartData | null;
@@ -145,6 +151,7 @@ export type StdcmSimulation = {
 /** This type is used for StdcmConsist, StdcmOrigin, StdcmDestination and StdcmVias components */
 export type StdcmConfigCardProps = {
   disabled?: boolean;
+  consistErrors?: ConsistErrors;
 };
 
 export enum ArrivalTimeTypes {

@@ -9,18 +9,6 @@ export const STDCM_REQUEST_STATUS = Object.freeze({
 
 export const STDCM_TRAIN_ID = -10;
 
-export const COMPOSITION_CODES = [
-  'HLP',
-  'MA100',
-  'MA80',
-  'MA90',
-  'ME100',
-  'ME120',
-  'ME140',
-  'MV160',
-  'MVGV',
-];
-
 export const COMPOSITION_CODES_MAX_SPEEDS: Record<string, number | undefined> = {
   MA80: 80,
   MA90: 90,
@@ -32,3 +20,5 @@ export const COMPOSITION_CODES_MAX_SPEEDS: Record<string, number | undefined> = 
   HLP: 100,
   MVGV: 200,
 };
+
+export const COMPOSITION_CODES = Object.keys(COMPOSITION_CODES_MAX_SPEEDS);

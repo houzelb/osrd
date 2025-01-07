@@ -7,6 +7,9 @@
   background-color: rgba(255, 255, 255, 1);
   height: fit-content;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 
   .stdcm-default-card-icon {
     color: #1844ef;
@@ -89,7 +92,9 @@
     }
 
     .feed-back {
-      padding: 0;
+      --field-wrapper-padding-bottom: 9px;
+      padding-top: 3px;
+      padding-bottom: 3px;
     }
 
     .date-picker {
@@ -121,7 +126,8 @@
 
     // cards styles
     &.consist {
-      padding-left: 24px;
+      padding-left: 11px;
+      padding-right: 11px;
       padding-bottom: 15px;
 
       .towed-rolling-stock {
@@ -130,9 +136,8 @@
 
       .stdcm-consist__properties {
         display: grid;
-        grid-template-columns: 119px 127px;
+        grid-template-columns: 139px 147px;
         justify-content: space-between;
-        padding-block: 8px;
 
         .osrd-config-item {
           padding-right: 3px;
