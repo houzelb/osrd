@@ -63,6 +63,7 @@ const StcdmResults = ({
     return getOperationalPointsWithTimes(
       outputs.pathProperties?.suggestedOperationalPoints || [],
       outputs.results.simulation,
+      outputs.results.simulationPathSteps,
       outputs.results.departure_time
     );
   }, [outputs]);
