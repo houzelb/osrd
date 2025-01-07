@@ -23,7 +23,18 @@ data class TrackLocation(
     @get:JvmName("getOffset") val offset: Offset<TrackSection>
 )
 
-sealed interface Path // Used for typing Length and Offset
+/**
+ * A marker type for Length and Offset. "Path" *mostly* refers to "BlockPath", where start is the
+ * beginning of the first block (NOT the real start of the train).
+ */
+// TODO: rename this to BlockPath and make sure it's used appropriately
+sealed interface Path
+
+/**
+ * A marker type for Length and Offset. In TravelledPath, start refers to the real start of the head
+ * of the train.
+ */
+sealed interface TravelledPath
 
 @Suppress("INAPPLICABLE_JVM_NAME")
 interface PathProperties {

@@ -1,7 +1,7 @@
 package fr.sncf.osrd.stdcm.preprocessing.interfaces
 
-import fr.sncf.osrd.conflicts.TravelledPath
 import fr.sncf.osrd.sim_infra.api.Path
+import fr.sncf.osrd.sim_infra.api.TravelledPath
 import fr.sncf.osrd.stdcm.infra_exploration.InfraExplorerWithEnvelope
 import fr.sncf.osrd.utils.units.Offset
 

@@ -6,7 +6,6 @@ import fr.sncf.osrd.api.api_v2.RangeValues
 import fr.sncf.osrd.api.api_v2.standalone_sim.MarginValue
 import fr.sncf.osrd.api.api_v2.standalone_sim.ReportTrain
 import fr.sncf.osrd.api.api_v2.standalone_sim.SimulationScheduleItem
-import fr.sncf.osrd.conflicts.TravelledPath
 import fr.sncf.osrd.envelope_sim.EnvelopeSimContext
 import fr.sncf.osrd.envelope_sim.allowances.utils.AllowanceValue.Percentage
 import fr.sncf.osrd.envelope_sim.allowances.utils.AllowanceValue.TimePerDistance
@@ -20,6 +19,7 @@ import fr.sncf.osrd.railjson.schema.schedule.RJSAllowanceDistribution
 import fr.sncf.osrd.railjson.schema.schedule.RJSTrainStop.RJSReceptionSignal.OPEN
 import fr.sncf.osrd.railjson.schema.schedule.RJSTrainStop.RJSReceptionSignal.SHORT_SLIP_STOP
 import fr.sncf.osrd.railjson.schema.schedule.RJSTrainStop.RJSReceptionSignal.STOP
+import fr.sncf.osrd.sim_infra.api.TravelledPath
 import fr.sncf.osrd.sim_infra.api.makePathProperties
 import fr.sncf.osrd.train.TestTrains
 import fr.sncf.osrd.utils.*

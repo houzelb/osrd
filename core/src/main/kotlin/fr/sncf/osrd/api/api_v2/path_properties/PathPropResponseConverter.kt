@@ -3,11 +3,11 @@ package fr.sncf.osrd.api.api_v2.path_properties
 import com.google.common.collect.Range
 import fr.sncf.osrd.api.api_v2.RangeValues
 import fr.sncf.osrd.api.pathfinding.toRJSLineString
-import fr.sncf.osrd.conflicts.TravelledPath
 import fr.sncf.osrd.railjson.schema.geom.RJSLineString
 import fr.sncf.osrd.sim_infra.api.NeutralSection
 import fr.sncf.osrd.sim_infra.api.PathProperties
 import fr.sncf.osrd.sim_infra.api.RawSignalingInfra
+import fr.sncf.osrd.sim_infra.api.TravelledPath
 import fr.sncf.osrd.utils.DistanceRangeMap
 import fr.sncf.osrd.utils.DistanceRangeMapImpl
 import fr.sncf.osrd.utils.units.Offset

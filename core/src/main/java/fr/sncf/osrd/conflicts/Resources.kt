@@ -2,6 +2,7 @@ package fr.sncf.osrd.conflicts
 
 import fr.sncf.osrd.sim_infra.api.LogicalSignalId
 import fr.sncf.osrd.sim_infra.api.Path
+import fr.sncf.osrd.sim_infra.api.TravelledPath
 import fr.sncf.osrd.utils.units.Offset
 
 interface IncrementalRequirementCallbacks {
