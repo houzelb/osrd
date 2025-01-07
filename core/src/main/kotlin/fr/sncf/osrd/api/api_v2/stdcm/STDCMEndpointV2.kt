@@ -104,13 +104,7 @@ class STDCMEndpointV2(private val infraManager: InfraManager) : Take {
                 convertWorkScheduleCollection(infra.rawInfra, request.workSchedules)
             trainsRequirements.add(convertedWorkSchedules)
             val spacingRequirements = trainsRequirements.flatMap { it.spacingRequirements }
-            val steps =
-                parseSteps(
-                    infra,
-                    request.pathItems,
-                    request.startTime,
-                    request.rollingStock.length.distance.meters
-                )
+            val steps = parseSteps(infra, request.pathItems, request.startTime, rollingStock.length)
 
             // Run the STDCM pathfinding
             val path =
