@@ -63,7 +63,7 @@ pub struct RollingStockModel {
     pub comfort_acceleration: Acceleration,
     #[serde(with = "meter_per_second_squared")]
     #[model(uom_unit = "meter_per_second_squared")]
-    pub const_gamma: Acceleration,
+    pub const_gamma: Deceleration,
     #[model(json)]
     #[schema(required)]
     pub etcs_brake_params: Option<EtcsBrakeParams>,

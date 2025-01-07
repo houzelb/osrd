@@ -61,7 +61,7 @@ pub struct PhysicsConsist {
     /// under ETCS/ERTMS signaling system
     #[derivative(Hash(hash_with = "meter_per_second_squared::hash"))]
     #[serde(with = "meter_per_second_squared")]
-    pub const_gamma: Acceleration,
+    pub const_gamma: Deceleration,
     pub etcs_brake_params: Option<EtcsBrakeParams>,
     #[derivative(Hash(hash_with = "meter_per_second_squared::hash"))]
     #[serde(with = "meter_per_second_squared")]

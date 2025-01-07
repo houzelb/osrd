@@ -20,7 +20,7 @@ pub struct TowedRollingStock {
     /// The constant gamma braking coefficient used when NOT circulating
     /// under ETCS/ERTMS signaling system
     #[serde(with = "meter_per_second_squared")]
-    pub const_gamma: Acceleration,
+    pub const_gamma: Deceleration,
     #[serde(default, with = "meter_per_second::option")]
     pub max_speed: Option<Velocity>,
 }

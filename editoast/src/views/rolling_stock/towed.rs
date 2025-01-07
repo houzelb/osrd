@@ -67,7 +67,7 @@ struct TowedRollingStock {
     inertia_coefficient: Acceleration,
     rolling_resistance: RollingResistancePerWeight,
     #[serde(with = "meter_per_second_squared")]
-    const_gamma: Acceleration,
+    const_gamma: Deceleration,
     #[schema(required)]
     #[serde(default, with = "meter_per_second::option")]
     max_speed: Option<Velocity>,
@@ -123,7 +123,7 @@ pub struct TowedRollingStockForm {
     pub inertia_coefficient: Acceleration,
     pub rolling_resistance: RollingResistancePerWeight,
     #[serde(with = "meter_per_second_squared")]
-    pub const_gamma: Acceleration,
+    pub const_gamma: Deceleration,
     #[serde(default, with = "meter_per_second::option")]
     pub max_speed: Option<Velocity>,
 }
