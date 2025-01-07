@@ -4,7 +4,6 @@ import fr.sncf.osrd.api.FullInfra
 import fr.sncf.osrd.api.api_v2.SignalCriticalPosition
 import fr.sncf.osrd.api.api_v2.ZoneUpdate
 import fr.sncf.osrd.api.api_v2.project_signals.SignalUpdate
-import fr.sncf.osrd.conflicts.TravelledPath
 import fr.sncf.osrd.reporting.exceptions.OSRDError
 import fr.sncf.osrd.signaling.SigSystemManager
 import fr.sncf.osrd.signaling.SignalingSimulator

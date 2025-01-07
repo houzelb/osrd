@@ -11,7 +11,6 @@ import fr.sncf.osrd.api.api_v2.standalone_sim.ElectricalProfileValue
 import fr.sncf.osrd.api.api_v2.standalone_sim.MarginValue
 import fr.sncf.osrd.api.api_v2.standalone_sim.SimulationScheduleItem
 import fr.sncf.osrd.api.api_v2.standalone_sim.SimulationSuccess
-import fr.sncf.osrd.conflicts.TravelledPath
 import fr.sncf.osrd.envelope.Envelope
 import fr.sncf.osrd.envelope_sim.EnvelopeProfile
 import fr.sncf.osrd.envelope_sim.EnvelopeSimContext

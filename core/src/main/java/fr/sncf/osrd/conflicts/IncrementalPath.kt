@@ -43,9 +43,6 @@ class PathFragment(
         }
 }
 
-/** A marker type for Offset<TravelledPath> */
-sealed interface TravelledPath
-
 interface IncrementalPath {
     fun extend(fragment: PathFragment)
 

@@ -1,9 +1,9 @@
 package fr.sncf.osrd.api.api_v2
 
 import com.squareup.moshi.Json
-import fr.sncf.osrd.conflicts.TravelledPath
 import fr.sncf.osrd.railjson.schema.common.graph.EdgeDirection
 import fr.sncf.osrd.sim_infra.api.TrackSection
+import fr.sncf.osrd.sim_infra.api.TravelledPath
 import fr.sncf.osrd.utils.units.Offset
 import fr.sncf.osrd.utils.units.TimeDelta
 
