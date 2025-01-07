@@ -34,6 +34,10 @@ type MapButtonsProps = {
   map?: MapRef;
   resetPitchBearing: () => void;
   closeFeatureInfoClickPopup?: () => void;
+  zoomIn?: () => void;
+  zoomOut?: () => void;
+  withSearchButton?: boolean;
+  withToggleLayersButton?: boolean;
   withInfraButton?: boolean;
   withMapKeyButton?: boolean;
   bearing: number;
@@ -56,10 +60,14 @@ export default function MapButtons({
   resetPitchBearing,
   closeFeatureInfoClickPopup,
   withInfraButton,
+  withSearchButton = true,
+  withToggleLayersButton = true,
   withMapKeyButton,
   bearing,
   editorProps,
   viewPort: viewportProps,
+  zoomIn: zoomInProps,
+  zoomOut: zoomOutProps,
   isNewButtons = false,
 }: MapButtonsProps) {
   const dispatch = useAppDispatch();
@@ -162,13 +170,13 @@ export default function MapButtons({
         })}
       >
         <MapButton
-          onClick={zoomIn}
+          onClick={zoomInProps ?? zoomIn}
           isNewButton={isNewButtons}
           icon={<ZoomIn />}
           tooltipKey="common.zoom-in"
         />
         <MapButton
-          onClick={zoomOut}
+          onClick={zoomOutProps ?? zoomOut}
           isNewButton={isNewButtons}
           icon={<ZoomOut />}
           tooltipKey="common.zoom-out"
@@ -189,18 +197,22 @@ export default function MapButtons({
           tooltipKey="common.reset-north"
           extraClasses={isNewButtons ? 'new-btn-map-resetviewport' : 'btn-map-resetviewport'}
         />
-        <MapButton
-          onClick={() => toggleMapModal('SEARCH')}
-          isNewButton={isNewButtons}
-          icon={<Search />}
-          tooltipKey="common.search"
-        />
-        <MapButton
-          onClick={openMapSettingsModal}
-          isNewButton={isNewButtons}
-          icon={<Sliders />}
-          tooltipKey="Editor.nav.toggle-layers"
-        />
+        {withSearchButton && (
+          <MapButton
+            onClick={() => toggleMapModal('SEARCH')}
+            isNewButton={isNewButtons}
+            icon={<Search />}
+            tooltipKey="common.search"
+          />
+        )}
+        {withToggleLayersButton && (
+          <MapButton
+            onClick={openMapSettingsModal}
+            isNewButton={isNewButtons}
+            icon={<Sliders />}
+            tooltipKey="Editor.nav.toggle-layers"
+          />
+        )}
         {withMapKeyButton && (
           <MapButton
             onClick={() => toggleMapModal('KEY')}

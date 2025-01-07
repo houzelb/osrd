@@ -15,7 +15,7 @@ import {
 import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import useInfraStatus from 'modules/pathfinding/hooks/useInfraStatus';
 import { useStoreDataForRollingStockSelector } from 'modules/rollingStock/components/RollingStockSelector/useStoreDataForRollingStockSelector';
-import { Map } from 'modules/trainschedule/components/ManageTrainSchedule';
+import NewMap from 'modules/trainschedule/components/ManageTrainSchedule/NewMap';
 import { type StdcmConfSliceActions, resetMargins } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
 import { useAppDispatch } from 'store';
@@ -246,7 +246,8 @@ const StdcmConfig = ({
         </div>
 
         <div className="osrd-config-item-container osrd-config-item-container-map stdcm-map">
-          <Map
+          <NewMap
+            id="stdcm-map-config"
             hideAttribution
             hideItinerary
             preventPointSelection

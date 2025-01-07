@@ -164,7 +164,7 @@ class STDCMPage {
     this.notificationHeader = page.locator('#notification');
     this.debugButton = page.getByTestId('stdcm-debug-button');
     this.helpButton = page.getByTestId('stdcm-help-button');
-    this.mapContainer = page.locator('#map-container');
+    this.mapContainer = page.locator('#stdcm-map-config');
     this.consistCard = page.locator('.stdcm-consist-container .stdcm-card');
     this.originCard = page.locator('.stdcm-card:has(.stdcm-origin-icon)');
     this.destinationCard = page.locator('.stdcm-card:has(.stdcm-destination-icon)');
@@ -228,7 +228,7 @@ class STDCMPage {
     this.originMarker = this.mapContainer.locator('img[alt="origin"]');
     this.destinationMarker = this.mapContainer.locator('img[alt="destination"]');
     this.viaMarker = this.mapContainer.locator('img[alt="via"]');
-    this.mapResultContainer = page.locator('#map-result');
+    this.mapResultContainer = page.locator('#stdcm-map-result');
     this.originResultMarker = this.mapResultContainer.locator('img[alt="origin"]');
     this.destinationResultMarker = this.mapResultContainer.locator('img[alt="destination"]');
     this.viaResultMarker = this.mapResultContainer.locator('img[alt="via"]');
