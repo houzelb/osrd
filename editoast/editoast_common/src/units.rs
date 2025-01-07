@@ -35,10 +35,14 @@
 //! ```
 
 /// Re-export the Quantities that are used in OSRD
-pub use uom::si::f64::{
-    Acceleration, Force, Frequency, Length, LinearMassDensity, LinearNumberDensity, Mass, MassRate,
-    Time, Velocity,
-};
+pub use uom::si::f64::{Acceleration, Length, Mass, Ratio, Time, Velocity};
+
+pub type SolidFriction = uom::si::f64::Force;
+pub type SolidFrictionPerWeight = uom::si::f64::Acceleration;
+pub type ViscosityFriction = uom::si::f64::MassRate;
+pub type ViscosityFrictionPerWeight = uom::si::f64::Frequency;
+pub type AerodynamicDrag = uom::si::f64::LinearMassDensity;
+pub type AerodynamicDragPerWeight = uom::si::f64::LinearNumberDensity;
 
 macro_rules! quantity_to_path {
     (Length, $unit:ident) => {
@@ -53,19 +57,19 @@ macro_rules! quantity_to_path {
     (Mass, $unit:ident) => {
         uom::si::mass::$unit
     };
-    (Force, $unit:ident) => {
+    (SolidFriction, $unit:ident) => {
         uom::si::force::$unit
     };
-    (MassRate, $unit:ident) => {
+    (ViscosityFriction, $unit:ident) => {
         uom::si::mass_rate::$unit
     };
-    (Frequency, $unit:ident) => {
+    (ViscosityFrictionPerWeight, $unit:ident) => {
         uom::si::frequency::$unit
     };
-    (LinearMassDensity, $unit:ident) => {
+    (AerodynamicDrag, $unit:ident) => {
         uom::si::linear_mass_density::$unit
     };
-    (LinearNumberDensity, $unit:ident) => {
+    (AerodynamicDragPerWeight, $unit:ident) => {
         uom::si::linear_number_density::$unit
     };
     (Time, $unit:ident) => {
@@ -79,8 +83,8 @@ macro_rules! quantity_to_path {
 macro_rules! define_unit {
     ($unit:ident, $quantity:ident) => {
         pub mod $unit {
+            use super::*;
             use serde::{Deserialize, Deserializer, Serialize, Serializer};
-            use uom::si::f64::*;
             type Unit = quantity_to_path!($quantity, $unit);
             pub type ReprType = f64;
 
@@ -155,10 +159,10 @@ define_unit!(millimeter, Length);
 define_unit!(meter_per_second, Velocity);
 define_unit!(meter_per_second_squared, Acceleration);
 define_unit!(kilogram, Mass);
-define_unit!(newton, Force);
-define_unit!(kilogram_per_second, MassRate);
-define_unit!(hertz, Frequency);
-define_unit!(kilogram_per_meter, LinearMassDensity);
-define_unit!(per_meter, LinearNumberDensity);
+define_unit!(newton, SolidFriction);
+define_unit!(kilogram_per_second, ViscosityFriction);
+define_unit!(hertz, ViscosityFrictionPerWeight);
+define_unit!(kilogram_per_meter, AerodynamicDrag);
+define_unit!(per_meter, AerodynamicDragPerWeight);
 define_unit!(second, Time);
 define_unit!(millisecond, Time);
