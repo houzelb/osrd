@@ -1,6 +1,7 @@
 import type { SimulationResponse } from 'common/api/osrdEditoastApi';
 import { interpolateValue } from 'modules/simulationResult/SimulationResultExport/utils';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
+import type { StdcmPathStep } from 'reducers/osrdconf/types';
 
 import type { StdcmResultsOperationalPoint } from '../types';
 
@@ -106,6 +107,7 @@ export function getStopDurationBetweenTwoPositions(
 export function getOperationalPointsWithTimes(
   operationalPoints: SuggestedOP[],
   simulation: Extract<SimulationResponse, { status: 'success' }>,
+  simulationPathSteps: StdcmPathStep[],
   departureTime: string
 ): StdcmResultsOperationalPoint[] {
   const { positions, times } = simulation.final_output;
@@ -124,8 +126,12 @@ export function getOperationalPointsWithTimes(
       departureMinute
     );
 
+    const isRequestedOp = simulationPathSteps.some(
+      (step) => step.location?.name === op.name && step.location?.secondary_code === op.ch
+    );
+
     const duration = getStopDurationBetweenTwoPositions(op.positionOnPath, positions, times);
-    const durationInSeconds = duration !== null ? duration / 1000 : 0;
+    const durationInSeconds = isRequestedOp && duration !== null ? duration / 1000 : 0;
     const durationToString = secondsToTimeString(durationInSeconds);
     const stopEndTime = computeStopDepartureTime(formattedTime, durationToString);
 
