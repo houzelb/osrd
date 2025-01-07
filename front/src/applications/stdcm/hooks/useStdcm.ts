@@ -83,12 +83,12 @@ const useStdcm = ({
   };
 
   const launchStdcmRequest = async () => {
-    setCurrentStdcmRequestStatus(STDCM_REQUEST_STATUS.pending);
     setStdcmResponse(undefined);
     setStdcmTrainConflicts(undefined);
 
     const validConfig = checkStdcmConf(dispatch, t, osrdconf);
     if (validConfig) {
+      setCurrentStdcmRequestStatus(STDCM_REQUEST_STATUS.pending);
       const payload = formatStdcmPayload(validConfig);
       try {
         const promise = postTimetableByIdStdcm(payload);
