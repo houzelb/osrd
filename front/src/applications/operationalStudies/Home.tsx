@@ -19,7 +19,6 @@ import ProjectCard from 'modules/project/components/ProjectCard';
 import cleanLocalStorageByProject from 'modules/project/helpers/cleanLocalStorageByProject';
 import { getUserSafeWord } from 'reducers/user/userSelectors';
 import { useAppDispatch } from 'store';
-import { getLogo } from 'utils/logo';
 
 import AddNewCard from './components/AddNewCard';
 import useMultiSelection from './hooks/useMultiSelection';
@@ -165,10 +164,7 @@ const HomeOperationalStudies = () => {
 
   return (
     <>
-      <NavBarSNCF
-        logo={getLogo()}
-        appName={<div className="navbar-breadcrumbs">{t('projects')}</div>}
-      />
+      <NavBarSNCF appName={<div className="navbar-breadcrumbs">{t('projects')}</div>} />
       <main className="mastcontainer mastcontainer-no-mastnav">
         <div className="p-3">
           <div className="projects-toolbar">

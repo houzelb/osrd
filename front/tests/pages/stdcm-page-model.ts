@@ -689,7 +689,7 @@ class STDCMPage {
 
       // Verify filename and save the download
       const suggestedFilename = download.suggestedFilename();
-      expect(suggestedFilename).toMatch(/^STDCM.*\.pdf$/);
+      expect(suggestedFilename).toMatch(/^Stdcm.*\.pdf$/);
       const downloadPath = `./tests/stdcm-results/${browserName}/${suggestedFilename}`;
       await download.saveAs(downloadPath);
       logger.info(`The PDF was successfully downloaded to: ${downloadPath}`);

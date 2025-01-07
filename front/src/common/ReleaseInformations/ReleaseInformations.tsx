@@ -7,12 +7,13 @@ import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import ModalBodySNCF from 'common/BootstrapSNCF/ModalSNCF/ModalBodySNCF';
 import ModalHeaderSNCF from 'common/BootstrapSNCF/ModalSNCF/ModalHeaderSNCF';
 import motriceParty from 'common/MotriceRelated/motriceParty';
-import { getLogo } from 'utils/logo';
+import useDeploymentSettings from 'utils/hooks/useDeploymentSettings';
 
 import LicenseAttributions from './LicenseAttributions';
 
 function ReleaseInformations() {
   const { t } = useTranslation('home/navbar');
+  const { digitalTwinLogo } = useDeploymentSettings();
   const { data: editoastVersion } = osrdEditoastApi.endpoints.getVersion.useQuery();
   const { data: coreVersion } = osrdEditoastApi.endpoints.getVersionCore.useQuery();
 
@@ -45,7 +46,7 @@ function ReleaseInformations() {
                   rel="noopener noreferrer"
                   onMouseEnter={motriceParty}
                 >
-                  <img src={getLogo()} alt="OSRD logo" width={192} />
+                  <img src={digitalTwinLogo} alt="OSRD logo" width={192} />
                 </a>
                 <h2>OSRD</h2>
                 <h3>Open Source Railway Designer</h3>

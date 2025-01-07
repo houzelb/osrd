@@ -67,6 +67,12 @@ body {
   img {
     height: 24px !important;
   }
+
+  &__horizon {
+    img {
+      height: 40px;
+    }
+  }
 }
 
 .actionbar.fullscreen {

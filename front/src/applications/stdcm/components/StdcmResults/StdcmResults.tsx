@@ -14,6 +14,7 @@ import {
 import { hasConflicts, hasResults } from 'applications/stdcm/utils/simulationOutputUtils';
 import { type TrackRange } from 'common/api/osrdEditoastApi';
 import NewMap from 'modules/trainschedule/components/ManageTrainSchedule/NewMap';
+import useDeploymentSettings from 'utils/hooks/useDeploymentSettings';
 
 import SimulationReportSheet from './SimulationReportSheet';
 import StdcmDebugResults from './StdcmDebugResults';
@@ -50,6 +51,7 @@ const StcdmResults = ({
   pathTrackRanges,
 }: StcdmResultsProps) => {
   const { t } = useTranslation('stdcm', { keyPrefix: 'simulation.results' });
+  const { stdcmName } = useDeploymentSettings();
 
   const selectedSimulation = simulationsList[selectedSimulationIndex];
   const { outputs } = selectedSimulation || {};
@@ -112,7 +114,7 @@ const StcdmResults = ({
                         operationalPointsList={operationalPointsList}
                       />
                     }
-                    fileName={`STDCM-${simulationReportSheetNumber}.pdf`}
+                    fileName={`${stdcmName}-${simulationReportSheetNumber}.pdf`}
                   >
                     <Button
                       data-testid="download-simulation-button"

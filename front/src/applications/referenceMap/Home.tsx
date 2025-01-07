@@ -9,7 +9,6 @@ import { ModalProvider } from 'common/BootstrapSNCF/ModalSNCF/ModalProvider';
 import NavBarSNCF from 'common/BootstrapSNCF/NavBarSNCF';
 import { useInfraActions, useInfraID } from 'common/osrdContext';
 import { useAppDispatch } from 'store';
-import { getLogo } from 'utils/logo';
 
 import Map from './Map';
 
@@ -40,7 +39,6 @@ const HomeReferenceMap = () => {
   return (
     <ModalProvider>
       <NavBarSNCF
-        logo={getLogo()}
         appName={
           <>
             {t('map')}
