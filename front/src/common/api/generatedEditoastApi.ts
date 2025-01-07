@@ -2834,12 +2834,12 @@ export type RollingResistance = {
 };
 export type RollingStockSupportedSignalingSystems = string[];
 export type LightRollingStock = {
-  base_power_class?: string | null;
+  base_power_class: string | null;
   comfort_acceleration: number;
   const_gamma: number;
   effort_curves: LightEffortCurves;
   energy_sources: EnergySource[];
-  etcs_brake_params?: EtcsBrakeParams | null;
+  etcs_brake_params: EtcsBrakeParams | null;
   id: number;
   inertia_coefficient: number;
   length: number;
@@ -2847,7 +2847,7 @@ export type LightRollingStock = {
   locked: boolean;
   mass: number;
   max_speed: number;
-  metadata?: RollingStockMetadata | null;
+  metadata: RollingStockMetadata | null;
   name: string;
   power_restrictions: {
     [key: string]: string;

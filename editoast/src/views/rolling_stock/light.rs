@@ -214,6 +214,7 @@ struct LightRollingStock {
     railjson_version: String,
     locked: bool,
     effort_curves: LightEffortCurves,
+    #[schema(required)]
     base_power_class: Option<String>,
     length: f64,
     max_speed: f64,
@@ -221,11 +222,13 @@ struct LightRollingStock {
     startup_acceleration: f64,
     comfort_acceleration: f64,
     const_gamma: f64,
+    #[schema(required)]
     etcs_brake_params: Option<EtcsBrakeParams>,
     inertia_coefficient: f64,
     mass: f64,
     rolling_resistance: RollingResistance,
     loading_gauge: LoadingGaugeType,
+    #[schema(required)]
     metadata: Option<RollingStockMetadata>,
     power_restrictions: HashMap<String, String>,
     energy_sources: Vec<EnergySource>,
