@@ -1,4 +1,5 @@
 .manchette-space-time-chart-wrapper {
+  width: 100%;
   border-radius: 10px;
   box-shadow:
     0 4px 9px rgba(0, 0, 0, 0.06),
@@ -52,5 +53,12 @@
   .space-time-chart-container {
     width: 100%;
     position: sticky;
+  }
+
+  .space-time-h-slider-container {
+    position: absolute;
+    right: 24px;
+    bottom: -21px;
+    z-index: 10;
   }
 }
