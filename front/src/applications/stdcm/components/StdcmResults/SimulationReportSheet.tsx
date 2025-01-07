@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import iconAlert from 'assets/simulationReportSheet/icon_alert_fill.png';
 import logoSNCF from 'assets/simulationReportSheet/logo_sncf_reseau.png';
+import i18n from 'i18n';
 import type { StdcmPathStep } from 'reducers/osrdconf/types';
 import { dateToHHMMSS, formatDateToString, formatDay } from 'utils/date';
 import { msToKmh } from 'utils/physics';
@@ -99,7 +100,7 @@ const SimulationReportSheet = ({
           <View style={styles.rcInfo.rcBox}>
             <View style={styles.rcInfo.stdcmApplication}>
               <Text style={styles.rcInfo.applicationDate}>{t('applicationDate')}</Text>
-              <Text style={styles.rcInfo.date}>{formatDay(departureTime)}</Text>
+              <Text style={styles.rcInfo.date}>{formatDay(departureTime, i18n.language)}</Text>
               <Text style={styles.rcInfo.referencePath}>{t('referencePath')}</Text>
               <Text style={styles.rcInfo.pathNumber}>{fakeInformation.path_number1}</Text>
             </View>
