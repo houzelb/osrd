@@ -229,7 +229,7 @@ struct LightRollingStock {
     #[serde(with = "meter_per_second_squared")]
     comfort_acceleration: Acceleration,
     #[serde(with = "meter_per_second_squared")]
-    const_gamma: Acceleration,
+    const_gamma: Deceleration,
     #[schema(required)]
     etcs_brake_params: Option<EtcsBrakeParams>,
     #[serde(with = "meter_per_second_squared")]

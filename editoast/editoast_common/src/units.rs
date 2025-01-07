@@ -43,6 +43,7 @@ pub type ViscosityFriction = uom::si::f64::MassRate;
 pub type ViscosityFrictionPerWeight = uom::si::f64::Frequency;
 pub type AerodynamicDrag = uom::si::f64::LinearMassDensity;
 pub type AerodynamicDragPerWeight = uom::si::f64::LinearNumberDensity;
+pub type Deceleration = uom::si::f64::Acceleration;
 
 macro_rules! quantity_to_path {
     (Length, $unit:ident) => {

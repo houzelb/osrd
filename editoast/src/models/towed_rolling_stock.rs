@@ -45,7 +45,7 @@ pub struct TowedRollingStockModel {
     pub rolling_resistance: RollingResistancePerWeight,
     #[model(uom_unit = "meter_per_second_squared")]
     #[serde(with = "meter_per_second_squared")]
-    pub const_gamma: Acceleration,
+    pub const_gamma: Deceleration,
 
     pub version: i64,
 }

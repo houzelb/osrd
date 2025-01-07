@@ -74,7 +74,7 @@ pub struct RollingStock {
     // The constant gamma braking coefficient used when NOT circulating
     // under ETCS/ERTMS signaling system
     #[serde(with = "meter_per_second_squared")]
-    pub const_gamma: Acceleration,
+    pub const_gamma: Deceleration,
     pub etcs_brake_params: Option<EtcsBrakeParams>,
     #[serde(with = "meter_per_second_squared")]
     pub inertia_coefficient: Acceleration,
