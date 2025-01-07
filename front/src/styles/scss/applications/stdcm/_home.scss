@@ -288,10 +288,11 @@
       }
 
       .error-message {
-        padding-top: 22px;
-        max-width: 546px;
+        padding: 22px 8px 0 8px;
+        width: 466px;
         color: rgba(49, 46, 43, 1);
         line-height: 24px;
+        text-align: center;
       }
     }
   }
