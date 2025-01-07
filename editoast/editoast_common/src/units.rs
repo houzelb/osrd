@@ -167,3 +167,4 @@ define_unit!(kilogram_per_meter, AerodynamicDrag);
 define_unit!(per_meter, AerodynamicDragPerWeight);
 define_unit!(second, Time);
 define_unit!(millisecond, Time);
+define_unit!(basis_point, Ratio);

@@ -575,7 +575,7 @@ mod tests {
         let mut rolling_stock = create_simple_rolling_stock();
         rolling_stock.mass = kilogram::new(100000.0);
         rolling_stock.length = meter::new(20.0);
-        rolling_stock.inertia_coefficient = meter_per_second_squared::new(1.10);
+        rolling_stock.inertia_coefficient = basis_point::new(1.10);
         rolling_stock.comfort_acceleration = meter_per_second_squared::new(0.1);
         rolling_stock.startup_acceleration = meter_per_second_squared::new(0.04);
         rolling_stock.rolling_resistance = RollingResistance {
@@ -601,10 +601,7 @@ mod tests {
 
         assert_eq!(physics_consist.mass, total_mass);
 
-        assert_eq!(
-            physics_consist.inertia_coefficient,
-            meter_per_second_squared::new(1.075)
-        );
+        assert_eq!(physics_consist.inertia_coefficient, basis_point::new(1.075));
 
         assert_eq!(
             physics_consist.rolling_resistance,
