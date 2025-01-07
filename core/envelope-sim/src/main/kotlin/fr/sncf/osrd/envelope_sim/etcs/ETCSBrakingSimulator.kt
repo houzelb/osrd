@@ -4,6 +4,7 @@ import fr.sncf.osrd.envelope.Envelope
 import fr.sncf.osrd.envelope_sim.PhysicsPath
 import fr.sncf.osrd.envelope_sim.PhysicsRollingStock
 import fr.sncf.osrd.sim_infra.api.Path
+import fr.sncf.osrd.sim_infra.api.TravelledPath
 import fr.sncf.osrd.utils.units.Offset
 
 interface ETCSBrakingSimulator {
@@ -29,8 +30,8 @@ data class LimitOfAuthority(
 }
 
 data class EndOfAuthority(
-    val offsetEOA: Offset<Path>,
-    val offsetSVL: Offset<Path>?,
+    val offsetEOA: Offset<TravelledPath>,
+    val offsetSVL: Offset<TravelledPath>?,
 ) {
     init {
         if (offsetSVL != null) assert(offsetSVL >= offsetEOA)

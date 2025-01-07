@@ -1,7 +1,7 @@
 package fr.sncf.osrd.envelope_sim
 
 import com.google.common.collect.RangeMap
-import fr.sncf.osrd.sim_infra.api.Path
+import fr.sncf.osrd.sim_infra.api.TravelledPath
 import fr.sncf.osrd.utils.DistanceRangeSet
 import fr.sncf.osrd.utils.units.Offset
 
@@ -19,15 +19,15 @@ constructor(
 
     data class ETCSContext(
         /**
-         * Ranges where ETCS rules are applied. Braking curves are computed using ETCS rules if they
-         * *end* in these ranges.
+         * Offset<TravelledPath> ranges where ETCS rules are applied. Braking curves are computed
+         * using ETCS rules if they *end* in these ranges.
          */
         val applicationRanges: DistanceRangeSet,
         /**
          * List of switch and buffer stop offsets on the path, up to the first switch/buffer stop
          * *after* the end of the path (or right at the end).
          */
-        val dangerPointOffsets: List<Offset<Path>>,
+        val dangerPointOffsets: List<Offset<TravelledPath>>,
     )
 
     /** Creates a context suitable to run simulations on envelopes */
