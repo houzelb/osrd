@@ -13,7 +13,7 @@ import {
 } from 'applications/stdcm/utils/formatSimulationReportSheet';
 import { hasConflicts, hasResults } from 'applications/stdcm/utils/simulationOutputUtils';
 import { type TrackRange } from 'common/api/osrdEditoastApi';
-import { Map } from 'modules/trainschedule/components/ManageTrainSchedule';
+import NewMap from 'modules/trainschedule/components/ManageTrainSchedule/NewMap';
 
 import SimulationReportSheet from './SimulationReportSheet';
 import StdcmDebugResults from './StdcmDebugResults';
@@ -175,10 +175,9 @@ const StcdmResults = ({
             <span>{t('changeSearchCriteria')}</span>
           </div>
         )}
-        <div className="osrd-config-item-container osrd-config-item-container-map map-results no-pointer-events">
-          <Map
-            mapId="map-result"
-            isReadOnly
+        <div className="osrd-config-item-container osrd-config-item-container-map map-results">
+          <NewMap
+            id="stdcm-map-result"
             hideAttribution
             showStdcmAssets
             isFeasible={!hasConflictResults}
