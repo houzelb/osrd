@@ -90,17 +90,24 @@ const Map = ({
   const infraID = useInfraID();
   const terrain3DExaggeration = useSelector(getTerrain3DExaggeration);
   const { viewport, mapSearchMarker, mapStyle, showOSM, layersSettings } = useSelector(getMap);
+  const mapRef = useRef<MapRef | null>(null);
+  const mapContainer = useMemo(() => mapRef.current?.getContainer(), [mapRef.current]);
 
   const pathGeometry = useMemo(
     () => geometry || pathProperties?.geometry,
     [pathProperties, geometry]
   );
 
-  const mapViewport = useMemo(
-    () =>
-      isReadOnly && pathGeometry ? computeBBoxViewport(bbox(pathGeometry), viewport) : viewport,
-    [isReadOnly, pathGeometry, viewport]
-  );
+  const mapViewport = useMemo(() => {
+    if (isReadOnly && pathGeometry) {
+      return computeBBoxViewport(bbox(pathGeometry), viewport, {
+        width: mapContainer?.clientWidth,
+        height: mapContainer?.clientHeight,
+        padding: 60,
+      });
+    }
+    return viewport;
+  }, [isReadOnly, pathGeometry, viewport, mapContainer]);
 
   const [mapIsLoaded, setMapIsLoaded] = useState(false);
 
@@ -111,8 +118,6 @@ const Map = ({
     (value: Partial<Viewport>) => dispatch(updateViewport(value, undefined)),
     [dispatch]
   );
-
-  const mapRef = useRef<MapRef | null>(null);
 
   const scaleControlStyle = {
     left: 20,
@@ -214,10 +219,14 @@ const Map = ({
       type: 'LineString',
     };
     if (points.coordinates.length > 2) {
-      const newViewport = computeBBoxViewport(bbox(points), mapViewport);
+      const newViewport = computeBBoxViewport(bbox(points), mapViewport, {
+        width: mapContainer?.clientWidth,
+        height: mapContainer?.clientHeight,
+        padding: 60,
+      });
       dispatch(updateViewport(newViewport));
     }
-  }, [pathGeometry, simulationPathSteps]);
+  }, [pathGeometry, simulationPathSteps, mapContainer]);
 
   return (
     <>

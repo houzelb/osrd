@@ -187,15 +187,23 @@ export function simplifyFeature(feature: MapGeoJSONFeature): Feature {
   };
 }
 
-export function computeBBoxViewport(boundingBox: BBox | Position, initialViewport: Viewport) {
+export function computeBBoxViewport(
+  boundingBox: BBox | Position,
+  initialViewport: Viewport,
+  opts?: { width?: number; height?: number; padding?: number }
+): Viewport {
   const [minLng, minLat, maxLng, maxLat] = boundingBox;
-  const viewportTemp = new WebMercatorViewport({ ...initialViewport, width: 600, height: 400 });
+  const viewportTemp = new WebMercatorViewport({
+    ...initialViewport,
+    width: opts?.width || 600,
+    height: opts?.height || 400,
+  });
   const { longitude, latitude, zoom } = viewportTemp.fitBounds(
     [
       [minLng, minLat],
       [maxLng, maxLat],
     ],
-    { padding: 40 }
+    { padding: opts?.padding ?? 40 }
   );
 
   return {
