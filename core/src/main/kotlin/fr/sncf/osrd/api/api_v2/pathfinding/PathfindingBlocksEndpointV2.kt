@@ -86,7 +86,15 @@ fun runPathfinding(
             for (waypoint in step) {
                 val waypointBlocks = findWaypointBlocks(infra, waypoint, direction)
                 if (request.stopAtNextSignal && stepIndex != 0) {
-                    allStarts.addAll(waypointBlocks.map { findNextSignalBlockOnWaypointBlock(it, infra, request.rollingStockLength) })
+                    allStarts.addAll(
+                        waypointBlocks.map {
+                            findNextSignalBlockOnWaypointBlock(
+                                it,
+                                infra,
+                                request.rollingStockLength
+                            )
+                        }
+                    )
                 } else {
                     allStarts.addAll(waypointBlocks)
                 }
@@ -377,26 +385,33 @@ private fun getBlockOffset(
     )
 }
 
-public fun findNextSignalBlockOnWaypointBlock(
+fun findNextSignalBlockOnWaypointBlock(
     waypointBlock: PathfindingEdgeLocationId<Block>,
     infra: FullInfra,
     rollingStockLength: Double
 ): PathfindingEdgeLocationId<Block> {
-    val nextSignalOffset = getNextSignalOffset(waypointBlock.edge, waypointBlock.offset, infra, rollingStockLength)
+    val nextSignalOffset =
+        getNextSignalOffset(waypointBlock.edge, waypointBlock.offset, infra, rollingStockLength)
     return PathfindingEdgeLocationId(waypointBlock.edge, nextSignalOffset)
 }
 
-private fun getNextSignalOffset(blockId: BlockId, blockOffset: Offset<Block>, infra: FullInfra, rollingStockLength: Double): Offset<Block> {
+private fun getNextSignalOffset(
+    blockId: BlockId,
+    blockOffset: Offset<Block>,
+    infra: FullInfra,
+    rollingStockLength: Double
+): Offset<Block> {
     val signalsPositions = infra.blockInfra.getSignalsPositions(blockId)
     val blockLength = infra.blockInfra.getBlockLength(blockId).distance
     val nextSignalPosition = signalsPositions.firstOrNull { it.distance >= blockOffset.distance }
 
     // some blocks are < 1m long (even 0m), we can't get further in the block
-    val maxHeadOffset = if (blockOffset.distance < 1.meters) {
-        blockOffset.distance
-    } else {
-        (nextSignalPosition?.distance ?: blockLength) - 1.meters
-    }
+    val maxHeadOffset =
+        if (blockOffset.distance < 1.meters) {
+            blockOffset.distance
+        } else {
+            (nextSignalPosition?.distance ?: blockLength) - 1.meters
+        }
 
     val minTailOffset = blockOffset.distance + rollingStockLength.meters
     val finalOffset = if (minTailOffset <= maxHeadOffset) minTailOffset else maxHeadOffset
