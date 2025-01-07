@@ -8,18 +8,18 @@ use editoast_schemas::rolling_stock::RollingStockMetadata;
 use editoast_schemas::rolling_stock::RollingStockSupportedSignalingSystems;
 use editoast_schemas::rolling_stock::ROLLING_STOCK_RAILJSON_VERSION;
 use serde::Deserialize;
+use serde::Deserializer;
 use serde::Serialize;
+use serde::Serializer;
 use utoipa::ToSchema;
-use validator::Validate;
-use validator::ValidationError;
 
 use crate::models::rolling_stock_model::validate_rolling_stock;
 use crate::models::Changeset;
 use crate::models::Model;
 use crate::models::RollingStockModel;
 
-#[derive(Debug, Clone, Deserialize, Serialize, ToSchema, Validate)]
-#[validate(schema(function = "validate_rolling_stock_form"))]
+#[derive(Debug, Clone, Deserialize, Serialize, ToSchema)]
+#[serde(remote = "Self")]
 pub struct RollingStockForm {
     pub name: String,
     pub effort_curves: EffortCurves,
@@ -52,6 +52,32 @@ pub struct RollingStockForm {
     pub metadata: Option<RollingStockMetadata>,
 }
 
+impl<'de> Deserialize<'de> for RollingStockForm {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let rolling_stock_form = RollingStockForm::deserialize(deserializer)?;
+
+        validate_rolling_stock::<D>(
+            &rolling_stock_form.effort_curves,
+            rolling_stock_form.electrical_power_startup_time,
+            rolling_stock_form.raise_pantograph_time,
+        )?;
+
+        Ok(rolling_stock_form)
+    }
+}
+
+impl Serialize for RollingStockForm {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        RollingStockForm::serialize(self, serializer)
+    }
+}
+
 impl From<RollingStockForm> for Changeset<RollingStockModel> {
     fn from(rolling_stock: RollingStockForm) -> Self {
         RollingStockModel::changeset()
@@ -77,16 +103,6 @@ impl From<RollingStockForm> for Changeset<RollingStockModel> {
             .raise_pantograph_time(rolling_stock.raise_pantograph_time)
             .supported_signaling_systems(rolling_stock.supported_signaling_systems)
     }
-}
-
-fn validate_rolling_stock_form(
-    rolling_stock_form: &RollingStockForm,
-) -> std::result::Result<(), ValidationError> {
-    validate_rolling_stock(
-        &rolling_stock_form.effort_curves,
-        rolling_stock_form.electrical_power_startup_time,
-        rolling_stock_form.raise_pantograph_time,
-    )
 }
 
 // Used in some tests where we import a rolling stock as a fixture

@@ -9,12 +9,10 @@ use colored::Colorize as _;
 use editoast_models::DbConnectionPoolV2;
 use editoast_schemas::rolling_stock::RollingStock;
 use editoast_schemas::rolling_stock::TowedRollingStock;
-use validator::ValidationErrorsKind;
 
 use crate::models::prelude::*;
 use crate::models::towed_rolling_stock::TowedRollingStockModel;
 use crate::models::RollingStockModel;
-use crate::CliError;
 
 #[derive(Args, Debug)]
 #[command(about, long_about = "Import a rolling stock given a json file")]
@@ -32,46 +30,24 @@ pub async fn import_rolling_stock(
         let rolling_stock: RollingStock =
             serde_json::from_reader(BufReader::new(rolling_stock_file))?;
         let rolling_stock: Changeset<RollingStockModel> = rolling_stock.into();
-        match rolling_stock.validate_imported_rolling_stock() {
-            Ok(()) => {
-                println!(
-                    "🍞 Importing rolling stock {}",
-                    rolling_stock
-                        .name
-                        .as_deref()
-                        .unwrap_or("rolling stock without name")
-                        .bold()
-                );
-                let rolling_stock = rolling_stock
-                    .locked(false)
-                    .version(0)
-                    .create(&mut db_pool.get().await?)
-                    .await?;
-                println!(
-                    "✅ Rolling stock {}[{}] saved!",
-                    &rolling_stock.name.bold(),
-                    &rolling_stock.id
-                );
-            }
-            Err(e) => {
-                let mut error_message = "❌ Rolling stock was not created!".to_string();
-                if let Some(ValidationErrorsKind::Field(field_errors)) = e.errors().get("__all__") {
-                    for error in field_errors {
-                        if &error.code == "electrical_power_startup_time" {
-                            error_message.push_str(
-                                "\nRolling stock is electrical, but electrical_power_startup_time is missing"
-                            );
-                        }
-                        if &error.code == "raise_pantograph_time" {
-                            error_message.push_str(
-                                "\nRolling stock is electrical, but raise_pantograph_time is missing"
-                            );
-                        }
-                    }
-                }
-                return Err(Box::new(CliError::new(2, error_message)));
-            }
-        };
+        println!(
+            "🍞 Importing rolling stock {}",
+            rolling_stock
+                .name
+                .as_deref()
+                .unwrap_or("rolling stock without name")
+                .bold()
+        );
+        let rolling_stock = rolling_stock
+            .locked(false)
+            .version(0)
+            .create(&mut db_pool.get().await?)
+            .await?;
+        println!(
+            "✅ Rolling stock {}[{}] saved!",
+            &rolling_stock.name.bold(),
+            &rolling_stock.id
+        );
     }
     Ok(())
 }

@@ -2,6 +2,7 @@ mod power_restrictions;
 
 use std::collections::HashMap;
 
+use diesel_json::Json;
 use editoast_derive::Model;
 use editoast_schemas::rolling_stock::EffortCurves;
 use editoast_schemas::rolling_stock::EnergySource;
@@ -13,10 +14,9 @@ use editoast_schemas::rolling_stock::RollingStockMetadata;
 use editoast_schemas::rolling_stock::RollingStockSupportedSignalingSystems;
 use power_restrictions::PowerRestriction;
 use serde::Deserialize;
+use serde::Deserializer;
 use serde::Serialize;
 use utoipa::ToSchema;
-use validator::ValidationError;
-use validator::ValidationErrors;
 
 use crate::models::prelude::*;
 
@@ -31,7 +31,7 @@ editoast_common::schemas! {
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Model, ToSchema)]
 #[model(table = editoast_models::tables::rolling_stock)]
 #[model(gen(ops = crud, batch_ops = r, list))]
-#[model(changeset(derive(Deserialize), public))]
+#[model(changeset(public))]
 #[schema(as = RollingStock)]
 pub struct RollingStockModel {
     pub id: i64,
@@ -75,50 +75,98 @@ pub struct RollingStockModel {
     pub supported_signaling_systems: RollingStockSupportedSignalingSystems,
 }
 
-impl RollingStockModelChangeset {
-    pub fn validate_imported_rolling_stock(&self) -> std::result::Result<(), ValidationErrors> {
-        match &self.effort_curves {
-            Some(effort_curves) => validate_rolling_stock(
-                effort_curves,
-                self.electrical_power_startup_time.flatten(),
-                self.raise_pantograph_time.flatten(),
-            )
-            .map_err(|e| {
-                let mut err = ValidationErrors::new();
-                err.add("effort_curves", e);
-                err
-            }),
-            None => {
-                let mut err = ValidationErrors::new();
-                err.add(
-                    "effort_curves",
-                    ValidationError::new("effort_curves is required"),
-                );
-                Err(err)
-            }
+impl<'de> Deserialize<'de> for RollingStockModelChangeset {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        struct Inner {
+            pub railjson_version: Option<String>,
+            pub name: Option<String>,
+            pub effort_curves: Option<Json<EffortCurves>>,
+            pub metadata: Option<Json<Option<RollingStockMetadata>>>,
+            pub length: Option<f64>,
+            pub max_speed: Option<f64>,
+            pub startup_time: Option<f64>,
+            pub startup_acceleration: Option<f64>,
+            pub comfort_acceleration: Option<f64>,
+            pub const_gamma: Option<f64>,
+            pub etcs_brake_params: Option<Json<Option<EtcsBrakeParams>>>,
+            pub inertia_coefficient: Option<f64>,
+            pub base_power_class: Option<Option<String>>,
+            pub mass: Option<f64>,
+            pub rolling_resistance: Option<Json<RollingResistance>>,
+            pub loading_gauge: Option<i16>,
+            pub power_restrictions: Option<Json<HashMap<String, String>>>,
+            pub energy_sources: Option<Json<Vec<EnergySource>>>,
+            pub locked: Option<bool>,
+            pub electrical_power_startup_time: Option<Option<f64>>,
+            pub raise_pantograph_time: Option<Option<f64>>,
+            pub version: Option<i64>,
+            pub supported_signaling_systems: Option<Vec<Option<String>>>,
         }
+
+        let changeset = Inner::deserialize(deserializer)?;
+
+        if changeset.effort_curves.is_none() {
+            return Err(serde::de::Error::custom("effort_curves is required"));
+        }
+
+        validate_rolling_stock::<D>(
+            changeset.effort_curves.as_ref().unwrap(),
+            changeset.electrical_power_startup_time.flatten(),
+            changeset.raise_pantograph_time.flatten(),
+        )?;
+
+        Ok(RollingStockModelChangeset {
+            railjson_version: changeset.railjson_version,
+            name: changeset.name,
+            effort_curves: changeset.effort_curves,
+            metadata: changeset.metadata,
+            length: changeset.length,
+            max_speed: changeset.max_speed,
+            startup_time: changeset.startup_time,
+            startup_acceleration: changeset.startup_acceleration,
+            comfort_acceleration: changeset.comfort_acceleration,
+            const_gamma: changeset.const_gamma,
+            etcs_brake_params: changeset.etcs_brake_params,
+            inertia_coefficient: changeset.inertia_coefficient,
+            base_power_class: changeset.base_power_class,
+            mass: changeset.mass,
+            rolling_resistance: changeset.rolling_resistance,
+            loading_gauge: changeset.loading_gauge,
+            power_restrictions: changeset.power_restrictions,
+            energy_sources: changeset.energy_sources,
+            locked: changeset.locked,
+            electrical_power_startup_time: changeset.electrical_power_startup_time,
+            raise_pantograph_time: changeset.raise_pantograph_time,
+            version: changeset.version,
+            supported_signaling_systems: changeset.supported_signaling_systems,
+        })
     }
 }
 
-pub fn validate_rolling_stock(
+pub fn validate_rolling_stock<'de, D>(
     effort_curves: &EffortCurves,
     electrical_power_startup_time: Option<f64>,
     raise_pantograph_time: Option<f64>,
-) -> std::result::Result<(), ValidationError> {
+) -> Result<(), D::Error>
+where
+    D: Deserializer<'de>,
+{
     if !effort_curves.is_electric() {
         return Ok(());
     }
     if electrical_power_startup_time.is_none() {
-        let mut error = ValidationError::new("electrical_power_startup_time");
-        error.message =
-            Some("electrical_power_startup_time is required for electric rolling stocks".into());
-        return Err(error);
+        return Err(serde::de::Error::custom(
+            "electrical_power_startup_time is required for electric rolling stocks",
+        ));
     }
     if raise_pantograph_time.is_none() {
-        let mut error = ValidationError::new("raise_pantograph_time");
-        error.message =
-            Some("raise_pantograph_time is required for electric rolling stocks".into());
-        return Err(error);
+        return Err(serde::de::Error::custom(
+            "raise_pantograph_time is required for electric rolling stocks",
+        ));
     }
     Ok(())
 }
