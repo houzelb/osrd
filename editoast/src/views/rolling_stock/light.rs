@@ -232,8 +232,8 @@ struct LightRollingStock {
     const_gamma: Deceleration,
     #[schema(required)]
     etcs_brake_params: Option<EtcsBrakeParams>,
-    #[serde(with = "meter_per_second_squared")]
-    inertia_coefficient: Acceleration,
+    #[serde(with = "basis_point")]
+    inertia_coefficient: Ratio,
     #[serde(with = "kilogram")]
     mass: Mass,
     rolling_resistance: RollingResistance,

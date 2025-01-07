@@ -67,9 +67,9 @@ pub struct RollingStockModel {
     #[model(json)]
     #[schema(required)]
     pub etcs_brake_params: Option<EtcsBrakeParams>,
-    #[serde(with = "meter_per_second_squared")]
-    #[model(uom_unit = "meter_per_second_squared")]
-    pub inertia_coefficient: Acceleration,
+    #[serde(with = "basis_point")]
+    #[model(uom_unit = "basis_point")]
+    pub inertia_coefficient: Ratio,
     #[schema(required)]
     pub base_power_class: Option<String>,
     #[serde(with = "kilogram")]

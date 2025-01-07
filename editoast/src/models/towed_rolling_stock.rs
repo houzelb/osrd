@@ -38,9 +38,9 @@ pub struct TowedRollingStockModel {
     #[model(uom_unit = "meter_per_second_squared")]
     #[serde(with = "meter_per_second_squared")]
     pub startup_acceleration: Acceleration,
-    #[model(uom_unit = "meter_per_second_squared")]
-    #[serde(with = "meter_per_second_squared")]
-    pub inertia_coefficient: Acceleration,
+    #[model(uom_unit = "basis_point")]
+    #[serde(with = "basis_point")]
+    pub inertia_coefficient: Ratio,
     #[model(json)]
     pub rolling_resistance: RollingResistancePerWeight,
     #[model(uom_unit = "meter_per_second_squared")]

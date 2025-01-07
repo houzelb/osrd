@@ -1282,6 +1282,7 @@ name = "editoast"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "approx",
  "async-std",
  "async-trait",
  "axum 0.8.1",

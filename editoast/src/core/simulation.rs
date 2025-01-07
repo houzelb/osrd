@@ -63,9 +63,9 @@ pub struct PhysicsConsist {
     #[serde(with = "meter_per_second_squared")]
     pub const_gamma: Deceleration,
     pub etcs_brake_params: Option<EtcsBrakeParams>,
-    #[derivative(Hash(hash_with = "meter_per_second_squared::hash"))]
-    #[serde(with = "meter_per_second_squared")]
-    pub inertia_coefficient: Acceleration,
+    #[derivative(Hash(hash_with = "basis_point::hash"))]
+    #[serde(with = "basis_point")]
+    pub inertia_coefficient: Ratio,
     /// Mass of the rolling stock
     #[derivative(Hash(hash_with = "kilogram::hash"))]
     #[serde(with = "kilogram")]
@@ -156,7 +156,7 @@ impl PhysicsConsistParameters {
             .unwrap_or(self.traction_engine.comfort_acceleration)
     }
 
-    pub fn compute_inertia_coefficient(&self) -> Acceleration {
+    pub fn compute_inertia_coefficient(&self) -> Ratio {
         if let (Some(towed_rolling_stock), Some(total_mass)) =
             (self.towed_rolling_stock.as_ref(), self.total_mass)
         {
@@ -662,15 +662,15 @@ mod tests {
     fn physics_consist_compute_inertia_coefficient() {
         let mut physics_consist = create_physics_consist();
 
-        assert_eq!(
-            physics_consist.compute_inertia_coefficient(),
-            meter_per_second_squared::new(1.065)
+        approx::assert_relative_eq!(
+            basis_point::from(physics_consist.compute_inertia_coefficient()),
+            1.065
         );
 
         physics_consist.towed_rolling_stock = None;
         assert_eq!(
             physics_consist.compute_inertia_coefficient(),
-            meter_per_second_squared::new(1.10,)
+            basis_point::new(1.10,)
         );
     }
 

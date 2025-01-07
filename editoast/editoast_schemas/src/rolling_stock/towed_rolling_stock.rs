@@ -14,8 +14,8 @@ pub struct TowedRollingStock {
     pub comfort_acceleration: Acceleration,
     #[serde(with = "meter_per_second_squared")]
     pub startup_acceleration: Acceleration,
-    #[serde(with = "meter_per_second_squared")]
-    pub inertia_coefficient: Acceleration,
+    #[serde(with = "basis_point")]
+    pub inertia_coefficient: Ratio,
     pub rolling_resistance: RollingResistancePerWeight,
     /// The constant gamma braking coefficient used when NOT circulating
     /// under ETCS/ERTMS signaling system
