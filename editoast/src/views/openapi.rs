@@ -66,24 +66,6 @@ where
     }
 }
 
-/// Reformats a service path defined in the OpenApi format to the Axum format
-///
-/// For path parameters, the OpenApi format uses curly braces, e.g. `/users/{id}`.
-/// The Axum format uses a colon, e.g. `/users/:id`.
-/// The `routes!` macro requires path parameters to be defined in the OpenApi format.
-pub(in crate::views) fn format_axum_path_parameters(url_with_path_params: &str) -> String {
-    url_with_path_params
-        .split('/')
-        .map(|part| {
-            if part.starts_with('{') && part.ends_with('}') {
-                format!(":{}", &part[1..part.len() - 1])
-            } else {
-                part.to_string()
-            }
-        })
-        .join("/")
-}
-
 #[allow(unused)]
 impl OpenApiPathScope {
     pub fn new(prefix: Option<&'static str>) -> Self {
@@ -227,7 +209,7 @@ macro_rules! routes {
     (@router [$router:expr] $prefix:literal => {$($tt:tt)+} , $($rest:tt)*) => {
         $crate::routes!(@router
             [$router.nest(
-                &$crate::views::openapi::format_axum_path_parameters($prefix),
+                &$prefix,
                 $crate::routes!(@router [axum::Router::<$crate::AppState>::new()] $($tt)+)
             )]
             $($rest)*
