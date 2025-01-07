@@ -19,6 +19,7 @@ import fr.sncf.osrd.envelope_sim.etcs.LimitOfAuthority
 import fr.sncf.osrd.envelope_sim.overlays.EnvelopeDeceleration
 import fr.sncf.osrd.reporting.exceptions.OSRDError
 import fr.sncf.osrd.sim_infra.api.Path
+import fr.sncf.osrd.sim_infra.api.TravelledPath
 import fr.sncf.osrd.utils.units.Offset
 import fr.sncf.osrd.utils.units.meters
 
@@ -184,7 +185,7 @@ object MaxSpeedEnvelope {
     /**
      * Returns the SVL location: next buffer stop or switch, whichever is closest. If there is any.
      */
-    private fun getDangerPoint(context: EnvelopeSimContext, stop: SimStop): Offset<Path>? {
+    private fun getDangerPoint(context: EnvelopeSimContext, stop: SimStop): Offset<TravelledPath>? {
         val etcsContext = context.etcsContext!!
         return etcsContext.dangerPointOffsets.firstOrNull { it.distance.meters >= stop.offset }
     }

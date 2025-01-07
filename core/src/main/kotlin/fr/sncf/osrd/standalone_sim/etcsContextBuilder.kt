@@ -11,8 +11,8 @@ import fr.sncf.osrd.utils.Direction
 import fr.sncf.osrd.utils.distanceRangeSetOf
 import fr.sncf.osrd.utils.indexing.DirStaticIdx
 import fr.sncf.osrd.utils.indexing.StaticIdxList
+import fr.sncf.osrd.utils.units.Distance
 import fr.sncf.osrd.utils.units.Offset
-import fr.sncf.osrd.utils.units.meters
 
 /** Build the ETCS context, if relevant. */
 fun makeETCSContext(
@@ -26,16 +26,24 @@ fun makeETCSContext(
     val etcsRanges = distanceRangeSetOf()
     val etcsLevel2 =
         infra.signalingSimulator.sigModuleManager.findSignalingSystemOrThrow(ETCS_LEVEL2.id)
-    var offsetSinceStart = Offset<Path>(0.meters)
+    var blockStartOffset =
+        Offset<TravelledPath>(
+            trainPathBlockOffset(infra.rawInfra, infra.blockInfra, blockPath, chunkPath) * -1.0
+        )
     for (blockId in blockPath) {
         val blockLength = blockInfra.getBlockLength(blockId)
-        if (blockInfra.getBlockSignalingSystem(blockId) == etcsLevel2) {
+        val blockEndOffset = blockStartOffset + blockLength.distance
+        if (
+            blockInfra.getBlockSignalingSystem(blockId) == etcsLevel2 &&
+                chunkPath.length >= blockStartOffset.distance &&
+                blockEndOffset.distance >= Distance.ZERO
+        ) {
             etcsRanges.put(
-                offsetSinceStart.distance,
-                offsetSinceStart.distance + blockLength.distance
+                Distance.max(blockStartOffset.distance, Distance.ZERO),
+                Distance.min(blockEndOffset.distance, chunkPath.length)
             )
         }
-        offsetSinceStart += blockLength.distance
+        blockStartOffset += blockLength.distance
     }
 
     if (etcsRanges.asList().isEmpty()) {
@@ -61,11 +69,11 @@ fun buildETCSDangerPoints(
     infra: RawInfra,
     chunkPath: ChunkPath,
     routePath: StaticIdxList<Route>
-): List<Offset<Path>> {
+): List<Offset<TravelledPath>> {
     val zonePaths = routePath.flatMap { infra.getRoutePath(it) }
     var currentZonePathStartOffset = -getRoutePathStartOffset(infra, chunkPath, zonePaths).distance
 
-    val res = mutableSetOf<Offset<Path>>()
+    val res = mutableSetOf<Offset<TravelledPath>>()
     for (zonePath in zonePaths) {
         val movableElements = infra.getZonePathMovableElements(zonePath)
         val movableElementPositions = infra.getZonePathMovableElementsPositions(zonePath)
@@ -84,10 +92,10 @@ fun buildETCSDangerPoints(
  * Find the last danger point, which may extend beyond the end of the path. Null if tracks are
  * circular with no switch nor buffer stop.
  */
-fun findLastDangerPoint(infra: RawInfra, chunkPath: ChunkPath): Offset<Path>? {
+fun findLastDangerPoint(infra: RawInfra, chunkPath: ChunkPath): Offset<TravelledPath>? {
     // Find the offset of the last chunk on the path
     val lastChunk = chunkPath.chunks.last()
-    var lastChunkEndOffset = chunkPath.beginOffset * -1.0
+    var lastChunkEndOffset = Offset<TravelledPath>(chunkPath.beginOffset.distance * -1.0)
     for (chunk in chunkPath.chunks) {
         lastChunkEndOffset += infra.getTrackChunkLength(chunk.value).distance
     }
@@ -115,8 +123,8 @@ fun getEndOfLastTrackPathOffset(
     infra: RawInfra,
     lastTrack: TrackSectionId,
     lastChunk: DirStaticIdx<TrackChunk>,
-    lastChunkEndOffset: Offset<Path>
-): Offset<Path> {
+    lastChunkEndOffset: Offset<TravelledPath>
+): Offset<TravelledPath> {
     val lastTrackLength = infra.getTrackSectionLength(lastTrack)
     val lastChunkLength = infra.getTrackChunkLength(lastChunk.value)
 
