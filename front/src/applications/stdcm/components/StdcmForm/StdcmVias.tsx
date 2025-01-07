@@ -77,9 +77,9 @@ const StdcmVias = ({ disabled = false }: StdcmConfigCardProps) => {
 
     const cancelListener = () => cancelAnimationFrame(requestId);
 
-    newElement.addEventListener('animationend', cancelListener);
+    newElement.parentElement!.addEventListener('animationend', cancelListener);
     return () => {
-      newElement.removeEventListener('animationend', cancelListener);
+      newElement.parentElement!.removeEventListener('animationend', cancelListener);
       cancelListener();
     };
   }, [newIntermediateOpIndex]);
