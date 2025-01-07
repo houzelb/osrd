@@ -86,7 +86,7 @@ fun runPathfinding(
             for (waypoint in step) {
                 val waypointBlocks = findWaypointBlocks(infra, waypoint, direction)
                 if (request.stopAtNextSignal && stepIndex != 0) {
-                    allStarts.addAll(waypointBlocks.map { findNextSignalBlockOnWaypointBlock(request, it, infra) })
+                    allStarts.addAll(waypointBlocks.map { findNextSignalBlockOnWaypointBlock(it, infra, request.rollingStockLength) })
                 } else {
                     allStarts.addAll(waypointBlocks)
                 }
@@ -377,12 +377,12 @@ private fun getBlockOffset(
     )
 }
 
-private fun findNextSignalBlockOnWaypointBlock(
-    request: PathfindingBlockRequest,
+public fun findNextSignalBlockOnWaypointBlock(
     waypointBlock: PathfindingEdgeLocationId<Block>,
-    infra: FullInfra
+    infra: FullInfra,
+    rollingStockLength: Double
 ): PathfindingEdgeLocationId<Block> {
-    val nextSignalOffset = getNextSignalOffset(waypointBlock.edge, waypointBlock.offset, infra, request.rollingStockLength)
+    val nextSignalOffset = getNextSignalOffset(waypointBlock.edge, waypointBlock.offset, infra, rollingStockLength)
     return PathfindingEdgeLocationId(waypointBlock.edge, nextSignalOffset)
 }
 

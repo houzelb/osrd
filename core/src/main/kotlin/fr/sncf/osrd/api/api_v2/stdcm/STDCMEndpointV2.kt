@@ -5,6 +5,7 @@ import fr.sncf.osrd.api.ExceptionHandler
 import fr.sncf.osrd.api.FullInfra
 import fr.sncf.osrd.api.InfraManager
 import fr.sncf.osrd.api.api_v2.*
+import fr.sncf.osrd.api.api_v2.pathfinding.findNextSignalBlockOnWaypointBlock
 import fr.sncf.osrd.api.api_v2.pathfinding.findWaypointBlocks
 import fr.sncf.osrd.api.api_v2.pathfinding.runPathfindingBlockPostProcessing
 import fr.sncf.osrd.api.api_v2.standalone_sim.*
@@ -103,7 +104,7 @@ class STDCMEndpointV2(private val infraManager: InfraManager) : Take {
                 convertWorkScheduleCollection(infra.rawInfra, request.workSchedules)
             trainsRequirements.add(convertedWorkSchedules)
             val spacingRequirements = trainsRequirements.flatMap { it.spacingRequirements }
-            val steps = parseSteps(infra, request.pathItems, request.startTime)
+            val steps = parseSteps(infra, request.pathItems, request.startTime, request.rollingStock.length.distance.meters)
 
             // Run the STDCM pathfinding
             val path =
@@ -287,7 +288,8 @@ fun buildTemporarySpeedLimitManager(
 private fun parseSteps(
     infra: FullInfra,
     pathItems: List<STDCMPathItem>,
-    startTime: ZonedDateTime
+    startTime: ZonedDateTime,
+    rollingStockLength: Double
 ): List<STDCMStep> {
     if (pathItems.last().stopDuration == null) {
         throw OSRDError(ErrorType.MissingLastSTDCMStop)
@@ -302,9 +304,15 @@ private fun parseSteps(
     pathItems.first().stopDuration = null
 
     return pathItems
-        .map {
+        .mapIndexed { index, it ->
             STDCMStep(
-                findWaypointBlocks(infra, it.locations), // TODO: use moveWaypointBlockToNextSignal()
+                if (index != 0) {
+                    findWaypointBlocks(infra, it.locations).map { waypointBlock ->
+                        findNextSignalBlockOnWaypointBlock(waypointBlock, infra, rollingStockLength)
+                    }
+                } else {
+                    findWaypointBlocks(infra, it.locations)
+                },
                 it.stopDuration?.seconds,
                 it.stopDuration != null,
                 if (it.stepTimingData != null)
