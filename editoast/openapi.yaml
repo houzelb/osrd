@@ -7227,16 +7227,19 @@ components:
       - railjson_version
       - locked
       - effort_curves
+      - base_power_class
       - length
       - max_speed
       - startup_time
       - startup_acceleration
       - comfort_acceleration
       - const_gamma
+      - etcs_brake_params
       - inertia_coefficient
       - mass
       - rolling_resistance
       - loading_gauge
+      - metadata
       - power_restrictions
       - energy_sources
       - supported_signaling_systems
