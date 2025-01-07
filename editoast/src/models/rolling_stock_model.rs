@@ -15,7 +15,6 @@ use power_restrictions::PowerRestriction;
 use serde::Deserialize;
 use serde::Serialize;
 use utoipa::ToSchema;
-use validator::Validate;
 use validator::ValidationError;
 use validator::ValidationErrors;
 
@@ -32,7 +31,7 @@ editoast_common::schemas! {
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Model, ToSchema)]
 #[model(table = editoast_models::tables::rolling_stock)]
 #[model(gen(ops = crud, batch_ops = r, list))]
-#[model(changeset(derive(Validate, Deserialize), public))]
+#[model(changeset(derive(Deserialize), public))]
 #[schema(as = RollingStock)]
 pub struct RollingStockModel {
     pub id: i64,
@@ -96,7 +95,6 @@ impl RollingStockModel {
 
 impl RollingStockModelChangeset {
     pub fn validate_imported_rolling_stock(&self) -> std::result::Result<(), ValidationErrors> {
-        self.validate()?;
         match &self.effort_curves {
             Some(effort_curves) => validate_rolling_stock(
                 effort_curves,
@@ -128,13 +126,13 @@ pub fn validate_rolling_stock(
     if !effort_curves.is_electric() {
         return Ok(());
     }
-    if electrical_power_startup_time.is_none() || electrical_power_startup_time.is_none() {
+    if electrical_power_startup_time.is_none() {
         let mut error = ValidationError::new("electrical_power_startup_time");
         error.message =
             Some("electrical_power_startup_time is required for electric rolling stocks".into());
         return Err(error);
     }
-    if raise_pantograph_time.is_none() || raise_pantograph_time.is_none() {
+    if raise_pantograph_time.is_none() {
         let mut error = ValidationError::new("raise_pantograph_time");
         error.message =
             Some("raise_pantograph_time is required for electric rolling stocks".into());

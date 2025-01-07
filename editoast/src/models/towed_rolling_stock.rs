@@ -4,14 +4,13 @@ use editoast_schemas::rolling_stock::TowedRollingStock;
 use serde::Deserialize;
 use serde::Serialize;
 use utoipa::ToSchema;
-use validator::Validate;
 
 use crate::models::prelude::*;
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Model, ToSchema)]
 #[model(table = editoast_models::tables::towed_rolling_stock)]
 #[model(gen(ops = crud, batch_ops = r, list))]
-#[model(changeset(derive(Validate), public))]
+#[model(changeset(public))]
 #[schema(as = TowedRollingStock)]
 pub struct TowedRollingStockModel {
     pub id: i64,
