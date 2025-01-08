@@ -100,7 +100,9 @@ fun runStandaloneSimulation(
             envelopeSimPath,
             timeStep,
             curvesAndConditions.curves,
-            makeETCSContext(rollingStock, infra, chunkPath, routes, blockPath)
+            // TODO: when ETCS braking curve is available, use
+            //   `makeETCSContext(rollingStock, infra, chunkPath, routes, blockPath)`
+            null
         )
 
     // Max speed envelope
