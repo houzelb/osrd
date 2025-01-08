@@ -173,6 +173,7 @@ const useSetupItineraryForTrainUpdate = (trainIdToEdit: number) => {
       );
       const suggestedOperationalPoints: SuggestedOP[] = formatSuggestedOperationalPoints(
         operational_points,
+        trainSchedule.path,
         geometry,
         pathfindingResult.length
       );

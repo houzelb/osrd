@@ -16,29 +16,6 @@ import { getPointCoordinates } from 'utils/geometry';
 
 import getStepLocation from './helpers/getStepLocation';
 
-export const formatSuggestedOperationalPoints = (
-  operationalPoints: Array<
-    NonNullable<Required<PathProperties['operational_points']>>[number] & {
-      metadata?: NonNullable<SuggestedOP['metadata']>;
-    }
-  >,
-  geometry: GeoJsonLineString,
-  pathLength: number
-): SuggestedOP[] =>
-  operationalPoints.map((op) => ({
-    opId: op.id,
-    name: op.extensions?.identifier?.name,
-    uic: op.extensions?.identifier?.uic,
-    ch: op.extensions?.sncf?.ch,
-    kp: op.part.extensions?.sncf?.kp,
-    trigram: op.extensions?.sncf?.trigram,
-    offsetOnTrack: op.part.position,
-    track: op.part.track,
-    positionOnPath: op.position,
-    coordinates: getPointCoordinates(geometry, pathLength, op.position),
-    metadata: op?.metadata,
-  }));
-
 export const matchPathStepAndOp = (
   step: PathItemLocation,
   op: Pick<SuggestedOP, 'opId' | 'uic' | 'ch' | 'trigram' | 'track' | 'offsetOnTrack'>
@@ -54,6 +31,37 @@ export const matchPathStepAndOp = (
   }
   return step.track === op.track && step.offset === op.offsetOnTrack;
 };
+
+export const formatSuggestedOperationalPoints = (
+  operationalPoints: Array<
+    NonNullable<Required<PathProperties['operational_points']>>[number] & {
+      metadata?: NonNullable<SuggestedOP['metadata']>;
+    }
+  >,
+  pathSteps: PathStep[],
+  geometry: GeoJsonLineString,
+  pathLength: number
+): SuggestedOP[] =>
+  operationalPoints
+    .map((op) => ({
+      opId: op.id,
+      name: op.extensions?.identifier?.name,
+      uic: op.extensions?.identifier?.uic,
+      ch: op.extensions?.sncf?.ch,
+      kp: op.part.extensions?.sncf?.kp,
+      trigram: op.extensions?.sncf?.trigram,
+      offsetOnTrack: op.part.position,
+      track: op.part.track,
+      positionOnPath: op.position,
+      coordinates: getPointCoordinates(geometry, pathLength, op.position),
+      metadata: op?.metadata,
+    }))
+    .map((op) => ({
+      ...op,
+      pathStepId: pathSteps.find(
+        (pathStep) => matchPathStepAndOp(pathStep, op) && op.kp === pathStep.kp
+      )?.id,
+    }));
 
 export const getPathfindingQuery = ({
   infraId,
@@ -124,10 +132,9 @@ export const upsertPathStepsInOPs = (ops: SuggestedOP[], pathSteps: PathStep[]):
       }
     } else {
       updatedOPs = updatedOPs.map((op) => {
-        if (matchPathStepAndOp(step, op) && op.kp === step.kp) {
+        if (step.id === op.pathStepId) {
           return {
             ...op,
-            pathStepId: step.id,
             stopFor,
             arrival,
             receptionSignal,
