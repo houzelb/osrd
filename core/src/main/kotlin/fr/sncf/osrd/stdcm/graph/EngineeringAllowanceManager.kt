@@ -141,13 +141,24 @@ class EngineeringAllowanceManager(private val graph: STDCMGraph) {
                     //          /
                     // We need to set the first constant speed part to 0
                     // so that we can use it as floor constraint
+
+                    // The min speed value isn't entirely trivial to determine:
+                    // We need it to be strictly positive to avoid NaN issues,
+                    // but we're also too optimistic with allowance possibility
+                    // when we let it get close to 0. But if it's too high, we miss
+                    // out on solutions.
+                    // So this is a magic value that could be tweaked if needed.
+                    //
+                    // Eventually, when we'll have actual capacity stops, we should
+                    // use the actual minimum speed on the network.
+                    val minSpeed = 1.0
                     builder.addPart(
                         EnvelopePart.generateTimes(
                             mutableListOf<SelfTypeHolder?>(
                                 EnvelopeProfile.CONSTANT_SPEED,
                             ),
                             doubleArrayOf(0.0, lastAccelerationPosition),
-                            doubleArrayOf(1e-5, 1e-5) // >0 to avoid NaN time delta
+                            doubleArrayOf(minSpeed, minSpeed)
                         )
                     )
                 }
@@ -168,7 +179,6 @@ class EngineeringAllowanceManager(private val graph: STDCMGraph) {
             if (slowdownPartBuilder.stepCount() > 1)
                 slowdownBuilder.addPart(slowdownPartBuilder.build())
             val slowestEnvelope = slowdownBuilder.build()
-            if (slowestEnvelope.minSpeed <= 1.0) return Double.POSITIVE_INFINITY
             return slowestEnvelope.totalTime
         } catch (e: OSRDError) {
             // We can be pessimistic: simulation error = no allowance
