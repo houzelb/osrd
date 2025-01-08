@@ -12,7 +12,7 @@ import { defaultCommonConf, buildCommonConfReducers } from 'reducers/osrdconf/os
 import type { OsrdStdcmConfState, StdcmPathStep } from 'reducers/osrdconf/types';
 import { addElementAtIndex } from 'utils/array';
 import { isArrivalDateInSearchTimeWindow } from 'utils/date';
-import type { ArrayElement } from 'utils/types';
+import type { ArrayElement, PickAndNonNullableFields } from 'utils/types';
 
 const DEFAULT_TOLERANCE = 1800; // 30min
 
@@ -136,17 +136,18 @@ export const stdcmConfSlice = createSlice({
     },
     updateStdcmEnvironment(
       state: Draft<OsrdStdcmConfState>,
-      action: PayloadAction<{
-        infraID: number;
-        timetableID: number;
-        searchDatetimeWindow?: {
-          begin: Date;
-          end: Date;
-        };
-        electricalProfileSetId?: number;
-        temporarySpeedLimitGroupId?: number;
-        workScheduleGroupId?: number;
-      }>
+      action: PayloadAction<
+        PickAndNonNullableFields<
+          OsrdStdcmConfState,
+          | 'infraID'
+          | 'timetableID'
+          | 'electricalProfileSetId'
+          | 'workScheduleGroupId'
+          | 'temporarySpeedLimitGroupId'
+          | 'searchDatetimeWindow',
+          'infraID' | 'timetableID'
+        >
+      >
     ) {
       const { searchDatetimeWindow } = action.payload;
       state.infraID = action.payload.infraID;
