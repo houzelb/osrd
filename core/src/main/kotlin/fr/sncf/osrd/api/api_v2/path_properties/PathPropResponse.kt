@@ -32,7 +32,8 @@ data class OperationalPointResponse(
     val id: String,
     val part: OperationalPointPartResponse,
     val extensions: OperationalPointExtensions?,
-    val position: Offset<Path>
+    val position: Offset<Path>,
+    val weight: Long?
 )
 
 data class OperationalPointPartResponse(
