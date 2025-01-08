@@ -124,7 +124,11 @@ export const upsertPathStepsInOPs = (ops: SuggestedOP[], pathSteps: PathStep[]):
       }
     } else {
       updatedOPs = updatedOPs.map((op) => {
-        if (matchPathStepAndOp(step, op) && op.kp === step.kp) {
+        if (
+          matchPathStepAndOp(step, op) &&
+          op.kp === step.kp &&
+          step.positionOnPath === op.positionOnPath
+        ) {
           return {
             ...op,
             pathStepId: step.id,
