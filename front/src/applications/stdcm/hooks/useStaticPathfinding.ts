@@ -32,7 +32,7 @@ const useStaticPathfinding = (infra?: InfraWithState) => {
 
   const [pathfinding, setPathfinding] = useState<PathfindingResult>();
 
-  const [postPathfindingBlocks] =
+  const [postPathfindingBlocks, { isFetching }] =
     osrdEditoastApi.endpoints.postInfraByInfraIdPathfindingBlocks.useLazyQuery();
 
   // When pathSteps changed
@@ -84,7 +84,7 @@ const useStaticPathfinding = (infra?: InfraWithState) => {
     [pathfinding, pathProperties]
   );
 
-  return result;
+  return { pathfinding: result, isPathFindingLoading: isFetching };
 };
 
 export default useStaticPathfinding;

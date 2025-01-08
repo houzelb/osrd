@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from '@osrd-project/ui-core';
 import cx from 'classnames';
@@ -90,8 +90,12 @@ const StdcmConfig = ({
   const totalLength = useSelector(getTotalLength);
   const maxSpeed = useSelector(getMaxSpeed);
 
-  const pathfinding = useStaticPathfinding(infra);
+  const [showMessage, setShowMessage] = useState(false);
+
+  const { pathfinding, isPathFindingLoading } = useStaticPathfinding(infra);
+
   const formRef = useRef<HTMLDivElement>(null);
+  const pathfindingBannerRef = useRef<HTMLDivElement>(null);
 
   const [formErrors, setFormErrors] = useState<StdcmConfigErrors>();
 
@@ -145,6 +149,13 @@ const StdcmConfig = ({
     );
   };
 
+  const getStatusMessage = () => {
+    if (isPathFindingLoading) {
+      return t('pathfindingStatus.calculating');
+    }
+    return t('pathfindingStatus.success');
+  };
+
   useEffect(() => {
     if (pathfinding) {
       const formErrorsStatus = checkStdcmConfigErrors(
@@ -176,6 +187,31 @@ const StdcmConfig = ({
       dispatch(restoreStdcmConfig(state));
     }
   }, []);
+
+  useEffect(() => {
+    if (isPathFindingLoading) {
+      setShowMessage(true);
+    }
+
+    if (pathfinding?.status === 'failure') {
+      setShowMessage(false);
+    }
+  }, [isPathFindingLoading, pathfinding?.status]);
+
+  useLayoutEffect(() => {
+    const handleAnimationEnd = () => {
+      setShowMessage(false);
+    };
+
+    if (!showMessage || formErrors) {
+      return undefined;
+    }
+    pathfindingBannerRef.current!.addEventListener('animationend', handleAnimationEnd);
+
+    return () => {
+      pathfindingBannerRef.current?.removeEventListener('animationend', handleAnimationEnd);
+    };
+  }, [showMessage, formErrors]);
 
   return (
     <div className="stdcm__body">
@@ -238,6 +274,20 @@ const StdcmConfig = ({
                 )}
               </div>
 
+              {!formErrors && showMessage && (
+                <div className="simulation-status-banner">
+                  <div className="banner-content">
+                    <div
+                      ref={pathfindingBannerRef}
+                      className={cx('pathfinding-status', {
+                        'pathfinding-status-success': pathfinding?.status === 'success',
+                      })}
+                    >
+                      {getStatusMessage()}
+                    </div>
+                  </div>
+                </div>
+              )}
               {isPending && (
                 <StdcmLoader
                   cancelStdcmRequest={cancelStdcmRequest}
