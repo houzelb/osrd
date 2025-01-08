@@ -407,10 +407,13 @@ private fun handlePostProcessingConflict(
     updatedTimeData: TimeData,
     fixedPoints: TreeSet<FixedTimePoint>,
     conflictOffset: Offset<TravelledPath>,
-    isMareco: Boolean
+    isMareco: Boolean,
 ): Envelope {
     postProcessingLogger.error(
         "Conflicts detected in post-processing, mismatch with the exploration data"
+    )
+    postProcessingLogger.error(
+        "NOTE: look through the logs for allowance issues, they may cause mismatches."
     )
     val conflictTime = fixedPoints.first { it.offset == conflictOffset }.time
     postProcessingLogger.info(
