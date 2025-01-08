@@ -15,7 +15,7 @@ import StdcmOperationalPoint from './StdcmOperationalPoint';
 import StdcmOpSchedule from './StdcmOpSchedule';
 import type { ArrivalTimeTypes, ScheduleConstraint, StdcmConfigCardProps } from '../../types';
 
-const StdcmDestination = ({ disabled = false }: StdcmConfigCardProps) => {
+const StdcmDestination = ({ disabled = false, showErrors }: StdcmConfigCardProps) => {
   const { t } = useTranslation('stdcm');
   const dispatch = useAppDispatch();
 
@@ -77,6 +77,7 @@ const StdcmDestination = ({ disabled = false }: StdcmConfigCardProps) => {
         location={destination.location}
         pathStepId={destination.id}
         disabled={disabled}
+        showErrors={showErrors}
       />
       <StdcmOpSchedule
         onArrivalChange={onArrivalChange}

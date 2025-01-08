@@ -16,6 +16,7 @@ type StdcmOperationalPointProps = {
   location?: StdcmPathStep['location'];
   pathStepId: string;
   disabled?: boolean;
+  showErrors?: boolean;
 };
 
 type Option = { label: string; value: string; uic: number };
@@ -24,7 +25,12 @@ function formatChCode(chCode: string) {
   return chCode === '' ? 'BV' : chCode;
 }
 
-const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperationalPointProps) => {
+const StdcmOperationalPoint = ({
+  location,
+  pathStepId,
+  disabled,
+  showErrors,
+}: StdcmOperationalPointProps) => {
   const { t } = useTranslation('stdcm');
   const dispatch = useAppDispatch();
 
@@ -35,6 +41,8 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
     });
 
   const { updateStdcmPathStep } = useOsrdConfActions() as StdcmConfSliceActions;
+
+  const isFieldEmpty = !searchTerm.trim();
 
   const operationalPointsSuggestions = useMemo(
     () =>
@@ -149,6 +157,11 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
           getSuggestionLabel={(option: Option) => option?.label}
           onSelectSuggestion={onSelectSuggestion}
           disableDefaultFilter
+          statusWithMessage={
+            showErrors && isFieldEmpty
+              ? { tooltip: 'left', status: 'error', message: t('form.missingValue') }
+              : undefined
+          }
         />
       </div>
       <div className="col-3 p-0">

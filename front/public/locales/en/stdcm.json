@@ -23,6 +23,7 @@
       "invalidDate": "Select a date between {{startDate}} and {{endDate}}"
     },
     "incompleteForm": "Incomplete form",
+    "missingValue": "Missing value",
     "viaNotDefined": "Au moins une localisation n'est pas renseignée"
   },
   "leaveAt": "Leave at {{ time }}",
