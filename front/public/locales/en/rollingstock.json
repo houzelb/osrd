@@ -42,7 +42,7 @@
     "missingInformation": "Missing informations",
     "minMaxRangeError": "The value must be between {{min}} and {{max}}",
     "minRangeError": "The value must be greater than {{min}}",
-    "rollingStockUsed": "This rollingstock is used in the following scenarios:",
+    "rollingStockUsed": "This rolling stock is used in the following scenarios:",
     "unableToRetrieveRollingStock": "Cannot fetch rolling stock",
     "unableToRetrieveRollingStockMessage": "An error has occurred",
     "ressourcesNotFound": "Resources not found"
@@ -82,7 +82,7 @@
   "noCompatibleVoltages": "No one",
   "noCurve": "No curve",
   "noDisplayFound": "No display",
-  "noRollingStock": "No selected rollingstock",
+  "noRollingStock": "No selected rolling stock",
   "notLocked": "Not locked",
   "number": "Number",
   "powerClass": "Power class",
@@ -100,7 +100,7 @@
   "rollingResistanceB": "Viscosity friction\u00A0(b)",
   "rollingResistanceC": "Aerodynamic drag\u00A0(c)",
   "rollingResistanceFormula": "R(v) = a + bv + cv²",
-  "rollingstockChoice": "Choose a rollingstock",
+  "rollingstockChoice": "Choose a rolling stock",
   "selectRollingStock": "Select",
   "series": "Series",
   "source": "Source",
@@ -115,12 +115,12 @@
     "rollingStockDetails": "General specifications"
   },
   "thermal": "Combustion engine",
-  "title": "Rollingstock composition generator",
+  "title": "Rolling stock composition generator",
   "tractionModes": "Traction modes",
   "type": "Type",
   "unit": "Unit",
   "unspecified": "Unspecified",
   "version": "Version",
-  "waitingLoader": "Please wait, rollingstock database loading...",
+  "waitingLoader": "Please wait, rolling stock database loading...",
   "yes": "Yes"
 }
