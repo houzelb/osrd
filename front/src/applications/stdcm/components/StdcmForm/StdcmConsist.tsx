@@ -200,7 +200,7 @@ const StdcmConsist = ({ consistErrors = {}, disabled = false }: StdcmConfigCardP
             consistErrors?.totalLength
               ? {
                   status: 'error',
-                  tooltip: 'right',
+                  tooltip: 'left',
                   message: t(consistErrors.totalLength, {
                     low: Math.floor((rollingStock?.length ?? 0) + (towedRollingStock?.length ?? 0)),
                     high: CONSIST_TOTAL_LENGTH_MAX,
@@ -230,7 +230,7 @@ const StdcmConsist = ({ consistErrors = {}, disabled = false }: StdcmConfigCardP
             consistErrors?.maxSpeed
               ? {
                   status: 'error',
-                  tooltip: 'right',
+                  tooltip: 'left',
                   message: t(consistErrors.maxSpeed, {
                     low: CONSIST_MAX_SPEED_MIN,
                     high: Math.floor(

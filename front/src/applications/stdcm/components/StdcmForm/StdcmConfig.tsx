@@ -218,10 +218,7 @@ const StdcmConfig = ({
                   isDisabled={
                     disabled ||
                     !showBtnToLaunchSimulation ||
-                    formErrors?.errorType === StdcmConfigErrorTypes.INFRA_NOT_LOADED ||
-                    !!consistErrors.totalMass ||
-                    !!consistErrors.totalLength ||
-                    !!consistErrors.maxSpeed
+                    formErrors?.errorType === StdcmConfigErrorTypes.INFRA_NOT_LOADED
                   }
                 />
                 {formErrors && (
