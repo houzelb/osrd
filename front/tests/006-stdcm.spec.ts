@@ -1,6 +1,6 @@
 import type { Infra, TowedRollingStock } from 'common/api/osrdEditoastApi';
 
-import { electricRollingStockName } from './assets/project-const';
+import { electricRollingStockName, fastRollingStockName } from './assets/project-const';
 import HomePage from './pages/home-page-model';
 import STDCMPage, { type ConsistFields } from './pages/stdcm-page-model';
 import test from './test-logger';
@@ -20,7 +20,7 @@ test.describe('Verify train schedule elements and filters', () => {
   let infra: Infra;
   let OSRDLanguage: string;
   let createdTowedRollingStock: TowedRollingStock;
-  const UPDATED_TONNAGE = '1061';
+  const UPDATED_ORIGIN_ARRIVAL_DATE = '18/10/24';
   const consistDetails: ConsistFields = {
     tractionEngine: electricRollingStockName,
     tonnage: '950',
@@ -32,6 +32,11 @@ test.describe('Verify train schedule elements and filters', () => {
     tonnage: '900',
     length: '400',
     maxSpeed: '288',
+  };
+  const fastRollingStockPrefilledValues = {
+    tonnage: '190',
+    length: '45',
+    maxSpeed: '220',
   };
   const towedRollingStockPrefilledValues = {
     tonnage: '46',
@@ -133,15 +138,15 @@ test.describe('Verify train schedule elements and filters', () => {
   /** *************** Test 4 **************** */
   test('Launch simulation with and without capacity for towed rolling stock', async ({ page }) => {
     const towedConsistDetails: ConsistFields = {
-      tractionEngine: electricRollingStockName,
+      tractionEngine: fastRollingStockName,
       towedRollingStock: createdTowedRollingStock.name,
     };
     const stdcmPage = new STDCMPage(page);
     await stdcmPage.fillAndVerifyConsistDetails(
       towedConsistDetails,
-      tractionEnginePrefilledValues.tonnage,
-      tractionEnginePrefilledValues.length,
-      tractionEnginePrefilledValues.maxSpeed,
+      fastRollingStockPrefilledValues.tonnage,
+      fastRollingStockPrefilledValues.length,
+      fastRollingStockPrefilledValues.maxSpeed,
       towedRollingStockPrefilledValues.tonnage,
       towedRollingStockPrefilledValues.length,
       towedRollingStockPrefilledValues.maxSpeed
@@ -159,12 +164,12 @@ test.describe('Verify train schedule elements and filters', () => {
       simulationNumber: 1,
     });
     // Update tonnage and launch a second simulation with capacity
-    await handleAndVerifyInput(stdcmPage.tonnageField, UPDATED_TONNAGE);
+    await handleAndVerifyInput(stdcmPage.dateOriginArrival, UPDATED_ORIGIN_ARRIVAL_DATE);
     await stdcmPage.launchSimulation();
     await stdcmPage.verifySimulationDetails({
       language: OSRDLanguage,
       simulationNumber: 2,
-      simulationLengthAndDuration: '51 km — 24min',
+      simulationLengthAndDuration: '51 km — 2h 35min',
     });
     await stdcmPage.verifyTableData(
       './tests/assets/stdcm/towedRollingStock/towedRollingStockTableResult.json'
