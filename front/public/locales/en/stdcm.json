@@ -50,6 +50,10 @@
   },
   "noCorrespondingResults": "No results matching your search.",
   "notificationTitle": "Phase 1: from D-7 to D-1 5pm, on the Perrigny-Miramas axis.",
+  "pathfindingStatus": {
+    "calculating": "Validating path...",
+    "success": "The requested path is valid."
+  },
   "pleaseWait": "Please wait…",
   "simulation": {
     "calculatingSimulation": "Calculation in progress...",

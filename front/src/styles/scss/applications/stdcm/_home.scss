@@ -258,6 +258,9 @@
     .banner-content {
       padding: 0 0 16px 378px;
       background: linear-gradient(180deg, rgba(239, 243, 245) 40px, rgba(233, 239, 242) 40px);
+      &:has(.pathfinding-status) {
+        padding: 0;
+      }
       .status {
         width: 466px;
         display: flex;
@@ -293,6 +296,45 @@
         color: rgba(49, 46, 43, 1);
         line-height: 24px;
         text-align: center;
+      }
+
+      .pathfinding-status {
+        left: -8px;
+        position: absolute;
+        bottom: -95px;
+        width: calc(100% + 16px);
+        display: flex;
+        justify-content: center;
+        line-height: 24px;
+        border-radius: 8px;
+        color: var(--info60);
+        background-color: var(--info5);
+        padding-block: 22px 26px;
+        box-shadow:
+          0 0 0 4px rgba(255, 255, 255, 1) inset,
+          0 0 0 5px rgb(112, 193, 229) inset,
+          0 3px 7px -3px rgba(28, 28, 217, 0.4);
+        &-success {
+          color: var(--success60);
+          background-color: var(--success5);
+          opacity: 0;
+          box-shadow:
+            0 0 0 4px rgba(255, 255, 255, 1) inset,
+            0 0 0 5px rgb(60, 202, 128) inset,
+            0 3px 7px -3px rgba(11, 114, 60, 0.4);
+          animation: pathfinding-success 2.7s;
+        }
+      }
+      @keyframes pathfinding-success {
+        0% {
+          opacity: 1;
+        }
+        74% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
       }
     }
   }
