@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { compact } from 'lodash';
+import { compact, isEqual } from 'lodash';
 import { useSelector } from 'react-redux';
 
 import {
@@ -13,11 +13,21 @@ import usePathProperties from 'modules/pathfinding/hooks/usePathProperties';
 import { getPathfindingQuery } from 'modules/pathfinding/utils';
 import { useStoreDataForRollingStockSelector } from 'modules/rollingStock/components/RollingStockSelector/useStoreDataForRollingStockSelector';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
+import type { StdcmPathStep } from 'reducers/osrdconf/types';
+
+/**
+ * Compute the path items locations from the path steps
+ */
+function pathStepsToLocations(
+  pathSteps: StdcmPathStep[]
+): Array<NonNullable<StdcmPathStep['location']>> {
+  return compact(pathSteps.map((s) => s.location));
+}
 
 const useStaticPathfinding = (infra?: InfraWithState) => {
   const { getStdcmPathSteps } = useOsrdConfSelectors() as StdcmConfSelectors;
-
   const pathSteps = useSelector(getStdcmPathSteps);
+  const [pathStepsLocations, setPathStepsLocations] = useState(pathStepsToLocations(pathSteps));
   const { rollingStock } = useStoreDataForRollingStockSelector();
 
   const [pathfinding, setPathfinding] = useState<PathfindingResult>();
@@ -25,10 +35,15 @@ const useStaticPathfinding = (infra?: InfraWithState) => {
   const [postPathfindingBlocks] =
     osrdEditoastApi.endpoints.postInfraByInfraIdPathfindingBlocks.useLazyQuery();
 
-  const pathStepsLocations = useMemo(
-    () => compact(pathSteps.map((step) => step.location)),
-    [pathSteps]
-  );
+  // When pathSteps changed
+  // => update the pathStepsLocations (if needed by doing a deep comparison).
+  useEffect(() => {
+    setPathStepsLocations((prev) => {
+      const newSteps = pathStepsToLocations(pathSteps);
+      if (isEqual(prev, newSteps)) return prev;
+      return newSteps;
+    });
+  }, [pathSteps]);
 
   const pathProperties = usePathProperties(
     infra?.id,
