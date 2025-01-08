@@ -147,7 +147,7 @@ const StdcmConfig = ({
       );
       setFormErrors(formErrorsStatus);
     }
-  }, [pathfinding]);
+  }, [pathfinding, pathSteps, t]);
 
   useEffect(() => {
     if (!isDebugMode) {
