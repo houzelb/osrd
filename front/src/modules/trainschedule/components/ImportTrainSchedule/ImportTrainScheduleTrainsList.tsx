@@ -38,6 +38,7 @@ type ImportTrainScheduleTrainsListProps = {
   trainsJsonData: TrainScheduleBase[];
   trainsXmlData: ImportedTrainSchedule[];
   upsertTrainSchedules: (trainSchedules: TrainScheduleResult[]) => void;
+  dtoImport: () => void;
 };
 
 const ImportTrainScheduleTrainsList = ({
@@ -48,6 +49,7 @@ const ImportTrainScheduleTrainsList = ({
   trainsJsonData,
   trainsXmlData,
   upsertTrainSchedules,
+  dtoImport,
 }: ImportTrainScheduleTrainsListProps) => {
   const { t } = useTranslation(['operationalStudies/importTrainSchedule']);
   const rollingStockDict = useMemo(
@@ -91,6 +93,7 @@ const ImportTrainScheduleTrainsList = ({
 
       const trainSchedules = await postTrainSchedule({ id: timetableId, body: payloads }).unwrap();
       upsertTrainSchedules(trainSchedules);
+      dtoImport();
       dispatch(
         setSuccess({
           title: t('success'),

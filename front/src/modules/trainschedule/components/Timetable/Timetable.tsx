@@ -64,6 +64,7 @@ const Timetable = ({
   const removeAndUnselectTrains = (trainIds: number[]) => {
     removeTrains(trainIds);
     setSelectedTrainIds([]);
+    dtoImport();
   };
 
   const toggleConflictsListExpanded = () => {

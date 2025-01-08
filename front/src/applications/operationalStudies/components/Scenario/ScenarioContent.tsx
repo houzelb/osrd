@@ -212,6 +212,7 @@ const ScenarioContent = ({
               <ImportTrainSchedule
                 timetableId={scenario.timetable_id}
                 upsertTrainSchedules={upsertTrainSchedules}
+                dtoImport={dtoImport}
               />
             </div>
           )}
