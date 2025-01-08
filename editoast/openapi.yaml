@@ -8087,6 +8087,7 @@ components:
             - id
             - part
             - position
+            - weight
             properties:
               extensions:
                 $ref: '#/components/schemas/OperationalPointExtensions'
@@ -8100,6 +8101,12 @@ components:
                 type: integer
                 format: int64
                 description: Distance from the beginning of the path in mm
+                minimum: 0
+              weight:
+                type: integer
+                format: int32
+                description: Importance of the operational point
+                nullable: true
                 minimum: 0
           description: Operational points along the path
           nullable: true

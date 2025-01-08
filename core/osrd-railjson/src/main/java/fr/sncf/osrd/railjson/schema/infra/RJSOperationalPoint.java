@@ -14,11 +14,18 @@ public class RJSOperationalPoint implements Identified {
     @Nullable
     public RJSOperationalPointExtensions extensions;
 
+    @Nullable
+    public String weight;
+
     public RJSOperationalPoint(
-            String id, List<RJSOperationalPointPart> parts, @Nullable RJSOperationalPointExtensions extensions) {
+            String id,
+            List<RJSOperationalPointPart> parts,
+            @Nullable RJSOperationalPointExtensions extensions,
+            @Nullable String weight) {
         this.id = id;
         this.parts = parts;
         this.extensions = extensions;
+        this.weight = weight;
     }
 
     @Override

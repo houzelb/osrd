@@ -611,6 +611,7 @@ export const sampleWithMultipleOperationalPoints: NonNullable<
       },
     },
     position: 0,
+    weight: null,
   },
   {
     id: 'Mid_West_station',
@@ -625,6 +626,7 @@ export const sampleWithMultipleOperationalPoints: NonNullable<
       },
     },
     position: 12050000,
+    weight: null,
   },
   {
     id: 'Mid_East_station',
@@ -639,6 +641,7 @@ export const sampleWithMultipleOperationalPoints: NonNullable<
       },
     },
     position: 26500000,
+    weight: null,
   },
 ];
 
@@ -687,5 +690,6 @@ export const sampleWithOneOperationalPoint: OperationalPoint[] = [
       },
     },
     position: 4069000,
+    weight: null,
   },
 ];

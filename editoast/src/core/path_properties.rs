@@ -78,6 +78,9 @@ pub struct OperationalPointOnPath {
     extensions: OperationalPointExtensions,
     /// Distance from the beginning of the path in mm
     position: u64,
+    /// Importance of the operational point
+    #[schema(required)]
+    weight: Option<u8>,
 }
 
 /// Zones along a path. Each value is associated to a range of the path.
