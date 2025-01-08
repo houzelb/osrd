@@ -4716,7 +4716,7 @@ components:
       - $ref: '#/components/schemas/EditoastListErrorsErrorsWrongErrorTypeProvided'
       - $ref: '#/components/schemas/EditoastListErrorsRailjsonWrongRailjsonVersionProvided'
       - $ref: '#/components/schemas/EditoastMacroNodeErrorNotFound'
-      - $ref: '#/components/schemas/EditoastModelErrorError'
+      - $ref: '#/components/schemas/EditoastModelError'
       - $ref: '#/components/schemas/EditoastMqClientErrorConnectionDoesNotExist'
       - $ref: '#/components/schemas/EditoastMqClientErrorLapin'
       - $ref: '#/components/schemas/EditoastMqClientErrorPoolChannelFail'
@@ -5060,7 +5060,7 @@ components:
           type: string
           enum:
           - editoast:macro_node:NotFound
-    EditoastModelErrorError:
+    EditoastModelError:
       type: object
       required:
       - type

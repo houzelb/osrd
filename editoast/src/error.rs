@@ -266,7 +266,7 @@ impl EditoastError for editoast_schemas::errors::GeometryError {
 }
 
 inventory::submit! {
-    ErrorDefinition::new("editoast:model:ModelError", "Error", "ModelError", 500u16, r#"{}"#)
+    ErrorDefinition::new("editoast:model:ModelError", "", "ModelError", 500u16, r#"{}"#)
 }
 impl EditoastError for editoast_models::model::Error {
     fn get_status(&self) -> StatusCode {
