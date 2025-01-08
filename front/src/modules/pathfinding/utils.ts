@@ -32,6 +32,17 @@ export const matchPathStepAndOp = (
   return step.track === op.track && step.offset === op.offsetOnTrack;
 };
 
+export const populatePathStepIdInSuggestedOPs = (
+  suggestedOPs: SuggestedOP[],
+  pathSteps: PathStep[]
+): SuggestedOP[] =>
+  suggestedOPs.map((op) => ({
+    ...op,
+    pathStepId: pathSteps.find(
+      (pathStep) => matchPathStepAndOp(pathStep, op) // TODO: && op.kp === pathStep.kp
+    )?.id,
+  }));
+
 export const formatSuggestedOperationalPoints = (
   operationalPoints: Array<
     NonNullable<Required<PathProperties['operational_points']>>[number] & {
@@ -41,27 +52,22 @@ export const formatSuggestedOperationalPoints = (
   pathSteps: PathStep[],
   geometry: GeoJsonLineString,
   pathLength: number
-): SuggestedOP[] =>
-  operationalPoints
-    .map((op) => ({
-      opId: op.id,
-      name: op.extensions?.identifier?.name,
-      uic: op.extensions?.identifier?.uic,
-      ch: op.extensions?.sncf?.ch,
-      kp: op.part.extensions?.sncf?.kp,
-      trigram: op.extensions?.sncf?.trigram,
-      offsetOnTrack: op.part.position,
-      track: op.part.track,
-      positionOnPath: op.position,
-      coordinates: getPointCoordinates(geometry, pathLength, op.position),
-      metadata: op?.metadata,
-    }))
-    .map((op) => ({
-      ...op,
-      pathStepId: pathSteps.find(
-        (pathStep) => matchPathStepAndOp(pathStep, op) && op.kp === pathStep.kp
-      )?.id,
-    }));
+): SuggestedOP[] => {
+  const suggestedOPs = operationalPoints.map((op) => ({
+    opId: op.id,
+    name: op.extensions?.identifier?.name,
+    uic: op.extensions?.identifier?.uic,
+    ch: op.extensions?.sncf?.ch,
+    kp: op.part.extensions?.sncf?.kp,
+    trigram: op.extensions?.sncf?.trigram,
+    offsetOnTrack: op.part.position,
+    track: op.part.track,
+    positionOnPath: op.position,
+    coordinates: getPointCoordinates(geometry, pathLength, op.position),
+    metadata: op?.metadata,
+  }));
+  return populatePathStepIdInSuggestedOPs(suggestedOPs, pathSteps);
+};
 
 export const getPathfindingQuery = ({
   infraId,

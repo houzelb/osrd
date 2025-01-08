@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
 import type { PathfindingResult } from 'common/api/osrdEditoastApi';
+import { populatePathStepIdInSuggestedOPs } from 'modules/pathfinding/utils';
 
 import { updatePathStepsFromOperationalPoints } from '../useSetupItineraryForTrainUpdate';
 
@@ -177,7 +178,7 @@ describe('updatePathStepsFrom', () => {
       ];
       const result = updatePathStepsFromOperationalPoints(
         pathSteps,
-        suggestedOpPoints,
+        populatePathStepIdInSuggestedOPs(suggestedOpPoints, pathSteps),
         pathFindingResult as Extract<PathfindingResult, { status: 'success' }>,
         stepsCoordinates
       );
@@ -253,7 +254,7 @@ describe('updatePathStepsFrom', () => {
       ];
       const result = updatePathStepsFromOperationalPoints(
         pathSteps,
-        suggestedOpPoints,
+        populatePathStepIdInSuggestedOPs(suggestedOpPoints, pathSteps),
         pathFindingResult as Extract<PathfindingResult, { status: 'success' }>,
         stepsCoordinates
       );
