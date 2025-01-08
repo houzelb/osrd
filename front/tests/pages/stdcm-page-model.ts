@@ -35,7 +35,7 @@ export interface ConsistFields {
   speedLimitTag?: string;
 }
 const EXPECT_TO_PASS_TIMEOUT = 90_000; // Since toPass ignores custom expect timeouts, this timeout is set to account for all actions within the function.
-
+const MINIMUM_SIMULATION_NUMBER = 1;
 class STDCMPage {
   readonly page: Page;
 
@@ -606,21 +606,23 @@ class STDCMPage {
   }
 
   // Launch the simulation and check if simulation-related elements are visible
-  async launchSimulation() {
-    await expect(async () => {
-      await this.launchSimulationButton.waitFor();
-      await expect(this.launchSimulationButton).toBeEnabled();
-      await this.launchSimulationButton.click({ force: true });
-      const simulationElements = await this.simulationList.all();
-      await Promise.all(simulationElements.map((simulationElement) => simulationElement.waitFor()));
-      expect(await this.simulationList.count()).toBeGreaterThanOrEqual(1);
-      // Check map result container visibility only for Chromium browser
-      if (this.page.context().browser()?.browserType().name() === 'chromium') {
-        await expect(this.mapResultContainer).toBeVisible();
-      }
-    }).toPass({
-      timeout: EXPECT_TO_PASS_TIMEOUT,
-    });
+  async launchSimulation(): Promise<void> {
+    await this.launchSimulationButton.waitFor({ state: 'visible' });
+    await expect(this.launchSimulationButton).toBeEnabled();
+    await this.launchSimulationButton.click({ force: true });
+    // Wait for simulation elements to load and validate their presence
+    await this.simulationList.waitFor({ timeout: 60_000 });
+    const simulationElements = await this.simulationList.all();
+
+    if (simulationElements.length < MINIMUM_SIMULATION_NUMBER) {
+      throw new Error(
+        `Expected at least ${MINIMUM_SIMULATION_NUMBER} simulation, but found ${simulationElements.length}.`
+      );
+    }
+    // Check map result container visibility only for Chromium browser
+    if (this.page.context().browser()?.browserType().name() === 'chromium') {
+      await expect(this.mapResultContainer).toBeVisible();
+    }
   }
 
   async verifyTableData(tableDataPath: string): Promise<void> {
