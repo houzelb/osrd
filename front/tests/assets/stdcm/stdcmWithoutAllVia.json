@@ -6,7 +6,7 @@
     "endStop": "",
     "passageStop": "",
     "startStop": "20:21",
-    "weight": "400t",
+    "weight": "950t",
     "refEngine": ""
   },
   {
@@ -23,10 +23,10 @@
     "index": 3,
     "operationalPoint": "South_station",
     "code": "BV",
-    "endStop": "20:56",
+    "endStop": "20:57",
     "passageStop": "",
     "startStop": "",
-    "weight": "400t",
+    "weight": "950t",
     "refEngine": ""
   }
 ]

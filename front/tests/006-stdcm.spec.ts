@@ -20,11 +20,11 @@ test.describe('Verify train schedule elements and filters', () => {
   let infra: Infra;
   let OSRDLanguage: string;
   let createdTowedRollingStock: TowedRollingStock;
-  const UPDATED_TONNAGE = '561';
+  const UPDATED_TONNAGE = '1061';
   const consistDetails: ConsistFields = {
     tractionEngine: electricRollingStockName,
-    tonnage: '400',
-    length: '300',
+    tonnage: '950',
+    length: '567',
     maxSpeed: '180',
     speedLimitTag: 'HLP',
   };
