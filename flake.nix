@@ -61,7 +61,7 @@
               # Tools & Libs
               diesel-cli
               cargo-watch
-              osmium-tool
+              # osmium-tool : currently broken in nixpkgs
               taplo
 
               # API
