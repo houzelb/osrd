@@ -14,9 +14,11 @@ import { useAppDispatch } from 'store';
 const ImportTrainSchedule = ({
   timetableId,
   upsertTrainSchedules,
+  dtoImport,
 }: {
   timetableId: number;
   upsertTrainSchedules: (trainSchedules: TrainScheduleResult[]) => void;
+  dtoImport: () => void;
 }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation(['rollingstock']);
@@ -57,6 +59,7 @@ const ImportTrainSchedule = ({
         trainsJsonData={trainsJsonData}
         trainsXmlData={trainsXmlData}
         upsertTrainSchedules={upsertTrainSchedules}
+        dtoImport={dtoImport}
       />
     </main>
   ) : (
