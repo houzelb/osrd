@@ -2567,6 +2567,8 @@ export type PathProperties = {
         part: OperationalPointPart;
         /** Distance from the beginning of the path in mm */
         position: number;
+        /** Importance of the operational point */
+        weight: number | null;
       }[]
     | null;
   slopes?: {

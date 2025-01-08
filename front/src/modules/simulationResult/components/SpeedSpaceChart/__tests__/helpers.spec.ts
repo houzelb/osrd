@@ -48,6 +48,7 @@ describe('formatStops', () => {
           position: 0,
           track: 'track',
         },
+        weight: null,
       },
     ];
     const expected = [{ position: { start: 0 }, value: 'name ch' }];

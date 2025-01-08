@@ -132,8 +132,9 @@ class PathPropertiesTests {
                     ),
                     RJSOperationalPointExtensions(
                         RJSOperationalPointSncfExtension(0, "BV", "B", "0", "TRI"),
-                        null
-                    )
+                        null,
+                    ),
+                    null
                 ),
                 RJSOperationalPoint(
                     "point2",
@@ -147,6 +148,7 @@ class PathPropertiesTests {
                         ),
                         RJSOperationalPointPart("TA1", 1_950.0, null),
                     ),
+                    null,
                     null
                 )
             )
