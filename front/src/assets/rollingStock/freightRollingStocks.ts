@@ -108,6 +108,7 @@ export const FREIGHT_ROLLING_STOCKS = [
   'Y8000AP',
   'Y9000US',
   'electric_rolling_stock_test_e2e',
+  'FAST_ROLLING_STOCK_TEST_E2E',
 ];
 
 export const ALLOWED_TOWED_ROLLING_STOCKS = [

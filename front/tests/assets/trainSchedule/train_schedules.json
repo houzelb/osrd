@@ -208,7 +208,7 @@
   {
     "train_name": "Train 7",
     "labels": ["Tag-7", "WS-NES"],
-    "rolling_stock_name": "fast_rolling_stock_test_e2e",
+    "rolling_stock_name": "FAST_ROLLING_STOCK_TEST_E2E",
     "start_time": "2024-10-17T08:37:00Z",
     "path": [
       { "id": "id2121", "deleted": false, "uic": 2, "secondary_code": "BV" },
