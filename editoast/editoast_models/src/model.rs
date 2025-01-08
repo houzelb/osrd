@@ -18,41 +18,36 @@ pub enum Error {
 
 impl From<diesel::result::Error> for Error {
     fn from(e: diesel::result::Error) -> Self {
-        match &e {
-            diesel::result::Error::DatabaseError(DatabaseErrorKind::UniqueViolation, inner) => {
-                static RE: LazyLock<Regex> = LazyLock::new(|| {
-                    Regex::new(
-                        r#"duplicate key value violates unique constraint "([0-9a-zA-Z_-]+)""#,
-                    )
+        if let diesel::result::Error::DatabaseError(DatabaseErrorKind::UniqueViolation, inner) = &e
+        {
+            static RE: LazyLock<Regex> = LazyLock::new(|| {
+                Regex::new(r#"duplicate key value violates unique constraint "([0-9a-zA-Z_-]+)""#)
                     .unwrap()
-                });
-                if let Some(captures) = RE.captures((*inner).message()) {
-                    Self::UniqueViolation {
-                        constraint: captures.get(1).unwrap().as_str().to_string(),
-                    }
-                } else {
-                    tracing::error!(?RE, %e, "failed to parse PostgreSQL error message");
-                    Self::DatabaseError(e.into())
-                }
+            });
+            if let Some(captures) = RE.captures((*inner).message()) {
+                return Self::UniqueViolation {
+                    constraint: captures.get(1).unwrap().as_str().to_string(),
+                };
+            } else {
+                tracing::error!(?RE, %e, "failed to parse PostgreSQL error message");
             }
-            diesel::result::Error::DatabaseError(DatabaseErrorKind::CheckViolation, inner) => {
-                static RE: LazyLock<Regex> = LazyLock::new(|| {
-                    Regex::new(
+        }
+        if let diesel::result::Error::DatabaseError(DatabaseErrorKind::CheckViolation, inner) = &e {
+            static RE: LazyLock<Regex> = LazyLock::new(|| {
+                Regex::new(
                         r#"new row for relation "([0-9a-zA-Z_-]+)" violates check constraint "([0-9a-zA-Z_-]+)""#,
                     )
                     .unwrap()
-                });
-                if let Some(captures) = RE.captures((*inner).message()) {
-                    Self::CheckViolation {
-                        relation: captures.get(1).unwrap().as_str().to_string(),
-                        constraint: captures.get(2).unwrap().as_str().to_string(),
-                    }
-                } else {
-                    tracing::error!(?RE, %e, "failed to parse PostgreSQL error message");
-                    Self::DatabaseError(e.into())
-                }
+            });
+            if let Some(captures) = RE.captures((*inner).message()) {
+                return Self::CheckViolation {
+                    relation: captures.get(1).unwrap().as_str().to_string(),
+                    constraint: captures.get(2).unwrap().as_str().to_string(),
+                };
+            } else {
+                tracing::error!(?RE, %e, "failed to parse PostgreSQL error message");
             }
-            _ => Self::DatabaseError(e.into()),
         }
+        Self::DatabaseError(e.into())
     }
 }
