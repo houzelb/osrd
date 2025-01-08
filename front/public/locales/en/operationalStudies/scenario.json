@@ -44,7 +44,7 @@
   "scenarioUpdatedDetails": "Scenario {{ name }} has been updated.",
   "timetable": {
     "addTrainSchedule": "Add",
-    "advancedFilterLabel": "Rollingstock",
+    "advancedFilterLabel": "Rolling stock",
     "choosePath": "Use this path",
     "closeFilter": "Close filter",
     "compositionCodes": "Composition codes",
