@@ -8,7 +8,7 @@ import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmPathStep } from 'reducers/osrdconf/types';
 import { useAppDispatch } from 'store';
-import { dateToHHMMSS, formatDateString } from 'utils/date';
+import { formatDateString } from 'utils/date';
 import { createStringSelectOptions } from 'utils/uiCoreHelpers';
 
 import type { ArrivalTimeTypes, ScheduleConstraint } from '../../types';
@@ -28,16 +28,14 @@ const StdcmOpSchedule = ({ disabled, pathStep, opId, isOrigin = false }: StdcmOp
   const { getSearchDatetimeWindow } = useOsrdConfSelectors();
   const searchDatetimeWindow = useSelector(getSearchDatetimeWindow);
 
-  const { arrivalTime, arrivalTimeHours, arrivalTimeMinutes } = useMemo(() => {
+  const { arrivalTimeHours, arrivalTimeMinutes } = useMemo(() => {
     if (!pathStep.arrival) {
       return {
-        arrivalTime: undefined,
         arrivalTimeHours: undefined,
         arrivalTimeMinutes: undefined,
       };
     }
     return {
-      arrivalTime: dateToHHMMSS(pathStep.arrival, { withoutSeconds: true }),
       arrivalTimeHours: pathStep.arrival.getHours(),
       arrivalTimeMinutes: pathStep.arrival.getMinutes(),
     };
@@ -143,7 +141,6 @@ const StdcmOpSchedule = ({ disabled, pathStep, opId, isOrigin = false }: StdcmOp
               });
             }}
             disabled={disabled}
-            value={arrivalTime}
             readOnly={false}
           />
           <div className="mr-n2 pr-1">
