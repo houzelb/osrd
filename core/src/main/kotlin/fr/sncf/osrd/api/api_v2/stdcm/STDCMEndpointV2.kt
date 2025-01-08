@@ -377,7 +377,7 @@ private fun checkForConflicts(
 
 private fun findWaypointBlocks(
     infra: FullInfra,
-    waypoints: Collection<TrackLocation>,
+    waypoints: Collection<TrackLocation>
 ): Set<PathfindingEdgeLocationId<Block>> {
     val waypointBlocks = HashSet<PathfindingEdgeLocationId<Block>>()
     for (waypoint in waypoints) {

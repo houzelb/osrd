@@ -143,5 +143,5 @@ class SimulationPowerRestrictionItem(
 )
 
 class TrainScheduleOptions(
-    @Json(name = "use_electrical_profiles") val useElectricalProfiles: Boolean,
+    @Json(name = "use_electrical_profiles") val useElectricalProfiles: Boolean
 )
