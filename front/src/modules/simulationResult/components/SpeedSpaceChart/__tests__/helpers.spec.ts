@@ -51,7 +51,15 @@ describe('formatStops', () => {
         weight: null,
       },
     ];
-    const expected = [{ position: { start: 0 }, value: 'name ch' }];
+    const expected = [
+      {
+        position: { start: 0 },
+        value: {
+          name: 'name ch',
+          weight: null,
+        },
+      },
+    ];
     expect(formatStops(operationalPoints)).toEqual(expected);
   });
 });
