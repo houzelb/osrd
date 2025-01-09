@@ -1,6 +1,8 @@
 package fr.sncf.osrd.envelope;
 
 import static fr.sncf.osrd.envelope_utils.DoubleUtils.clamp;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -157,26 +159,27 @@ public class EnvelopeConcat implements EnvelopeInterpolate {
         var firstEnvelopeIndex = findEnvelopeIndexAt(beginPos, false);
         assert firstEnvelopeIndex != -1 : "Trying to interpolate time outside of the envelope";
         var firstEnvelope = envelopes.get(firstEnvelopeIndex);
-        var beginSpeed = firstEnvelope.envelope.maxSpeedInRange(
-                beginPos - firstEnvelope.startOffset, firstEnvelope.envelope.getEndPos());
+        var firstEnvelopeMaxSpeed = firstEnvelope.envelope.maxSpeedInRange(
+                beginPos - firstEnvelope.startOffset,
+                min(firstEnvelope.envelope.getEndPos(), endPos - firstEnvelope.startOffset));
 
         var lastEnvelopeIndex = findEnvelopeIndexAt(endPos, true);
+        if (lastEnvelopeIndex == firstEnvelopeIndex) return firstEnvelopeMaxSpeed;
         assert lastEnvelopeIndex != -1 : "Trying to interpolate time outside of the envelope";
         var lastEnvelope = envelopes.get(lastEnvelopeIndex);
         var endOffset = endPos - lastEnvelope.startOffset;
         if (Math.abs(endOffset - lastEnvelope.envelope.getEndPos()) < 1e-6) {
             endOffset = lastEnvelope.envelope.getEndPos();
         }
-        var endSpeed = lastEnvelope.envelope.maxSpeedInRange(0, endOffset);
+        var lastEnvelopeMaxSpeed = lastEnvelope.envelope.maxSpeedInRange(0, endOffset);
 
-        var maxSpeed = beginSpeed;
+        var maxSpeed = max(firstEnvelopeMaxSpeed, lastEnvelopeMaxSpeed);
         for (var i = firstEnvelopeIndex + 1; i < lastEnvelopeIndex; i++) {
             var envelope = envelopes.get(i);
             var speed = envelope.envelope.maxSpeedInRange(0, envelope.envelope.getEndPos());
             if (speed > maxSpeed) maxSpeed = speed;
         }
 
-        if (endSpeed > maxSpeed) maxSpeed = endSpeed;
         return maxSpeed;
     }
 
