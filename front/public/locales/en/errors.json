@@ -55,6 +55,7 @@
       "InvalidLocations": "Some locations are invalid"
     },
     "document": {
+      "Database": "Internal error (database)",
       "NotFound": "Document '{{document_key}}' not found"
     },
     "electrical_profiles": {
@@ -101,6 +102,9 @@
     "macro_node": {
       "NotFound": "Node {{node_id}} not found."
     },
+    "model": {
+      "ModelError": "Internal error (database query)"
+    },
     "operation": {
       "EmptyId": "Empty string id is forbidden",
       "InvalidPatch": "A Json Patch error occurred",
@@ -141,6 +145,7 @@
       "BasePowerClassEmpty": "Base power class is an empty string",
       "CannotCreateCompoundImage": "Impossible to copy the separated image on the compound image",
       "CannotReadImage": "Impossible to read the separated image",
+      "Database": "Internal error (database)",
       "NameAlreadyUsed": "Name '{{name}}' already used",
       "KeyNotFound": "Rolling stock '{{rolling_stock_key.key}}' could not be found",
       "LiveryMultipartError": "Invalid multipart request while uploading livery",
@@ -152,6 +157,7 @@
       "IsLocked": "Towed rolling stock '{{towed_rolling_stock_id}}' is locked"
     },
     "scenario": {
+      "Database": "Internal error (database)",
       "NotFound": "Scenario not found"
     },
     "search": {
@@ -161,7 +167,7 @@
       "EmptyArray": "Empty arrays are invalid syntax",
       "IntegerConversion": "Could not convert to i64",
       "InvalidColumnName": "Invalid column name",
-      "InvalidFunctionIdentifier": "Function identifer must be a string",
+      "InvalidFunctionIdentifier": "Function identifier must be a string",
       "InvalidSyntax": "Invalid syntax",
       "ObjectType": "Object type is invalid",
       "QueryAst": "Query Boolean type is expected",
@@ -194,10 +200,12 @@
       "TimetableNotFound": "Timetable '{{timetable_id}}' does not exist"
     },
     "study": {
+      "Database": "Internal error (database)",
       "NotFound": "Study '{{study_id}}' could not be found",
       "StartDateAfterEndDate": "The study start date must be before the end date"
     },
     "timetable": {
+      "Database": "Internal error (database)",
       "InfraNotLoaded": "Infrastructure '{{infra_id}}' is not loaded",
       "InfraNotFound": "Infrastructure '{{infra_id}}' does not exist",
       "NotFound": "Timetable '{{timetable_id}}' could not be found"
@@ -205,6 +213,7 @@
     "train_schedule": {
       "BatchShouldHaveSameTimetable": "Batch should have the same timetable",
       "BatchTrainScheduleNotFound": "Some Train Schedules could not be found",
+      "Database": "Internal error (database)",
       "NoSimulation": "No simulation given",
       "NoTrainSchedules": "No train schedules given",
       "NotFound": "Train Schedule '{{train_schedule_id}}' could not be found",
@@ -223,6 +232,7 @@
       "InvalidUrl": "Invalid url '{{url}}'"
     },
     "work_schedule": {
+      "Database": "Internal error (database)",
       "NameAlreadyUsed": "A group of work schedules with '{{name}}' already exists",
       "WorkScheduleGroupNotFound": "No such work schedule group with id '{{id}}'"
     },

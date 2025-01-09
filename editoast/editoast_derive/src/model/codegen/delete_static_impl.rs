@@ -32,7 +32,7 @@ impl ToTokens for DeleteStaticImpl {
                 async fn delete_static(
                     conn: &mut editoast_models::DbConnection,
                     #id_ident: #ty,
-                ) -> crate::error::Result<bool> {
+                ) -> std::result::Result<bool, editoast_models::model::Error> {
                     use diesel::prelude::*;
                     use diesel_async::RunQueryDsl;
                     use std::ops::DerefMut;

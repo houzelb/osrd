@@ -2327,10 +2327,6 @@ paths:
           description: The requested rolling stock was not found
         '409':
           description: The requested rolling stock is used
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RollingStockError'
     patch:
       tags:
       - rolling_stock
@@ -4530,6 +4526,25 @@ components:
           type: string
           enum:
           - editoast:delimited_area:InvalidLocations
+    EditoastDocumentErrorsDatabase:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 500
+        type:
+          type: string
+          enum:
+          - editoast:document:Database
     EditoastDocumentErrorsNotFound:
       type: object
       required:
@@ -4683,6 +4698,7 @@ components:
       - $ref: '#/components/schemas/EditoastCoreErrorUnparsableErrorOutput'
       - $ref: '#/components/schemas/EditoastDatabaseAccessErrorDatabaseAccessError'
       - $ref: '#/components/schemas/EditoastDelimitedAreaErrorInvalidLocations'
+      - $ref: '#/components/schemas/EditoastDocumentErrorsDatabase'
       - $ref: '#/components/schemas/EditoastDocumentErrorsNotFound'
       - $ref: '#/components/schemas/EditoastEditionErrorInfraIsLocked'
       - $ref: '#/components/schemas/EditoastEditionErrorSplitTrackSectionBadOffset'
@@ -4700,6 +4716,7 @@ components:
       - $ref: '#/components/schemas/EditoastListErrorsErrorsWrongErrorTypeProvided'
       - $ref: '#/components/schemas/EditoastListErrorsRailjsonWrongRailjsonVersionProvided'
       - $ref: '#/components/schemas/EditoastMacroNodeErrorNotFound'
+      - $ref: '#/components/schemas/EditoastModelError'
       - $ref: '#/components/schemas/EditoastMqClientErrorConnectionDoesNotExist'
       - $ref: '#/components/schemas/EditoastMqClientErrorLapin'
       - $ref: '#/components/schemas/EditoastMqClientErrorPoolChannelFail'
@@ -4724,11 +4741,13 @@ components:
       - $ref: '#/components/schemas/EditoastRollingStockErrorBasePowerClassEmpty'
       - $ref: '#/components/schemas/EditoastRollingStockErrorCannotCreateCompoundImage'
       - $ref: '#/components/schemas/EditoastRollingStockErrorCannotReadImage'
+      - $ref: '#/components/schemas/EditoastRollingStockErrorDatabase'
       - $ref: '#/components/schemas/EditoastRollingStockErrorIsLocked'
       - $ref: '#/components/schemas/EditoastRollingStockErrorIsUsed'
       - $ref: '#/components/schemas/EditoastRollingStockErrorKeyNotFound'
       - $ref: '#/components/schemas/EditoastRollingStockErrorLiveryMultipartError'
       - $ref: '#/components/schemas/EditoastRollingStockErrorNameAlreadyUsed'
+      - $ref: '#/components/schemas/EditoastScenarioErrorDatabase'
       - $ref: '#/components/schemas/EditoastScenarioErrorInfraNotFound'
       - $ref: '#/components/schemas/EditoastScenarioErrorNotFound'
       - $ref: '#/components/schemas/EditoastScenarioErrorTimetableNotFound'
@@ -4741,16 +4760,21 @@ components:
       - $ref: '#/components/schemas/EditoastStdcmErrorRollingStockNotFound'
       - $ref: '#/components/schemas/EditoastStdcmErrorTimetableNotFound'
       - $ref: '#/components/schemas/EditoastStdcmErrorTowedRollingStockNotFound'
+      - $ref: '#/components/schemas/EditoastStudyErrorDatabase'
       - $ref: '#/components/schemas/EditoastStudyErrorNotFound'
       - $ref: '#/components/schemas/EditoastStudyErrorStartDateAfterEndDate'
+      - $ref: '#/components/schemas/EditoastTemporarySpeedLimitErrorDatabase'
       - $ref: '#/components/schemas/EditoastTemporarySpeedLimitErrorNameAlreadyUsed'
+      - $ref: '#/components/schemas/EditoastTimetableErrorDatabase'
       - $ref: '#/components/schemas/EditoastTimetableErrorInfraNotFound'
       - $ref: '#/components/schemas/EditoastTimetableErrorNotFound'
       - $ref: '#/components/schemas/EditoastTowedRollingStockErrorIdNotFound'
       - $ref: '#/components/schemas/EditoastTowedRollingStockErrorIsLocked'
       - $ref: '#/components/schemas/EditoastTrainScheduleErrorBatchTrainScheduleNotFound'
+      - $ref: '#/components/schemas/EditoastTrainScheduleErrorDatabase'
       - $ref: '#/components/schemas/EditoastTrainScheduleErrorInfraNotFound'
       - $ref: '#/components/schemas/EditoastTrainScheduleErrorNotFound'
+      - $ref: '#/components/schemas/EditoastWorkScheduleErrorDatabase'
       - $ref: '#/components/schemas/EditoastWorkScheduleErrorNameAlreadyUsed'
       - $ref: '#/components/schemas/EditoastWorkScheduleErrorWorkScheduleGroupNotFound'
       description: Generated error type for Editoast
@@ -5036,6 +5060,25 @@ components:
           type: string
           enum:
           - editoast:macro_node:NotFound
+    EditoastModelError:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 500
+        type:
+          type: string
+          enum:
+          - editoast:model:ModelError
     EditoastMqClientErrorConnectionDoesNotExist:
       type: object
       required:
@@ -5559,6 +5602,25 @@ components:
           type: string
           enum:
           - editoast:rollingstocks:CannotReadImage
+    EditoastRollingStockErrorDatabase:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 500
+        type:
+          type: string
+          enum:
+          - editoast:rollingstocks:Database
     EditoastRollingStockErrorIsLocked:
       type: object
       required:
@@ -5677,6 +5739,25 @@ components:
           type: string
           enum:
           - editoast:rollingstocks:NameAlreadyUsed
+    EditoastScenarioErrorDatabase:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 500
+        type:
+          type: string
+          enum:
+          - editoast:scenario:Database
     EditoastScenarioErrorInfraNotFound:
       type: object
       required:
@@ -5960,6 +6041,25 @@ components:
           type: string
           enum:
           - editoast:stdcm_v2:TowedRollingStockNotFound
+    EditoastStudyErrorDatabase:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 500
+        type:
+          type: string
+          enum:
+          - editoast:study:Database
     EditoastStudyErrorNotFound:
       type: object
       required:
@@ -6003,6 +6103,25 @@ components:
           type: string
           enum:
           - editoast:study:StartDateAfterEndDate
+    EditoastTemporarySpeedLimitErrorDatabase:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 500
+        type:
+          type: string
+          enum:
+          - editoast:temporary_speed_limit:Database
     EditoastTemporarySpeedLimitErrorNameAlreadyUsed:
       type: object
       required:
@@ -6027,6 +6146,25 @@ components:
           type: string
           enum:
           - editoast:temporary_speed_limit:NameAlreadyUsed
+    EditoastTimetableErrorDatabase:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 500
+        type:
+          type: string
+          enum:
+          - editoast:timetable:Database
     EditoastTimetableErrorInfraNotFound:
       type: object
       required:
@@ -6147,6 +6285,25 @@ components:
           type: string
           enum:
           - editoast:train_schedule:BatchTrainScheduleNotFound
+    EditoastTrainScheduleErrorDatabase:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 500
+        type:
+          type: string
+          enum:
+          - editoast:train_schedule:Database
     EditoastTrainScheduleErrorInfraNotFound:
       type: object
       required:
@@ -6195,6 +6352,25 @@ components:
           type: string
           enum:
           - editoast:train_schedule:NotFound
+    EditoastWorkScheduleErrorDatabase:
+      type: object
+      required:
+      - type
+      - status
+      - message
+      properties:
+        context:
+          type: object
+        message:
+          type: string
+        status:
+          type: integer
+          enum:
+          - 500
+        type:
+          type: string
+          enum:
+          - editoast:work_schedule:Database
     EditoastWorkScheduleErrorNameAlreadyUsed:
       type: object
       required:
@@ -9233,68 +9409,6 @@ components:
         version:
           type: integer
           format: int64
-    RollingStockError:
-      oneOf:
-      - type: string
-        enum:
-        - CannotReadImage
-      - type: string
-        enum:
-        - CannotCreateCompoundImage
-      - type: object
-        required:
-        - KeyNotFound
-        properties:
-          KeyNotFound:
-            type: object
-            required:
-            - rolling_stock_key
-            properties:
-              rolling_stock_key:
-                $ref: '#/components/schemas/RollingStockKey'
-      - type: object
-        required:
-        - NameAlreadyUsed
-        properties:
-          NameAlreadyUsed:
-            type: object
-            required:
-            - name
-            properties:
-              name:
-                type: string
-      - type: object
-        required:
-        - IsLocked
-        properties:
-          IsLocked:
-            type: object
-            required:
-            - rolling_stock_id
-            properties:
-              rolling_stock_id:
-                type: integer
-                format: int64
-      - type: object
-        required:
-        - IsUsed
-        properties:
-          IsUsed:
-            type: object
-            required:
-            - rolling_stock_id
-            - usage
-            properties:
-              rolling_stock_id:
-                type: integer
-                format: int64
-              usage:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ScenarioReference'
-      - type: string
-        enum:
-        - BasePowerClassEmpty
     RollingStockForm:
       type: object
       required:
@@ -9380,31 +9494,6 @@ components:
           format: double
         supported_signaling_systems:
           $ref: '#/components/schemas/RollingStockSupportedSignalingSystems'
-    RollingStockKey:
-      oneOf:
-      - type: object
-        required:
-        - type
-        - key
-        properties:
-          key:
-            type: integer
-            format: int64
-          type:
-            type: string
-            enum:
-            - Id
-      - type: object
-        required:
-        - type
-        - key
-        properties:
-          key:
-            type: string
-          type:
-            type: string
-            enum:
-            - Name
     RollingStockLivery:
       type: object
       required:

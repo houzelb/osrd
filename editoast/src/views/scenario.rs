@@ -133,6 +133,10 @@ pub enum ScenarioError {
     #[error("Infra '{infra_id}', could not be found")]
     #[editoast_error(status = 404)]
     InfraNotFound { infra_id: i64 },
+
+    #[error(transparent)]
+    #[editoast_error(status = 500)]
+    Database(#[from] editoast_models::model::Error),
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, ToSchema)]

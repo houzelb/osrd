@@ -1,6 +1,5 @@
 use super::pagination::PaginatedList;
 use crate::core::pathfinding::TrackRange as CoreTrackRange;
-use crate::error::InternalError;
 use crate::error::Result;
 use crate::models::prelude::*;
 use crate::models::work_schedules::WorkSchedule;
@@ -24,6 +23,7 @@ use chrono::Utc;
 use derivative::Derivative;
 use editoast_authz::BuiltinRole;
 use editoast_derive::EditoastError;
+use editoast_models::model;
 use editoast_models::DbConnectionPoolV2;
 use editoast_schemas::infra::Direction;
 use editoast_schemas::infra::TrackRange;
@@ -73,18 +73,32 @@ enum WorkScheduleError {
     #[error("Work schedule group '{id}' not found")]
     #[editoast_error(status = 404)]
     WorkScheduleGroupNotFound { id: i64 },
+    #[error(transparent)]
+    #[editoast_error(status = 500)]
+    Database(model::Error),
 }
 
-pub fn map_diesel_error(e: InternalError, name: impl AsRef<str>) -> InternalError {
-    if e.message.contains(
-        r#"duplicate key value violates unique constraint "work_schedule_group_name_key""#,
-    ) {
-        WorkScheduleError::NameAlreadyUsed {
-            name: name.as_ref().to_string(),
+impl From<model::Error> for WorkScheduleError {
+    fn from(e: model::Error) -> Self {
+        match e {
+            model::Error::UniqueViolation { constraint }
+                if constraint == "work_schedule_group_name_key" =>
+            {
+                Self::NameAlreadyUsed {
+                    name: String::default(),
+                }
+            }
+            e => Self::Database(e),
         }
-        .into()
-    } else {
-        e
+    }
+}
+
+impl WorkScheduleError {
+    fn with_name(self, name: String) -> Self {
+        match self {
+            Self::NameAlreadyUsed { .. } => Self::NameAlreadyUsed { name },
+            e => e,
+        }
     }
 }
 
@@ -336,8 +350,8 @@ async fn create_group(
         .name(group_name.clone())
         .creation_date(Utc::now())
         .create(conn)
-        .await;
-    let work_schedule_group = work_schedule_group.map_err(|e| map_diesel_error(e, group_name))?;
+        .await
+        .map_err(|e| WorkScheduleError::from(e).with_name(group_name))?;
     Ok(Json(WorkScheduleGroupCreateResponse {
         work_schedule_group_id: work_schedule_group.id,
     }))
@@ -608,7 +622,7 @@ pub mod tests {
         let work_schedule_response = app
             .fetch(request)
             .assert_status(StatusCode::BAD_REQUEST)
-            .json_into::<InternalError>();
+            .json_into::<crate::error::InternalError>();
 
         assert_eq!(
             &work_schedule_response.error_type,

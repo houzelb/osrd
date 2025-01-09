@@ -24,7 +24,7 @@ impl ToTokens for DeleteImpl {
                 async fn delete(
                     &self,
                     conn: &mut editoast_models::DbConnection,
-                ) -> crate::error::Result<bool> {
+                ) -> std::result::Result<bool, editoast_models::model::Error> {
                     use diesel::prelude::*;
                     use diesel_async::RunQueryDsl;
                     use #table_mod::dsl;
