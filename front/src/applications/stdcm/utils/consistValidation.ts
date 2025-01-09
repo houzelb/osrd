@@ -22,7 +22,7 @@ export const validateTotalMass = ({
   }
 
   const tractionMassInTons = kgToT(tractionEngineMass);
-  const consistMassInTons = kgToT(tractionEngineMass + towedMass);
+  const consistMassInTons = Math.floor(kgToT(tractionEngineMass + towedMass));
   const massLimit = towedMass ? consistMassInTons : tractionMassInTons;
 
   if (totalMass < massLimit || totalMass >= CONSIST_TOTAL_MASS_MAX) {
