@@ -88,6 +88,7 @@ export type PathStep = PathItemLocation & {
 export type StdcmPathStep = {
   id: string;
   location?: Extract<OperationalPointReference, { uic: number }> & {
+    trigram: string;
     secondary_code: string;
     name: string;
     coordinates: [number, number];

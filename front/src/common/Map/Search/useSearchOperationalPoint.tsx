@@ -59,6 +59,7 @@ export default function useSearchOperationalPoint({
             ]),
           ]
         : true;
+
     const payload = {
       object: 'operationalpoint',
       query: [
@@ -70,14 +71,14 @@ export default function useSearchOperationalPoint({
     };
 
     try {
-      const results = await postSearch({
+      const results = (await postSearch({
         searchPayload: payload,
         pageSize: 101,
-      }).unwrap();
-      setSearchResults(results as SearchResultItemOperationalPoint[]);
+      }).unwrap()) as SearchResultItemOperationalPoint[];
+      setSearchResults(results);
     } catch (error) {
-      setSearchResults([]);
       setFailure(castErrorToFailure(error));
+      setSearchResults([]);
     }
   };
 
