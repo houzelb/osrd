@@ -1,6 +1,4 @@
-import { useEffect } from 'react';
-
-import { Input, ComboBox } from '@osrd-project/ui-core';
+import { Input, ComboBox, useDefaultComboBox } from '@osrd-project/ui-core';
 import { useTranslation } from 'react-i18next';
 
 import useStdcmTowedRollingStock from 'applications/stdcm/hooks/useStdcmTowedRollingStock';
@@ -67,43 +65,26 @@ const StdcmConsist = ({ isDebugMode, consistErrors = {}, disabled = false }: Std
     prefillConsist,
   } = useStdcmConsist();
 
-  const { filters, searchRollingStock, searchRollingStockById, filteredRollingStockList } =
-    useFilterRollingStock({ isStdcm: true });
+  const { filteredRollingStockList: rollingStocks } = useFilterRollingStock({ isStdcm: true });
 
-  const {
-    filteredTowedRollingStockList,
-    searchTowedRollingStock,
-    searchTowedRollingStockById,
-    filters: towedRsFilters,
-  } = useFilterTowedRollingStock({ isDebugMode });
-
-  useEffect(() => {
-    if (towedRollingStock) {
-      searchTowedRollingStock(towedRollingStock.name);
-    } else {
-      searchTowedRollingStock('');
-    }
-  }, [towedRollingStock]);
+  const { filteredTowedRollingStockList: towedRollingStocks } = useFilterTowedRollingStock({
+    isDebugMode,
+  });
 
   const getLabel = (rs: LightRollingStockWithLiveries) => {
     const secondPart = rs.metadata?.series || rs.metadata?.reference || '';
     return secondPart ? `${rs.name} - ${secondPart}` : rs.name;
   };
 
-  const onInputClick = () => {
-    if (rollingStock?.id !== undefined) {
-      searchRollingStockById(rollingStock.id);
-    }
-  };
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  const rollingStockComboBoxDefaultProps = useDefaultComboBox(rollingStocks, getLabel);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  const towedRollingStockComboBoxDefaultProps = useDefaultComboBox(
+    towedRollingStocks,
+    (trs: TowedRollingStock) => trs.name
+  );
 
-  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    searchRollingStock(e.target.value);
-    if (e.target.value.trim().length === 0) {
-      dispatch(updateRollingStockID(undefined));
-    }
-  };
-
-  const onSelectSuggestion = (option?: LightRollingStockWithLiveries) => {
+  const handleRollingStockSelect = (option?: LightRollingStockWithLiveries) => {
     prefillConsist(option, towedRollingStock, speedLimitByTag);
     dispatch(updateRollingStockID(option?.id));
   };
@@ -112,14 +93,6 @@ const StdcmConsist = ({ isDebugMode, consistErrors = {}, disabled = false }: Std
     prefillConsist(rollingStock, towedRollingStock, newTag);
     dispatchUpdateSpeedLimitByTag(newTag);
   };
-
-  useEffect(() => {
-    if (rollingStock) {
-      searchRollingStock(getLabel(rollingStock));
-    } else {
-      searchRollingStock('');
-    }
-  }, [rollingStock]);
 
   return (
     <StdcmCard
@@ -132,40 +105,27 @@ const StdcmConsist = ({ isDebugMode, consistErrors = {}, disabled = false }: Std
         <ComboBox
           id="tractionEngine"
           label={t('consist.tractionEngine')}
-          value={filters.text.toUpperCase()}
-          onClick={onInputClick}
-          onChange={onInputChange}
+          value={rollingStock}
+          getSuggestionLabel={getLabel}
+          onSelectSuggestion={handleRollingStockSelect}
+          {...rollingStockComboBoxDefaultProps}
           autoComplete="off"
           disabled={disabled}
-          suggestions={filteredRollingStockList}
-          getSuggestionLabel={(suggestion: LightRollingStockWithLiveries) => getLabel(suggestion)}
-          onSelectSuggestion={onSelectSuggestion}
         />
       </div>
       <div className="towed-rolling-stock">
         <ComboBox
           id="towedRollingStock"
           label={t('consist.towedRollingStock')}
-          value={towedRsFilters.text.toUpperCase()}
-          onClick={() => {
-            if (towedRollingStock?.id !== undefined) {
-              searchTowedRollingStockById(towedRollingStock.id);
-            }
-          }}
-          onChange={(e) => {
-            searchTowedRollingStock(e.target.value);
-            if (e.target.value.trim().length === 0) {
-              updateTowedRollingStockID(undefined);
-            }
-          }}
-          autoComplete="off"
-          disabled={disabled}
-          suggestions={filteredTowedRollingStockList}
+          value={towedRollingStock}
           getSuggestionLabel={(suggestion: TowedRollingStock) => suggestion.name}
           onSelectSuggestion={(towed) => {
             prefillConsist(rollingStock, towed, speedLimitByTag);
             dispatch(updateTowedRollingStockID(towed?.id));
           }}
+          {...towedRollingStockComboBoxDefaultProps}
+          autoComplete="off"
+          disabled={disabled}
         />
       </div>
       <div className="stdcm-consist__properties">
