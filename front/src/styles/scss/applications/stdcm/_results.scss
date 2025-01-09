@@ -150,7 +150,7 @@
       .table-container {
         width: 804px;
         margin-right: 32px;
-        height: calc(100vh - 180px);
+        max-height: calc(100vh - 180px);
         overflow-y: auto;
         scrollbar-width: none;
         .table-results {
@@ -306,7 +306,7 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        margin: 0 32px;
+        margin: 0 32px 0 0;
         background-color: rgb(255, 255, 255);
         border-bottom-left-radius: 6px;
         border-bottom-right-radius: 6px;
