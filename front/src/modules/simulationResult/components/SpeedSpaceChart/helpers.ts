@@ -101,11 +101,14 @@ const formatMrsp = (mrsp: SimulationResponseSuccess['mrsp']) => ({
 });
 
 export const formatStops = (operationalPoints: PathPropertiesFormatted['operationalPoints']) =>
-  operationalPoints.map(({ position, extensions: { identifier, sncf } = {} }) => ({
+  operationalPoints.map(({ position, weight, extensions: { identifier, sncf } = {} }) => ({
     position: {
       start: mmToKm(position),
     },
-    value: identifier ? `${identifier.name} ${sncf ? sncf.ch : ''}` : '',
+    value: {
+      name: identifier ? `${identifier.name} ${sncf ? sncf.ch : ''}` : '',
+      weight: weight!,
+    },
   }));
 
 export const formatElectrifications = (
@@ -202,7 +205,9 @@ export const formatData = (
   const pathLength = simulation.base.positions[simulation.base.positions.length - 1];
   const speeds: LayerData<number>[] = formatSpeeds(simulation.base);
   const ecoSpeeds: LayerData<number>[] = formatSpeeds(simulation.final_output);
-  const stops: LayerData<string>[] = formatStops(pathProperties!.operationalPoints);
+  const stops: LayerData<{ name: string; weight: number }>[] = formatStops(
+    pathProperties!.operationalPoints
+  );
   const electrifications: LayerData<ElectrificationValues>[] = formatElectrifications(
     pathProperties!.electrifications
   );
