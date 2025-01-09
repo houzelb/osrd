@@ -131,6 +131,10 @@ class DummyInfra : RawInfra, BlockInfra {
         return makeIndexList(signal)
     }
 
+    override fun findPhysicalSignal(signalName: String): PhysicalSignalId? {
+        TODO("Not yet implemented")
+    }
+
     override fun getPhysicalSignal(signal: LogicalSignalId): PhysicalSignalId {
         return convertId(signal)
     }
