@@ -120,6 +120,17 @@ const SimulationResults = ({
     return null;
   }
 
+  const matchingIndexes = useMemo(() => {
+    const pathItemPositions = path?.path_item_positions || [];
+    const positions = pathProperties?.operationalPoints.map((op) => op.position);
+
+    return pathItemPositions.map((itemPosition) =>
+      positions?.findIndex((position) => position === itemPosition)
+    );
+  }, [path?.path_item_positions, pathProperties?.operationalPoints]);
+
+  console.log(matchingIndexes);
+
   return (
     <div className="simulation-results">
       {/* SIMULATION : STICKY BAR */}
