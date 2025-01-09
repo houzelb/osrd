@@ -24,7 +24,7 @@ import StdcmConsist from './StdcmConsist';
 import StdcmDestination from './StdcmDestination';
 import StdcmLinkedTrainSearch from './StdcmLinkedTrainSearch';
 import StdcmOrigin from './StdcmOrigin';
-import useStaticPathfinding from '../../hooks/useStaticPathfinding';
+import useStdcmPathfinding from '../../hooks/useStdcmPathfinding';
 import type { StdcmConfigErrors } from '../../types';
 import StdcmSimulationParams from '../StdcmSimulationParams';
 import StdcmVias from './StdcmVias';
@@ -82,8 +82,8 @@ const StdcmConfig = ({
   const totalMass = useSelector(getTotalMass);
   const totalLength = useSelector(getTotalLength);
   const maxSpeed = useSelector(getMaxSpeed);
+  const { isPathfindingLoading, pathfinding } = useStdcmPathfinding(infra);
 
-  const pathfinding = useStaticPathfinding(infra);
   const formRef = useRef<HTMLDivElement>(null);
 
   const [formErrors, setFormErrors] = useState<StdcmConfigErrors>();
@@ -250,6 +250,7 @@ const StdcmConfig = ({
             id="stdcm-map-config"
             hideAttribution
             hideItinerary
+            isPathfindingLoading={isPathfindingLoading}
             preventPointSelection
             pathGeometry={pathfinding?.geometry}
             showStdcmAssets
