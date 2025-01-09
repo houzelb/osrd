@@ -18,6 +18,7 @@ import fr.sncf.osrd.stdcm.graph.extendLookaheadUntil
 import fr.sncf.osrd.stdcm.infra_exploration.initInfraExplorer
 import fr.sncf.osrd.utils.*
 import fr.sncf.osrd.utils.indexing.*
+import fr.sncf.osrd.utils.units.Distance.Companion.min
 import fr.sncf.osrd.utils.units.Length
 import fr.sncf.osrd.utils.units.Offset
 import fr.sncf.osrd.utils.units.meters
@@ -385,6 +386,14 @@ private fun getBlockOffset(
     )
 }
 
+/**
+ * Returns the block of the signal next to a waypoint block.
+ *
+ * @param waypointBlock waypoint block.
+ * @param infra full infra.
+ * @param rollingStockLength length of the rolling stock.
+ * @return next signal block.
+ */
 fun findNextSignalBlockOnWaypointBlock(
     waypointBlock: PathfindingEdgeLocationId<Block>,
     infra: FullInfra,
@@ -405,16 +414,8 @@ private fun getNextSignalOffset(
     val blockLength = infra.blockInfra.getBlockLength(blockId).distance
     val nextSignalPosition = signalsPositions.firstOrNull { it.distance >= blockOffset.distance }
 
-    // some blocks are < 1m long (even 0m), we can't get further in the block
-    val maxHeadOffset =
-        if (blockOffset.distance < 1.meters) {
-            blockOffset.distance
-        } else {
-            (nextSignalPosition?.distance ?: blockLength) - 1.meters
-        }
-
     val minTailOffset = blockOffset.distance + rollingStockLength.meters
-    val finalOffset = if (minTailOffset <= maxHeadOffset) minTailOffset else maxHeadOffset
+    val maxHeadOffset = nextSignalPosition?.distance ?: blockLength
 
-    return Offset(finalOffset)
+    return Offset(min(minTailOffset, maxHeadOffset))
 }

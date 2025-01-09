@@ -362,7 +362,8 @@ class PathfindingV2Test : ApiTest() {
                 .act(RqFake("POST", "/v2/pathfinding/blocks", reversedShortTrainRequestBody))
         val reversedShortTrainResponse = TakesUtils.readBodyResponse(reversedShortTrainRawResponse)
         val reversedShortTrainParsed =
-            (pathfindingResponseAdapter.fromJson(reversedShortTrainResponse) as? PathfindingBlockSuccess)!!
+            (pathfindingResponseAdapter.fromJson(reversedShortTrainResponse)
+                as? PathfindingBlockSuccess)!!
 
         val longTrainRawResponse =
             PathfindingBlocksEndpointV2(infraManager)
@@ -376,7 +377,8 @@ class PathfindingV2Test : ApiTest() {
                 .act(RqFake("POST", "/v2/pathfinding/blocks", reversedLongTrainRequestBody))
         val reversedLongTrainResponse = TakesUtils.readBodyResponse(reversedLongTrainRawResponse)
         val reversedLongTrainParsed =
-            (pathfindingResponseAdapter.fromJson(reversedLongTrainResponse) as? PathfindingBlockSuccess)!!
+            (pathfindingResponseAdapter.fromJson(reversedLongTrainResponse)
+                as? PathfindingBlockSuccess)!!
 
         assertEquals(3, nonStopAtNextSignalParsed.pathItemPositions.size)
         assertEquals(0.meters, nonStopAtNextSignalParsed.pathItemPositions[0].distance)
@@ -396,7 +398,7 @@ class PathfindingV2Test : ApiTest() {
         assertEquals(3, longTrainParsed.pathItemPositions.size)
         assertEquals(0.meters, longTrainParsed.pathItemPositions[0].distance)
         assertEquals(12250.meters, longTrainParsed.pathItemPositions[1].distance)
-        assertEquals(26516.5.meters, longTrainParsed.pathItemPositions[2].distance)
+        assertEquals(26517.5.meters, longTrainParsed.pathItemPositions[2].distance)
 
         assertEquals(3, reversedLongTrainParsed.pathItemPositions.size)
         assertEquals(0.meters, reversedLongTrainParsed.pathItemPositions[0].distance)
