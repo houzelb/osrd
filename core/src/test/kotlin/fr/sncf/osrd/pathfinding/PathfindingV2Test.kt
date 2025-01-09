@@ -254,6 +254,7 @@ class PathfindingV2Test : ApiTest() {
         val waypointsIntermediate = listOf(waypointIntermediate)
         val waypointsEnd = listOf(waypointEnd)
         val waypoints = listOf(waypointsStart, waypointsIntermediate, waypointsEnd)
+        val reverseWaypoints = listOf(waypointsEnd, waypointsIntermediate, waypointsStart)
 
         val nonStopAtNextSignalRequestBody =
             pathfindingRequestAdapter.toJson(
@@ -263,12 +264,12 @@ class PathfindingV2Test : ApiTest() {
                     rollingStockSupportedElectrifications = listOf(),
                     rollingStockSupportedSignalingSystems = listOf("BAL"),
                     rollingStockMaximumSpeed = 320.0,
-                    rollingStockLength = 0.0,
+                    rollingStockLength = 200.0,
                     timeout = null,
                     infra = "small_infra/infra.json",
                     expectedVersion = "1",
                     pathItems = waypoints,
-                    stopAtNextSignal = true,
+                    stopAtNextSignal = false,
                 )
             )
 
@@ -285,6 +286,23 @@ class PathfindingV2Test : ApiTest() {
                     infra = "small_infra/infra.json",
                     expectedVersion = "1",
                     pathItems = waypoints,
+                    stopAtNextSignal = true,
+                )
+            )
+
+        val reversedShortTrainRequestBody =
+            pathfindingRequestAdapter.toJson(
+                PathfindingBlockRequest(
+                    rollingStockLoadingGauge = RJSLoadingGaugeType.G1,
+                    rollingStockIsThermal = true,
+                    rollingStockSupportedElectrifications = listOf(),
+                    rollingStockSupportedSignalingSystems = listOf("BAL"),
+                    rollingStockMaximumSpeed = 320.0,
+                    rollingStockLength = 10.0,
+                    timeout = null,
+                    infra = "small_infra/infra.json",
+                    expectedVersion = "1",
+                    pathItems = reverseWaypoints,
                     stopAtNextSignal = true,
                 )
             )
@@ -306,6 +324,23 @@ class PathfindingV2Test : ApiTest() {
                 )
             )
 
+        val reversedLongTrainRequestBody =
+            pathfindingRequestAdapter.toJson(
+                PathfindingBlockRequest(
+                    rollingStockLoadingGauge = RJSLoadingGaugeType.G1,
+                    rollingStockIsThermal = true,
+                    rollingStockSupportedElectrifications = listOf(),
+                    rollingStockSupportedSignalingSystems = listOf("BAL"),
+                    rollingStockMaximumSpeed = 320.0,
+                    rollingStockLength = 200.0,
+                    timeout = null,
+                    infra = "small_infra/infra.json",
+                    expectedVersion = "1",
+                    pathItems = reverseWaypoints,
+                    stopAtNextSignal = true,
+                )
+            )
+
         val nonStopAtNextSignalRawResponse =
             PathfindingBlocksEndpointV2(infraManager)
                 .act(RqFake("POST", "/v2/pathfinding/blocks", nonStopAtNextSignalRequestBody))
@@ -322,12 +357,26 @@ class PathfindingV2Test : ApiTest() {
         val shortTrainParsed =
             (pathfindingResponseAdapter.fromJson(shortTrainResponse) as? PathfindingBlockSuccess)!!
 
+        val reversedShortTrainRawResponse =
+            PathfindingBlocksEndpointV2(infraManager)
+                .act(RqFake("POST", "/v2/pathfinding/blocks", reversedShortTrainRequestBody))
+        val reversedShortTrainResponse = TakesUtils.readBodyResponse(reversedShortTrainRawResponse)
+        val reversedShortTrainParsed =
+            (pathfindingResponseAdapter.fromJson(reversedShortTrainResponse) as? PathfindingBlockSuccess)!!
+
         val longTrainRawResponse =
             PathfindingBlocksEndpointV2(infraManager)
                 .act(RqFake("POST", "/v2/pathfinding/blocks", longTrainRequestBody))
         val longTrainResponse = TakesUtils.readBodyResponse(longTrainRawResponse)
         val longTrainParsed =
             (pathfindingResponseAdapter.fromJson(longTrainResponse) as? PathfindingBlockSuccess)!!
+
+        val reversedLongTrainRawResponse =
+            PathfindingBlocksEndpointV2(infraManager)
+                .act(RqFake("POST", "/v2/pathfinding/blocks", reversedLongTrainRequestBody))
+        val reversedLongTrainResponse = TakesUtils.readBodyResponse(reversedLongTrainRawResponse)
+        val reversedLongTrainParsed =
+            (pathfindingResponseAdapter.fromJson(reversedLongTrainResponse) as? PathfindingBlockSuccess)!!
 
         assertEquals(3, nonStopAtNextSignalParsed.pathItemPositions.size)
         assertEquals(0.meters, nonStopAtNextSignalParsed.pathItemPositions[0].distance)
@@ -339,9 +388,19 @@ class PathfindingV2Test : ApiTest() {
         assertEquals(12060.meters, shortTrainParsed.pathItemPositions[1].distance)
         assertEquals(26510.meters, shortTrainParsed.pathItemPositions[2].distance)
 
+        assertEquals(3, reversedShortTrainParsed.pathItemPositions.size)
+        assertEquals(0.meters, reversedShortTrainParsed.pathItemPositions[0].distance)
+        assertEquals(14460.meters, reversedShortTrainParsed.pathItemPositions[1].distance)
+        assertEquals(26510.meters, reversedShortTrainParsed.pathItemPositions[2].distance)
+
         assertEquals(3, longTrainParsed.pathItemPositions.size)
         assertEquals(0.meters, longTrainParsed.pathItemPositions[0].distance)
         assertEquals(12250.meters, longTrainParsed.pathItemPositions[1].distance)
         assertEquals(26516.5.meters, longTrainParsed.pathItemPositions[2].distance)
+
+        assertEquals(3, reversedLongTrainParsed.pathItemPositions.size)
+        assertEquals(0.meters, reversedLongTrainParsed.pathItemPositions[0].distance)
+        assertEquals(14650.meters, reversedLongTrainParsed.pathItemPositions[1].distance)
+        assertEquals(26700.meters, reversedLongTrainParsed.pathItemPositions[2].distance)
     }
 }
