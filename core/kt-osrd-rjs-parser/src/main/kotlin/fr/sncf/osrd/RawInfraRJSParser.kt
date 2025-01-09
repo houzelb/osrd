@@ -796,6 +796,7 @@ fun parseRJSInfra(rjsInfra: RJSInfra): RawInfra {
                 props["chShortLabel"] = sncf.chShortLabel
                 props["chLongLabel"] = sncf.chLongLabel
                 props["trigram"] = sncf.trigram
+                props["weight"] = operationalPoint.weight
             }
             if (opPart.extensions?.sncf != null) props["kp"] = opPart.extensions!!.sncf!!.kp
             val partId =
