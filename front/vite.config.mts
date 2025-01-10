@@ -2,7 +2,6 @@
 import { createRequire } from 'node:module';
 import * as path from 'node:path';
 
-import ImportMetaEnvPlugin from '@import-meta-env/unplugin';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig, loadEnv } from 'vite';
 import checker from 'vite-plugin-checker';
@@ -21,9 +20,6 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       viteTsconfigPaths(),
-      ImportMetaEnvPlugin.vite({
-        example: '.env.example',
-      }),
       checker({
         typescript: {
           buildMode: true,

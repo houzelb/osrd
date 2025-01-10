@@ -16,6 +16,10 @@ COPY --from=exec_as_builder /exec-as /
 
 WORKDIR /app
 
+# Fill build time values
+ARG OSRD_GIT_DESCRIBE
+ENV VITE_OSRD_GIT_DESCRIBE=${OSRD_GIT_DESCRIBE}
+
 # Start the app
 COPY docker/dev-entrypoint.sh /
 ENTRYPOINT ["/dev-entrypoint.sh"]

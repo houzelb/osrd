@@ -66,7 +66,7 @@ function ReleaseInformations() {
                 <tbody>
                   {serviceRow('Editoast', editoastVersion?.git_describe)}
                   {serviceRow('Core', coreVersion?.git_describe)}
-                  {serviceRow('Front', import.meta.env.OSRD_GIT_DESCRIBE)}
+                  {serviceRow('Front', import.meta.env.VITE_OSRD_GIT_DESCRIBE)}
                 </tbody>
               </table>
             </div>
