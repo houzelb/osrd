@@ -31,6 +31,7 @@ impl From<diesel::result::Error> for Error {
                         constraint: captures.get(1).unwrap().as_str().to_string(),
                     }
                 } else {
+                    // falling back to the generic error — since it's still semantically correct, logging the error is enough
                     tracing::error!(?RE, %e, "failed to parse PostgreSQL error message");
                     Self::DatabaseError(e.into())
                 }
@@ -48,6 +49,7 @@ impl From<diesel::result::Error> for Error {
                         constraint: captures.get(2).unwrap().as_str().to_string(),
                     }
                 } else {
+                    // falling back to the generic error — since it's still semantically correct, logging the error is enough
                     tracing::error!(?RE, %e, "failed to parse PostgreSQL error message");
                     Self::DatabaseError(e.into())
                 }
