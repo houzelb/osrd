@@ -41,7 +41,7 @@ interface MapProps<S extends CommonToolState = CommonToolState> {
   toolState: S;
   setToolState: (state: Partial<S>) => void;
   activeTool: Tool<S>;
-  mapStyle: string;
+  mapStyle: 'normal' | 'dark' | 'blueprint' | 'minimal';
   viewport: Viewport;
   setViewport: (newViewport: Partial<Viewport>, updateRouter?: boolean) => void;
   mapRef: React.RefObject<MapRef>;
