@@ -1,3 +1,4 @@
+import colors from 'common/Map/Consts/colors';
 import { LAYER_GROUPS_ORDER, LAYERS } from 'config/layerOrder';
 
 import Background from './Background';
@@ -6,7 +7,6 @@ import OSM from './OSM';
 import PlatformsLayer from './Platforms';
 import Terrain from './Terrain';
 import TracksOSM from './TracksOSM';
-import colors from '../Consts/colors';
 
 type OSMLayersProps = {
   mapStyle: 'normal' | 'dark' | 'blueprint' | 'minimal';
