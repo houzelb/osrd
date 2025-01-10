@@ -2,7 +2,10 @@ mod power_restrictions;
 
 use std::collections::HashMap;
 
-use editoast_common::units::*;
+use editoast_common::units;
+use editoast_common::units::quantities::{
+    Acceleration, Deceleration, Length, Mass, Ratio, Time, Velocity,
+};
 use editoast_derive::Model;
 use editoast_schemas::rolling_stock::EffortCurves;
 use editoast_schemas::rolling_stock::EnergySource;
@@ -46,34 +49,34 @@ pub struct RollingStockModel {
     #[model(json)]
     #[schema(required)]
     pub metadata: Option<RollingStockMetadata>,
-    #[serde(with = "meter")]
-    #[model(uom_unit = "meter")]
+    #[serde(with = "units::meter")]
+    #[model(uom_unit = "units::meter")]
     pub length: Length,
-    #[serde(with = "meter_per_second")]
-    #[model(uom_unit = "meter_per_second")]
+    #[serde(with = "units::meter_per_second")]
+    #[model(uom_unit = "units::meter_per_second")]
     pub max_speed: Velocity,
-    #[serde(with = "second")]
-    #[model(uom_unit = "second")]
+    #[serde(with = "units::second")]
+    #[model(uom_unit = "units::second")]
     pub startup_time: Time,
-    #[serde(with = "meter_per_second_squared")]
-    #[model(uom_unit = "meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
+    #[model(uom_unit = "units::meter_per_second_squared")]
     pub startup_acceleration: Acceleration,
-    #[serde(with = "meter_per_second_squared")]
-    #[model(uom_unit = "meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
+    #[model(uom_unit = "units::meter_per_second_squared")]
     pub comfort_acceleration: Acceleration,
-    #[serde(with = "meter_per_second_squared")]
-    #[model(uom_unit = "meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
+    #[model(uom_unit = "units::meter_per_second_squared")]
     pub const_gamma: Deceleration,
     #[model(json)]
     #[schema(required)]
     pub etcs_brake_params: Option<EtcsBrakeParams>,
-    #[serde(with = "basis_point")]
-    #[model(uom_unit = "basis_point")]
+    #[serde(with = "units::basis_point")]
+    #[model(uom_unit = "units::basis_point")]
     pub inertia_coefficient: Ratio,
     #[schema(required)]
     pub base_power_class: Option<String>,
-    #[serde(with = "kilogram")]
-    #[model(uom_unit = "kilogram")]
+    #[serde(with = "units::kilogram")]
+    #[model(uom_unit = "units::kilogram")]
     pub mass: Mass,
     #[model(json)]
     pub rolling_resistance: RollingResistance,
@@ -85,12 +88,12 @@ pub struct RollingStockModel {
     pub energy_sources: Vec<EnergySource>,
     pub locked: bool,
     #[schema(required)]
-    #[serde(default, with = "second::option")]
-    #[model(uom_unit = "second::option")]
+    #[serde(default, with = "units::second::option")]
+    #[model(uom_unit = "units::second::option")]
     pub electrical_power_startup_time: Option<Time>,
     #[schema(required)]
-    #[serde(default, with = "second::option")]
-    #[model(uom_unit = "second::option")]
+    #[serde(default, with = "units::second::option")]
+    #[model(uom_unit = "units::second::option")]
     pub raise_pantograph_time: Option<Time>,
     pub version: i64,
     #[schema(value_type = Vec<String>)]
@@ -105,8 +108,8 @@ impl RollingStockModelChangeset {
                 effort_curves,
                 self.electrical_power_startup_time
                     .flatten()
-                    .map(second::new),
-                self.raise_pantograph_time.flatten().map(second::new),
+                    .map(units::second::new),
+                self.raise_pantograph_time.flatten().map(units::second::new),
             )
             .map_err(|e| {
                 let mut err = ValidationErrors::new();

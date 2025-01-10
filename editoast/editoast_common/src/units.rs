@@ -35,15 +35,16 @@
 //! ```
 
 /// Re-export the Quantities that are used in OSRD
-pub use uom::si::f64::{Acceleration, Length, Mass, Ratio, Time, Velocity};
-
-pub type SolidFriction = uom::si::f64::Force;
-pub type SolidFrictionPerWeight = uom::si::f64::Acceleration;
-pub type ViscosityFriction = uom::si::f64::MassRate;
-pub type ViscosityFrictionPerWeight = uom::si::f64::Frequency;
-pub type AerodynamicDrag = uom::si::f64::LinearMassDensity;
-pub type AerodynamicDragPerWeight = uom::si::f64::LinearNumberDensity;
-pub type Deceleration = uom::si::f64::Acceleration;
+pub mod quantities {
+    pub use uom::si::f64::{Acceleration, Length, Mass, Ratio, Time, Velocity};
+    pub type SolidFriction = uom::si::f64::Force;
+    pub type SolidFrictionPerWeight = uom::si::f64::Acceleration;
+    pub type ViscosityFriction = uom::si::f64::MassRate;
+    pub type ViscosityFrictionPerWeight = uom::si::f64::Frequency;
+    pub type AerodynamicDrag = uom::si::f64::LinearMassDensity;
+    pub type AerodynamicDragPerWeight = uom::si::f64::LinearNumberDensity;
+    pub type Deceleration = uom::si::f64::Acceleration;
+}
 
 macro_rules! quantity_to_path {
     (Length, $unit:ident) => {
@@ -199,6 +200,7 @@ macro_rules! define_unit {
 }
 
 // Any new value here must also be added in editoast_derive/src/annotate_units.rs
+use quantities::*;
 define_unit!(meter, Length);
 define_unit!(millimeter, Length);
 define_unit!(meter_per_second, Velocity);

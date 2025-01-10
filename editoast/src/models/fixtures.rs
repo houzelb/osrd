@@ -5,7 +5,7 @@ use std::ops::DerefMut;
 use chrono::Utc;
 use editoast_models::DbConnection;
 
-use editoast_common::units::*;
+use editoast_common::units;
 use editoast_models::DbConnectionPoolV2;
 use editoast_schemas::infra::Direction;
 use editoast_schemas::infra::DirectionalTrackRange;
@@ -228,21 +228,21 @@ pub fn create_towed_rolling_stock() -> TowedRollingStock {
     TowedRollingStock {
         name: "TOWED_ROLLING_STOCK".to_string(),
         label: "towed".to_string(),
-        mass: kilogram::new(50000.0),
-        length: meter::new(30.0),
-        comfort_acceleration: meter_per_second_squared::new(0.2),
-        startup_acceleration: meter_per_second_squared::new(0.06),
-        inertia_coefficient: basis_point::new(1.05),
+        mass: units::kilogram::new(50000.0),
+        length: units::meter::new(30.0),
+        comfort_acceleration: units::meter_per_second_squared::new(0.2),
+        startup_acceleration: units::meter_per_second_squared::new(0.06),
+        inertia_coefficient: units::basis_point::new(1.05),
         rolling_resistance: RollingResistancePerWeight {
             rolling_resistance_type: "davis".to_string(),
             // TODO those values are wrong, they correspond to daN/T, (daN/T)/(km/h), and (daN/T)/(km/h)² per weight
             // We should use more realistic values and fix the tests
-            A: meter_per_second_squared::new(1.0),
-            B: hertz::new(0.01),
-            C: per_meter::new(0.0002),
+            A: units::meter_per_second_squared::new(1.0),
+            B: units::hertz::new(0.01),
+            C: units::per_meter::new(0.0002),
         },
-        const_gamma: meter_per_second_squared::new(0.5),
-        max_speed: Some(meter_per_second::new(35.0)),
+        const_gamma: units::meter_per_second_squared::new(0.5),
+        max_speed: Some(units::meter_per_second::new(35.0)),
         railjson_version: "3.4".to_string(),
     }
 }
@@ -253,15 +253,15 @@ pub fn create_simple_rolling_stock() -> RollingStock {
         loading_gauge: LoadingGaugeType::G1,
         supported_signaling_systems: RollingStockSupportedSignalingSystems(vec![]),
         base_power_class: None,
-        comfort_acceleration: meter_per_second_squared::new(0.1),
-        inertia_coefficient: basis_point::new(1.10),
-        startup_acceleration: meter_per_second_squared::new(0.04),
-        startup_time: second::new(1.0),
+        comfort_acceleration: units::meter_per_second_squared::new(0.1),
+        inertia_coefficient: units::basis_point::new(1.10),
+        startup_acceleration: units::meter_per_second_squared::new(0.04),
+        startup_time: units::second::new(1.0),
         effort_curves: EffortCurves::default(),
         electrical_power_startup_time: None,
         raise_pantograph_time: None,
         energy_sources: vec![],
-        const_gamma: meter_per_second_squared::new(1.0),
+        const_gamma: units::meter_per_second_squared::new(1.0),
         etcs_brake_params: None,
         locked: false,
         metadata: None,
@@ -271,13 +271,13 @@ pub fn create_simple_rolling_stock() -> RollingStock {
             rolling_resistance_type: "davis".to_string(),
             // TODO those values are wrong, they correspond to daN/T, (daN/T)/(km/h), and (daN/T)/(km/h)²
             // We should use more realistic values and fix the tests
-            A: newton::new(1.0),
-            B: kilogram_per_second::new(0.01),
-            C: kilogram_per_meter::new(0.0005),
+            A: units::newton::new(1.0),
+            B: units::kilogram_per_second::new(0.01),
+            C: units::kilogram_per_meter::new(0.0005),
         },
-        length: meter::new(140.0),
-        mass: kilogram::new(15000.0),
-        max_speed: meter_per_second::new(20.0),
+        length: units::meter::new(140.0),
+        mass: units::kilogram::new(15000.0),
+        max_speed: units::meter_per_second::new(20.0),
     }
 }
 

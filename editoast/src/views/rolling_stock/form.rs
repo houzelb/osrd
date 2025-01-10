@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use editoast_common::units::*;
+use editoast_common::units::{quantities::*, *};
 use editoast_schemas::rolling_stock::EffortCurves;
 use editoast_schemas::rolling_stock::EnergySource;
 use editoast_schemas::rolling_stock::LoadingGaugeType;

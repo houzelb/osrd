@@ -36,7 +36,10 @@ pub use rolling_stock_livery::RollingStockLiveryMetadata;
 mod towed_rolling_stock;
 pub use towed_rolling_stock::TowedRollingStock;
 
-use editoast_common::units::*;
+use editoast_common::units;
+use editoast_common::units::quantities::{
+    Acceleration, Deceleration, Length, Mass, Ratio, Time, Velocity,
+};
 use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
@@ -61,24 +64,24 @@ pub struct RollingStock {
     pub locked: bool,
     pub effort_curves: EffortCurves,
     pub base_power_class: Option<String>,
-    #[serde(with = "meter")]
+    #[serde(with = "units::meter")]
     pub length: Length,
-    #[serde(with = "meter_per_second")]
+    #[serde(with = "units::meter_per_second")]
     pub max_speed: Velocity,
-    #[serde(with = "second")]
+    #[serde(with = "units::second")]
     pub startup_time: Time,
-    #[serde(with = "meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
     pub startup_acceleration: Acceleration,
-    #[serde(with = "meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
     pub comfort_acceleration: Acceleration,
     // The constant gamma braking coefficient used when NOT circulating
     // under ETCS/ERTMS signaling system
-    #[serde(with = "meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
     pub const_gamma: Deceleration,
     pub etcs_brake_params: Option<EtcsBrakeParams>,
-    #[serde(with = "basis_point")]
+    #[serde(with = "units::basis_point")]
     pub inertia_coefficient: Ratio,
-    #[serde(with = "kilogram")]
+    #[serde(with = "units::kilogram")]
     pub mass: Mass,
     pub rolling_resistance: RollingResistance,
     pub loading_gauge: LoadingGaugeType,
@@ -89,11 +92,11 @@ pub struct RollingStock {
     pub energy_sources: Vec<EnergySource>,
     /// The time the train takes before actually using electrical power (in seconds).
     /// Is null if the train is not electric.
-    #[serde(default, with = "second::option")]
+    #[serde(default, with = "units::second::option")]
     pub electrical_power_startup_time: Option<Time>,
     /// The time it takes to raise this train's pantograph in seconds.
     /// Is null if the train is not electric.
-    #[serde(default, with = "second::option")]
+    #[serde(default, with = "units::second::option")]
     pub raise_pantograph_time: Option<Time>,
     pub supported_signaling_systems: RollingStockSupportedSignalingSystems,
     pub railjson_version: String,

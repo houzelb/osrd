@@ -4,7 +4,7 @@ use axum::Extension;
 use chrono::DateTime;
 use chrono::Utc;
 use editoast_authz::BuiltinRole;
-use editoast_common::units::*;
+use editoast_common::units;
 use editoast_schemas::primitives::Identifier;
 use futures::join;
 use itertools::izip;
@@ -318,7 +318,7 @@ async fn project_path(
             train_id,
             ProjectPathTrainResult {
                 departure_time: train.start_time,
-                rolling_stock_length: millimeter::from(*length) as u64,
+                rolling_stock_length: units::millimeter::from(*length) as u64,
                 cached,
             },
         );

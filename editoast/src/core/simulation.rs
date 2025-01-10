@@ -3,7 +3,10 @@ use std::collections::HashMap;
 use std::hash::Hash;
 
 use derivative::Derivative;
-use editoast_common::units::*;
+use editoast_common::units;
+use editoast_common::units::quantities::{
+    Acceleration, Deceleration, Length, Mass, Ratio, Time, Velocity,
+};
 use editoast_schemas::primitives::Identifier;
 use editoast_schemas::rolling_stock::EffortCurves;
 use editoast_schemas::rolling_stock::EtcsBrakeParams;
@@ -41,34 +44,34 @@ pub struct PhysicsConsist {
     pub effort_curves: EffortCurves,
     pub base_power_class: Option<String>,
     /// Length of the rolling stock
-    #[derivative(Hash(hash_with = "millimeter::hash"))]
-    #[serde(with = "millimeter::u64")]
+    #[derivative(Hash(hash_with = "units::millimeter::hash"))]
+    #[serde(with = "units::millimeter::u64")]
     pub length: Length,
     /// Maximum speed of the rolling stock
-    #[derivative(Hash(hash_with = "meter_per_second::hash"))]
-    #[serde(with = "meter_per_second")]
+    #[derivative(Hash(hash_with = "units::meter_per_second::hash"))]
+    #[serde(with = "units::meter_per_second")]
     pub max_speed: Velocity,
-    #[derivative(Hash(hash_with = "millisecond::hash"))]
-    #[serde(with = "millisecond::u64")]
+    #[derivative(Hash(hash_with = "units::millisecond::hash"))]
+    #[serde(with = "units::millisecond::u64")]
     pub startup_time: Time,
-    #[derivative(Hash(hash_with = "meter_per_second_squared::hash"))]
-    #[serde(with = "meter_per_second_squared")]
+    #[derivative(Hash(hash_with = "units::meter_per_second_squared::hash"))]
+    #[serde(with = "units::meter_per_second_squared")]
     pub startup_acceleration: Acceleration,
-    #[derivative(Hash(hash_with = "meter_per_second_squared::hash"))]
-    #[serde(with = "meter_per_second_squared")]
+    #[derivative(Hash(hash_with = "units::meter_per_second_squared::hash"))]
+    #[serde(with = "units::meter_per_second_squared")]
     pub comfort_acceleration: Acceleration,
     /// The constant gamma braking coefficient used when NOT circulating
     /// under ETCS/ERTMS signaling system
-    #[derivative(Hash(hash_with = "meter_per_second_squared::hash"))]
-    #[serde(with = "meter_per_second_squared")]
+    #[derivative(Hash(hash_with = "units::meter_per_second_squared::hash"))]
+    #[serde(with = "units::meter_per_second_squared")]
     pub const_gamma: Deceleration,
     pub etcs_brake_params: Option<EtcsBrakeParams>,
-    #[derivative(Hash(hash_with = "basis_point::hash"))]
-    #[serde(with = "basis_point")]
+    #[derivative(Hash(hash_with = "units::basis_point::hash"))]
+    #[serde(with = "units::basis_point")]
     pub inertia_coefficient: Ratio,
     /// Mass of the rolling stock
-    #[derivative(Hash(hash_with = "kilogram::hash"))]
-    #[serde(with = "kilogram::u64")]
+    #[derivative(Hash(hash_with = "units::kilogram::hash"))]
+    #[serde(with = "units::kilogram::u64")]
     pub mass: Mass,
     pub rolling_resistance: RollingResistance,
     /// Mapping of power restriction code to power class
@@ -76,13 +79,13 @@ pub struct PhysicsConsist {
     pub power_restrictions: BTreeMap<String, String>,
     /// The time the train takes before actually using electrical power.
     /// Is null if the train is not electric or the value not specified.
-    #[derivative(Hash(hash_with = "millisecond::option::hash"))]
-    #[serde(default, with = "millisecond::u64::option")]
+    #[derivative(Hash(hash_with = "units::millisecond::option::hash"))]
+    #[serde(default, with = "units::millisecond::u64::option")]
     pub electrical_power_startup_time: Option<Time>,
     /// The time it takes to raise this train's pantograph.
     /// Is null if the train is not electric or the value not specified.
-    #[derivative(Hash(hash_with = "millisecond::option::hash"))]
-    #[serde(default, with = "millisecond::u64::option")]
+    #[derivative(Hash(hash_with = "units::millisecond::option::hash"))]
+    #[serde(default, with = "units::millisecond::u64::option")]
     pub raise_pantograph_time: Option<Time>,
 }
 
@@ -527,7 +530,7 @@ impl SimulationResponse {
 
 #[cfg(test)]
 mod tests {
-    use editoast_common::units::*;
+    use editoast_common::units;
     use editoast_schemas::rolling_stock::RollingResistance;
     use pretty_assertions::assert_eq;
 
@@ -538,9 +541,9 @@ mod tests {
 
     fn create_physics_consist() -> PhysicsConsistParameters {
         PhysicsConsistParameters {
-            total_length: Some(meter::new(100.0)),
-            total_mass: Some(kilogram::new(50000.0)),
-            max_speed: Some(meter_per_second::new(22.0)),
+            total_length: Some(units::meter::new(100.0)),
+            total_mass: Some(units::kilogram::new(50000.0)),
+            max_speed: Some(units::meter_per_second::new(22.0)),
             towed_rolling_stock: Some(create_towed_rolling_stock()),
             traction_engine: create_simple_rolling_stock(),
         }
@@ -549,78 +552,87 @@ mod tests {
     #[test]
     fn physics_consist_compute_length() {
         let mut physics_consist = create_physics_consist();
-        physics_consist.total_length = Some(meter::new(100.0));
-        physics_consist.traction_engine.length = meter::new(40.0);
+        physics_consist.total_length = Some(units::meter::new(100.0));
+        physics_consist.traction_engine.length = units::meter::new(40.0);
 
         // We always take total_length
-        assert_eq!(physics_consist.compute_length(), millimeter::new(100000.));
+        assert_eq!(
+            physics_consist.compute_length(),
+            units::millimeter::new(100000.)
+        );
 
         physics_consist.total_length = None;
         // When no total_length we take towed length + traction_engine length
-        assert_eq!(physics_consist.compute_length(), millimeter::new(70000.));
+        assert_eq!(
+            physics_consist.compute_length(),
+            units::millimeter::new(70000.)
+        );
 
         physics_consist.total_length = None;
         physics_consist.towed_rolling_stock = None;
         // When no user specified length and towed rolling stock, we take traction_engine length
-        assert_eq!(physics_consist.compute_length(), millimeter::new(40000.));
+        assert_eq!(
+            physics_consist.compute_length(),
+            units::millimeter::new(40000.)
+        );
     }
 
     #[test]
     fn physics_consist_compute_mass() {
         let mut physics_consist = create_physics_consist();
-        physics_consist.total_mass = Some(kilogram::new(50000.0));
-        physics_consist.traction_engine.mass = kilogram::new(15000.0);
+        physics_consist.total_mass = Some(units::kilogram::new(50000.0));
+        physics_consist.traction_engine.mass = units::kilogram::new(15000.0);
 
         // We always take total_mass
-        assert_eq!(physics_consist.compute_mass(), kilogram::new(50000.));
+        assert_eq!(physics_consist.compute_mass(), units::kilogram::new(50000.));
 
         physics_consist.total_mass = None;
         // When no total_mass we take towed mass + traction_engine mass
-        assert_eq!(physics_consist.compute_mass(), kilogram::new(65000.));
+        assert_eq!(physics_consist.compute_mass(), units::kilogram::new(65000.));
 
         physics_consist.total_mass = None;
         physics_consist.towed_rolling_stock = None;
         // When no user specified mass and towed rolling stock, we take traction_engine mass
-        assert_eq!(physics_consist.compute_mass(), kilogram::new(15000.));
+        assert_eq!(physics_consist.compute_mass(), units::kilogram::new(15000.));
     }
 
     #[test]
     fn physics_consist_max_speed() {
         // Towed max speed 35
         let mut physics_consist = create_physics_consist();
-        physics_consist.max_speed = Some(meter_per_second::new(20.0));
-        physics_consist.traction_engine.max_speed = meter_per_second::new(22.0);
+        physics_consist.max_speed = Some(units::meter_per_second::new(20.0));
+        physics_consist.traction_engine.max_speed = units::meter_per_second::new(22.0);
 
         // We take the smallest max speed
         assert_eq!(
             physics_consist.compute_max_speed(),
-            meter_per_second::new(20.0)
+            units::meter_per_second::new(20.0)
         );
 
-        physics_consist.max_speed = Some(meter_per_second::new(25.0));
-        physics_consist.traction_engine.max_speed = meter_per_second::new(24.0);
+        physics_consist.max_speed = Some(units::meter_per_second::new(25.0));
+        physics_consist.traction_engine.max_speed = units::meter_per_second::new(24.0);
 
         assert_eq!(
             physics_consist.compute_max_speed(),
-            meter_per_second::new(24.0)
+            units::meter_per_second::new(24.0)
         );
 
         physics_consist.max_speed = None;
         assert_eq!(
             physics_consist.compute_max_speed(),
-            meter_per_second::new(24.0)
+            units::meter_per_second::new(24.0)
         );
 
-        physics_consist.traction_engine.max_speed = meter_per_second::new(40.0);
+        physics_consist.traction_engine.max_speed = units::meter_per_second::new(40.0);
         assert_eq!(
             physics_consist.compute_max_speed(),
-            meter_per_second::new(35.0)
+            units::meter_per_second::new(35.0)
         );
 
         physics_consist.towed_rolling_stock = None;
         assert_eq!(
             physics_consist.compute_max_speed(),
-            meter_per_second::new(40.0)
+            units::meter_per_second::new(40.0)
         );
     }
 
@@ -631,13 +643,13 @@ mod tests {
         // We take the biggest
         assert_eq!(
             physics_consist.compute_startup_acceleration(),
-            meter_per_second_squared::new(0.06)
+            units::meter_per_second_squared::new(0.06)
         );
 
         physics_consist.towed_rolling_stock = None;
         assert_eq!(
             physics_consist.compute_startup_acceleration(),
-            meter_per_second_squared::new(0.04)
+            units::meter_per_second_squared::new(0.04)
         );
     }
 
@@ -648,13 +660,13 @@ mod tests {
         // We take the smallest
         assert_eq!(
             physics_consist.compute_comfort_acceleration(),
-            meter_per_second_squared::new(0.1)
+            units::meter_per_second_squared::new(0.1)
         );
 
         physics_consist.towed_rolling_stock = None;
         assert_eq!(
             physics_consist.compute_comfort_acceleration(),
-            meter_per_second_squared::new(0.1)
+            units::meter_per_second_squared::new(0.1)
         );
     }
 
@@ -663,14 +675,14 @@ mod tests {
         let mut physics_consist = create_physics_consist();
 
         approx::assert_relative_eq!(
-            basis_point::from(physics_consist.compute_inertia_coefficient()),
+            units::basis_point::from(physics_consist.compute_inertia_coefficient()),
             1.065
         );
 
         physics_consist.towed_rolling_stock = None;
         assert_eq!(
             physics_consist.compute_inertia_coefficient(),
-            basis_point::new(1.10,)
+            units::basis_point::new(1.10,)
         );
     }
 
@@ -682,9 +694,9 @@ mod tests {
             physics_consist.compute_rolling_resistance(),
             RollingResistance {
                 rolling_resistance_type: "davis".to_string(),
-                A: newton::new(35001.0),
-                B: kilogram_per_second::new(350.01),
-                C: kilogram_per_meter::new(7.0005),
+                A: units::newton::new(35001.0),
+                B: units::kilogram_per_second::new(350.01),
+                C: units::kilogram_per_meter::new(7.0005),
             }
         );
 
@@ -699,23 +711,23 @@ mod tests {
     fn physics_consist_compute_gamma() {
         // Towed const gamma 0.5
         let mut physics_consist = create_physics_consist();
-        physics_consist.traction_engine.const_gamma = meter_per_second_squared::new(0.4);
+        physics_consist.traction_engine.const_gamma = units::meter_per_second_squared::new(0.4);
 
         assert_eq!(
             physics_consist.compute_const_gamma(),
-            meter_per_second_squared::new(0.4)
+            units::meter_per_second_squared::new(0.4)
         );
 
-        physics_consist.traction_engine.const_gamma = meter_per_second_squared::new(0.6);
+        physics_consist.traction_engine.const_gamma = units::meter_per_second_squared::new(0.6);
         assert_eq!(
             physics_consist.compute_const_gamma(),
-            meter_per_second_squared::new(0.5)
+            units::meter_per_second_squared::new(0.5)
         );
 
         physics_consist.towed_rolling_stock = None;
         assert_eq!(
             physics_consist.compute_const_gamma(),
-            meter_per_second_squared::new(0.6)
+            units::meter_per_second_squared::new(0.6)
         );
     }
 }
