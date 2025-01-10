@@ -3,12 +3,13 @@ import { type LayerProps, Source, type SymbolLayer } from 'react-map-gl/maplibre
 import { useSelector } from 'react-redux';
 
 import { MAP_URL } from 'common/Map/const';
-import getKPLabelLayerProps from 'common/Map/Layers/KPLabel';
 import getMastLayerProps from 'common/Map/Layers/mastLayerProps';
 import OrderedLayer from 'common/Map/Layers/OrderedLayer';
 import type { LayerContext } from 'common/Map/Layers/types';
 import { getMap } from 'reducers/map/selectors';
 import type { Theme } from 'types';
+
+import getKPLabelLayerProps from '../../getKPLabelLayerProps';
 
 export function getNeutralSectionSignsLayerProps({
   sourceTable,
