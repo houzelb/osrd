@@ -1,6 +1,7 @@
 package fr.sncf.osrd.envelope.part;
 
 import static fr.sncf.osrd.envelope.EnvelopePhysics.intersectStepWithSpeed;
+import static fr.sncf.osrd.envelope_sim.TrainPhysicsIntegrator.areSpeedsEqual;
 
 import com.carrotsearch.hppc.DoubleArrayList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -429,6 +430,13 @@ public final class EnvelopePart implements SearchableEnvelope {
      */
     public Double interpolatePosition(int startIndex, double speed) {
         assert strictlyMonotonicSpeeds;
+        var minSpeed = getMinSpeed();
+        var maxSpeed = getMaxSpeed();
+        if (areSpeedsEqual(speed, minSpeed)) {
+            speed = minSpeed;
+        } else if (areSpeedsEqual(speed, maxSpeed)) {
+            speed = maxSpeed;
+        }
         assert isBetween(speed, getMinSpeed(), getMaxSpeed());
 
         for (int i = startIndex; i < positions.length - 1; i++) {
