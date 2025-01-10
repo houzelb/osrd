@@ -150,6 +150,50 @@ macro_rules! define_unit {
                     super::hash(&value.unwrap_or_default(), state);
                 }
             }
+
+            pub mod u64 {
+                use super::*;
+
+                pub fn serialize<S>(value: &$quantity, serializer: S) -> Result<S::Ok, S::Error>
+                where
+                    S: Serializer,
+                {
+                    (value.get::<Unit>() as u64).serialize(serializer)
+                }
+
+                pub fn deserialize<'de, D>(deserializer: D) -> Result<$quantity, D::Error>
+                where
+                    D: Deserializer<'de>,
+                {
+                    super::deserialize(deserializer)
+                }
+
+                pub mod option {
+                    use super::*;
+                    pub type ReprType = Option<super::ReprType>;
+
+                    pub fn serialize<S>(
+                        value: &Option<$quantity>,
+                        serializer: S,
+                    ) -> Result<S::Ok, S::Error>
+                    where
+                        S: Serializer,
+                    {
+                        value
+                            .map(|value| value.get::<Unit>() as u64)
+                            .serialize(serializer)
+                    }
+
+                    pub fn deserialize<'de, D>(
+                        deserializer: D,
+                    ) -> Result<Option<$quantity>, D::Error>
+                    where
+                        D: Deserializer<'de>,
+                    {
+                        super::super::option::deserialize(deserializer)
+                    }
+                }
+            }
         }
     };
 }

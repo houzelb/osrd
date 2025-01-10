@@ -41,8 +41,8 @@ pub struct PhysicsConsist {
     pub effort_curves: EffortCurves,
     pub base_power_class: Option<String>,
     /// Length of the rolling stock
-    #[derivative(Hash(hash_with = "meter::hash"))]
-    #[serde(with = "meter")]
+    #[derivative(Hash(hash_with = "millimeter::hash"))]
+    #[serde(with = "millimeter::u64")]
     pub length: Length,
     /// Maximum speed of the rolling stock
     #[derivative(Hash(hash_with = "meter_per_second::hash"))]
@@ -68,7 +68,7 @@ pub struct PhysicsConsist {
     pub inertia_coefficient: Ratio,
     /// Mass of the rolling stock
     #[derivative(Hash(hash_with = "kilogram::hash"))]
-    #[serde(with = "kilogram")]
+    #[serde(with = "kilogram::u64")]
     pub mass: Mass,
     pub rolling_resistance: RollingResistance,
     /// Mapping of power restriction code to power class
@@ -77,12 +77,12 @@ pub struct PhysicsConsist {
     /// The time the train takes before actually using electrical power.
     /// Is null if the train is not electric or the value not specified.
     #[derivative(Hash(hash_with = "millisecond::option::hash"))]
-    #[serde(default, with = "millisecond::option")]
+    #[serde(default, with = "millisecond::u64::option")]
     pub electrical_power_startup_time: Option<Time>,
     /// The time it takes to raise this train's pantograph.
     /// Is null if the train is not electric or the value not specified.
     #[derivative(Hash(hash_with = "millisecond::option::hash"))]
-    #[serde(default, with = "millisecond::option")]
+    #[serde(default, with = "millisecond::u64::option")]
     pub raise_pantograph_time: Option<Time>,
 }
 

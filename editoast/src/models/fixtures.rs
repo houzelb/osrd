@@ -235,9 +235,6 @@ pub fn create_towed_rolling_stock() -> TowedRollingStock {
         inertia_coefficient: basis_point::new(1.05),
         rolling_resistance: RollingResistancePerWeight {
             rolling_resistance_type: "davis".to_string(),
-            A: meter_per_second_squared::new(1.0), // In N/kg
-            B: hertz::new(0.01),                   // In N/kg/(m/s)
-            C: per_meter::new(0.0002),             // In N/kg/(m/s)²
         },
         const_gamma: meter_per_second_squared::new(0.5),
         max_speed: Some(meter_per_second::new(35.0)),
@@ -267,9 +264,6 @@ pub fn create_simple_rolling_stock() -> RollingStock {
         railjson_version: "12".to_string(),
         rolling_resistance: RollingResistance {
             rolling_resistance_type: "davis".to_string(),
-            A: newton::new(1.0),                // In N
-            B: kilogram_per_second::new(0.01),  // In N/(m/s)
-            C: kilogram_per_meter::new(0.0005), // In N/(m/s)²
         },
         length: meter::new(140.0),
         mass: kilogram::new(15000.0),
