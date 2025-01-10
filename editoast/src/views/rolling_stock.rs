@@ -195,28 +195,19 @@ pub fn map_diesel_error(e: InternalError, name: impl AsRef<str>) -> InternalErro
 impl From<model::Error> for RollingStockError {
     fn from(e: model::Error) -> Self {
         match e {
-            model::Error::UniqueViolation { constraint }
-                if constraint == "rolling_stock_name_key" =>
-            {
-                Self::NameAlreadyUsed {
-                    name: String::default(),
-                }
+            model::Error::UniqueViolation {
+                constraint,
+                column,
+                value,
+            } if constraint == "rolling_stock_name_key" && column == "name" => {
+                Self::NameAlreadyUsed { name: value }
             }
-            model::Error::CheckViolation { constraint, .. }
+            model::Error::CheckViolation { constraint }
                 if constraint == "base_power_class_null_or_non_empty" =>
             {
                 Self::BasePowerClassEmpty
             }
             e => Self::Database(e),
-        }
-    }
-}
-
-impl RollingStockError {
-    fn with_name(self, name: String) -> Self {
-        match self {
-            Self::NameAlreadyUsed { .. } => Self::NameAlreadyUsed { name },
-            e => e,
         }
     }
 }
@@ -357,15 +348,13 @@ async fn create(
     }
     rolling_stock_form.validate()?;
     let conn = &mut db_pool.get().await?;
-    let rolling_stock_name = rolling_stock_form.name.clone();
     let rolling_stock_changeset: Changeset<RollingStockModel> = rolling_stock_form.into();
 
     let rolling_stock = rolling_stock_changeset
         .locked(query_params.locked)
         .version(0)
         .create(conn)
-        .await
-        .map_err(|e| RollingStockError::from(e).with_name(rolling_stock_name))?;
+        .await?;
 
     Ok(Json(rolling_stock))
 }

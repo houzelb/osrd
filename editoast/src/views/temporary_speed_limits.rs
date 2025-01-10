@@ -119,23 +119,14 @@ enum TemporarySpeedLimitError {
 impl From<model::Error> for TemporarySpeedLimitError {
     fn from(e: model::Error) -> Self {
         match e {
-            model::Error::UniqueViolation { constraint }
-                if constraint == "temporary_speed_limit_group_name_key" =>
-            {
-                Self::NameAlreadyUsed {
-                    name: "unknown".to_string(),
-                }
+            model::Error::UniqueViolation {
+                constraint,
+                column,
+                value,
+            } if constraint == "temporary_speed_limit_group_name_key" && column == "name" => {
+                Self::NameAlreadyUsed { name: value }
             }
             e => Self::Database(e),
-        }
-    }
-}
-
-impl TemporarySpeedLimitError {
-    fn with_name(self, name: String) -> Self {
-        match self {
-            Self::NameAlreadyUsed { .. } => Self::NameAlreadyUsed { name },
-            e => e,
         }
     }
 }
@@ -171,8 +162,7 @@ async fn create_temporary_speed_limit_group(
         .name(speed_limit_group_name.clone())
         .creation_date(Utc::now().naive_utc())
         .create(conn)
-        .await
-        .map_err(|e| TemporarySpeedLimitError::from(e).with_name(speed_limit_group_name))?;
+        .await?;
 
     // Create the speed limits
     let speed_limits_changesets = speed_limits

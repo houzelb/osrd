@@ -81,23 +81,14 @@ enum WorkScheduleError {
 impl From<model::Error> for WorkScheduleError {
     fn from(e: model::Error) -> Self {
         match e {
-            model::Error::UniqueViolation { constraint }
-                if constraint == "work_schedule_group_name_key" =>
-            {
-                Self::NameAlreadyUsed {
-                    name: String::default(),
-                }
+            model::Error::UniqueViolation {
+                constraint,
+                column,
+                value,
+            } if constraint == "work_schedule_group_name_key" && column == "name" => {
+                Self::NameAlreadyUsed { name: value }
             }
             e => Self::Database(e),
-        }
-    }
-}
-
-impl WorkScheduleError {
-    fn with_name(self, name: String) -> Self {
-        match self {
-            Self::NameAlreadyUsed { .. } => Self::NameAlreadyUsed { name },
-            e => e,
         }
     }
 }
@@ -350,8 +341,7 @@ async fn create_group(
         .name(group_name.clone())
         .creation_date(Utc::now())
         .create(conn)
-        .await
-        .map_err(|e| WorkScheduleError::from(e).with_name(group_name))?;
+        .await?;
     Ok(Json(WorkScheduleGroupCreateResponse {
         work_schedule_group_id: work_schedule_group.id,
     }))
