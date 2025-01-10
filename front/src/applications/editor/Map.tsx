@@ -16,20 +16,16 @@ import type { EditorContextType, ExtendedEditorContextType, Tool } from 'applica
 import type { InfraError } from 'common/api/osrdEditoastApi';
 import { CUSTOM_ATTRIBUTION } from 'common/Map/const';
 import colors from 'common/Map/Consts/colors';
-import Background from 'common/Map/Layers/Background';
-import { useMapBlankStyle } from 'common/Map/Layers/blankStyle';
-import NeutralSections from 'common/Map/Layers/extensions/SNCF/NeutralSections';
-import Hillshade from 'common/Map/Layers/Hillshade';
-import IGN_BD_ORTHO from 'common/Map/Layers/IGN_BD_ORTHO';
-import IGN_CADASTRE from 'common/Map/Layers/IGN_CADASTRE';
-import IGN_SCAN25 from 'common/Map/Layers/IGN_SCAN25';
-import LineSearchLayer from 'common/Map/Layers/LineSearchLayer';
-import OperationalPoints from 'common/Map/Layers/OperationalPoints';
-import OSM from 'common/Map/Layers/OSM';
-import { Platforms as PlatformsLayer } from 'common/Map/Layers/Platforms';
-import SearchMarker from 'common/Map/Layers/SearchMarker';
-import Terrain from 'common/Map/Layers/Terrain';
-import TracksOSM from 'common/Map/Layers/TracksOSM';
+import {
+  IGNLayers,
+  LineSearchLayer,
+  NeutralSectionsLayer,
+  OperationalPointsLayer,
+  OSMLayers,
+  PlatformsLayer,
+  SearchMarker,
+  useMapBlankStyle,
+} from 'common/Map/Layers';
 import { removeSearchItemMarkersOnMap } from 'common/Map/utils';
 import { LAYER_GROUPS_ORDER, LAYERS } from 'config/layerOrder';
 import VirtualLayers from 'modules/simulationResult/components/SimulationResultsMap/VirtualLayers';
@@ -44,7 +40,7 @@ interface MapProps<S extends CommonToolState = CommonToolState> {
   toolState: S;
   setToolState: (state: Partial<S>) => void;
   activeTool: Tool<S>;
-  mapStyle: string;
+  mapStyle: 'normal' | 'dark' | 'blueprint' | 'minimal';
   viewport: Viewport;
   setViewport: (newViewport: Partial<Viewport>, updateRouter?: boolean) => void;
   mapRef: React.RefObject<MapRef>;
@@ -289,29 +285,9 @@ const MapUnplugged = ({
           />
 
           {/* Common layers */}
-          <Background
-            colors={colors[mapStyle]}
-            layerOrder={LAYER_GROUPS_ORDER[LAYERS.BACKGROUND.GROUP]}
-          />
-          <Terrain />
-          <TracksOSM
-            colors={colors[mapStyle]}
-            layerOrder={LAYER_GROUPS_ORDER[LAYERS.TRACKS_OSM.GROUP]}
-          />
+          <OSMLayers mapStyle={mapStyle} showOSM={showOSM} hidePlatforms />
 
-          <IGN_BD_ORTHO layerOrder={LAYER_GROUPS_ORDER[LAYERS.BACKGROUND.GROUP]} />
-          <IGN_SCAN25 layerOrder={LAYER_GROUPS_ORDER[LAYERS.BACKGROUND.GROUP]} />
-          <IGN_CADASTRE layerOrder={LAYER_GROUPS_ORDER[LAYERS.BACKGROUND.GROUP]} />
-
-          {!showOSM ? null : (
-            <>
-              <OSM mapStyle={mapStyle} layerOrder={LAYER_GROUPS_ORDER[LAYERS.BACKGROUND.GROUP]} />
-              <Hillshade
-                mapStyle={mapStyle}
-                layerOrder={LAYER_GROUPS_ORDER[LAYERS.BACKGROUND.GROUP]}
-              />
-            </>
-          )}
+          <IGNLayers />
 
           <LineSearchLayer
             layerOrder={LAYER_GROUPS_ORDER[LAYERS.LINE_SEARCH.GROUP]}
@@ -326,18 +302,20 @@ const MapUnplugged = ({
           )}
 
           {editorState.editorLayers.has('neutral_sections') && (
-            <NeutralSections
+            <NeutralSectionsLayer
               colors={colors[mapStyle]}
               layerOrder={LAYER_GROUPS_ORDER[LAYERS.DEAD_SECTIONS.GROUP]}
               infraID={infraID}
+              overrideStore
             />
           )}
 
           {editorState.editorLayers.has('operational_points') && (
-            <OperationalPoints
+            <OperationalPointsLayer
               colors={colors[mapStyle]}
               layerOrder={LAYER_GROUPS_ORDER[LAYERS.OPERATIONAL_POINTS.GROUP]}
               infraID={infraID}
+              overrideStore
             />
           )}
 

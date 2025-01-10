@@ -4,7 +4,7 @@ import { Source } from 'react-map-gl/maplibre';
 import { useSelector } from 'react-redux';
 
 import { MAP_URL } from 'common/Map/const';
-import getKPLabelLayerProps from 'common/Map/Layers/KPLabel';
+import getKPLabelLayerProps from 'common/Map/Layers/InfraObjectLayers/getKPLabelLayerProps';
 import getMastLayerProps from 'common/Map/Layers/mastLayerProps';
 import OrderedLayer from 'common/Map/Layers/OrderedLayer';
 import type { LayerContext } from 'common/Map/Layers/types';
