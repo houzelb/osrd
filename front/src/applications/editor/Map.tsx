@@ -16,12 +16,16 @@ import type { EditorContextType, ExtendedEditorContextType, Tool } from 'applica
 import type { InfraError } from 'common/api/osrdEditoastApi';
 import { CUSTOM_ATTRIBUTION } from 'common/Map/const';
 import colors from 'common/Map/Consts/colors';
-import { useMapBlankStyle } from 'common/Map/Layers/blankStyle';
-import IGNLayers from 'common/Map/Layers/IGNLayers';
-import { NeutralSectionsLayer, OperationalPointsLayer } from 'common/Map/Layers/InfraObjectLayers';
-import LineSearchLayer from 'common/Map/Layers/LineSearchLayer';
-import OSMLayers, { PlatformsLayer } from 'common/Map/Layers/OSMLayers';
-import SearchMarker from 'common/Map/Layers/SearchMarker';
+import {
+  IGNLayers,
+  LineSearchLayer,
+  NeutralSectionsLayer,
+  OperationalPointsLayer,
+  OSMLayers,
+  PlatformsLayer,
+  SearchMarker,
+  useMapBlankStyle,
+} from 'common/Map/Layers';
 import { removeSearchItemMarkersOnMap } from 'common/Map/utils';
 import { LAYER_GROUPS_ORDER, LAYERS } from 'config/layerOrder';
 import VirtualLayers from 'modules/simulationResult/components/SimulationResultsMap/VirtualLayers';

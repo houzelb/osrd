@@ -20,12 +20,14 @@ import MapButtons from 'common/Map/Buttons/MapButtons';
 import TrainOnMap, { type TrainCurrentInfo } from 'common/Map/components/TrainOnMap/TrainOnMap';
 import { CUSTOM_ATTRIBUTION } from 'common/Map/const';
 import colors from 'common/Map/Consts/colors';
-import { useMapBlankStyle } from 'common/Map/Layers/blankStyle';
-import IGNLayers from 'common/Map/Layers/IGNLayers';
-import InfraObjectLayers from 'common/Map/Layers/InfraObjectLayers';
-import LineSearchLayer from 'common/Map/Layers/LineSearchLayer';
-import OSMLayers from 'common/Map/Layers/OSMLayers';
-import SearchMarker from 'common/Map/Layers/SearchMarker';
+import {
+  useMapBlankStyle,
+  IGNLayers,
+  InfraObjectLayers,
+  LineSearchLayer,
+  OSMLayers,
+  SearchMarker,
+} from 'common/Map/Layers';
 import { removeSearchItemMarkersOnMap } from 'common/Map/utils';
 import { computeBBoxViewport } from 'common/Map/WarpedMap/core/helpers';
 import { useInfraID } from 'common/osrdContext';

@@ -15,13 +15,15 @@ import type { PathProperties } from 'common/api/osrdEditoastApi';
 import MapButtons from 'common/Map/Buttons/MapButtons';
 import { CUSTOM_ATTRIBUTION } from 'common/Map/const';
 import colors from 'common/Map/Consts/colors';
-import { useMapBlankStyle } from 'common/Map/Layers/blankStyle';
-import IGNLayers from 'common/Map/Layers/IGNLayers';
-import InfraObjectLayers from 'common/Map/Layers/InfraObjectLayers';
-import LineSearchLayer from 'common/Map/Layers/LineSearchLayer';
-import OSMLayers from 'common/Map/Layers/OSMLayers';
-import SearchMarker from 'common/Map/Layers/SearchMarker';
-import SnappedMarker from 'common/Map/Layers/SnappedMarker';
+import {
+  useMapBlankStyle,
+  IGNLayers,
+  InfraObjectLayers,
+  LineSearchLayer,
+  OSMLayers,
+  SearchMarker,
+  SnappedMarker,
+} from 'common/Map/Layers';
 import { removeSearchItemMarkersOnMap } from 'common/Map/utils';
 import { computeBBoxViewport } from 'common/Map/WarpedMap/core/helpers';
 import { useInfraID } from 'common/osrdContext';

@@ -9,12 +9,14 @@ import { useParams } from 'react-router-dom';
 import MapButtons from 'common/Map/Buttons/MapButtons';
 import { CUSTOM_ATTRIBUTION } from 'common/Map/const';
 import colors from 'common/Map/Consts/colors';
-import { useMapBlankStyle } from 'common/Map/Layers/blankStyle';
-import IGNLayers from 'common/Map/Layers/IGNLayers';
-import InfraObjectLayers from 'common/Map/Layers/InfraObjectLayers';
-import LineSearchLayer from 'common/Map/Layers/LineSearchLayer';
-import OSMLayers from 'common/Map/Layers/OSMLayers';
-import SearchMarker from 'common/Map/Layers/SearchMarker';
+import {
+  IGNLayers,
+  InfraObjectLayers,
+  LineSearchLayer,
+  OSMLayers,
+  SearchMarker,
+  useMapBlankStyle,
+} from 'common/Map/Layers';
 import { removeSearchItemMarkersOnMap } from 'common/Map/utils';
 import { useInfraID } from 'common/osrdContext';
 import { LAYER_GROUPS_ORDER, LAYERS } from 'config/layerOrder';
