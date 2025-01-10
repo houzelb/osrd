@@ -54,9 +54,9 @@ const persistor = persistStore(store);
 // Retrieve the persisted state from storage and purge if new front version
 getStoredState(persistConfig)
   .then((persistedState) => {
-    console.info('Front OSRD Version', import.meta.env.OSRD_GIT_DESCRIBE);
+    console.info('Front OSRD Version', import.meta.env.VITE_OSRD_GIT_DESCRIBE);
 
-    const envInterfaceVersion = import.meta.env.OSRD_GIT_DESCRIBE;
+    const envInterfaceVersion = import.meta.env.VITE_OSRD_GIT_DESCRIBE;
     const persistedRootState = persistedState as RootState;
 
     if (
