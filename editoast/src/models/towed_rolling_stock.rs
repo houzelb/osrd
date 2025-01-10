@@ -1,4 +1,7 @@
-use editoast_common::units::*;
+use editoast_common::units;
+use editoast_common::units::quantities::{
+    Acceleration, Deceleration, Length, Mass, Ratio, Velocity,
+};
 use editoast_derive::Model;
 use editoast_schemas::rolling_stock::RollingResistancePerWeight;
 use editoast_schemas::rolling_stock::TowedRollingStock;
@@ -22,29 +25,29 @@ pub struct TowedRollingStockModel {
     pub railjson_version: String,
     pub locked: bool,
 
-    #[serde(with = "kilogram")]
-    #[model(uom_unit = "kilogram")]
+    #[serde(with = "units::kilogram")]
+    #[model(uom_unit = "units::kilogram")]
     pub mass: Mass,
-    #[serde(with = "meter")]
-    #[model(uom_unit = "meter")]
+    #[serde(with = "units::meter")]
+    #[model(uom_unit = "units::meter")]
     pub length: Length,
     #[schema(required)]
-    #[serde(default, with = "meter_per_second::option")]
-    #[model(uom_unit = "meter_per_second::option")]
+    #[serde(default, with = "units::meter_per_second::option")]
+    #[model(uom_unit = "units::meter_per_second::option")]
     pub max_speed: Option<Velocity>,
-    #[model(uom_unit = "meter_per_second_squared")]
-    #[serde(with = "meter_per_second_squared")]
+    #[model(uom_unit = "units::meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
     pub comfort_acceleration: Acceleration,
-    #[model(uom_unit = "meter_per_second_squared")]
-    #[serde(with = "meter_per_second_squared")]
+    #[model(uom_unit = "units::meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
     pub startup_acceleration: Acceleration,
-    #[model(uom_unit = "basis_point")]
-    #[serde(with = "basis_point")]
+    #[model(uom_unit = "units::basis_point")]
+    #[serde(with = "units::basis_point")]
     pub inertia_coefficient: Ratio,
     #[model(json)]
     pub rolling_resistance: RollingResistancePerWeight,
-    #[model(uom_unit = "meter_per_second_squared")]
-    #[serde(with = "meter_per_second_squared")]
+    #[model(uom_unit = "units::meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
     pub const_gamma: Deceleration,
 
     pub version: i64,

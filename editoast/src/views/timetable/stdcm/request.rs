@@ -1,7 +1,7 @@
 use chrono::DateTime;
 use chrono::Duration;
 use chrono::Utc;
-use editoast_common::units::*;
+use editoast_common::units;
 use editoast_models::DbConnection;
 use editoast_schemas::rolling_stock::LoadingGaugeType;
 use editoast_schemas::train_schedule::Comfort;
@@ -12,6 +12,8 @@ use itertools::Itertools;
 use serde::Deserialize;
 use serde::Deserializer;
 use serde::Serialize;
+use serde::Serializer;
+use units::quantities;
 use utoipa::ToSchema;
 
 use crate::core::pathfinding::PathfindingInputError;
@@ -106,14 +108,14 @@ pub(super) struct Request {
     #[schema(value_type = Option<String>, example = json!(["5%", "2min/100km"]))]
     pub(super) margin: Option<MarginValue>,
     /// Total mass of the consist
-    #[serde(default, with = "kilogram::option")]
-    pub(super) total_mass: Option<Mass>,
+    #[serde(default, with = "units::kilogram::option")]
+    pub(super) total_mass: Option<quantities::Mass>,
     /// Total length of the consist in meters
-    #[serde(default, with = "meter::option")]
-    pub(super) total_length: Option<Length>,
+    #[serde(default, with = "units::meter::option")]
+    pub(super) total_length: Option<quantities::Length>,
     /// Maximum speed of the consist in km/h
-    #[serde(default, with = "meter_per_second::option")]
-    pub(super) max_speed: Option<Velocity>,
+    #[serde(default, with = "units::meter_per_second::option")]
+    pub(super) max_speed: Option<quantities::Velocity>,
     pub(super) loading_gauge_type: Option<LoadingGaugeType>,
 }
 
@@ -300,7 +302,7 @@ impl<'de> Deserialize<'de> for Request {
     {
         let request = Request::deserialize(deserializer)?;
         if let Some(mass) = request.total_mass {
-            if mass <= kilogram::new(0.0) {
+            if mass <= units::kilogram::new(0.0) {
                 return Err(serde::de::Error::custom(
                     "the total mass must be strictly positive",
                 ));
@@ -308,7 +310,7 @@ impl<'de> Deserialize<'de> for Request {
         }
 
         if let Some(total_length) = request.total_length {
-            if total_length <= meter::new(0.0) {
+            if total_length <= units::meter::new(0.0) {
                 return Err(serde::de::Error::custom(
                     "the length mass must be strictly positive",
                 ));
@@ -316,7 +318,7 @@ impl<'de> Deserialize<'de> for Request {
         }
 
         if let Some(max_speed) = request.max_speed {
-            if max_speed <= meter_per_second::new(0.0) {
+            if max_speed <= units::meter_per_second::new(0.0) {
                 return Err(serde::de::Error::custom(
                     "the max_speed must be strictly positive",
                 ));

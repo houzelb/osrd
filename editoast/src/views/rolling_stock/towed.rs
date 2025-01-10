@@ -15,7 +15,10 @@ use axum::Extension;
 use axum::Json;
 use diesel_async::scoped_futures::ScopedFutureExt as _;
 use editoast_authz::BuiltinRole;
-use editoast_common::units::*;
+use editoast_common::units;
+use editoast_common::units::quantities::{
+    Acceleration, Deceleration, Length, Mass, Ratio, Velocity,
+};
 use editoast_derive::EditoastError;
 use editoast_models::DbConnectionPoolV2;
 use editoast_schemas::rolling_stock::RollingResistancePerWeight;
@@ -55,21 +58,21 @@ struct TowedRollingStock {
     railjson_version: String,
     locked: bool,
 
-    #[serde(with = "kilogram")]
+    #[serde(with = "units::kilogram")]
     mass: Mass,
-    #[serde(with = "meter")]
+    #[serde(with = "units::meter")]
     length: Length,
-    #[serde(with = "meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
     comfort_acceleration: Acceleration,
-    #[serde(with = "meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
     startup_acceleration: Acceleration,
-    #[serde(with = "basis_point")]
+    #[serde(with = "units::basis_point")]
     inertia_coefficient: Ratio,
     rolling_resistance: RollingResistancePerWeight,
-    #[serde(with = "meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
     const_gamma: Deceleration,
     #[schema(required)]
-    #[serde(default, with = "meter_per_second::option")]
+    #[serde(default, with = "units::meter_per_second::option")]
     max_speed: Option<Velocity>,
 }
 
@@ -111,20 +114,20 @@ pub struct TowedRollingStockForm {
     pub label: String,
     pub locked: bool,
 
-    #[serde(with = "kilogram")]
+    #[serde(with = "units::kilogram")]
     pub mass: Mass,
-    #[serde(with = "meter")]
+    #[serde(with = "units::meter")]
     pub length: Length,
-    #[serde(with = "meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
     pub comfort_acceleration: Acceleration,
-    #[serde(with = "meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
     pub startup_acceleration: Acceleration,
-    #[serde(with = "basis_point")]
+    #[serde(with = "units::basis_point")]
     pub inertia_coefficient: Ratio,
     pub rolling_resistance: RollingResistancePerWeight,
-    #[serde(with = "meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
     pub const_gamma: Deceleration,
-    #[serde(default, with = "meter_per_second::option")]
+    #[serde(default, with = "units::meter_per_second::option")]
     pub max_speed: Option<Velocity>,
 }
 
@@ -378,7 +381,7 @@ mod tests {
     use crate::views::test_app::TestApp;
     use crate::views::test_app::TestAppBuilder;
     use axum::http::StatusCode;
-    use editoast_common::units::*;
+    use editoast_common::units;
     use rstest::rstest;
     use serde_json::json;
     use uuid::Uuid;
@@ -482,7 +485,7 @@ mod tests {
         let mut towed_rolling_stock = create_towed_rolling_stock(&app, &name, UNLOCKED);
 
         let id = towed_rolling_stock.id;
-        towed_rolling_stock.mass = kilogram::new(13000.0);
+        towed_rolling_stock.mass = units::kilogram::new(13000.0);
         let updated_towed_rolling_stock: TowedRollingStock = app
             .fetch(
                 app.patch(&format!("/towed_rolling_stock/{id}"))
@@ -492,7 +495,10 @@ mod tests {
             .json_into();
 
         assert_eq!(updated_towed_rolling_stock.name, name);
-        assert_eq!(updated_towed_rolling_stock.mass, kilogram::new(13000.0));
+        assert_eq!(
+            updated_towed_rolling_stock.mass,
+            units::kilogram::new(13000.0)
+        );
     }
 
     #[rstest]
@@ -515,7 +521,7 @@ mod tests {
         let mut towed_rolling_stock = create_towed_rolling_stock(&app, &name, LOCKED);
 
         let id = towed_rolling_stock.id;
-        towed_rolling_stock.mass = kilogram::new(13000.0);
+        towed_rolling_stock.mass = units::kilogram::new(13000.0);
         app.fetch(
             app.patch(&format!("/towed_rolling_stock/{id}"))
                 .json(&towed_rolling_stock),
@@ -531,7 +537,7 @@ mod tests {
         let mut towed_rolling_stock = create_towed_rolling_stock(&app, &name, LOCKED);
 
         let id = towed_rolling_stock.id;
-        towed_rolling_stock.mass = kilogram::new(13000.0);
+        towed_rolling_stock.mass = units::kilogram::new(13000.0);
         app.fetch(
             app.patch(&format!("/towed_rolling_stock/{id}/locked"))
                 .json(&json!({ "locked": false })),

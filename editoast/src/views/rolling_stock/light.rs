@@ -4,7 +4,10 @@ use axum::extract::Query;
 use axum::extract::State;
 use axum::Extension;
 use editoast_authz::BuiltinRole;
-use editoast_common::units::*;
+use editoast_common::units;
+use editoast_common::units::quantities::{
+    Acceleration, Deceleration, Length, Mass, Ratio, Time, Velocity,
+};
 use editoast_models::DbConnection;
 use editoast_models::DbConnectionPoolV2;
 use editoast_schemas::rolling_stock::EffortCurves;
@@ -218,23 +221,23 @@ struct LightRollingStock {
     effort_curves: LightEffortCurves,
     #[schema(required)]
     base_power_class: Option<String>,
-    #[serde(with = "meter")]
+    #[serde(with = "units::meter")]
     length: Length,
-    #[serde(with = "meter_per_second")]
+    #[serde(with = "units::meter_per_second")]
     max_speed: Velocity,
-    #[serde(with = "second")]
+    #[serde(with = "units::second")]
     startup_time: Time,
-    #[serde(with = "meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
     startup_acceleration: Acceleration,
-    #[serde(with = "meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
     comfort_acceleration: Acceleration,
-    #[serde(with = "meter_per_second_squared")]
+    #[serde(with = "units::meter_per_second_squared")]
     const_gamma: Deceleration,
     #[schema(required)]
     etcs_brake_params: Option<EtcsBrakeParams>,
-    #[serde(with = "basis_point")]
+    #[serde(with = "units::basis_point")]
     inertia_coefficient: Ratio,
-    #[serde(with = "kilogram")]
+    #[serde(with = "units::kilogram")]
     mass: Mass,
     rolling_resistance: RollingResistance,
     loading_gauge: LoadingGaugeType,
