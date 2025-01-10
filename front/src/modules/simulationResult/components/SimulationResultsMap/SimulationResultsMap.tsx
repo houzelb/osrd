@@ -51,7 +51,7 @@ import RenderItinerary from 'modules/simulationResult/components/SimulationResul
 import VirtualLayers from 'modules/simulationResult/components/SimulationResultsMap/VirtualLayers';
 import type { RootState } from 'reducers';
 import { updateViewport, type Viewport } from 'reducers/map';
-import { getLayersSettings, getTerrain3DExaggeration } from 'reducers/map/selectors';
+import { getTerrain3DExaggeration } from 'reducers/map/selectors';
 import { getIsPlaying } from 'reducers/simulationResults/selectors';
 import { useAppDispatch } from 'store';
 import { isoDateWithTimezoneToSec } from 'utils/date';
@@ -86,7 +86,6 @@ const SimulationResultMap = ({
   } = useSelector((state: RootState) => state.map);
   const isPlaying = useSelector(getIsPlaying);
   const terrain3DExaggeration = useSelector(getTerrain3DExaggeration);
-  const layersSettings = useSelector(getLayersSettings);
 
   const [mapLoaded, setMapLoaded] = useState(false);
   const [interactiveLayerIds, setInteractiveLayerIds] = useState<string[]>([]);
@@ -287,25 +286,23 @@ const SimulationResultMap = ({
           layerOrder={LAYER_GROUPS_ORDER[LAYERS.ROUTES.GROUP]}
           infraID={infraID}
         />
-        {layersSettings.operationalpoints && (
-          <OperationalPoints
-            colors={colors[mapStyle]}
-            layerOrder={LAYER_GROUPS_ORDER[LAYERS.OPERATIONAL_POINTS.GROUP]}
-            infraID={infraID}
-          />
-        )}
+
+        <OperationalPoints
+          colors={colors[mapStyle]}
+          layerOrder={LAYER_GROUPS_ORDER[LAYERS.OPERATIONAL_POINTS.GROUP]}
+          infraID={infraID}
+        />
+
         <Electrifications
           colors={colors[mapStyle]}
           layerOrder={LAYER_GROUPS_ORDER[LAYERS.ELECTRIFICATIONS.GROUP]}
           infraID={infraID}
         />
-        {layersSettings.neutral_sections && (
-          <NeutralSections
-            colors={colors[mapStyle]}
-            layerOrder={LAYER_GROUPS_ORDER[LAYERS.DEAD_SECTIONS.GROUP]}
-            infraID={infraID}
-          />
-        )}
+        <NeutralSections
+          colors={colors[mapStyle]}
+          layerOrder={LAYER_GROUPS_ORDER[LAYERS.DEAD_SECTIONS.GROUP]}
+          infraID={infraID}
+        />
         <BufferStops
           colors={colors[mapStyle]}
           layerOrder={LAYER_GROUPS_ORDER[LAYERS.BUFFER_STOPS.GROUP]}

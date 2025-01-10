@@ -1,18 +1,28 @@
 import { isNil } from 'lodash';
 import { type LayerProps, Source } from 'react-map-gl/maplibre';
+import { useSelector } from 'react-redux';
 
 import { MAP_URL } from 'common/Map/const';
 import NeutralSectionSigns from 'common/Map/Layers/extensions/SNCF/NeutralSectionSigns';
 import OrderedLayer from 'common/Map/Layers/OrderedLayer';
+import { getLayersSettings } from 'reducers/map/selectors';
 import type { Theme } from 'types';
 
 type NeutralSectionsProps = {
   colors: Theme;
   layerOrder: number;
   infraID: number | undefined;
+  overrideStore?: boolean;
 };
 
-export default ({ colors, layerOrder, infraID }: NeutralSectionsProps) => {
+const NeutralSectionsLayer = ({
+  colors,
+  layerOrder,
+  infraID,
+  overrideStore = false,
+}: NeutralSectionsProps) => {
+  const layersSettings = useSelector(getLayersSettings);
+
   const neutralSectionsParams: LayerProps = {
     type: 'line',
     'source-layer': 'neutral_sections',
@@ -35,7 +45,7 @@ export default ({ colors, layerOrder, infraID }: NeutralSectionsProps) => {
     },
   };
 
-  if (isNil(infraID)) return null;
+  if ((!overrideStore && !layersSettings.neutral_sections) || isNil(infraID)) return null;
   return (
     <>
       <Source
@@ -53,3 +63,5 @@ export default ({ colors, layerOrder, infraID }: NeutralSectionsProps) => {
     </>
   );
 };
+
+export default NeutralSectionsLayer;
