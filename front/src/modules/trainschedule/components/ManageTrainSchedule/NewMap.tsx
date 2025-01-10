@@ -61,7 +61,6 @@ type MapProps = {
   pathProperties?: ManageTrainSchedulePathProperties;
   pathGeometry?: NonNullable<PathProperties['geometry']>;
   setMapCanvas?: (mapCanvas: string) => void;
-  isReadOnly?: boolean;
   hideAttribution?: boolean;
   hideItinerary?: boolean;
   preventPointSelection?: boolean;
@@ -82,7 +81,6 @@ const NewMap = ({
   pathProperties,
   pathGeometry: geometry,
   setMapCanvas,
-  isReadOnly = false,
   hideAttribution = false,
   hideItinerary = false,
   preventPointSelection = false,
@@ -112,9 +110,8 @@ const NewMap = ({
   );
 
   const mapViewport = useMemo(
-    () =>
-      isReadOnly && pathGeometry ? computeBBoxViewport(bbox(pathGeometry), viewport) : viewport,
-    [isReadOnly, pathGeometry, viewport]
+    () => (pathGeometry ? computeBBoxViewport(bbox(pathGeometry), viewport) : viewport),
+    [pathGeometry, viewport]
   );
 
   const [mapIsLoaded, setMapIsLoaded] = useState(false);
@@ -253,45 +250,37 @@ const NewMap = ({
 
   return (
     <>
-      {!isReadOnly && (
-        <MapButtons
-          zoomIn={zoomIn}
-          zoomOut={zoomOut}
-          map={mapRef.current ?? undefined}
-          resetPitchBearing={resetPitchBearing}
-          closeFeatureInfoClickPopup={closeFeatureInfoClickPopup}
-          bearing={mapViewport.bearing}
-          withMapKeyButton={withMapKeyButton}
-          withSearchButton={withSearchButton}
-          withToggleLayersButton={withToggleLayersButton}
-          viewPort={mapViewport}
-          isNewButtons
-        />
-      )}
+      <MapButtons
+        zoomIn={zoomIn}
+        zoomOut={zoomOut}
+        map={mapRef.current ?? undefined}
+        resetPitchBearing={resetPitchBearing}
+        closeFeatureInfoClickPopup={closeFeatureInfoClickPopup}
+        bearing={mapViewport.bearing}
+        withMapKeyButton={withMapKeyButton}
+        withSearchButton={withSearchButton}
+        withToggleLayersButton={withToggleLayersButton}
+        viewPort={mapViewport}
+        isNewButtons
+      />
       <ReactMapGL
-        dragPan={false}
-        scrollZoom={false}
+        id={id}
         ref={mapRef}
         {...mapViewport}
         style={{ width: '100%', height: '100%' }}
-        cursor={isReadOnly || preventPointSelection ? 'default' : 'pointer'}
+        cursor={preventPointSelection ? 'default' : 'pointer'}
         mapStyle={mapBlankStyle}
         attributionControl={false} // Defined below
-        {...(!isReadOnly && {
-          dragPan: true,
-          scrollZoom: true,
-          onMove: (e) => updateViewportChange(e.viewState),
-          onMouseMove: onMoveGetFeature,
-          onClick: onFeatureClick,
-          onResize: (e) => {
-            updateViewportChange({
-              width: e.target.getContainer().offsetWidth,
-              height: e.target.getContainer().offsetHeight,
-            });
-          },
-        })}
+        onMove={(e) => updateViewportChange(e.viewState)}
+        onMouseMove={onMoveGetFeature}
+        onClick={onFeatureClick}
+        onResize={(e) => {
+          updateViewportChange({
+            width: e.target.getContainer().offsetWidth,
+            height: e.target.getContainer().offsetHeight,
+          });
+        }}
         interactiveLayerIds={interactiveLayerIds}
-        touchZoomRotate
         maxPitch={85}
         terrain={
           terrain3DExaggeration
@@ -305,7 +294,9 @@ const NewMap = ({
           captureMap(mapViewport, id, setMapCanvas, pathGeometry);
         }}
         preserveDrawingBuffer
-        id={id}
+        dragPan
+        scrollZoom
+        touchZoomRotate
       >
         <VirtualLayers />
         {!hideAttribution && (
@@ -357,72 +348,72 @@ const NewMap = ({
           layerOrder={LAYER_GROUPS_ORDER[LAYERS.ROUTES.GROUP]}
           infraID={infraID}
         />
-        {!isReadOnly && (
-          <>
-            <OperationalPoints
-              colors={colors[mapStyle]}
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.OPERATIONAL_POINTS.GROUP]}
-              infraID={infraID}
-            />
 
-            <Electrifications
-              colors={colors[mapStyle]}
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.ELECTRIFICATIONS.GROUP]}
-              infraID={infraID}
-            />
+        <OperationalPoints
+          colors={colors[mapStyle]}
+          layerOrder={LAYER_GROUPS_ORDER[LAYERS.OPERATIONAL_POINTS.GROUP]}
+          infraID={infraID}
+        />
 
-            <NeutralSections
-              colors={colors[mapStyle]}
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.DEAD_SECTIONS.GROUP]}
-              infraID={infraID}
-            />
+        <Electrifications
+          colors={colors[mapStyle]}
+          layerOrder={LAYER_GROUPS_ORDER[LAYERS.ELECTRIFICATIONS.GROUP]}
+          infraID={infraID}
+        />
 
-            <BufferStops
-              colors={colors[mapStyle]}
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.BUFFER_STOPS.GROUP]}
-              infraID={infraID}
-            />
-            <Detectors
-              colors={colors[mapStyle]}
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.DETECTORS.GROUP]}
-              infraID={infraID}
-            />
-            <Switches
-              colors={colors[mapStyle]}
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.SWITCHES.GROUP]}
-              infraID={infraID}
-            />
+        <NeutralSections
+          colors={colors[mapStyle]}
+          layerOrder={LAYER_GROUPS_ORDER[LAYERS.DEAD_SECTIONS.GROUP]}
+          infraID={infraID}
+        />
 
-            <SpeedLimits
-              colors={colors[mapStyle]}
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.SPEED_LIMITS.GROUP]}
-              infraID={infraID}
-            />
-            <SNCF_PSL
-              colors={colors[mapStyle]}
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.SPEED_LIMITS.GROUP]}
-              infraID={infraID}
-            />
+        <BufferStops
+          colors={colors[mapStyle]}
+          layerOrder={LAYER_GROUPS_ORDER[LAYERS.BUFFER_STOPS.GROUP]}
+          infraID={infraID}
+        />
+        <Detectors
+          colors={colors[mapStyle]}
+          layerOrder={LAYER_GROUPS_ORDER[LAYERS.DETECTORS.GROUP]}
+          infraID={infraID}
+        />
+        <Switches
+          colors={colors[mapStyle]}
+          layerOrder={LAYER_GROUPS_ORDER[LAYERS.SWITCHES.GROUP]}
+          infraID={infraID}
+        />
 
-            <Signals
-              sourceTable="signals"
-              colors={colors[mapStyle]}
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.SIGNALS.GROUP]}
-              infraID={infraID}
-            />
-            <LineSearchLayer
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.LINE_SEARCH.GROUP]}
-              infraID={infraID}
-            />
-            {!showStdcmAssets && featureInfoClick && (
-              <AddPathStepPopup
-                pathProperties={pathProperties}
-                featureInfoClick={featureInfoClick}
-                resetFeatureInfoClick={resetFeatureInfoClick}
-              />
-            )}
-          </>
+        <SpeedLimits
+          colors={colors[mapStyle]}
+          layerOrder={LAYER_GROUPS_ORDER[LAYERS.SPEED_LIMITS.GROUP]}
+          infraID={infraID}
+        />
+        <SNCF_PSL
+          colors={colors[mapStyle]}
+          layerOrder={LAYER_GROUPS_ORDER[LAYERS.SPEED_LIMITS.GROUP]}
+          infraID={infraID}
+        />
+
+        <Signals
+          sourceTable="signals"
+          colors={colors[mapStyle]}
+          layerOrder={LAYER_GROUPS_ORDER[LAYERS.SIGNALS.GROUP]}
+          infraID={infraID}
+        />
+        
+        <LineSearchLayer
+          layerOrder={LAYER_GROUPS_ORDER[LAYERS.LINE_SEARCH.GROUP]}
+          infraID={infraID}
+        />
+
+        {!showStdcmAssets && featureInfoClick && (
+          <AddPathStepPopup
+            pathProperties={pathProperties}
+            featureInfoClick={featureInfoClick}
+            resetFeatureInfoClick={resetFeatureInfoClick}
+          />
         )}
+
         <ItineraryLayer
           layerOrder={LAYER_GROUPS_ORDER[LAYERS.ITINERARY.GROUP]}
           geometry={pathGeometry}
