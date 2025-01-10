@@ -75,12 +75,19 @@ const StdcmVias = ({ disabled = false }: StdcmConfigCardProps) => {
 
     requestId = requestAnimationFrame(scrollWithAnimation);
 
-    const cancelListener = () => cancelAnimationFrame(requestId);
+    const newElementCIInput: HTMLInputElement | null = newElement.querySelector('.ci-input input');
 
-    newElement.parentElement!.addEventListener('animationend', cancelListener);
+    if (newElementCIInput) newElementCIInput.focus({ preventScroll: true });
+
+    const handleAnimationEnd = () => {
+      cancelAnimationFrame(requestId);
+      setNewIntermediateOpIndex(undefined);
+    };
+
+    newElement.parentElement!.addEventListener('animationend', handleAnimationEnd);
     return () => {
-      newElement.parentElement!.removeEventListener('animationend', cancelListener);
-      cancelListener();
+      newElement.parentElement!.removeEventListener('animationend', handleAnimationEnd);
+      cancelAnimationFrame(requestId);
     };
   }, [newIntermediateOpIndex]);
 
