@@ -86,23 +86,27 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
     [searchResults]
   );
 
+  const updateChSuggestions = (selectedLocationName: string) => {
+    const newChSuggestions = searchResults
+      .filter((pr) => pr.name === selectedLocationName)
+      .reduce(
+        (acc, pr) => {
+          const newObject = {
+            label: formatChCode(pr.ch),
+            id: pr.ch,
+          };
+          const isDuplicate = acc.some((option) => option.label === newObject.label);
+          if (!isDuplicate) acc.push(newObject);
+          return acc;
+        },
+        [] as { label: string; id: string }[]
+      );
+    setChSuggestions(newChSuggestions);
+  };
+
   const handleCiSelect = (selectedSuggestion?: Option) => {
     if (selectedSuggestion) {
-      const newChSuggestions = searchResults
-        .filter((pr) => pr.name === selectedSuggestion.name)
-        .reduce(
-          (acc, pr) => {
-            const newObject = {
-              label: formatChCode(pr.ch),
-              id: pr.ch,
-            };
-            const isDuplicate = acc.some((option) => option.label === newObject.label);
-            if (!isDuplicate) acc.push(newObject);
-            return acc;
-          },
-          [] as { label: string; id: string }[]
-        );
-      setChSuggestions(newChSuggestions);
+      updateChSuggestions(selectedSuggestion.name);
     } else {
       setChSuggestions([]);
     }
@@ -132,11 +136,21 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
   useEffect(() => {
     if (location) {
       setSearchTerm(location.name);
+      // Clear the list of CH suggestions if the location has changed to avoid showing outated suggestions
+      if (!chSuggestions.some((suggestion) => suggestion.label === location.secondary_code)) {
+        setChSuggestions([]);
+      }
     } else {
       setSearchTerm('');
       setChSuggestions([]);
     }
   }, [location]);
+
+  useEffect(() => {
+    if (location && searchResults.length > 0) {
+      updateChSuggestions(location.name);
+    }
+  }, [searchResults]);
 
   return (
     <div className="location-line">
