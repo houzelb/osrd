@@ -51,8 +51,7 @@ class ETCSBrakingSimulatorImpl(override val context: EnvelopeSimContext) : ETCSB
         limitsOfAuthority: Collection<LimitOfAuthority>
     ): Envelope {
         if (limitsOfAuthority.isEmpty()) return envelope
-        // TODO: implement braking at LOAs CORRECTLY
-        return envelope
+        return addBrakingCurvesAtLOAs(envelope, context, limitsOfAuthority)
     }
 
     override fun addStopBrakingCurves(
