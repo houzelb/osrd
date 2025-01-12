@@ -374,9 +374,9 @@ async fn compute_batch_signal_updates<'a>(
 }
 
 /// Compute space time curves of a list of train schedules
-async fn compute_batch_space_time_curves<'a>(
+async fn compute_batch_space_time_curves(
     trains_details: &Vec<TrainSimulationDetails>,
-    path_projection: &PathProjection<'a>,
+    path_projection: &PathProjection<'_>,
 ) -> HashMap<i64, Vec<SpaceTimeCurve>> {
     let mut space_time_curves = HashMap::new();
 

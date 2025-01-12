@@ -68,7 +68,7 @@ crate::routes! {
         (status = 200, body = Vec<InfraObject>, description = "The result of the operations")
     )
 )]
-async fn edit<'a>(
+async fn edit(
     Path(InfraIdParam { infra_id }): Path<InfraIdParam>,
     State(AppState {
         db_pool,
@@ -123,7 +123,7 @@ async fn edit<'a>(
         (status = 200, body = inline(Vec<String>), description = "ID of the trackSections created")
     ),
 )]
-pub async fn split_track_section<'a>(
+pub async fn split_track_section(
     Path(InfraIdParam { infra_id }): Path<InfraIdParam>,
     State(AppState {
         db_pool,

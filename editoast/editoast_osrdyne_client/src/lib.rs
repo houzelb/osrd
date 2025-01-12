@@ -95,7 +95,7 @@ impl OsrdyneClient {
         Ok(res)
     }
 
-    pub async fn get_workers_statuses<'a, T>(
+    pub async fn get_workers_statuses<T>(
         &self,
         keys: &[T],
     ) -> Result<HashMap<String, WorkerStatus>, Error>
@@ -127,7 +127,7 @@ struct OsrdyneWorkerMetadata {
 }
 
 impl HTTPClient {
-    pub async fn get_workers_statuses<'a, T>(
+    pub async fn get_workers_statuses<T>(
         &self,
         keys: &[T],
     ) -> Result<HashMap<String, WorkerStatus>, Error>

@@ -131,7 +131,7 @@ impl<'de> Deserialize<'de> for TrainScheduleBase {
         let first_point_id = &internal.path.first().unwrap().id;
         if schedules
             .get(first_point_id)
-            .map_or(false, |s| s.arrival.is_some())
+            .is_some_and(|s| s.arrival.is_some())
         {
             return Err(SerdeError::custom(
                 "First path waypoint can't have an arrival time",
