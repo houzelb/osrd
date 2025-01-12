@@ -16,29 +16,6 @@ import { getPointCoordinates } from 'utils/geometry';
 
 import getStepLocation from './helpers/getStepLocation';
 
-export const formatSuggestedOperationalPoints = (
-  operationalPoints: Array<
-    NonNullable<Required<PathProperties['operational_points']>>[number] & {
-      metadata?: NonNullable<SuggestedOP['metadata']>;
-    }
-  >,
-  geometry: GeoJsonLineString,
-  pathLength: number
-): SuggestedOP[] =>
-  operationalPoints.map((op) => ({
-    opId: op.id,
-    name: op.extensions?.identifier?.name,
-    uic: op.extensions?.identifier?.uic,
-    ch: op.extensions?.sncf?.ch,
-    kp: op.part.extensions?.sncf?.kp,
-    trigram: op.extensions?.sncf?.trigram,
-    offsetOnTrack: op.part.position,
-    track: op.part.track,
-    positionOnPath: op.position,
-    coordinates: getPointCoordinates(geometry, pathLength, op.position),
-    metadata: op?.metadata,
-  }));
-
 export const matchPathStepAndOp = (
   step: PathItemLocation,
   op: Pick<SuggestedOP, 'opId' | 'uic' | 'ch' | 'trigram' | 'track' | 'offsetOnTrack'>
@@ -53,6 +30,43 @@ export const matchPathStepAndOp = (
     return step.trigram === op.trigram && step.secondary_code === op.ch;
   }
   return step.track === op.track && step.offset === op.offsetOnTrack;
+};
+
+export const populatePathStepIdInSuggestedOPs = (
+  suggestedOPs: SuggestedOP[],
+  pathSteps: PathStep[]
+): SuggestedOP[] =>
+  suggestedOPs.map((op) => ({
+    ...op,
+    pathStepId: pathSteps.find(
+      (pathStep) => matchPathStepAndOp(pathStep, op) // TODO: && op.kp === pathStep.kp
+    )?.id,
+  }));
+
+export const formatSuggestedOperationalPoints = (
+  operationalPoints: Array<
+    NonNullable<Required<PathProperties['operational_points']>>[number] & {
+      metadata?: NonNullable<SuggestedOP['metadata']>;
+    }
+  >,
+  pathSteps: PathStep[],
+  geometry: GeoJsonLineString,
+  pathLength: number
+): SuggestedOP[] => {
+  const suggestedOPs = operationalPoints.map((op) => ({
+    opId: op.id,
+    name: op.extensions?.identifier?.name,
+    uic: op.extensions?.identifier?.uic,
+    ch: op.extensions?.sncf?.ch,
+    kp: op.part.extensions?.sncf?.kp,
+    trigram: op.extensions?.sncf?.trigram,
+    offsetOnTrack: op.part.position,
+    track: op.part.track,
+    positionOnPath: op.position,
+    coordinates: getPointCoordinates(geometry, pathLength, op.position),
+    metadata: op?.metadata,
+  }));
+  return populatePathStepIdInSuggestedOPs(suggestedOPs, pathSteps);
 };
 
 export const getPathfindingQuery = ({
@@ -124,10 +138,9 @@ export const upsertPathStepsInOPs = (ops: SuggestedOP[], pathSteps: PathStep[]):
       }
     } else {
       updatedOPs = updatedOPs.map((op) => {
-        if (matchPathStepAndOp(step, op) && op.kp === step.kp) {
+        if (step.id === op.pathStepId) {
           return {
             ...op,
-            pathStepId: step.id,
             stopFor,
             arrival,
             receptionSignal,
@@ -140,40 +153,6 @@ export const upsertPathStepsInOPs = (ops: SuggestedOP[], pathSteps: PathStep[]):
   });
   return updatedOPs;
 };
-
-export const pathStepMatchesOp = (
-  pathStep: PathStep,
-  op: Pick<
-    SuggestedOP,
-    'pathStepId' | 'opId' | 'uic' | 'ch' | 'trigram' | 'track' | 'offsetOnTrack' | 'name' | 'kp'
-  >,
-  withKP = false
-) => {
-  if (!matchPathStepAndOp(pathStep, op)) {
-    return pathStep.id === op.pathStepId;
-  }
-  if ('uic' in pathStep) {
-    return withKP ? pathStep.kp === op.kp : pathStep.name === op.name;
-  }
-  return true;
-};
-
-/**
- * Check if a suggested operational point is a via.
- * Some OPs have same uic so we need to check also the ch (can be still not enough
- * probably because of imports problem).
- * If the vias has no uic, it has been added via map click and we know it has an id.
- * @param withKP - If true, we check the kp compatibility instead of the name.
- * It is used in the times and stops table to check if an operational point is a via.
- */
-export const isVia = (
-  vias: PathStep[],
-  op: Pick<
-    SuggestedOP,
-    'pathStepId' | 'opId' | 'uic' | 'ch' | 'trigram' | 'track' | 'offsetOnTrack' | 'name' | 'kp'
-  >,
-  { withKP = false } = {}
-) => vias.some((via) => pathStepMatchesOp(via, op, withKP));
 
 export const isStation = (chCode: string): boolean =>
   chCode === 'BV' || chCode === '00' || chCode === '';

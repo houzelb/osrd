@@ -106,6 +106,7 @@ const useStdcmResults = (
 
           const suggestedOperationalPoints: SuggestedOP[] = formatSuggestedOperationalPoints(
             operationalPointsWithMetadata, // Pass the operational points with metadata
+            [],
             geometry,
             path.length
           );
