@@ -1,18 +1,31 @@
 import { isNil } from 'lodash';
 import { Source, type LayerProps } from 'react-map-gl/maplibre';
+import { useSelector } from 'react-redux';
 
 import { MAP_URL } from 'common/Map/const';
-import getKPLabelLayerProps from 'common/Map/Layers/KPLabel';
 import OrderedLayer from 'common/Map/Layers/OrderedLayer';
+import { getLayersSettings } from 'reducers/map/selectors';
 import type { Theme } from 'types';
 
-interface Props {
+import getKPLabelLayerProps from './getKPLabelLayerProps';
+
+type OperationalPointsProps = {
   colors: Theme;
   layerOrder: number;
   infraID: number | undefined;
-}
+  overrideStore?: boolean;
+};
 
-export default function OperationalPoints({ colors, layerOrder, infraID }: Props) {
+const OperationalPointsLayer = ({
+  colors,
+  layerOrder,
+  infraID,
+  overrideStore = false,
+}: OperationalPointsProps) => {
+  const layersSettings = useSelector(getLayersSettings);
+
+  if ((!overrideStore && !layersSettings.operationalpoints) || isNil(infraID)) return null;
+
   const point: LayerProps = {
     type: 'circle',
     'source-layer': 'operational_points',
@@ -115,7 +128,6 @@ export default function OperationalPoints({ colors, layerOrder, infraID }: Props
     },
   };
 
-  if (isNil(infraID)) return null;
   return (
     <Source
       id="osrd_operational_point_geo"
@@ -149,4 +161,6 @@ export default function OperationalPoints({ colors, layerOrder, infraID }: Props
       />
     </Source>
   );
-}
+};
+
+export default OperationalPointsLayer;

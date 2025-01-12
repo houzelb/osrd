@@ -16,27 +16,17 @@ import { CUSTOM_ATTRIBUTION } from 'common/Map/const';
 import colors from 'common/Map/Consts/colors';
 import Background from 'common/Map/Layers/Background';
 import { useMapBlankStyle } from 'common/Map/Layers/blankStyle';
-import BufferStops from 'common/Map/Layers/BufferStops';
-import Detectors from 'common/Map/Layers/Detectors';
-import Electrifications from 'common/Map/Layers/Electrifications';
-import NeutralSections from 'common/Map/Layers/extensions/SNCF/NeutralSections';
-import SNCF_PSL from 'common/Map/Layers/extensions/SNCF/PSL';
 import Hillshade from 'common/Map/Layers/Hillshade';
 import IGN_BD_ORTHO from 'common/Map/Layers/IGN_BD_ORTHO';
 import IGN_CADASTRE from 'common/Map/Layers/IGN_CADASTRE';
 import IGN_SCAN25 from 'common/Map/Layers/IGN_SCAN25';
+import InfraObjectLayers from 'common/Map/Layers/InfraObjectLayers';
 import LineSearchLayer from 'common/Map/Layers/LineSearchLayer';
-import OperationalPoints from 'common/Map/Layers/OperationalPoints';
 import OSM from 'common/Map/Layers/OSM';
 import PlatformsLayer from 'common/Map/Layers/Platforms';
-import Routes from 'common/Map/Layers/Routes';
 import SearchMarker from 'common/Map/Layers/SearchMarker';
-import Signals from 'common/Map/Layers/Signals';
 import SnappedMarker from 'common/Map/Layers/SnappedMarker';
-import SpeedLimits from 'common/Map/Layers/SpeedLimits';
-import Switches from 'common/Map/Layers/Switches';
 import Terrain from 'common/Map/Layers/Terrain';
-import TracksGeographic from 'common/Map/Layers/TracksGeographic';
 import TracksOSM from 'common/Map/Layers/TracksOSM';
 import { computeBBoxViewport } from 'common/Map/WarpedMap/core/helpers';
 import { useInfraID } from 'common/osrdContext';
@@ -61,7 +51,6 @@ type MapProps = {
   pathProperties?: ManageTrainSchedulePathProperties;
   pathGeometry?: NonNullable<PathProperties['geometry']>;
   setMapCanvas?: (mapCanvas: string) => void;
-  isReadOnly?: boolean;
   hideAttribution?: boolean;
   hideItinerary?: boolean;
   preventPointSelection?: boolean;
@@ -82,7 +71,6 @@ const NewMap = ({
   pathProperties,
   pathGeometry: geometry,
   setMapCanvas,
-  isReadOnly = false,
   hideAttribution = false,
   hideItinerary = false,
   preventPointSelection = false,
@@ -112,9 +100,8 @@ const NewMap = ({
   );
 
   const mapViewport = useMemo(
-    () =>
-      isReadOnly && pathGeometry ? computeBBoxViewport(bbox(pathGeometry), viewport) : viewport,
-    [isReadOnly, pathGeometry, viewport]
+    () => (pathGeometry ? computeBBoxViewport(bbox(pathGeometry), viewport) : viewport),
+    [pathGeometry, viewport]
   );
 
   const [mapIsLoaded, setMapIsLoaded] = useState(false);
@@ -253,45 +240,37 @@ const NewMap = ({
 
   return (
     <>
-      {!isReadOnly && (
-        <MapButtons
-          zoomIn={zoomIn}
-          zoomOut={zoomOut}
-          map={mapRef.current ?? undefined}
-          resetPitchBearing={resetPitchBearing}
-          closeFeatureInfoClickPopup={closeFeatureInfoClickPopup}
-          bearing={mapViewport.bearing}
-          withMapKeyButton={withMapKeyButton}
-          withSearchButton={withSearchButton}
-          withToggleLayersButton={withToggleLayersButton}
-          viewPort={mapViewport}
-          isNewButtons
-        />
-      )}
+      <MapButtons
+        zoomIn={zoomIn}
+        zoomOut={zoomOut}
+        map={mapRef.current ?? undefined}
+        resetPitchBearing={resetPitchBearing}
+        closeFeatureInfoClickPopup={closeFeatureInfoClickPopup}
+        bearing={mapViewport.bearing}
+        withMapKeyButton={withMapKeyButton}
+        withSearchButton={withSearchButton}
+        withToggleLayersButton={withToggleLayersButton}
+        viewPort={mapViewport}
+        isNewButtons
+      />
       <ReactMapGL
-        dragPan={false}
-        scrollZoom={false}
+        id={id}
         ref={mapRef}
         {...mapViewport}
         style={{ width: '100%', height: '100%' }}
-        cursor={isReadOnly || preventPointSelection ? 'default' : 'pointer'}
+        cursor={preventPointSelection ? 'default' : 'pointer'}
         mapStyle={mapBlankStyle}
         attributionControl={false} // Defined below
-        {...(!isReadOnly && {
-          dragPan: true,
-          scrollZoom: true,
-          onMove: (e) => updateViewportChange(e.viewState),
-          onMouseMove: onMoveGetFeature,
-          onClick: onFeatureClick,
-          onResize: (e) => {
-            updateViewportChange({
-              width: e.target.getContainer().offsetWidth,
-              height: e.target.getContainer().offsetHeight,
-            });
-          },
-        })}
+        onMove={(e) => updateViewportChange(e.viewState)}
+        onMouseMove={onMoveGetFeature}
+        onClick={onFeatureClick}
+        onResize={(e) => {
+          updateViewportChange({
+            width: e.target.getContainer().offsetWidth,
+            height: e.target.getContainer().offsetHeight,
+          });
+        }}
         interactiveLayerIds={interactiveLayerIds}
-        touchZoomRotate
         maxPitch={85}
         terrain={
           terrain3DExaggeration
@@ -305,13 +284,17 @@ const NewMap = ({
           captureMap(mapViewport, id, setMapCanvas, pathGeometry);
         }}
         preserveDrawingBuffer
-        id={id}
+        dragPan
+        scrollZoom
+        touchZoomRotate
       >
         <VirtualLayers />
         {!hideAttribution && (
           <AttributionControl position="bottom-right" customAttribution={CUSTOM_ATTRIBUTION} />
         )}
         <ScaleControl maxWidth={100} unit="metric" style={scaleControlStyle} />
+
+        {infraID && <InfraObjectLayers infraId={infraID} mapStyle={mapStyle} />}
 
         <Background
           colors={colors[mapStyle]}
@@ -342,89 +325,24 @@ const NewMap = ({
           layerOrder={LAYER_GROUPS_ORDER[LAYERS.PLATFORMS.GROUP]}
         />
 
-        <TracksGeographic
-          colors={colors[mapStyle]}
-          layerOrder={LAYER_GROUPS_ORDER[LAYERS.TRACKS_GEOGRAPHIC.GROUP]}
-          infraID={infraID}
-        />
         <TracksOSM
           colors={colors[mapStyle]}
           layerOrder={LAYER_GROUPS_ORDER[LAYERS.TRACKS_OSM.GROUP]}
         />
 
-        <Routes
-          colors={colors[mapStyle]}
-          layerOrder={LAYER_GROUPS_ORDER[LAYERS.ROUTES.GROUP]}
+        <LineSearchLayer
+          layerOrder={LAYER_GROUPS_ORDER[LAYERS.LINE_SEARCH.GROUP]}
           infraID={infraID}
         />
-        {!isReadOnly && (
-          <>
-            {layersSettings.operationalpoints && (
-              <OperationalPoints
-                colors={colors[mapStyle]}
-                layerOrder={LAYER_GROUPS_ORDER[LAYERS.OPERATIONAL_POINTS.GROUP]}
-                infraID={infraID}
-              />
-            )}
 
-            <Electrifications
-              colors={colors[mapStyle]}
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.ELECTRIFICATIONS.GROUP]}
-              infraID={infraID}
-            />
-            {layersSettings.neutral_sections && (
-              <NeutralSections
-                colors={colors[mapStyle]}
-                layerOrder={LAYER_GROUPS_ORDER[LAYERS.DEAD_SECTIONS.GROUP]}
-                infraID={infraID}
-              />
-            )}
-            <BufferStops
-              colors={colors[mapStyle]}
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.BUFFER_STOPS.GROUP]}
-              infraID={infraID}
-            />
-            <Detectors
-              colors={colors[mapStyle]}
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.DETECTORS.GROUP]}
-              infraID={infraID}
-            />
-            <Switches
-              colors={colors[mapStyle]}
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.SWITCHES.GROUP]}
-              infraID={infraID}
-            />
-
-            <SpeedLimits
-              colors={colors[mapStyle]}
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.SPEED_LIMITS.GROUP]}
-              infraID={infraID}
-            />
-            <SNCF_PSL
-              colors={colors[mapStyle]}
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.SPEED_LIMITS.GROUP]}
-              infraID={infraID}
-            />
-
-            <Signals
-              sourceTable="signals"
-              colors={colors[mapStyle]}
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.SIGNALS.GROUP]}
-              infraID={infraID}
-            />
-            <LineSearchLayer
-              layerOrder={LAYER_GROUPS_ORDER[LAYERS.LINE_SEARCH.GROUP]}
-              infraID={infraID}
-            />
-            {!showStdcmAssets && featureInfoClick && (
-              <AddPathStepPopup
-                pathProperties={pathProperties}
-                featureInfoClick={featureInfoClick}
-                resetFeatureInfoClick={resetFeatureInfoClick}
-              />
-            )}
-          </>
+        {!showStdcmAssets && featureInfoClick && (
+          <AddPathStepPopup
+            pathProperties={pathProperties}
+            featureInfoClick={featureInfoClick}
+            resetFeatureInfoClick={resetFeatureInfoClick}
+          />
         )}
+
         <ItineraryLayer
           layerOrder={LAYER_GROUPS_ORDER[LAYERS.ITINERARY.GROUP]}
           geometry={pathGeometry}
