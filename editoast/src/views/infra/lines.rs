@@ -69,7 +69,7 @@ async fn get_line_bbox(
         .track_sections()
         .values()
         .map(ObjectCache::unwrap_track_section)
-        .filter(|track| track.line_code.map_or(false, |code| code == line_code))
+        .filter(|track| track.line_code == Some(line_code))
         .peekable();
     if tracksections.peek().is_none() {
         return Err(LinesErrors::LineNotFound { line_code }.into());

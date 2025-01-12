@@ -39,7 +39,7 @@ pub struct Patch<'a, T: Model> {
 }
 
 #[allow(unused)]
-impl<'a, M: Model> Patch<'a, M> {
+impl<M: Model> Patch<'_, M> {
     /// Applies the patch changeset to update the model instance's row and updates
     /// the model reference with its new values
     ///

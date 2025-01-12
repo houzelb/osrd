@@ -211,7 +211,7 @@ impl PathfindingStep {
 
         self.previous
             .as_ref()
-            .map_or(false, |p| p.is_using_switch(switch_id))
+            .is_some_and(|p| p.is_using_switch(switch_id))
     }
 }
 
