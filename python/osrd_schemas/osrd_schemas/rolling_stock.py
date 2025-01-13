@@ -257,7 +257,9 @@ class RollingStock(BaseModel, extra="forbid"):
         description="The constant gamma braking coefficient used when NOT circulating under "
         "ETCS/ERTMS signaling system in m/s^2"
     )
-    etcs_brake_params: Optional[EtcsBrakeParams] = Field(description="Braking parameters for ERTMS ETCS Level 2")
+    etcs_brake_params: Optional[EtcsBrakeParams] = Field(
+        description="Braking parameters for ERTMS ETCS Level 2", default=None
+    )
     inertia_coefficient: NonNegativeFloat = Field(description="The coefficient of inertia")
     mass: NonNegativeFloat = Field(description="The mass of the train, in kg")
     rolling_resistance: RollingResistance = Field(description="The formula to use to compute rolling resistance")
