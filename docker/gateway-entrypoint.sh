@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -x
+
 >/tmp/front_config jq -rn '{
     OSRD_GIT_DESCRIBE: env.OSRD_GIT_DESCRIBE,
 } | @json | "      globalThis.import_meta_env = \(.);"'

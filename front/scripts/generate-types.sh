@@ -1,4 +1,7 @@
 #!/bin/sh
+
+set -x
+
 if ! npx @rtk-query/codegen-openapi src/config/openapi-editoast-config.ts; then
     echo "npx @rtk-query/codegen-openapi src/config/openapi-editoast-config.ts command failed. Exit the script"
     exit 1

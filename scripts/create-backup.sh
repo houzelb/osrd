@@ -7,6 +7,7 @@
 # As a workaround, use relative paths: container:tmp/foo instead of container://tmp/foo
 
 set -e
+set -x
 
 OUTPUT_DIR="."
 if [ "$#" -eq 1 ]; then

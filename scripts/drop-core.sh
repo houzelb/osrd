@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -x
+
 docker rm -f "dyn-osrd-core-$1"
 
 docker compose \

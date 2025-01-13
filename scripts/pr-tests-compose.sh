@@ -6,6 +6,7 @@
 
 
 set -e
+set -x
 
 # For Macos ARM chip users set a postgis image compiled to run on ARM, it makes their DB runs faster as their computer don't have to emulate x86_64's architecture.
 case "$(uname -s)" in
@@ -22,12 +23,12 @@ if  {
     {
         [ "$#" -eq 2 ] &&
             [ "$2" != "up" ]
-    } || 
+    } ||
     {
         [ "$#" -eq 1 ] &&
             [ "$1" != "down" ] &&
             [ "$1" != "down-and-clean" ]
-    } || 
+    } ||
     {
         [ "$#" -ne 1 ] &&
             [ "$#" -ne 2 ] &&

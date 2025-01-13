@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -x
+
 # This script should be used to generate signaling systems atlas given svg.
 # First add all your svg in a subfolder named to the signaling system (eg: `BAL`)
 # Then run this script. You will need docker.

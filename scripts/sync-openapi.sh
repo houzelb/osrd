@@ -1,6 +1,7 @@
 #!/bin/sh
 
 set -e
+set -x
 
 root_path="$(realpath "$(dirname "$0")"/..)"
 

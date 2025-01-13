@@ -1,6 +1,7 @@
 #!/bin/sh
 
 set -e
+set -x
 
 # This script changes the user and group of the dev server
 # process to match the owner of the project's files.

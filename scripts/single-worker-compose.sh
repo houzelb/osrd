@@ -4,6 +4,7 @@
 # By design, this script is not meant to be run on Windows since it relies exclusively on network_mode: host.
 
 set -e
+set -x
 
 # We override the default docker-compose file with "host" and "single-worker" versions in the docker folder
 docker compose \

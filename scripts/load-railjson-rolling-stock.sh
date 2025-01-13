@@ -7,6 +7,7 @@
 # As a workaround, use relative paths: container:tmp/foo instead of container://tmp/foo
 
 set -e
+set -x
 
 if [ "$#" = 0 ]; then
 	echo "Missing path to RailJSON rolling stock"
