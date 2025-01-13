@@ -16,7 +16,8 @@ type StdcmOperationalPointProps = {
   disabled?: boolean;
 };
 
-type Option = StdcmPathStep['location'] & { label: string };
+type CIOption = StdcmPathStep['location'] & { label: string };
+type CHOption = { label: string; id: string; coordinates: [number, number] };
 
 function formatChCode(chCode: string) {
   return chCode === '' ? 'BV' : chCode;
@@ -37,7 +38,7 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
     isStdcm: true,
   });
 
-  const [chSuggestions, setChSuggestions] = useState<{ label: string; id: string }[]>([]);
+  const [chSuggestions, setChSuggestions] = useState<CHOption[]>([]);
 
   const { updateStdcmPathStep } = useOsrdConfActions() as StdcmConfSliceActions;
 
@@ -55,12 +56,16 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
   const selectedCh = useMemo(
     () =>
       location
-        ? { label: formatChCode(location.secondary_code), id: location.secondary_code }
+        ? {
+            label: formatChCode(location.secondary_code),
+            id: location.secondary_code,
+            coordinates: location.coordinates,
+          }
         : undefined,
     [location]
   );
 
-  const ciSuggestions: Option[] = useMemo(
+  const ciSuggestions: CIOption[] = useMemo(
     () =>
       // Temporary filter added to show a more restrictive list of suggestions inside the stdcm app.
       searchResults
@@ -70,7 +75,7 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
             normalized(op.name).includes(normalized(searchTerm)) ||
             op.trigram === searchTerm.toUpperCase()
         )
-        .reduce<Option[]>((acc, p) => {
+        .reduce<CIOption[]>((acc, p) => {
           const newObject = {
             label: [p.trigram, p.name].join(' '),
             trigram: p.trigram,
@@ -86,22 +91,20 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
     [searchResults]
   );
 
-  const handleCiSelect = (selectedSuggestion?: Option) => {
+  const handleCiSelect = (selectedSuggestion?: CIOption) => {
     if (selectedSuggestion) {
       const newChSuggestions = searchResults
         .filter((pr) => pr.name === selectedSuggestion.name)
-        .reduce(
-          (acc, pr) => {
-            const newObject = {
-              label: formatChCode(pr.ch),
-              id: pr.ch,
-            };
-            const isDuplicate = acc.some((option) => option.label === newObject.label);
-            if (!isDuplicate) acc.push(newObject);
-            return acc;
-          },
-          [] as { label: string; id: string }[]
-        );
+        .reduce((acc, pr) => {
+          const newObject = {
+            label: formatChCode(pr.ch),
+            id: pr.ch,
+            coordinates: pr.geographic.coordinates as [number, number],
+          };
+          const isDuplicate = acc.some((option) => option.label === newObject.label);
+          if (!isDuplicate) acc.push(newObject);
+          return acc;
+        }, [] as CHOption[]);
       setChSuggestions(newChSuggestions);
     } else {
       setChSuggestions([]);
@@ -109,12 +112,18 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
     dispatch(updateStdcmPathStep({ id: pathStepId, updates: { location: selectedSuggestion } }));
   };
 
-  const handleChSelect = (selectedChCode?: { id: string }) => {
+  const handleChSelect = (selectedChCode?: CHOption) => {
     if (location && selectedChCode) {
       dispatch(
         updateStdcmPathStep({
           id: pathStepId,
-          updates: { location: { ...location, secondary_code: selectedChCode?.id } },
+          updates: {
+            location: {
+              ...location,
+              secondary_code: selectedChCode.id,
+              coordinates: selectedChCode.coordinates,
+            },
+          },
         })
       );
     }
@@ -147,7 +156,7 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
           value={selectedCi}
           suggestions={ciSuggestions}
           onChange={handleCiInputChange}
-          getSuggestionLabel={(option: Option) => option.label}
+          getSuggestionLabel={(option: CIOption) => option.label}
           onSelectSuggestion={handleCiSelect}
           resetSuggestions={resetSuggestions}
           disabled={disabled}
