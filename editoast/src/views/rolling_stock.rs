@@ -31,7 +31,6 @@ use strum::Display;
 use thiserror::Error;
 use utoipa::IntoParams;
 use utoipa::ToSchema;
-use validator::Validate;
 
 use crate::error::InternalError;
 use crate::error::Result;
@@ -323,7 +322,6 @@ async fn create(
     if !authorized {
         return Err(AuthorizationError::Forbidden.into());
     }
-    rolling_stock_form.validate()?;
     let conn = &mut db_pool.get().await?;
     let rolling_stock_name = rolling_stock_form.name.clone();
     let rolling_stock_changeset: Changeset<RollingStockModel> = rolling_stock_form.into();
@@ -361,7 +359,6 @@ async fn update(
     if !authorized {
         return Err(AuthorizationError::Forbidden.into());
     }
-    rolling_stock_form.validate()?;
     let name = rolling_stock_form.name.clone();
 
     let new_rolling_stock = db_pool
