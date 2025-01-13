@@ -4,6 +4,7 @@ import fr.sncf.osrd.signaling.*
 import fr.sncf.osrd.sim_infra.api.*
 import fr.sncf.osrd.sim_infra.impl.SignalParameters
 import fr.sncf.osrd.sim_infra.impl.loadedSignalInfra
+import fr.sncf.osrd.utils.LogAggregator
 import fr.sncf.osrd.utils.indexing.*
 import fr.sncf.osrd.utils.units.Distance
 import mu.KotlinLogging
@@ -83,6 +84,14 @@ class SignalingSimulatorImpl(override val sigModuleManager: SigSystemManager) : 
         loadedSignalInfra: LoadedSignalInfra
     ): BlockInfra {
         val blockInfra = internalBuildBlocks(sigModuleManager, rawSignalingInfra, loadedSignalInfra)
+        val blockLogAggregator =
+            LogAggregator(
+                { logger.debug(it) },
+            )
+        val signalLogAggregator =
+            LogAggregator(
+                { logger.debug(it) },
+            )
         for (block in blockInfra.blocks) {
             val sigSystem = blockInfra.getBlockSignalingSystem(block)
             val path = blockInfra.getBlockPath(block)
@@ -110,19 +119,17 @@ class SignalingSimulatorImpl(override val sigModuleManager: SigSystemManager) : 
             val reporter =
                 object : BlockDiagReporter {
                     override fun reportBlock(errorType: String) {
-                        logger.debug {
-                            val entrySignal = rawSignalingInfra.getLogicalSignalName(signals[0])
-                            val exitSignal =
-                                rawSignalingInfra.getLogicalSignalName(signals[signals.size - 1])
+                        val entrySignal = rawSignalingInfra.getLogicalSignalName(signals[0])
+                        val exitSignal =
+                            rawSignalingInfra.getLogicalSignalName(signals[signals.size - 1])
+                        blockLogAggregator.registerError(
                             "error in block from $entrySignal to $exitSignal: $errorType"
-                        }
+                        )
                     }
 
                     override fun reportSignal(sigIndex: Int, errorType: String) {
-                        logger.debug {
-                            val signal = rawSignalingInfra.getLogicalSignalName(signals[sigIndex])
-                            "error at signal $signal: $errorType"
-                        }
+                        val signal = rawSignalingInfra.getLogicalSignalName(signals[sigIndex])
+                        signalLogAggregator.registerError("error at signal $signal: $errorType")
                     }
                 }
             sigModuleManager.checkSignalingSystemBlock(reporter, sigSystem, sigBlock)
@@ -151,6 +158,8 @@ class SignalingSimulatorImpl(override val sigModuleManager: SigSystemManager) : 
                 )
             }
         }
+        blockLogAggregator.logAggregatedSummary()
+        signalLogAggregator.logAggregatedSummary()
         return blockInfra
     }
 

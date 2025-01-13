@@ -5,6 +5,7 @@ import fr.sncf.osrd.api.api_v2.conflicts.WorkSchedulesRequest
 import fr.sncf.osrd.conflicts.*
 import fr.sncf.osrd.sim_infra.api.RawSignalingInfra
 import fr.sncf.osrd.standalone_sim.result.ResultTrain
+import fr.sncf.osrd.utils.LogAggregator
 import fr.sncf.osrd.utils.units.Duration
 import fr.sncf.osrd.utils.units.TimeDelta
 import fr.sncf.osrd.utils.units.seconds
@@ -99,9 +100,12 @@ fun convertWorkScheduleMap(
     timeToAdd: TimeDelta = 0.seconds
 ): Collection<Requirements> {
     val res = mutableListOf<Requirements>()
+    val logAggregator = LogAggregator({ requirementsParserLogger.warn(it) })
     for (entry in workSchedules) {
         val workScheduleRequirements = mutableListOf<ResultTrain.SpacingRequirement>()
-        workScheduleRequirements.addAll(convertWorkSchedule(rawInfra, entry.value, timeToAdd))
+        workScheduleRequirements.addAll(
+            convertWorkSchedule(rawInfra, entry.value, timeToAdd, logAggregator)
+        )
         res.add(
             Requirements(
                 RequirementId(entry.key, RequirementType.WORK_SCHEDULE),
@@ -122,9 +126,12 @@ fun convertWorkScheduleCollection(
     workSchedules: Collection<WorkSchedule>,
     timeToAdd: TimeDelta = 0.seconds,
 ): Requirements {
+    val logAggregator = LogAggregator({ requirementsParserLogger.warn(it) })
     val workSchedulesRequirements = mutableListOf<ResultTrain.SpacingRequirement>()
     for (workSchedule in workSchedules) {
-        workSchedulesRequirements.addAll(convertWorkSchedule(rawInfra, workSchedule, timeToAdd))
+        workSchedulesRequirements.addAll(
+            convertWorkSchedule(rawInfra, workSchedule, timeToAdd, logAggregator)
+        )
     }
     return Requirements(
         RequirementId(DEFAULT_WORK_SCHEDULE_ID, RequirementType.WORK_SCHEDULE),
@@ -137,6 +144,7 @@ private fun convertWorkSchedule(
     rawInfra: RawSignalingInfra,
     workSchedule: WorkSchedule,
     timeToAdd: TimeDelta = 0.seconds,
+    logAggregator: LogAggregator,
 ): Collection<ResultTrain.SpacingRequirement> {
     val res = mutableListOf<ResultTrain.SpacingRequirement>()
 
@@ -181,7 +189,7 @@ private fun convertWorkSchedule(
             "${tracksNotCoveredByRoutes.size} track sections were not fully covered by routes (ignoring some work schedules): " +
                 tracksNotCoveredByRoutes.take(3).joinToString(", ") +
                 (if (tracksNotCoveredByRoutes.size > 3) ", ..." else "")
-        requirementsParserLogger.warn(msg)
+        logAggregator.registerError(msg)
     }
     return res
 }
