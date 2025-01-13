@@ -3674,19 +3674,18 @@ dependencies = [
 
 [[package]]
 name = "redis"
-version = "0.27.6"
+version = "0.28.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "09d8f99a4090c89cc489a94833c901ead69bfbf3877b4867d5482e321ee875bc"
+checksum = "9f89727cba9cec05cc579942321ff6dd09fe57a8b3217f52f952301efa010da5"
 dependencies = [
  "arc-swap",
- "async-trait",
  "backon",
  "bytes",
  "combine",
  "crc16",
- "futures 0.3.31",
+ "futures-channel",
+ "futures-sink",
  "futures-util",
- "itertools",
  "itoa",
  "log",
  "native-tls",
