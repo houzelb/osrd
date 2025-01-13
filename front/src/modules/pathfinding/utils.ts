@@ -179,7 +179,4 @@ export const isVia = (
   { withKP = false } = {}
 ) => vias.some((via) => pathStepMatchesOp(via, op, withKP));
 
-export const isStation = (chCode: string): boolean =>
-  chCode === 'BV' || chCode === '00' || chCode === '';
-
 export const isPathStepInvalid = (step: PathStep | null): boolean => step?.isInvalid || false;

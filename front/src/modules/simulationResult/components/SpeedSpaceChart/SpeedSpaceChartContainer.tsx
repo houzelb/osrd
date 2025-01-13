@@ -20,7 +20,7 @@ import { formatData } from './helpers';
 export type SpeedSpaceChartContainerProps = {
   trainSimulation: SimulationResponseSuccess;
   selectedTrainPowerRestrictions?: LayerData<PowerRestrictionValues>[];
-  pathProperties: PathPropertiesFormatted;
+  pathProperties?: PathPropertiesFormatted;
   heightOfSpeedSpaceChartContainer: number;
   rollingStock: RollingStockWithLiveries;
   setHeightOfSpeedSpaceChartContainer: React.Dispatch<React.SetStateAction<number>>;

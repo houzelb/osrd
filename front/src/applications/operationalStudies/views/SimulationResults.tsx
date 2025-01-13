@@ -26,6 +26,7 @@ import { useAppDispatch } from 'store';
 import { getPointCoordinates } from 'utils/geometry';
 
 import useSimulationResults from '../hooks/useSimulationResults';
+import type { OperationalPoint, PathPropertiesFormatted } from '../types';
 
 const SPEED_SPACE_CHART_HEIGHT = 521.5;
 const HANDLE_TAB_RESIZE_HEIGHT = 20;
@@ -120,6 +121,35 @@ const SimulationResults = ({
     return null;
   }
 
+  const pathItemPositions = path?.path_item_positions || [];
+  const positions = pathProperties?.operationalPoints.map((op) => op.position);
+  const matchingIndexes =
+    pathItemPositions.map((itemPosition) =>
+      positions?.findIndex((position) => position === itemPosition)
+    ) || [];
+
+  const operationalPointsWithWeight = projectedOperationalPoints.map((op, index) => {
+    if (matchingIndexes.includes(index)) {
+      return { ...op, weight: 100 };
+    }
+    return op;
+  });
+
+  function updatePathProperties(
+    pathProps: PathPropertiesFormatted | undefined,
+    updatedOperationalPoints: OperationalPoint[] | undefined
+  ): PathPropertiesFormatted | undefined {
+    if (!pathProps || !updatedOperationalPoints) {
+      return undefined;
+    }
+    return {
+      ...pathProps,
+      operationalPoints: updatedOperationalPoints,
+    };
+  }
+
+  const updatedPathProperties = updatePathProperties(pathProperties, operationalPointsWithWeight);
+
   return (
     <div className="simulation-results">
       {/* SIMULATION : STICKY BAR */}
@@ -169,7 +199,7 @@ const SimulationResults = ({
               <div className="osrd-simulation-container d-flex flex-grow-1 flex-shrink-1">
                 <div className="chart-container">
                   <ManchetteWithSpaceTimeChartWrapper
-                    operationalPoints={projectedOperationalPoints}
+                    operationalPoints={operationalPointsWithWeight}
                     projectPathTrainResult={projectionData?.projectedTrains}
                     selectedTrainScheduleId={selectedTrainSchedule?.id}
                     waypointsPanelData={{
@@ -203,7 +233,7 @@ const SimulationResults = ({
                   trainSimulation={trainSimulation}
                   selectedTrainPowerRestrictions={selectedTrainPowerRestrictions}
                   rollingStock={selectedTrainRollingStock}
-                  pathProperties={pathProperties}
+                  pathProperties={updatedPathProperties}
                   heightOfSpeedSpaceChartContainer={speedSpaceChartContainerHeight}
                   setHeightOfSpeedSpaceChartContainer={setSpeedSpaceChartContainerHeight}
                 />
