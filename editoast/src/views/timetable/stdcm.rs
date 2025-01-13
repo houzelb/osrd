@@ -40,7 +40,7 @@ use crate::core::CoreClient;
 use crate::error::Result;
 use crate::models::prelude::*;
 use crate::models::stdcm_log::StdcmLog;
-use crate::models::timetable::TimetableWithTrains;
+use crate::models::timetable::Timetable;
 use crate::models::train_schedule::TrainSchedule;
 use crate::models::Infra;
 use crate::models::RollingStockModel;
@@ -149,19 +149,12 @@ async fn stdcm(
     let timetable_id = id;
     let infra_id = query.infra;
 
-    // 1. Retrieve Timetable / Infra / Trains / Simulation / Rolling Stock
-    let timetable_trains = TimetableWithTrains::retrieve_or_fail(&mut conn, timetable_id, || {
-        StdcmError::TimetableNotFound { timetable_id }
-    })
-    .await?;
+    // 1.  Infra / Timetable / Trains / Simulation / Rolling Stock
 
     let infra = Infra::retrieve_or_fail(&mut conn, infra_id, || StdcmError::InfraNotFound {
         infra_id,
     })
     .await?;
-
-    let (train_schedules, _): (Vec<_>, _) =
-        TrainSchedule::retrieve_batch(&mut conn, timetable_trains.train_ids.clone()).await?;
 
     let rolling_stock =
         RollingStockModel::retrieve_or_fail(&mut conn, stdcm_request.rolling_stock_id, || {
@@ -204,6 +197,70 @@ async fn stdcm(
 
     let earliest_departure_time = stdcm_request.get_earliest_departure_time(simulation_run_time);
     let latest_simulation_end = stdcm_request.get_latest_simulation_end(simulation_run_time);
+
+    let timetable = Timetable::retrieve_or_fail(&mut conn, timetable_id, || {
+        StdcmError::TimetableNotFound { timetable_id }
+    })
+    .await?;
+
+    // Filter trains
+    // The goal is to filter out as many trains as possible whose schedules overlap
+    // with the LMR train being searched for.
+    // The diagram below shows an LMR train inserted into a timetable.
+
+    // '?': unscheduled arrival times.
+    // '|': scheduled arrival times.
+    // tA: earliest_departure_time
+    // tB: latest_simulation_end
+    //
+    //                           tA                     tB
+    //       LMR Train           |----------------------|
+    // Train 1            |--------------|
+    // Train 2      |------------|
+    //                                        |----------?   Train 3
+    // Train 4        |-------?
+    //                         Train 5  |---------?
+    //                                       |----------?   Train 6
+
+    // Step 1 (SQL Filter):
+    // Trains that depart after the latest arrival time of the LMR train are excluded.
+    // In this example, Train 3 and Train 6 are filtered out.
+
+    // It's not easy to write an SQL query to filter trains when the train departure time < latest_simulation_ended
+    // because there are two cases : when the train departure time > tA (Step 2) and the train departure time < tA (Step 3).
+
+    // Step 2 (Rust filter) :
+    // If the train departure time > LMR train departure (tA), the train is kept (e.g., train_5)
+    // Step 3 (Rust filter) :
+    // For trains departing before the LMR train departure (tA):
+
+    // If the train's arrival time is unscheduled (?), the train is kept (e.g., Train 4 and Train 5).
+    // If the train's arrival time is scheduled (|), the train is kept only if its arrival time is after the LMR train's earliest departure time.
+    // Train 1 is kept and train 2 is filtered out.
+
+    // Step 1
+    let mut train_schedules = timetable
+        .schedules_before_date(&mut conn, latest_simulation_end)
+        .await?;
+
+    train_schedules.retain(|train_schedule| {
+        // Step 2 and 3
+        train_schedule.start_time >= earliest_departure_time
+            || train_schedule
+                .schedule
+                .last()
+                .and_then(|last_schedule_item| {
+                    train_schedule.path.last().and_then(|last_path_item| {
+                        (last_schedule_item.at == last_path_item.id).then_some(last_schedule_item)
+                    })
+                })
+                .and_then(|last_schedule_item| {
+                    last_schedule_item.arrival.clone().map(|arrival| {
+                        train_schedule.start_time + *arrival > earliest_departure_time
+                    })
+                })
+                .unwrap_or(true)
+    });
 
     // 3. Get scheduled train requirements
     let simulations: Vec<_> = train_simulation_batch(

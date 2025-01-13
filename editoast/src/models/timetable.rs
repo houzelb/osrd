@@ -5,9 +5,12 @@ use diesel::sql_query;
 use diesel::sql_types::Array;
 use diesel::sql_types::BigInt;
 use diesel_async::RunQueryDsl;
+use futures_util::stream::TryStreamExt;
 use std::ops::DerefMut;
 
 use crate::error::Result;
+use crate::models::prelude::*;
+use crate::models::train_schedule::TrainSchedule;
 use crate::models::Identifiable;
 use crate::models::{DeleteStatic, Retrieve};
 use crate::Exists;
@@ -55,6 +58,29 @@ impl Timetable {
             .load(conn.write().await.deref_mut())
             .await
             .map_err(Into::into)
+    }
+
+    pub async fn schedules_before_date(
+        self,
+        conn: &mut DbConnection,
+        time: DateTime<Utc>,
+    ) -> Result<Vec<TrainSchedule>> {
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+        use editoast_models::tables::train_schedule::dsl;
+
+        let train_schedules = dsl::train_schedule
+            .filter(dsl::start_time.le(time))
+            .filter(dsl::timetable_id.eq(self.id))
+            .load_stream::<Row<TrainSchedule>>(conn.write().await.deref_mut())
+            .await?
+            .map_ok(|ts| ts.into())
+            .try_collect::<Vec<TrainSchedule>>()
+            .await;
+        match train_schedules {
+            Ok(train_schedules) => Ok(train_schedules),
+            Err(err) => Err(err.into()),
+        }
     }
 }
 
