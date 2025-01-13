@@ -17,6 +17,7 @@ public class App {
         commands.put("standalone-simulation", new StandaloneSimulationCommand());
         commands.put("load-infra", new ValidateInfra());
         commands.put("worker", new WorkerCommand());
+        commands.put("reproduce-request", new ReproduceRequest());
 
         // prepare the command line parser
         var argsParserBuilder = JCommander.newBuilder();

@@ -61,25 +61,31 @@ import org.takes.rs.RsWithStatus
 class STDCMEndpointV2(private val infraManager: InfraManager) : Take {
     @Throws(OSRDError::class)
     override fun act(req: Request): Response {
-        val recorder = DiagnosticRecorderImpl(false)
-        return try {
-            // Parse request input
-            val body = RqPrint(req).printBody()
-            val request =
-                stdcmRequestAdapter.fromJson(body)
-                    ?: return RsWithStatus(RsText("missing request body"), 400)
-            logger.info(
-                "Request received: start=${request.startTime}, max duration=${request.maximumRunTime}"
-            )
+        // Parse request input
+        val body = RqPrint(req).printBody()
+        val request =
+            stdcmRequestAdapter.fromJson(body)
+                ?: return RsWithStatus(RsText("missing request body"), 400)
 
-            val logRequest = System.getenv("LOG_STDCM_REQUESTS")
-            if (logRequest?.equals("true", ignoreCase = true) == true) {
-                val time = LocalDateTime.now()
-                val formatted = time.format(DateTimeFormatter.ofPattern("MM-dd-HH:mm:ss:SSS"))
-                File("stdcm-$formatted.json").printWriter().use {
-                    it.println(stdcmRequestAdapter.indent("    ").toJson(request))
-                }
+        val logRequest = System.getenv("LOG_STDCM_REQUESTS")
+        if (logRequest?.equals("true", ignoreCase = true) == true) {
+            val time = LocalDateTime.now()
+            val formatted = time.format(DateTimeFormatter.ofPattern("MM-dd-HH:mm:ss:SSS"))
+            File("stdcm-$formatted.json").printWriter().use {
+                it.println(stdcmRequestAdapter.indent("    ").toJson(request))
             }
+        }
+
+        return run(request)
+    }
+
+    /** Process the given parsed request */
+    fun run(request: STDCMRequestV2): Response {
+        val recorder = DiagnosticRecorderImpl(false)
+        logger.info(
+            "Request received: start=${request.startTime}, max duration=${request.maximumRunTime}"
+        )
+        return try {
             // parse input data
             val infra = infraManager.getInfra(request.infra, request.expectedVersion, recorder)
             val temporarySpeedLimitManager =
