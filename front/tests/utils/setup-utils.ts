@@ -1,7 +1,3 @@
-import dayjs from 'dayjs';
-import timezone from 'dayjs/plugin/timezone';
-import utc from 'dayjs/plugin/utc';
-
 import type {
   Infra,
   PostInfraRailjsonApiResponse,
@@ -33,9 +29,7 @@ import {
   trainScheduleStudyName,
 } from '../assets/project-const';
 import { logger } from '../test-logger';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
+import { createDateInSpecialTimeZone } from './date';
 
 /**
  * Helper function to create infrastructure using RailJson.
@@ -144,9 +138,6 @@ export async function createStudy(projectId: number, studyName = globalStudyName
 
   return study;
 }
-
-const createDateInSpecialTimeZone = (dateString: string, timeZone: string) =>
-  dayjs.tz(dateString, timeZone);
 
 /**
  * Main function to create all necessary test data including infrastructure, rolling stocks,

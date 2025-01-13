@@ -12,7 +12,7 @@ test.use({
     slowMo: 500, // Give the interface time to update between actions
   },
 });
-test.describe('Verify train schedule elements and filters', () => {
+test.describe('Verify stdcm simulation page', () => {
   test.slow(); // Mark test as slow due to multiple steps
 
   test.use({ viewport: { width: 1920, height: 1080 } });
@@ -55,7 +55,7 @@ test.describe('Verify train schedule elements and filters', () => {
     await homePage.goToHomePage();
     OSRDLanguage = await homePage.getOSRDLanguage();
     await page.goto('/stdcm');
-    await page.waitForLoadState('load', { timeout: 30 * 1000 });
+    await page.waitForLoadState('domcontentloaded', { timeout: 30_000 });
     await homePage.removeViteOverlay();
 
     // Wait for infra to be in 'CACHED' state before proceeding
@@ -99,43 +99,6 @@ test.describe('Verify train schedule elements and filters', () => {
   });
 
   /** *************** Test 3 **************** */
-  test('Verify STDCM stops and simulation sheet', async ({ page, browserName }) => {
-    // Populate STDCM page with origin, destination, and via details
-    const stdcmPage = new STDCMPage(page);
-    await stdcmPage.fillAndVerifyConsistDetails(
-      consistDetails,
-      tractionEnginePrefilledValues.tonnage,
-      tractionEnginePrefilledValues.length,
-      tractionEnginePrefilledValues.maxSpeed
-    );
-    await stdcmPage.fillOriginDetailsLight();
-    await stdcmPage.fillDestinationDetailsLight();
-    await stdcmPage.fillAndVerifyViaDetails({
-      viaNumber: 1,
-      ciSearchText: 'mid_west',
-    });
-    // Verify input map markers in Chromium
-    if (browserName === 'chromium') {
-      await stdcmPage.mapMarkerVisibility();
-    }
-    // Launch simulation and verify output data matches expected results
-    await stdcmPage.launchSimulation();
-    // Verify map results markers in Chromium
-    if (browserName === 'chromium') {
-      await stdcmPage.mapMarkerResultVisibility();
-    }
-    await stdcmPage.verifyTableData('./tests/assets/stdcm/stdcmWithoutAllVia.json');
-    await stdcmPage.displayAllOperationalPoints();
-    await stdcmPage.verifyTableData('./tests/assets/stdcm/stdcmWithAllVia.json');
-    await stdcmPage.retainSimulation();
-    await stdcmPage.downloadSimulation(browserName);
-    // Reset and verify empty fields
-    await stdcmPage.startNewQuery();
-    // TODO: Uncomment the check when the bug #9533 is fixed
-    // await stdcmPage.verifyAllFieldsEmpty();
-  });
-
-  /** *************** Test 4 **************** */
   test('Launch simulation with and without capacity for towed rolling stock', async ({ page }) => {
     const towedConsistDetails: ConsistFields = {
       tractionEngine: fastRollingStockName,

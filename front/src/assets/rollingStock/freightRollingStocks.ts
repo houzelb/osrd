@@ -107,9 +107,9 @@ export const FREIGHT_ROLLING_STOCKS = [
   'Y8000AG',
   'Y8000AP',
   'Y9000US',
-  'electric_rolling_stock_test_e2e',
-  // TODO Find a better solution for injecting test data.
-  'FAST_ROLLING_STOCK_TEST_E2E',
+  // TODO: Find a better solution for injecting e2e test data.
+  'ELECTRIC_RS_E2E',
+  'FAST_RS_E2E',
 ];
 
 export const ALLOWED_TOWED_ROLLING_STOCKS = [
@@ -125,5 +125,6 @@ export const ALLOWED_TOWED_ROLLING_STOCKS = [
   'ME200SER',
   'MEPA',
   'TRAINLOC',
+  // TODO: Find a better solution for injecting e2e test data.
   'TOWED-TEST-E2E',
 ];

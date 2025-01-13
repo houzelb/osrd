@@ -1,7 +1,7 @@
 {
   "id": 789,
   "railjson_version": "3.2",
-  "name": "improbable_rolling_stock_test_e2e",
+  "name": "IMPROBABLE_RS_E2E",
   "effort_curves": {
     "modes": {
       "1500V": {

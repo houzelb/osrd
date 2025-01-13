@@ -2,7 +2,7 @@
   {
     "train_name": "Train 1",
     "labels": ["Tag-1", "SS-NS"],
-    "rolling_stock_name": "slow_rolling_stock_test_e2e",
+    "rolling_stock_name": "SLOW_RS_E2E",
     "start_time": "2024-10-17T03:00:00Z",
     "path": [
       { "id": "id227", "deleted": false, "uic": 6, "secondary_code": "BV" },
@@ -28,7 +28,7 @@
   {
     "train_name": "Train 2",
     "labels": ["Tag-2", "WS-SES"],
-    "rolling_stock_name": "electric_rolling_stock_test_e2e",
+    "rolling_stock_name": "ELECTRIC_RS_E2E",
     "start_time": "2024-10-17T03:15:00Z",
     "path": [
       { "id": "id477", "deleted": false, "uic": 2, "secondary_code": "BV" },
@@ -63,7 +63,7 @@
   {
     "train_name": "Train 3",
     "labels": ["Tag-3", "MWS-NES"],
-    "rolling_stock_name": "dual-mode_rolling_stock_test_e2e",
+    "rolling_stock_name": "DUAL-MODE_RS_E2E",
     "start_time": "2024-10-17T05:00:00Z",
     "path": [
       { "id": "id744", "deleted": false, "uic": 3, "secondary_code": "BV" },
@@ -97,7 +97,7 @@
   {
     "train_name": "Train 4",
     "labels": ["Tag-4", "WS-SES"],
-    "rolling_stock_name": "electric_rolling_stock_test_e2e",
+    "rolling_stock_name": "ELECTRIC_RS_E2E",
     "start_time": "2024-10-17T05:15:00Z",
     "path": [
       { "id": "id938", "deleted": false, "uic": 2, "secondary_code": "BV" },
@@ -140,7 +140,7 @@
   {
     "train_name": "Train 5",
     "labels": ["Tag-5", "SWE-MES"],
-    "rolling_stock_name": "slow_rolling_stock_test_e2e",
+    "rolling_stock_name": "SLOW_RS_E2E",
     "start_time": "2024-10-17T07:30:00Z",
     "path": [
       { "id": "id1306", "deleted": false, "uic": 1, "secondary_code": "BV" },
@@ -174,7 +174,7 @@
   {
     "train_name": "Train 6",
     "labels": ["Tag-6", "WS-NS"],
-    "rolling_stock_name": "dual-mode_rolling_stock_test_e2e",
+    "rolling_stock_name": "DUAL-MODE_RS_E2E",
     "start_time": "2024-10-17T07:45:00Z",
     "path": [
       { "id": "id1700", "deleted": false, "uic": 2, "secondary_code": "BV" },
@@ -208,7 +208,7 @@
   {
     "train_name": "Train 7",
     "labels": ["Tag-7", "WS-NES"],
-    "rolling_stock_name": "FAST_ROLLING_STOCK_TEST_E2E",
+    "rolling_stock_name": "FAST_RS_E2E",
     "start_time": "2024-10-17T08:37:00Z",
     "path": [
       { "id": "id2121", "deleted": false, "uic": 2, "secondary_code": "BV" },
@@ -235,7 +235,7 @@
   {
     "train_name": "Train 8",
     "labels": ["Tag-8", "SS-MES"],
-    "rolling_stock_name": "slow_rolling_stock_test_e2e",
+    "rolling_stock_name": "SLOW_RS_E2E",
     "start_time": "2024-10-17T08:56:01Z",
     "path": [
       { "id": "id2532", "deleted": false, "uic": 6, "secondary_code": "BV" },
@@ -269,7 +269,7 @@
   {
     "train_name": "Train 9",
     "labels": ["Tag-9", "MWS-NES"],
-    "rolling_stock_name": "electric_rolling_stock_test_e2e",
+    "rolling_stock_name": "ELECTRIC_RS_E2E",
     "start_time": "2024-10-17T09:35:59Z",
     "path": [
       { "id": "id2854", "deleted": false, "uic": 3, "secondary_code": "BV" },
@@ -295,7 +295,7 @@
   {
     "train_name": "Train 10",
     "labels": ["Tag-10", "SES-MES"],
-    "rolling_stock_name": "dual-mode_rolling_stock_test_e2e",
+    "rolling_stock_name": "DUAL-MODE_RS_E2E",
     "start_time": "2024-10-17T09:45:31Z",
     "path": [
       { "id": "id3088", "deleted": false, "uic": 8, "secondary_code": "BV" },
@@ -377,7 +377,7 @@
   {
     "train_name": "Train 13",
     "labels": ["Tag-13", "SES-SWS"],
-    "rolling_stock_name": "slow_rolling_stock_test_e2e",
+    "rolling_stock_name": "SLOW_RS_E2E",
     "start_time": "2024-10-17T10:48:00Z",
     "path": [
       { "id": "id354", "deleted": false, "uic": 8, "secondary_code": "BV" },
@@ -411,7 +411,7 @@
   {
     "train_name": "Train 14",
     "labels": ["Tag-14", "NES-MES"],
-    "rolling_stock_name": "electric_rolling_stock_test_e2e",
+    "rolling_stock_name": "ELECTRIC_RS_E2E",
     "start_time": "2024-10-17T12:10:00Z",
     "path": [
       { "id": "id803", "deleted": false, "uic": 7, "secondary_code": "BV" },
@@ -437,7 +437,7 @@
   {
     "train_name": "Train 15",
     "labels": ["Tag-15"],
-    "rolling_stock_name": "improbable_rolling_stock_test_e2e",
+    "rolling_stock_name": "IMPROBABLE_RS_E2E",
     "start_time": "2024-10-17T12:30:00Z",
     "path": [
       { "id": "id1073", "deleted": false, "track": "TA6", "offset": 6609000 },
@@ -464,7 +464,7 @@
   {
     "train_name": "Train 16",
     "labels": ["Tag-16", "SES-WS"],
-    "rolling_stock_name": "dual-mode_rolling_stock_test_e2e",
+    "rolling_stock_name": "DUAL-MODE_RS_E2E",
     "start_time": "2024-10-17T13:00:00Z",
     "path": [
       { "id": "id1353", "deleted": false, "uic": 8, "secondary_code": "BV" },
@@ -498,7 +498,7 @@
   {
     "train_name": "Train 17",
     "labels": ["Tag-17", "WS-SES"],
-    "rolling_stock_name": "electric_rolling_stock_test_e2e",
+    "rolling_stock_name": "ELECTRIC_RS_E2E",
     "start_time": "2024-10-17T14:05:00Z",
     "path": [
       { "id": "id1572", "deleted": false, "uic": 2, "secondary_code": "BV" },
@@ -540,7 +540,7 @@
   {
     "train_name": "Train 18",
     "labels": ["Tag-18", "SWS-MWS"],
-    "rolling_stock_name": "slow_rolling_stock_test_e2e",
+    "rolling_stock_name": "SLOW_RS_E2E",
     "start_time": "2024-10-17T14:15:08Z",
     "path": [
       { "id": "id1948", "deleted": false, "uic": 1, "secondary_code": "BV" },
@@ -592,7 +592,7 @@
   {
     "train_name": "Train 20",
     "labels": ["Tag-20", "SS-WS"],
-    "rolling_stock_name": "electric_rolling_stock_test_e2e",
+    "rolling_stock_name": "ELECTRIC_RS_E2E",
     "start_time": "2024-10-17T16:00:00Z",
     "path": [
       { "id": "id2078", "deleted": false, "uic": 6, "secondary_code": "BV" },
@@ -634,7 +634,7 @@
   {
     "train_name": "Train 21",
     "labels": ["Tag-21", "NWS-NES"],
-    "rolling_stock_name": "electric_rolling_stock_test_e2e",
+    "rolling_stock_name": "ELECTRIC_RS_E2E",
     "start_time": "2024-10-17T19:05:00Z",
     "path": [
       { "id": "id2458", "deleted": false, "track": "TG4", "offset": 1549000 },
