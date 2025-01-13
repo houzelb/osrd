@@ -3,6 +3,7 @@ package fr.sncf.osrd.signaling.impl
 import fr.sncf.osrd.sim_infra.api.*
 import fr.sncf.osrd.sim_infra.impl.BlockInfraBuilder
 import fr.sncf.osrd.sim_infra.impl.blockInfraBuilder
+import fr.sncf.osrd.utils.LogAggregator
 import fr.sncf.osrd.utils.indexing.IdxMap
 import fr.sncf.osrd.utils.indexing.MutableStaticIdxArrayList
 import fr.sncf.osrd.utils.units.*
@@ -18,86 +19,87 @@ internal fun internalBuildBlocks(
     // Step 1) associate DirDetectorIds to a list of delimiting logical signals
     val signalDelimiters = findSignalDelimiters(rawSignalingInfra, loadedSignalInfra)
     val detectorEntrySignals = makeDetectorEntrySignals(loadedSignalInfra, signalDelimiters)
-    return blockInfraBuilder(loadedSignalInfra, rawSignalingInfra) {
-        // Step 2) iterate on zone paths along the route path.
-        //   - maintain a list of currently active blocks
-        //   - At each signal, add it to compatible current blocks.
-        //   - if the signal is delimiting, stop and create the block (deduplicate it too)
-        for (route in rawSignalingInfra.routes) {
-            val routeEntryDet = rawSignalingInfra.getRouteEntry(route)
-            val routeExitDet = rawSignalingInfra.getRouteExit(route)
-            val entrySignals = detectorEntrySignals[routeEntryDet]
-            var currentBlocks =
-                getInitPartialBlocks(
-                    sigModuleManager,
-                    rawSignalingInfra,
-                    loadedSignalInfra,
-                    entrySignals,
-                    routeEntryDet
-                )
-            // while inside the route, we maintain a list of currently active blocks.
-            // each block either expect any signaling system (when starting from a buffer stop or
-            // wildcard
-            // signal),
-            // or expects a given signaling system. blocks can therefore tell whether a signal
-            // belongs
-            // there.
-            // if a signal is not part of a block, it is ignored
-            // if a signal delimits a block, it ends the block and starts a new ones, one per driver
-            // if a signal does not delimit a block and has a single driver, it continues the block
-            // if a signal does not delimit a block and has multiple drivers, it duplicates the
-            // block
+    val missingSignalLogAggregator = LogAggregator({ logger.debug(it) })
+    val result =
+        blockInfraBuilder(loadedSignalInfra, rawSignalingInfra) {
+            // Step 2) iterate on zone paths along the route path.
+            //   - maintain a list of currently active blocks
+            //   - At each signal, add it to compatible current blocks.
+            //   - if the signal is delimiting, stop and create the block (deduplicate it too)
+            for (route in rawSignalingInfra.routes) {
+                val routeEntryDet = rawSignalingInfra.getRouteEntry(route)
+                val routeExitDet = rawSignalingInfra.getRouteExit(route)
+                val entrySignals = detectorEntrySignals[routeEntryDet]
+                var currentBlocks =
+                    getInitPartialBlocks(
+                        sigModuleManager,
+                        rawSignalingInfra,
+                        loadedSignalInfra,
+                        entrySignals,
+                        routeEntryDet,
+                        missingSignalLogAggregator,
+                    )
+                // While inside the route, we maintain a list of currently active blocks. Each block
+                // either expect any signaling system (when starting from a buffer stop or wildcard
+                // signal), or expects a given signaling system. Blocks can therefore tell whether a
+                // signal belongs there.
+                // If a signal is not part of a block, it is ignored. If a signal delimits a block,
+                // it ends the block and starts a new ones, one per driver. If a signal does not
+                // delimit a block and has a single driver, it continues the block. If a signal does
+                // not delimit a block and has multiple drivers, it duplicates the block.
 
-            for (zonePath in rawSignalingInfra.getRoutePath(route)) {
-                val zonePathLength = rawSignalingInfra.getZonePathLength(zonePath)
-                for (block in currentBlocks) block.addZonePath(zonePath, zonePathLength)
+                for (zonePath in rawSignalingInfra.getRoutePath(route)) {
+                    val zonePathLength = rawSignalingInfra.getZonePathLength(zonePath)
+                    for (block in currentBlocks) block.addZonePath(zonePath, zonePathLength)
 
-                // iterate over signals which are between the block entry and the block exit
-                val signals = rawSignalingInfra.getSignals(zonePath)
-                val signalsPositions = rawSignalingInfra.getSignalPositions(zonePath)
-                for ((physicalSignal, position) in signals.zip(signalsPositions)) {
-                    val distanceToZonePathEnd = zonePathLength - position
-                    assert(distanceToZonePathEnd >= Distance.ZERO)
-                    assert(distanceToZonePathEnd <= zonePathLength.distance)
-                    for (signal in loadedSignalInfra.getLogicalSignals(physicalSignal)) {
-                        currentBlocks =
-                            updatePartialBlocks(
-                                sigModuleManager,
-                                currentBlocks,
-                                loadedSignalInfra,
-                                signal,
-                                distanceToZonePathEnd,
-                            )
+                    // iterate over signals which are between the block entry and the block exit
+                    val signals = rawSignalingInfra.getSignals(zonePath)
+                    val signalsPositions = rawSignalingInfra.getSignalPositions(zonePath)
+                    for ((physicalSignal, position) in signals.zip(signalsPositions)) {
+                        val distanceToZonePathEnd = zonePathLength - position
+                        assert(distanceToZonePathEnd >= Distance.ZERO)
+                        assert(distanceToZonePathEnd <= zonePathLength.distance)
+                        for (signal in loadedSignalInfra.getLogicalSignals(physicalSignal)) {
+                            currentBlocks =
+                                updatePartialBlocks(
+                                    sigModuleManager,
+                                    currentBlocks,
+                                    loadedSignalInfra,
+                                    signal,
+                                    distanceToZonePathEnd,
+                                )
+                        }
                     }
                 }
-            }
 
-            // when a route ends at a buffer stop, unterminated blocks are expected,
-            // as the buffer stop sort of acts as a closed signal. when a route does not
-            // end with a buffer stop, blocks are expected to end with the route.
-            // such blocks are not valid, and can be fixed by adding a delimiter signal
-            // right before the end of the route.
-            val routeEndsAtBufferStop = rawSignalingInfra.isBufferStop(routeExitDet.value)
-            for (curBlock in currentBlocks) {
-                if (curBlock.zonePaths.size == 0) continue
-                if (curBlock.signals.size == 0) continue
+                // when a route ends at a buffer stop, unterminated blocks are expected,
+                // as the buffer stop sort of acts as a closed signal. when a route does not
+                // end with a buffer stop, blocks are expected to end with the route.
+                // such blocks are not valid, and can be fixed by adding a delimiter signal
+                // right before the end of the route.
+                val routeEndsAtBufferStop = rawSignalingInfra.isBufferStop(routeExitDet.value)
+                for (curBlock in currentBlocks) {
+                    if (curBlock.zonePaths.size == 0) continue
+                    if (curBlock.signals.size == 0) continue
 
-                val lastZonePath = curBlock.zonePaths[curBlock.zonePaths.size - 1]
-                assert(routeExitDet == rawSignalingInfra.getZonePathExit(lastZonePath))
-                if (!routeEndsAtBufferStop)
-                    logger.debug {
-                        "unterminated block at end of route ${rawSignalingInfra.getRouteName(route)}"
-                    }
-                block(
-                    curBlock.startAtBufferStop,
-                    true,
-                    curBlock.zonePaths,
-                    curBlock.signals,
-                    curBlock.signalPositions
-                )
+                    val lastZonePath = curBlock.zonePaths[curBlock.zonePaths.size - 1]
+                    assert(routeExitDet == rawSignalingInfra.getZonePathExit(lastZonePath))
+                    if (!routeEndsAtBufferStop)
+                        logger.debug {
+                            "unterminated block at end of route ${rawSignalingInfra.getRouteName(route)}"
+                        }
+                    block(
+                        curBlock.startAtBufferStop,
+                        true,
+                        curBlock.zonePaths,
+                        curBlock.signals,
+                        curBlock.signalPositions
+                    )
+                }
             }
         }
-    }
+    missingSignalLogAggregator.logAggregatedSummary()
+    return result
 }
 
 data class AssociatedDetector(val detector: DirDetectorId, val distance: Distance)
@@ -210,14 +212,15 @@ private fun getInitPartialBlocks(
     loadedSignalInfra: LoadedSignalInfra,
     entrySignals: IdxMap<SignalingSystemId, AssociatedSignal>?,
     entryDet: DirDetectorId,
+    missingSignalLogAggregator: LogAggregator,
 ): MutableList<PartialBlock> {
     val initialBlocks = mutableListOf<PartialBlock>()
     val isBufferStop = rawSignalingInfra.isBufferStop(entryDet.value)
     if (entrySignals == null) {
         if (!isBufferStop)
-            logger.debug {
+            missingSignalLogAggregator.registerError(
                 "no signal at non buffer stop ${rawSignalingInfra.getDetectorName(entryDet.value)}:${entryDet.direction}"
-            }
+            )
         initialBlocks.add(
             PartialBlock(
                 true,
