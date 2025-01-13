@@ -113,7 +113,6 @@ fun runStandaloneSimulation(
             rollingStock.addNeutralSystemTimes(
                 electrificationMap,
                 comfort,
-                maxSpeedEnvelope,
                 context.tractiveEffortCurveMap
             )
         )

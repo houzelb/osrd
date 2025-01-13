@@ -18,4 +18,9 @@ public class FlatPath implements PhysicsPath {
     public double getAverageGrade(double begin, double end) {
         return slope;
     }
+
+    @Override
+    public double getMinGrade(double begin, double end) {
+        return slope;
+    }
 }

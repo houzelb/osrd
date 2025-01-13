@@ -1,5 +1,11 @@
 package fr.sncf.osrd.envelope_sim;
 
+import static fr.sncf.osrd.envelope_sim.TrainPhysicsIntegrator.GRAVITY_ACCELERATION;
+import static fr.sncf.osrd.envelope_sim.etcs.ConstantsKt.mRotatingMax;
+import static fr.sncf.osrd.envelope_sim.etcs.ConstantsKt.mRotatingMin;
+
+import fr.sncf.osrd.railjson.schema.rollingstock.RJSEtcsBrakeParams;
+
 public interface PhysicsRollingStock {
     /** The mass of the train, in kilograms */
     double getMass();
@@ -18,6 +24,8 @@ public interface PhysicsRollingStock {
 
     /** The first derivative of the resistance to movement at a given speed, in kg/s */
     double getRollingResistanceDeriv(double speed);
+
+    RJSEtcsBrakeParams getRJSEtcsBrakeParams();
 
     /** Get the effort the train can apply at a given speed, in newtons */
     static double getMaxEffort(double speed, TractiveEffortPoint[] tractiveEffortCurve) {
@@ -48,6 +56,16 @@ public interface PhysicsRollingStock {
         double coeff =
                 (previousPoint.maxEffort() - nextPoint.maxEffort()) / (previousPoint.speed() - nextPoint.speed());
         return previousPoint.maxEffort() + coeff * (Math.abs(speed) - previousPoint.speed());
+    }
+
+    /**
+     * The gradient acceleration of the rolling stock taking its rotating mass into account, in m/s².
+     * Grade is in m/km.
+     * mRotating (Max or Min) is in %, as seen in ERA braking curves simulation tool v5.1.
+     */
+    static double getGradientAcceleration(double grade) {
+        var mRotating = grade >= 0 ? mRotatingMax : mRotatingMin;
+        return -GRAVITY_ACCELERATION * grade / (1000.0 + 10.0 * mRotating);
     }
 
     /** The maximum constant deceleration, in m/s^2 */

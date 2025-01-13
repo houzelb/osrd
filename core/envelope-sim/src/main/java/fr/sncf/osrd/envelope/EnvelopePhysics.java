@@ -1,5 +1,6 @@
 package fr.sncf.osrd.envelope;
 
+import static fr.sncf.osrd.envelope_sim.TrainPhysicsIntegrator.GRAVITY_ACCELERATION;
 import static fr.sncf.osrd.envelope_sim.TrainPhysicsIntegrator.areAccelerationsEqual;
 import static java.lang.Math.max;
 
@@ -217,7 +218,7 @@ public class EnvelopePhysics {
         var meanGrade = 0.001 * path.getAverageGrade(part.getBeginPos(), part.getEndPos());
         var altitudeDelta = meanGrade * part.getTotalDistance();
 
-        var workGravity = -mass * 9.81 * altitudeDelta;
+        var workGravity = -mass * GRAVITY_ACCELERATION * altitudeDelta;
 
         var kineticEnergyDelta =
                 0.5 * inertia * (part.getEndSpeed() * part.getEndSpeed() - part.getBeginSpeed() * part.getBeginSpeed());

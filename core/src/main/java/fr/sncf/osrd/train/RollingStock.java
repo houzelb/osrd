@@ -5,7 +5,6 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import fr.sncf.osrd.envelope.Envelope;
 import fr.sncf.osrd.envelope_sim.PhysicsRollingStock;
 import fr.sncf.osrd.envelope_sim.electrification.Electrification;
 import fr.sncf.osrd.envelope_sim.electrification.Electrified;
@@ -123,6 +122,12 @@ public final class RollingStock implements PhysicsRollingStock {
         return B + 2 * C * speed;
     }
 
+    @Override
+    public RJSEtcsBrakeParams getRJSEtcsBrakeParams() {
+        assert etcsBrakeParams != null;
+        return etcsBrakeParams;
+    }
+
     public record ModeEffortCurves(
             boolean isElectric, TractiveEffortPoint[] defaultCurve, ConditionalEffortCurve[] curves) {}
 
@@ -164,7 +169,7 @@ public final class RollingStock implements PhysicsRollingStock {
      * Returns the tractive effort curve that matches best, along with the electrification
      * conditions that matched
      */
-    protected CurveAndCondition findTractiveEffortCurve(Comfort comfort, Electrification electrification) {
+    private CurveAndCondition findTractiveEffortCurve(Comfort comfort, Electrification electrification) {
         if (electrification instanceof Neutral n) {
             if (shouldCoast(n, comfort)) {
                 return new CurveAndCondition(COASTING_CURVE, new InfraConditions(null, null, null));
@@ -220,12 +225,10 @@ public final class RollingStock implements PhysicsRollingStock {
      *
      * @param electrificationMap The map of electrification conditions to use
      * @param comfort The comfort level to get the curves for
-     * @param maxSpeedEnvelope The maxSpeedEnvelope used to extend the neutral sections
      */
     public RangeMap<Double, TractiveEffortPoint[]> addNeutralSystemTimes(
             RangeMap<Double, Electrification> electrificationMap,
             Comfort comfort,
-            Envelope maxSpeedEnvelope,
             RangeMap<Double, TractiveEffortPoint[]> curvesUsed) {
 
         TreeRangeMap<Double, TractiveEffortPoint[]> newCurves = TreeRangeMap.create();
@@ -260,7 +263,7 @@ public final class RollingStock implements PhysicsRollingStock {
     }
 
     /** Return whether this rolling stock's has an electric mode */
-    public final boolean isElectric() {
+    public boolean isElectric() {
         return modes.values().stream().anyMatch(ModeEffortCurves::isElectric);
     }
 

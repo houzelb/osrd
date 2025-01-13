@@ -122,7 +122,7 @@ object MaxSpeedEnvelope {
             }
             cursor.nextPart()
         }
-        return etcsSimulator.addETCSBrakingParts(envelope, limitsOfAuthority, listOf())
+        return etcsSimulator.addSlowdownBrakingCurves(envelope, limitsOfAuthority)
     }
 
     /** Generate braking curves overlay at every stop position */
@@ -179,7 +179,7 @@ object MaxSpeedEnvelope {
             stops
                 .filter { it.isETCS }
                 .map { EndOfAuthority(Offset(it.offset.meters), getDangerPoint(context, it)) }
-        return simulator.addETCSBrakingParts(envelope, listOf(), endsOfAuthority)
+        return simulator.addStopBrakingCurves(envelope, endsOfAuthority)
     }
 
     /**
@@ -218,8 +218,7 @@ object MaxSpeedEnvelope {
     /** Generate a max speed envelope given a mrsp */
     @JvmStatic
     fun from(context: EnvelopeSimContext, stopPositions: DoubleArray, mrsp: Envelope): Envelope {
-        val etcsSimulator =
-            ETCSBrakingSimulatorImpl(context.path, context.rollingStock, context.timeStep)
+        val etcsSimulator = ETCSBrakingSimulatorImpl(context)
         var maxSpeedEnvelope = addSlowdownBrakingCurves(etcsSimulator, context, mrsp)
         maxSpeedEnvelope =
             addStopBrakingCurves(etcsSimulator, context, stopPositions, maxSpeedEnvelope)

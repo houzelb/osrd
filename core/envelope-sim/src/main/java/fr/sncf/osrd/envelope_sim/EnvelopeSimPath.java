@@ -106,6 +106,31 @@ public final class EnvelopeSimPath implements PhysicsPath {
         return (getCumGrade(end) - getCumGrade(begin)) / (end - begin);
     }
 
+    @Override
+    public double getMinGrade(double begin, double end) {
+        // TODO: Optimise method by adding in a cache.
+        int indexBegin = getIndexBeforePos(begin);
+        int indexEnd = getIndexBeforePos(end);
+        var lowestGradient = gradeValues[indexBegin];
+        for (int i = indexBegin; i < indexEnd; i++) {
+            var grad = gradeValues[i];
+            if (grad < lowestGradient) lowestGradient = grad;
+        }
+        return lowestGradient;
+    }
+
+    /** For a given position, return the index of the position just before in gradePositions */
+    public int getIndexBeforePos(double position) {
+        // TODO: Optimise method by using binary search.
+        if (position <= gradePositions[0]) return 0;
+        if (position >= gradePositions[gradePositions.length - 1]) return gradePositions.length - 1;
+        for (int i = 0; i < gradePositions.length; i++) {
+            var pos = gradePositions[i];
+            if (pos > position) return i - 1;
+        }
+        return gradePositions.length - 1;
+    }
+
     private RangeMap<Double, Electrification> getModeAndProfileMap(
             String powerClass, Range<Double> range, boolean ignoreElectricalProfiles) {
         if (ignoreElectricalProfiles) powerClass = null;
