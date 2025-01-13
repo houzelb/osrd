@@ -8107,6 +8107,7 @@ components:
                 format: int32
                 description: Importance of the operational point
                 nullable: true
+                maximum: 100
                 minimum: 0
           description: Operational points along the path
           nullable: true

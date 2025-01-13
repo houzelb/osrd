@@ -79,7 +79,7 @@ pub struct OperationalPointOnPath {
     /// Distance from the beginning of the path in mm
     position: u64,
     /// Importance of the operational point
-    #[schema(required)]
+    #[schema(required, minimum = 0, maximum = 100)]
     weight: Option<u8>,
 }
 
