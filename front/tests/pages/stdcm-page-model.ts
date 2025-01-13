@@ -699,7 +699,7 @@ class STDCMPage {
   }
 
   async startNewQuery() {
-    await this.startNewQueryButton.dispatchEvent('click');
+    await this.startNewQueryButton.click();
   }
 
   async mapMarkerVisibility() {

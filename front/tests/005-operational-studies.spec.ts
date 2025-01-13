@@ -69,7 +69,7 @@ test.describe('Verify simulation configuration in operational studies', () => {
     await expect(rollingstockPage.rollingStockSelectorModal).toBeVisible();
 
     // Test rolling stock search with normalization (spaces and capital letters)
-    await rollingstockPage.searchRollingstock(' electric_rolling_stock_test_E2E ');
+    await rollingstockPage.searchRollingstock(' electric_Rs_E2e ');
 
     // Select the rolling stock card based on the test ID
     const rollingstockCard = rollingstockPage.getRollingstockCardByTestID(
