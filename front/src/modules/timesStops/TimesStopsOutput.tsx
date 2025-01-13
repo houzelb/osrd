@@ -45,7 +45,7 @@ const TimesStopsOutput = ({
 
     return getUniqueOperationalPoints(
       enrichedOperationalPoints,
-      (op) => `${op.name}-${op.ch}`,
+      (op) => `${op.opId}-${path?.path_item_positions}`,
       (previousOP, nextOP) => {
         if (previousOP.trackName !== nextOP.trackName) {
           previousOP.trackName = `${previousOP.trackName}/${nextOP.trackName}`;

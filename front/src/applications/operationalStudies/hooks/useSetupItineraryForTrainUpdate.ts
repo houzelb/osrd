@@ -13,7 +13,11 @@ import {
 } from 'common/api/osrdEditoastApi';
 import { useOsrdConfActions } from 'common/osrdContext';
 import buildOpSearchQuery from 'modules/operationalPoint/helpers/buildOpSearchQuery';
-import { formatSuggestedOperationalPoints, matchPathStepAndOp } from 'modules/pathfinding/utils';
+import {
+  formatSuggestedOperationalPoints,
+  getUniqueOperationalPoints,
+  matchPathStepAndOp,
+} from 'modules/pathfinding/utils';
 import { getSupportedElectrification, isThermal } from 'modules/rollingStock/helpers/electric';
 import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSchedule/types';
 import computeBasePathStep from 'modules/trainschedule/helpers/computeBasePathStep';
@@ -171,10 +175,21 @@ const useSetupItineraryForTrainUpdate = (trainIdToEdit: number) => {
       const stepsCoordinates = pathfindingResult.path_item_positions.map((position) =>
         getPointCoordinates(geometry, pathfindingResult.length, position)
       );
+
       const suggestedOperationalPoints: SuggestedOP[] = formatSuggestedOperationalPoints(
         operational_points,
         geometry,
         pathfindingResult.length
+      );
+
+      const mergedOperationalPoints = getUniqueOperationalPoints(
+        suggestedOperationalPoints,
+        (op) => `${op.opId}-${op.positionOnPath}`,
+        (previousOP, nextOP) => {
+          if (previousOP.trackName !== nextOP.trackName) {
+            previousOP.trackName = `${previousOP.trackName}/${nextOP.trackName}`;
+          }
+        }
       );
 
       const computedpathSteps = trainSchedule.path.map((_, index) =>
@@ -182,7 +197,7 @@ const useSetupItineraryForTrainUpdate = (trainIdToEdit: number) => {
       );
       const updatedPathSteps: PathStep[] = updatePathStepsFromOperationalPoints(
         computedpathSteps,
-        suggestedOperationalPoints,
+        mergedOperationalPoints,
         pathfindingResult,
         stepsCoordinates
       );
@@ -210,7 +225,7 @@ const useSetupItineraryForTrainUpdate = (trainIdToEdit: number) => {
         pathProperties: {
           electrifications,
           geometry,
-          suggestedOperationalPoints,
+          suggestedOperationalPoints: mergedOperationalPoints,
           length: pathfindingResult.length,
           trackSectionRanges: pathfindingResult.track_section_ranges,
         },

@@ -194,12 +194,12 @@ export const isPathStepInvalid = (step: PathStep | null): boolean => step?.isInv
  */
 export function getUniqueOperationalPoints<T>(
   operationalPoints: T[],
-  extractKeyFromOp: (operationalPoint: T) => string,
+  getDuplicatedOP: (operationalPoint: T) => string,
   mergeOP: (previousOperationalPoint: T, nextOperationalPoint: T) => void
 ): T[] {
   return Object.values(
     operationalPoints.reduce<Record<string, T>>((uniqueOperationalPoints, operationalPoint) => {
-      const key = extractKeyFromOp(operationalPoint);
+      const key = getDuplicatedOP(operationalPoint);
       if (uniqueOperationalPoints[key]) {
         mergeOP(uniqueOperationalPoints[key], operationalPoint);
       } else {

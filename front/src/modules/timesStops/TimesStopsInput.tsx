@@ -142,7 +142,7 @@ const TimesStopsInput = ({
 
         const mergedWaypoints = getUniqueOperationalPoints(
           suggestedOPsWithTrackNames,
-          (waypoint) => `${waypoint.ci}-${waypoint.ch}`,
+          (waypoint) => `${waypoint.opId}-${waypoint.positionOnPath}`,
           (previousWaypoint, nextWaypoint) => {
             if (previousWaypoint.trackName !== nextWaypoint.trackName) {
               previousWaypoint.trackName = `${previousWaypoint.trackName}/${nextWaypoint.trackName}`;
