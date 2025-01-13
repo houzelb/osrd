@@ -10,7 +10,7 @@ use editoast_schemas::train_schedule::ScheduleItem;
 use editoast_schemas::train_schedule::TrainScheduleBase;
 use editoast_schemas::train_schedule::TrainScheduleOptions;
 
-use super::Model as _;
+use crate::models::prelude::*;
 
 #[derive(Debug, Default, Clone, Model)]
 #[model(table = editoast_models::tables::train_schedule)]
