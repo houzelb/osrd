@@ -106,7 +106,7 @@ axum-tracing-opentelemetry = { version = "0.25.0", default-features = false, fea
   "tracing_level_info",
 ] }
 chrono.workspace = true
-clap = { version = "4.5.23", features = ["derive", "env"] }
+clap = { version = "4.5.26", features = ["derive", "env"] }
 colored = "2.2.0"
 dashmap = "6.1.0"
 deadpool = { version = "0.12.1", features = [
