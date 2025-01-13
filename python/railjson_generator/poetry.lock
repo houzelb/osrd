@@ -485,7 +485,7 @@ name = "osrd-schemas"
 version = "0.8.16"
 description = ""
 optional = false
-python-versions = ">=3.9,<3.13"
+python-versions = ">=3.9,<3.12"
 files = []
 develop = false
 
@@ -950,5 +950,5 @@ typing-extensions = ">=3.7.4"
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.9,<3.13"
-content-hash = "c9c3d89247ec19ae3c2402ca9dc08d4365d81f062648dc34c9165114351781e5"
+python-versions = ">=3.9,<3.12"
+content-hash = "2094df8db0fd952c2289918d9f0d6f137a451e85b7b95112d4558672985ab7aa"
