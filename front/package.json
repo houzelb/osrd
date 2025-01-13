@@ -20,7 +20,7 @@
     "@rjsf/core": "^5.23.2",
     "@rjsf/utils": "^5.17.0",
     "@rjsf/validator-ajv8": "^5.23.2",
-    "@rtk-query/codegen-openapi": "^1.2.0",
+    "@rtk-query/codegen-openapi": "^2.0.0",
     "@sncf/bootstrap-sncf.metier.reseau": "^4.3.1-r6-beta4",
     "@turf/along": "^7.2.0",
     "@turf/bbox": "^7.2.0",
