@@ -1,14 +1,21 @@
 package fr.sncf.osrd.envelope_sim;
 
+import static fr.sncf.osrd.envelope_sim.PhysicsRollingStock.getGradientAcceleration;
+import static fr.sncf.osrd.envelope_sim.PhysicsRollingStock.getMaxEffort;
+
 import com.google.common.collect.RangeMap;
+import fr.sncf.osrd.envelope_sim.etcs.BrakingType;
 
 /**
- * An utility class to help simulate the train, using numerical integration. It's used when
+ * A utility class to help simulate the train, using numerical integration. It's used when
  * simulating the train, and it is passed to speed controllers so they can take decisions about what
  * action to make. Once speed controllers took a decision, this same class is used to compute the
  * next position and speed of the train.
  */
 public final class TrainPhysicsIntegrator {
+    // Gravity acceleration, in m/s²
+    public static final double GRAVITY_ACCELERATION = 9.81;
+
     // A position delta lower than this value will be considered zero
     // Going back and forth with Distance and double (meters) often causes 1e-3 errors,
     // we need the tolerance to be higher than this
@@ -25,18 +32,21 @@ public final class TrainPhysicsIntegrator {
     private final double directionSign;
 
     private final RangeMap<Double, PhysicsRollingStock.TractiveEffortPoint[]> tractiveEffortCurveMap;
+    private final BrakingType brakingType;
 
     private TrainPhysicsIntegrator(
             PhysicsRollingStock rollingStock,
             PhysicsPath path,
             Action action,
             double directionSign,
-            RangeMap<Double, PhysicsRollingStock.TractiveEffortPoint[]> tractiveEffortCurveMap) {
+            RangeMap<Double, PhysicsRollingStock.TractiveEffortPoint[]> tractiveEffortCurveMap,
+            BrakingType brakingType) {
         this.rollingStock = rollingStock;
         this.path = path;
         this.action = action;
         this.directionSign = directionSign;
         this.tractiveEffortCurveMap = tractiveEffortCurveMap;
+        this.brakingType = brakingType;
     }
 
     /** Simulates train movement */
@@ -46,8 +56,19 @@ public final class TrainPhysicsIntegrator {
             double initialSpeed,
             Action action,
             double directionSign) {
+        return step(context, initialLocation, initialSpeed, action, directionSign, BrakingType.CONSTANT);
+    }
+
+    /** Simulates train movement */
+    public static IntegrationStep step(
+            EnvelopeSimContext context,
+            double initialLocation,
+            double initialSpeed,
+            Action action,
+            double directionSign,
+            BrakingType brakingType) {
         var integrator = new TrainPhysicsIntegrator(
-                context.rollingStock, context.path, action, directionSign, context.tractiveEffortCurveMap);
+                context.rollingStock, context.path, action, directionSign, context.tractiveEffortCurveMap, brakingType);
         return integrator.step(context.timeStep, initialLocation, initialSpeed, directionSign);
     }
 
@@ -65,16 +86,15 @@ public final class TrainPhysicsIntegrator {
     }
 
     private IntegrationStep step(double timeStep, double position, double speed) {
+        if (action == Action.BRAKE) return newtonStep(timeStep, speed, getDeceleration(speed, position), directionSign);
+
         double tractionForce = 0;
         var tractiveEffortCurve = tractiveEffortCurveMap.get(Math.min(Math.max(0, position), path.getLength()));
         assert tractiveEffortCurve != null;
-        double maxTractionForce = PhysicsRollingStock.getMaxEffort(speed, tractiveEffortCurve);
+        double maxTractionForce = getMaxEffort(speed, tractiveEffortCurve);
         double rollingResistance = rollingStock.getRollingResistance(speed);
-        double weightForce = getWeightForce(rollingStock, path, position);
-
-        if (action == Action.ACCELERATE) tractionForce = maxTractionForce;
-
-        boolean isBraking = (action == Action.BRAKE);
+        double averageGrade = getAverageGrade(rollingStock, path, position);
+        double weightForce = getWeightForce(rollingStock, averageGrade);
 
         if (action == Action.MAINTAIN) {
             tractionForce = rollingResistance - weightForce;
@@ -82,20 +102,53 @@ public final class TrainPhysicsIntegrator {
             else tractionForce = maxTractionForce;
         }
 
-        double acceleration = computeAcceleration(
-                rollingStock, rollingResistance, weightForce, speed, tractionForce, isBraking, directionSign);
+        if (action == Action.ACCELERATE) tractionForce = maxTractionForce;
+        double acceleration =
+                computeAcceleration(rollingStock, rollingResistance, weightForce, speed, tractionForce, directionSign);
         return newtonStep(timeStep, speed, acceleration, directionSign);
     }
 
-    /** Compute the weight force of a rolling stock at a given position on a given path */
-    public static double getWeightForce(PhysicsRollingStock rollingStock, PhysicsPath path, double headPosition) {
+    private double getDeceleration(double speed, double position) {
+        assert (action == Action.BRAKE);
+        if (brakingType == BrakingType.CONSTANT) return rollingStock.getDeceleration();
+
+        var grade = getMinGrade(rollingStock, path, position);
+        var gradientAcceleration = getGradientAcceleration(grade);
+        return switch (brakingType) {
+                // See Subset referenced in RJSEtcsBrakeParams: §3.13.6.2.1.3.
+            case ETCS_EBD -> -rollingStock.getRJSEtcsBrakeParams().getSafeBrakingAcceleration(speed)
+                    + gradientAcceleration;
+                // See Subset referenced in RJSEtcsBrakeParams: §3.13.6.3.1.3.
+            case ETCS_SBD -> -rollingStock.getRJSEtcsBrakeParams().getServiceBrakingAcceleration(speed)
+                    + gradientAcceleration;
+                // See Subset referenced in RJSEtcsBrakeParams: §3.13.6.4.3.
+            case ETCS_GUI -> -rollingStock.getRJSEtcsBrakeParams().getNormalServiceBrakingAcceleration(speed)
+                    + gradientAcceleration
+                    + rollingStock.getRJSEtcsBrakeParams().getGradientAccelerationCorrection(grade, speed);
+            default -> throw new UnsupportedOperationException("Braking type not supported: " + brakingType);
+        };
+    }
+
+    /** Compute the average grade of a rolling stock at a given position on a given path in m/km */
+    public static double getAverageGrade(PhysicsRollingStock rollingStock, PhysicsPath path, double headPosition) {
         var tailPosition = Math.min(Math.max(0, headPosition - rollingStock.getLength()), path.getLength());
         headPosition = Math.min(Math.max(0, headPosition), path.getLength());
-        var averageGrade = path.getAverageGrade(tailPosition, headPosition);
-        // get an angle from a meter per km elevation difference
+        return path.getAverageGrade(tailPosition, headPosition);
+    }
+
+    /** Compute the weight force of a rolling stock at a given position on a given path */
+    public static double getWeightForce(PhysicsRollingStock rollingStock, double grade) {
+        // get an angle from a m/km elevation difference
         // the curve's radius is taken into account in meanTrainGrade
-        var angle = Math.atan(averageGrade / 1000.0); // from m/km to m/m
-        return -rollingStock.getMass() * 9.81 * Math.sin(angle);
+        var angle = Math.atan(grade / 1000.0); // from m/km to m/m
+        return -rollingStock.getMass() * GRAVITY_ACCELERATION * Math.sin(angle);
+    }
+
+    /** Compute the min grade of a rolling stock at a given position on a given path in m/km */
+    public static double getMinGrade(PhysicsRollingStock rollingStock, PhysicsPath path, double headPosition) {
+        var tailPosition = Math.min(Math.max(0, headPosition - rollingStock.getLength()), path.getLength());
+        headPosition = Math.min(Math.max(0, headPosition), path.getLength());
+        return path.getMinGrade(tailPosition, headPosition);
     }
 
     /**
@@ -107,14 +160,9 @@ public final class TrainPhysicsIntegrator {
             double weightForce,
             double currentSpeed,
             double tractionForce,
-            boolean isBraking,
             double directionSign) {
 
         assert tractionForce >= 0.;
-
-        if (isBraking) {
-            return rollingStock.getDeceleration();
-        }
 
         if (currentSpeed == 0 && directionSign > 0) {
             // If we are stopped and if the forces are not enough to compensate the opposite force,

@@ -92,7 +92,7 @@ public class StandaloneSim {
                 // extend the
                 // neutral sections (with time to lower/raise pantograph...)
                 context = context.updateCurves(rollingStock.addNeutralSystemTimes(
-                        electrificationMap, trainSchedule.comfort, maxSpeedEnvelope, context.tractiveEffortCurveMap));
+                        electrificationMap, trainSchedule.comfort, context.tractiveEffortCurveMap));
                 var envelope = MaxEffortEnvelope.from(context, trainSchedule.initialSpeed, maxSpeedEnvelope);
 
                 var simResultTrain =

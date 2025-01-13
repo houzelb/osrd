@@ -1,21 +1,28 @@
 package fr.sncf.osrd.envelope_sim.etcs
 
 import fr.sncf.osrd.envelope.Envelope
-import fr.sncf.osrd.envelope_sim.PhysicsPath
-import fr.sncf.osrd.envelope_sim.PhysicsRollingStock
+import fr.sncf.osrd.envelope_sim.EnvelopeSimContext
 import fr.sncf.osrd.sim_infra.api.Path
 import fr.sncf.osrd.sim_infra.api.TravelledPath
 import fr.sncf.osrd.utils.units.Offset
 
+/**
+ * In charge of computing and adding the ETCS braking curves. Formulas are found in `SUBSET-026-3
+ * v400.pdf` from the file at
+ * https://www.era.europa.eu/system/files/2023-09/index004_-_SUBSET-026_v400.zip
+ */
 interface ETCSBrakingSimulator {
-    val path: PhysicsPath
-    val rollingStock: PhysicsRollingStock
-    val timeStep: Double
+    val context: EnvelopeSimContext
 
-    /** Compute the ETCS braking envelope from the MRSP, for each LOA and EOA. */
-    fun addETCSBrakingParts(
-        mrsp: Envelope,
-        limitsOfAuthority: Collection<LimitOfAuthority>,
+    /** Compute the ETCS braking envelope for each LOA. */
+    fun addSlowdownBrakingCurves(
+        envelope: Envelope,
+        limitsOfAuthority: Collection<LimitOfAuthority>
+    ): Envelope
+
+    /** Compute the ETCS braking envelope for each EOA. */
+    fun addStopBrakingCurves(
+        envelope: Envelope,
         endsOfAuthority: Collection<EndOfAuthority>
     ): Envelope
 }
@@ -38,18 +45,22 @@ data class EndOfAuthority(
     }
 }
 
-class ETCSBrakingSimulatorImpl(
-    override val path: PhysicsPath,
-    override val rollingStock: PhysicsRollingStock,
-    override val timeStep: Double
-) : ETCSBrakingSimulator {
+class ETCSBrakingSimulatorImpl(override val context: EnvelopeSimContext) : ETCSBrakingSimulator {
+    override fun addSlowdownBrakingCurves(
+        envelope: Envelope,
+        limitsOfAuthority: Collection<LimitOfAuthority>
+    ): Envelope {
+        if (limitsOfAuthority.isEmpty()) return envelope
+        // TODO: implement braking at LOAs CORRECTLY
+        return envelope
+    }
 
-    override fun addETCSBrakingParts(
-        mrsp: Envelope,
-        limitsOfAuthority: Collection<LimitOfAuthority>,
+    override fun addStopBrakingCurves(
+        envelope: Envelope,
         endsOfAuthority: Collection<EndOfAuthority>
     ): Envelope {
-        if (limitsOfAuthority.isEmpty() && endsOfAuthority.isEmpty()) return mrsp
-        TODO("Not yet implemented")
+        if (endsOfAuthority.isEmpty()) return envelope
+        // TODO: compute curve at SvL and intersect
+        return addBrakingCurvesAtEOAs(envelope, context, endsOfAuthority)
     }
 }
