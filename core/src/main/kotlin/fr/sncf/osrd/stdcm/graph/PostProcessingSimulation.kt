@@ -291,7 +291,7 @@ private fun findConflictOffsets(
     edges: List<STDCMEdge>,
     updatedTimeData: TimeData,
 ): Offset<TravelledPath>? {
-    val startOffset = edges[0].envelopeStartOffset
+    val startOffset = edges[0].fromTravelledOffset(Offset(0.meters))
     val endOffset =
         startOffset +
             Distance(

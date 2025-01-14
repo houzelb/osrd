@@ -1,6 +1,8 @@
 package fr.sncf.osrd.stdcm.graph
 
 import fr.sncf.osrd.sim_infra.api.Block
+import fr.sncf.osrd.sim_infra.api.Path
+import fr.sncf.osrd.sim_infra.api.TravelledPath
 import fr.sncf.osrd.stdcm.infra_exploration.InfraExplorerWithEnvelope
 import fr.sncf.osrd.utils.units.Length
 import fr.sncf.osrd.utils.units.Offset
@@ -17,6 +19,7 @@ data class STDCMEdge(
     // Node located at the start of this edge
     val previousNode: STDCMNode,
     // Offset of the envelope if it doesn't start at the beginning of the edge
+    // This can *not* be used to convert Path / TravelledPath (should reference start of 1st route)
     val envelopeStartOffset: Offset<Block>,
     // Index of the last waypoint passed by this train
     val waypointIndex: Int,
@@ -142,5 +145,21 @@ data class STDCMEdge(
     /** Returns the offset on the block referential from a given edge offset. */
     fun blockOffsetFromEdge(edgeOffset: Offset<STDCMEdge>): Offset<Block> {
         return envelopeStartOffset + edgeOffset.distance
+    }
+
+    /**
+     * Converts from Path Offset (references start of first route) to Travelled path offset
+     * (references train departure point)
+     */
+    fun toTravelledOffset(pathOffset: Offset<Path>): Offset<TravelledPath> {
+        return infraExplorer.getIncrementalPath().toTravelledPath(pathOffset)
+    }
+
+    /**
+     * Converts from Travelled path offset (references train departure point) to Path Offset
+     * (references start of first route)
+     */
+    fun fromTravelledOffset(travelledPathOffset: Offset<TravelledPath>): Offset<Path> {
+        return infraExplorer.getIncrementalPath().fromTravelledPath(travelledPathOffset)
     }
 }
