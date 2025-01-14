@@ -288,13 +288,10 @@ const Study = () => {
                         study.state && (
                           <StateStep
                             key={nextId()}
-                            projectID={study.project.id}
-                            studyID={study.id}
+                            study={study}
                             number={idx + 1}
-                            studyName={study.name}
                             state={state}
                             done={idx <= studyStates.indexOf(study.state as StudyState)}
-                            tags={study.tags}
                           />
                         )
                     )}
