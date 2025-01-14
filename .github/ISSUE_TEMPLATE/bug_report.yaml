@@ -50,6 +50,8 @@ body:
         - Dev (SNCF)
         - Recette (SNCF)
         - Integration (SNCF)
+        - Preproduction (SNCF)
+        - Production (SNCF)
         - Custom (Docker compose)
         - Custom (Using K8s Helm Chart)
         - Other
