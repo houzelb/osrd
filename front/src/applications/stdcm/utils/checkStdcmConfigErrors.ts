@@ -23,23 +23,19 @@ const checkStdcmConfigErrors = (
     throw new Error('Last step can not be a via');
   }
 
+  if (
+    origin.location!.uic === destination.location!.uic &&
+    origin.location!.secondary_code === destination.location!.secondary_code
+  ) {
+    return { errorType: StdcmConfigErrorTypes.ZERO_LENGTH_PATH };
+  }
+
   if (pathfindingStateError) {
     return { errorType: StdcmConfigErrorTypes.PATHFINDING_FAILED };
   }
 
   const isOriginRespectDestinationSchedule =
     origin.arrivalType === ArrivalTimeTypes.RESPECT_DESTINATION_SCHEDULE;
-
-  if (
-    'uic' in origin &&
-    'uic' in destination &&
-    'ch' in origin &&
-    'ch' in destination &&
-    origin.uic === destination.uic &&
-    origin.ch === destination.ch
-  ) {
-    return { errorType: StdcmConfigErrorTypes.SAME_ORIGIN_AND_DESTINATION };
-  }
 
   const isDestinationASAP = destination.arrivalType === ArrivalTimeTypes.ASAP;
 
