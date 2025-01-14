@@ -1,7 +1,7 @@
 import enTranslations from '../../public/locales/en/stdcm-simulation-report-sheet.json';
 import frTranslations from '../../public/locales/fr/stdcm-simulation-report-sheet.json';
 import { getLocalizedDateString } from '../utils/date';
-import type { Simulation } from '../utils/types';
+import type { Simulation } from '../utils/simulationSheet';
 
 const simulationSheetDetails = (selectedLanguage: string): Simulation => {
   const translations = selectedLanguage === 'English' ? enTranslations : frTranslations;
