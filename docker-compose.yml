@@ -129,6 +129,7 @@ services:
       OSRDYNE_API_URL: "http://osrd-osrdyne:4242/"
       TELEMETRY_KIND: "opentelemetry"
       TELEMETRY_ENDPOINT: "http://jaeger:4317"
+      OTEL_SERVICE_NAME: "osrd-editoast"
       OSRD_MQ_URL: "amqp://osrd:password@osrd-rabbitmq:5672/%2f"
     command:
       - /bin/sh
@@ -184,7 +185,7 @@ services:
       OSRDYNE__OPENTELEMETRY__SERVICE_NAME: "osrdyne"
 
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/jaeger:latest
     container_name: osrd-jaeger
     restart: unless-stopped
     ports:
