@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef } from 'react';
+import { useMemo, useState, useRef, useCallback } from 'react';
 
 import cx from 'classnames';
 import dayjs from 'dayjs';
@@ -62,27 +62,30 @@ const Timetable = ({
     setShowTrainDetails(!showTrainDetails);
   };
 
-  const removeAndUnselectTrains = (trainIds: number[]) => {
+  const removeAndUnselectTrains = useCallback((trainIds: number[]) => {
     removeTrains(trainIds);
     setSelectedTrainIds([]);
-  };
+  }, []);
 
   const toggleConflictsListExpanded = () => {
     setConflictsListExpanded(!conflictsListExpanded);
   };
 
-  const handleSelectTrain = (id: number) => {
-    const currentSelectedTrainIds = [...selectedTrainIds];
-    const index = currentSelectedTrainIds.indexOf(id);
+  const handleSelectTrain = useCallback(
+    (id: number) => {
+      const currentSelectedTrainIds = [...selectedTrainIds];
+      const index = currentSelectedTrainIds.indexOf(id);
 
-    if (index === -1) {
-      currentSelectedTrainIds.push(id);
-    } else {
-      currentSelectedTrainIds.splice(index, 1);
-    }
+      if (index === -1) {
+        currentSelectedTrainIds.push(id);
+      } else {
+        currentSelectedTrainIds.splice(index, 1);
+      }
 
-    setSelectedTrainIds(currentSelectedTrainIds);
-  };
+      setSelectedTrainIds(currentSelectedTrainIds);
+    },
+    [selectedTrainIds]
+  );
 
   const handleConflictClick = (conflict: Conflict) => {
     if (conflict.train_ids.length > 0) {
