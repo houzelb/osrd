@@ -4,10 +4,10 @@
   "createScenario": "Create a scenario",
   "dates": {
     "creation": "Creation",
-    "estimatedend": "Expected ending",
+    "estimatedend": "Expected end",
     "modified": "Updated",
     "realend": "Real end",
-    "start": "Started"
+    "start": "Start"
   },
   "deleteScenarios": "Delete",
   "deleteItems": "Delete",
