@@ -549,16 +549,20 @@ class STDCMPage {
   }
 
   // Fill origin section
-  async fillOriginDetailsLight() {
+  async fillOriginDetailsLight(arrivalTypeOverride: string = '', isPrecise: boolean = false) {
     const { input, chValue, arrivalDate, arrivalTime, tolerance, arrivalType } =
       LIGHT_ORIGIN_DETAILS;
     await this.dynamicOriginCi.fill(input);
     await this.suggestionNWS.click();
-    await expect(this.dynamicOriginCh).toHaveValue(chValue);
-    await expect(this.originArrival).toHaveValue(arrivalType);
-    await this.dateOriginArrival.fill(arrivalDate);
-    await this.timeOriginArrival.fill(arrivalTime);
-    await this.fillToleranceField(tolerance.negative, tolerance.positive, true);
+    if (isPrecise && arrivalTypeOverride) {
+      await this.originArrival.selectOption(arrivalTypeOverride);
+    } else {
+      await expect(this.dynamicOriginCh).toHaveValue(chValue);
+      await expect(this.originArrival).toHaveValue(arrivalType);
+      await this.dateOriginArrival.fill(arrivalDate);
+      await this.timeOriginArrival.fill(arrivalTime);
+      await this.fillToleranceField(tolerance.negative, tolerance.positive, true);
+    }
   }
 
   // Fill destination section
@@ -708,7 +712,7 @@ class STDCMPage {
     await expect(this.startNewQueryWithDataButton).toBeVisible();
   }
 
-  async downloadSimulation(browserName: string) {
+  async downloadSimulation(browserName: string, isLinkedTrain: boolean = false) {
     await expect(async () => {
       const downloadPromise = this.page.waitForEvent('download');
       await this.downloadSimulationButton.dispatchEvent('click');
