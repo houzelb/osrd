@@ -61,17 +61,6 @@ const saveUserFilter = createFilter('user', userWhiteList);
 const saveMainFilter = createFilter('main', mainWhiteList);
 
 // Deserialize date strings coming from local storage
-const stdcmPathStepsDateTransform = createTransform(
-  null,
-  (outboundState: { arrival?: string }[]) =>
-    outboundState.map(({ arrival, ...step }) => {
-      if (arrival) {
-        return { ...step, arrival: new Date(arrival) };
-      }
-      return step;
-    }),
-  { whitelist: ['stdcmPathSteps'] }
-);
 const operationalStudiesDateTransform = createTransform(
   null,
   ({ startTime, ...outboundState }: { startTime: string }) => ({
@@ -96,7 +85,7 @@ const buildOsrdConfPersistConfig = <T extends OperationalStudiesConfState | Osrd
 ): PersistConfig<T> => ({
   key: slice.name,
   storage,
-  transforms: [stdcmPathStepsDateTransform, operationalStudiesDateTransform, pathStepsTransform],
+  transforms: [operationalStudiesDateTransform, pathStepsTransform],
 });
 
 export const persistConfig = {
@@ -153,10 +142,7 @@ export const rootReducer: ReducersMapObject<RootState> = {
   [mapViewerSlice.name]: mapViewerReducer,
   [editorSlice.name]: editorReducer as Reducer<EditorState, AnyAction>,
   [mainSlice.name]: mainReducer,
-  [stdcmConfSlice.name]: persistReducer(
-    buildOsrdConfPersistConfig<OsrdStdcmConfState>(stdcmConfSlice),
-    stdcmConfReducer
-  ) as unknown as Reducer<OsrdStdcmConfState, AnyAction>,
+  [stdcmConfSlice.name]: stdcmConfReducer,
   [operationalStudiesConfSlice.name]: persistReducer(
     buildOsrdConfPersistConfig<OperationalStudiesConfState>(operationalStudiesConfSlice),
     operationalStudiesConfReducer
