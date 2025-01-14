@@ -35,7 +35,7 @@ export const upsertMapWaypointsInOperationalPoints = (
         },
         part: { track: step.track, position: step.offset },
         position: positionOnPath,
-        weight: null,
+        weight: 100,
       };
 
       waypointCounter += 1;
