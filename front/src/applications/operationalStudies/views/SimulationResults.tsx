@@ -26,7 +26,6 @@ import { useAppDispatch } from 'store';
 import { getPointCoordinates } from 'utils/geometry';
 
 import useSimulationResults from '../hooks/useSimulationResults';
-import type { OperationalPoint, PathPropertiesFormatted } from '../types';
 
 const SPEED_SPACE_CHART_HEIGHT = 521.5;
 const HANDLE_TAB_RESIZE_HEIGHT = 20;
@@ -121,16 +120,6 @@ const SimulationResults = ({
     return null;
   }
 
-  const updatePathProperties = (
-    pathProps: PathPropertiesFormatted,
-    updatedOperationalPoints: OperationalPoint[]
-  ): PathPropertiesFormatted => ({
-    ...pathProps,
-    operationalPoints: updatedOperationalPoints,
-  });
-
-  const updatedPathProperties = updatePathProperties(pathProperties!, filteredOperationalPoints);
-
   return (
     <div className="simulation-results">
       {/* SIMULATION : STICKY BAR */}
@@ -214,7 +203,7 @@ const SimulationResults = ({
                   trainSimulation={trainSimulation}
                   selectedTrainPowerRestrictions={selectedTrainPowerRestrictions}
                   rollingStock={selectedTrainRollingStock}
-                  pathProperties={updatedPathProperties}
+                  pathProperties={pathProperties}
                   heightOfSpeedSpaceChartContainer={speedSpaceChartContainerHeight}
                   setHeightOfSpeedSpaceChartContainer={setSpeedSpaceChartContainerHeight}
                 />

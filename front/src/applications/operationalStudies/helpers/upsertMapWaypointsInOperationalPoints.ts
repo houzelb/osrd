@@ -18,35 +18,48 @@ export const upsertMapWaypointsInOperationalPoints = (
 
   return path.reduce(
     (operationalPointsWithAllWaypoints, step, i) => {
-      if (!('track' in step)) return operationalPointsWithAllWaypoints;
-
-      const positionOnPath = pathItemsPositions[i];
-      const indexToInsert = operationalPointsWithAllWaypoints.findIndex(
-        (op) => op.position >= positionOnPath
-      );
-
-      const formattedStep: OperationalPoint = {
-        id: step.id,
-        extensions: {
-          identifier: {
-            name: t('requestedPoint', { count: waypointCounter }),
-            uic: 0,
-          },
-        },
-        part: { track: step.track, position: step.offset },
-        position: positionOnPath,
-        weight: 100,
-      };
-
-      waypointCounter += 1;
-
-      // If we can't find any op position greater than the current step position, we add it at the end
-      if (indexToInsert === -1) {
-        operationalPointsWithAllWaypoints.push(formattedStep);
-      } else {
-        operationalPointsWithAllWaypoints.splice(indexToInsert, 0, formattedStep);
+      if ('uic' in step) {
+        const matchedOP = operationalPoints.find(
+          (op) =>
+            'uic' in step &&
+            'secondary_code' in step &&
+            step.uic === op.extensions?.identifier?.uic &&
+            step.secondary_code === op.extensions?.sncf?.ch
+        );
+        if (matchedOP) operationalPointsWithAllWaypoints.push({ ...matchedOP, weight: 100 });
+        return operationalPointsWithAllWaypoints;
       }
 
+      if ('track' in step) {
+        const positionOnPath = pathItemsPositions[i];
+        const indexToInsert = operationalPointsWithAllWaypoints.findIndex(
+          (op) => op.position >= positionOnPath
+        );
+
+        const formattedStep: OperationalPoint = {
+          id: step.id,
+          extensions: {
+            identifier: {
+              name: t('requestedPoint', { count: waypointCounter }),
+              uic: 0,
+            },
+          },
+          part: { track: step.track, position: step.offset },
+          position: positionOnPath,
+          weight: 100,
+        };
+
+        waypointCounter += 1;
+
+        // If we can't find any op position greater than the current step position, we add it at the end
+        if (indexToInsert === -1) {
+          operationalPointsWithAllWaypoints.push(formattedStep);
+        } else {
+          operationalPointsWithAllWaypoints.splice(indexToInsert, 0, formattedStep);
+        }
+
+        return operationalPointsWithAllWaypoints;
+      }
       return operationalPointsWithAllWaypoints;
     },
     [...operationalPoints]
