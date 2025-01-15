@@ -29,7 +29,6 @@ const useLinkedTrainSearch = () => {
 
   const selectableSlot = useMemo(() => {
     const startDate = searchDatetimeWindow ? new Date(searchDatetimeWindow.begin) : new Date();
-    startDate.setUTCHours(0, 0, 0);
     return {
       start: startDate,
       end: searchDatetimeWindow?.end || startDate,
