@@ -119,7 +119,8 @@ const useOutputTableData = (
 
       const formattedRows = operationalPoints.map((op) => {
         const matchingPathStep = pathStepRows.find(
-          (pathStepRow) => op.position === pathStepRow.positionOnPath
+          (pathStepRow) =>
+            op.position === pathStepRow.positionOnPath && op.extensions?.sncf?.ch === pathStepRow.ch
         );
         if (matchingPathStep) {
           return {
