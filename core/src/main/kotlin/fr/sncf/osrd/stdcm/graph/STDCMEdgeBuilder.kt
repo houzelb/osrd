@@ -158,7 +158,9 @@ internal constructor(
 
         var maximumDelay = 0.0
         var departureTimeShift = delayNeeded
-        if (delayNeeded > prevNode.timeData.maxDepartureDelayingWithoutConflict) {
+        val needEngineeringAllowance =
+            delayNeeded > prevNode.timeData.maxDepartureDelayingWithoutConflict
+        if (needEngineeringAllowance) {
             // We can't just shift the departure time, we need an engineering allowance
             // It's not computed yet, we just check that it's possible
             if (!graph.allowanceManager.checkEngineeringAllowance(prevNode, actualStartTime))
@@ -212,6 +214,7 @@ internal constructor(
                 envelope!!.endSpeed,
                 Length(fromMeters(envelope!!.endPos)),
                 envelope!!.totalTime / standardAllowanceSpeedRatio,
+                needEngineeringAllowance,
             )
         res = graph.backtrackingManager.backtrack(res!!, envelope!!)
         return if (res == null || graph.delayManager.isRunTimeTooLong(res)) null else res
