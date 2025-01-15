@@ -83,7 +83,6 @@ const useSetupItineraryForTrainUpdate = (trainIdToEdit: number) => {
         }
       });
       const tracks = await getTrackSectionsByIds(trackSectionIds);
-
       // get operational points
       const searchPayload = buildOpSearchQuery(infraId, [trainSchedule]);
       const ops = searchPayload

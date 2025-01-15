@@ -44,6 +44,8 @@ function AddPathStepPopup({
   const [getTrackEntity] =
     osrdEditoastApi.endpoints.postInfraByInfraIdObjectsAndObjectType.useLazyQuery();
 
+  console.log('featureInfoClick', featureInfoClick);
+
   useEffect(() => {
     const calculateOffset = async () => {
       const trackId = featureInfoClick.feature.properties?.id;
@@ -52,7 +54,7 @@ function AddPathStepPopup({
         objectType: 'TrackSection',
         body: [trackId],
       }).unwrap();
-
+      console.log(trackId, 'result');
       if (!result.length) {
         console.error('No track found');
         return;
@@ -88,6 +90,10 @@ function AddPathStepPopup({
       trackNumber: trackProperties.extensions_sncf_track_number,
     },
   };
+
+  useEffect(() => {
+    console.log(pathStepProperties, 'pathStepProperties');
+  }, [pathStepProperties]);
 
   return (
     <Popup

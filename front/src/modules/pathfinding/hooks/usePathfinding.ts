@@ -156,6 +156,7 @@ const usePathfinding = (
         })
       );
     }
+    console.log(updatedPathSteps, 'updatedPathSteps');
     dispatch(updatePathSteps(updatedPathSteps));
 
     setPathProperties({
@@ -170,9 +171,9 @@ const usePathfinding = (
 
   const launchPathfinding = useCallback(
     async (steps: (PathStep | null)[]) => {
+      console.log(steps, 'steps before pathfinding');
       dispatch(replaceItinerary(steps));
       setPathProperties(undefined);
-
       if (!steps.every((step) => step !== null)) {
         setIsMissingParam();
         return;
@@ -196,7 +197,7 @@ const usePathfinding = (
 
       try {
         const pathfindingResult = await postPathfindingBlocks(pathfindingInput).unwrap();
-
+        console.log(pathfindingResult, 'pathfindingResult in usePathfinding');
         if (pathfindingResult.status === 'success') {
           await populateStoreWithPathfinding(steps, pathfindingResult);
           setIsDone();

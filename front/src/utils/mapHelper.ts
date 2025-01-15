@@ -409,9 +409,11 @@ export function getNearestTrack(
   const tracks = map.queryRenderedFeatures(undefined, {
     layers: ['chartis/tracks-geo/main'],
   }) as Feature<LineString>[];
+  console.log('on est dans getNearestTrack');
   const result = head(
     sortBy(
       tracks.map((track) => {
+        console.log(track, 'tracks');
         const nearestFeaturePoint = nearestPointOnLine(track.geometry, coordinates);
         const distance = fnDistance(coordinates, nearestFeaturePoint.geometry.coordinates);
         return {

@@ -100,14 +100,16 @@ const ItineraryMarkers = ({ map, simulationPathSteps, showStdcmAssets }: Itinera
     () => extractMarkerInformation(simulationPathSteps, showStdcmAssets),
     [simulationPathSteps, showStdcmAssets]
   );
-
+  console.log(simulationPathSteps, 'simulationPathSteps');
   const getMarkerDisplayInformation = useCallback(
     (markerInfo: MarkerProperties) => {
+      console.log(markerInfo, 'markerInfo1');
+
       const {
         marker: { coordinates: markerCoordinates, metadata: markerMetadata },
         type: markerType,
       } = markerInfo;
-
+      console.log(markerInfo, 'markerInfo2');
       if (markerMetadata) {
         const {
           lineCode: markerLineCode,

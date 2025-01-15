@@ -13,7 +13,7 @@ export function setPointIti(
   pathProperties?: ManageTrainSchedulePathProperties
 ) {
   const { pathSteps } = store.getState().operationalStudiesConf;
-
+  console.log(pathStep, 'initial pathStep in set point iti');
   let newPathSteps: (PathStep | null)[];
 
   switch (pointType) {
@@ -26,10 +26,12 @@ export function setPointIti(
     default:
       if (pathProperties) {
         newPathSteps = insertViaFromMap(pathSteps, pathStep, pathProperties);
+        console.log('New pathSteps after insertViaFromMap:', newPathSteps);
       } else {
         newPathSteps = addElementAtIndex(pathSteps, pathSteps.length - 1, pathStep);
       }
   }
+  console.log('final new pathsteps', newPathSteps);
   resetFeatureInfoClick();
   launchPathfinding(newPathSteps);
 }

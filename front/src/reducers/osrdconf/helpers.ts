@@ -82,6 +82,7 @@ export function upsertPathStep(statePathSteps: (PathStep | null)[], op: Suggeste
     // To avoid updating the wrong one, we need to find the one that matches the payload
     newVia = { ...newVia, id: cleanPathSteps[stepIndex].id }; // We don't need to change the id of the updated via
     statePathSteps[stepIndex] = newVia;
+    console.log(newVia, 'newVia');
   } else {
     // Because of import issues, there can be multiple ops at position 0
     // To avoid inserting a new via before the origin we need to check if the index is 0

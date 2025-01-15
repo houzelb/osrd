@@ -76,6 +76,7 @@ export function buildCommonConfReducers<S extends OsrdConfState>(): CommonConfRe
     },
     replaceItinerary(state: Draft<S>, action: PayloadAction<S['pathSteps']>) {
       state.pathSteps = action.payload;
+      console.log('replaceItinerary', action.payload);
       state.powerRestriction = [];
     },
   };
