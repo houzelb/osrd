@@ -3,7 +3,9 @@ import { useMemo } from 'react';
 import { Button } from '@osrd-project/ui-core';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { useTranslation, Trans } from 'react-i18next';
+import { useSelector } from 'react-redux';
 
+import { ScenarioContextProvider } from 'applications/operationalStudies/hooks/useScenarioContext';
 import useConflictsMessages from 'applications/stdcm/hooks/useConflictsMessages';
 import type { StdcmSimulation } from 'applications/stdcm/types';
 import { extractMarkersInfo } from 'applications/stdcm/utils';
@@ -13,6 +15,7 @@ import {
 } from 'applications/stdcm/utils/formatSimulationReportSheet';
 import { hasConflicts, hasResults } from 'applications/stdcm/utils/simulationOutputUtils';
 import { type TrackRange } from 'common/api/osrdEditoastApi';
+import { useOsrdConfSelectors } from 'common/osrdContext';
 import NewMap from 'modules/trainschedule/components/ManageTrainSchedule/NewMap';
 
 import SimulationReportSheet from './SimulationReportSheet';
@@ -50,6 +53,8 @@ const StcdmResults = ({
   pathTrackRanges,
 }: StcdmResultsProps) => {
   const { t } = useTranslation('stdcm', { keyPrefix: 'simulation.results' });
+  const { getInfraID } = useOsrdConfSelectors();
+  const infraId = useSelector(getInfraID);
 
   const selectedSimulation = simulationsList[selectedSimulationIndex];
   const { outputs } = selectedSimulation || {};
@@ -176,14 +181,18 @@ const StcdmResults = ({
           </div>
         )}
         <div className="osrd-config-item-container osrd-config-item-container-map map-results">
-          <NewMap
-            id="stdcm-map-result"
-            hideAttribution
-            showStdcmAssets
-            isFeasible={!hasConflictResults}
-            pathGeometry={outputs?.pathProperties?.geometry}
-            simulationPathSteps={markersInfo}
-          />
+          {infraId && (
+            <ScenarioContextProvider infraId={infraId}>
+              <NewMap
+                id="stdcm-map-result"
+                hideAttribution
+                showStdcmAssets
+                isFeasible={!hasConflictResults}
+                pathGeometry={outputs?.pathProperties?.geometry}
+                simulationPathSteps={markersInfo}
+              />
+            </ScenarioContextProvider>
+          )}
         </div>
       </div>
       {isDebugMode && pathTrackRanges && hasSimulationResults && (

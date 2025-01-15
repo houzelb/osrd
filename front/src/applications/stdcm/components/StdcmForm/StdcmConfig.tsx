@@ -5,6 +5,7 @@ import cx from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
+import { ScenarioContextProvider } from 'applications/operationalStudies/hooks/useScenarioContext';
 import useStdcmTowedRollingStock from 'applications/stdcm/hooks/useStdcmTowedRollingStock';
 import { extractMarkersInfo } from 'applications/stdcm/utils';
 import {
@@ -246,15 +247,19 @@ const StdcmConfig = ({
         </div>
 
         <div className="osrd-config-item-container osrd-config-item-container-map stdcm-map">
-          <NewMap
-            id="stdcm-map-config"
-            hideAttribution
-            hideItinerary
-            preventPointSelection
-            pathGeometry={pathfinding?.geometry}
-            showStdcmAssets
-            simulationPathSteps={markersInfo}
-          />
+          {infra && (
+            <ScenarioContextProvider infraId={infra.id}>
+              <NewMap
+                id="stdcm-map-config"
+                hideAttribution
+                hideItinerary
+                preventPointSelection
+                pathGeometry={pathfinding?.geometry}
+                showStdcmAssets
+                simulationPathSteps={markersInfo}
+              />
+            </ScenarioContextProvider>
+          )}
         </div>
       </div>
     </div>
