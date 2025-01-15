@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useDeferredValue } from 'react';
 
 import { ChevronRight } from '@osrd-project/ui-icons';
 import cx from 'classnames';
@@ -65,6 +65,7 @@ const ScenarioContent = ({
     upsertTrainSchedules,
     removeTrains,
   } = useScenarioData(scenario, timetable, infra);
+  const deferredTrainScheduleSummaries = useDeferredValue(trainScheduleSummaries);
   const macroEditorState = useRef<MacroEditorState>();
   const [ngeDto, setNgeDto] = useState<NetzgrafikDto>();
 
@@ -125,6 +126,9 @@ const ScenarioContent = ({
     });
   };
 
+  const handleCollapseTimetable = useCallback(() => {
+    setCollapsedTimetable(true);
+  }, []);
   return (
     <main className="mastcontainer mastcontainer-no-mastnav scenario">
       <div className="row no-gutters h-100">
@@ -140,7 +144,7 @@ const ScenarioContent = ({
               scenario={scenario}
               infra={infra}
               infraReloadCount={reloadCount}
-              collapseTimetable={() => setCollapsedTimetable(true)}
+              collapseTimetable={handleCollapseTimetable}
             />
 
             <MicroMacroSwitch isMacro={isMacro} setIsMacro={toggleMicroMacroButton} />
@@ -168,7 +172,7 @@ const ScenarioContent = ({
                   setTrainIdToEdit={setTrainIdToEdit}
                   trainIdToEdit={trainIdToEdit}
                   trainSchedules={trainSchedules}
-                  trainSchedulesWithDetails={trainScheduleSummaries}
+                  trainSchedulesWithDetails={deferredTrainScheduleSummaries}
                   dtoImport={dtoImport}
                 />
               </>

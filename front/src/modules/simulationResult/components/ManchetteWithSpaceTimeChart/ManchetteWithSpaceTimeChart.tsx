@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useDeferredValue, useMemo, useRef, useState } from 'react';
 
 import { Slider } from '@osrd-project/ui-core';
 import { KebabHorizontal, Iterations } from '@osrd-project/ui-icons';
@@ -174,6 +174,7 @@ const ManchetteWithSpaceTimeChartWrapper = ({
       height,
       spaceTimeChartRef
     );
+  const deferredSpaceTimeChartProps = useDeferredValue(spaceTimeChartProps);
 
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
   const [settings, setSettings] = useState({
@@ -298,9 +299,9 @@ const ManchetteWithSpaceTimeChartWrapper = ({
               (waypointsPanelData?.filteredWaypoints ?? operationalPoints).at(0)?.position || 0
             }
             timeOrigin={Math.min(...projectPathTrainResult.map((p) => +p.departureTime))}
-            {...spaceTimeChartProps}
+            {...deferredSpaceTimeChartProps}
           >
-            {spaceTimeChartProps.paths.map((path) => (
+            {deferredSpaceTimeChartProps.paths.map((path) => (
               <PathLayer key={path.id} path={path} color={path.color} />
             ))}
             {workSchedules && (

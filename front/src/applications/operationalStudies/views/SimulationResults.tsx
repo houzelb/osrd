@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useDeferredValue } from 'react';
 
 import { ChevronLeft, ChevronRight } from '@osrd-project/ui-icons';
 import cx from 'classnames';
@@ -116,6 +116,12 @@ const SimulationResults = ({
     }
   }, [extViewport]);
 
+  const deferredWypointsPanelData = useDeferredValue({
+    filteredWaypoints: filteredOperationalPoints,
+    setFilteredWaypoints: setFilteredOperationalPoints,
+    projectionPath: projectionData?.trainSchedule.path || [],
+  });
+
   if ((!selectedTrainSchedule || !trainSimulation) && !projectionData) {
     return null;
   }
@@ -172,11 +178,7 @@ const SimulationResults = ({
                     operationalPoints={projectedOperationalPoints}
                     projectPathTrainResult={projectionData?.projectedTrains}
                     selectedTrainScheduleId={selectedTrainSchedule?.id}
-                    waypointsPanelData={{
-                      filteredWaypoints: filteredOperationalPoints,
-                      setFilteredWaypoints: setFilteredOperationalPoints,
-                      projectionPath: projectionData.trainSchedule.path,
-                    }}
+                    waypointsPanelData={deferredWypointsPanelData}
                     conflicts={conflictZones}
                     projectionLoaderData={projectionData.projectionLoaderData}
                     height={manchetteWithSpaceTimeChartHeight - MANCHETTE_HEIGHT_DIFF}
