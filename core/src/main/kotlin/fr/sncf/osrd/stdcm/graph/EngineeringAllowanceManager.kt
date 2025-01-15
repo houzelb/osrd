@@ -7,6 +7,7 @@ import fr.sncf.osrd.envelope.part.EnvelopePart
 import fr.sncf.osrd.envelope.part.EnvelopePartBuilder
 import fr.sncf.osrd.envelope.part.constraints.EnvelopeConstraint
 import fr.sncf.osrd.envelope.part.constraints.EnvelopePartConstraintType
+import fr.sncf.osrd.envelope.part.constraints.PositionConstraint
 import fr.sncf.osrd.envelope.part.constraints.SpeedConstraint
 import fr.sncf.osrd.envelope_sim.EnvelopeProfile
 import fr.sncf.osrd.envelope_sim.overlays.EnvelopeAcceleration
@@ -117,7 +118,7 @@ class EngineeringAllowanceManager(private val graph: STDCMGraph) {
                 ConstrainedEnvelopePartBuilder(
                     speedupPartBuilder,
                     SpeedConstraint(0.0, EnvelopePartConstraintType.FLOOR),
-                    EnvelopeConstraint(maxEffort, EnvelopePartConstraintType.CEILING)
+                    PositionConstraint(maxEffort.beginPos, maxEffort.endPos),
                 )
             EnvelopeAcceleration.accelerate(
                 context,

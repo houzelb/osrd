@@ -34,6 +34,9 @@ data class STDCMEdge(
     // How long it takes to go from the beginning to the end of the block, taking the
     // standard allowance into account
     val totalTime: Double,
+    // Set to true if a conflict in the current edge required an engineering allowance.
+    // Used for initial placement of fixed time points in post-processing.
+    val afterEngineeringAllowance: Boolean,
 ) {
     val block = infraExplorer.getCurrentBlock()
 

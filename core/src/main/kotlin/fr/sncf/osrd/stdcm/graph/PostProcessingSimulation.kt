@@ -194,6 +194,25 @@ private fun initFixedPoints(
     }
     if (hasStandardAllowance && res.none { it.offset == length })
         res.add(makeFixedPoint(res, edges, length, length, updatedTimeData, 0.0))
+
+    // Add points at the end of each engineering allowance
+    var prevEdgeLength = 0.meters
+    for (edge in edges) {
+        if (edge.afterEngineeringAllowance) {
+            if (res.none { it.offset.distance == prevEdgeLength }) {
+                res.add(
+                    makeFixedPoint(
+                        res,
+                        edges,
+                        Offset(prevEdgeLength),
+                        length,
+                        updatedTimeData,
+                    )
+                )
+            }
+        }
+        prevEdgeLength += edge.length.distance
+    }
     return res
 }
 
