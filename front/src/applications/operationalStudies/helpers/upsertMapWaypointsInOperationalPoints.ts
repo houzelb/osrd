@@ -15,6 +15,7 @@ export const upsertMapWaypointsInOperationalPoints = (
   t: TFunction
 ): OperationalPoint[] => {
   let waypointCounter = 1;
+  const HIGHEST_PRIORITY_WEIGHT = 100;
 
   return path.reduce(
     (operationalPointsWithAllWaypoints, step, i) => {
@@ -26,7 +27,8 @@ export const upsertMapWaypointsInOperationalPoints = (
             step.uic === op.extensions?.identifier?.uic &&
             step.secondary_code === op.extensions?.sncf?.ch
         );
-        if (matchedOP) operationalPointsWithAllWaypoints.push({ ...matchedOP, weight: 100 });
+        if (matchedOP)
+          operationalPointsWithAllWaypoints.push({ ...matchedOP, weight: HIGHEST_PRIORITY_WEIGHT });
         return operationalPointsWithAllWaypoints;
       }
 
@@ -46,7 +48,7 @@ export const upsertMapWaypointsInOperationalPoints = (
           },
           part: { track: step.track, position: step.offset },
           position: positionOnPath,
-          weight: 100,
+          weight: HIGHEST_PRIORITY_WEIGHT,
         };
 
         waypointCounter += 1;
