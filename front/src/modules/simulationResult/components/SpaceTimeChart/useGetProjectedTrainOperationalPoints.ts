@@ -62,6 +62,21 @@ const useGetProjectedTrainOperationalPoints = (
           id: `${op.id}-${op.position}-${i}`,
         }));
 
+        const matchingIndexes = pathfindingResult.path_item_positions.map((itemPosition) =>
+          operationalPointsWithAllWaypoints
+            .map((op) => op.position)
+            ?.findIndex((position) => position === itemPosition)
+        );
+
+        const operationalPointsWithWeightedVias = operationalPointsWithAllWaypoints.map(
+          (op, index) => {
+            if (matchingIndexes.includes(index)) {
+              return { ...op, weight: 100 };
+            }
+            return op;
+          }
+        );
+
         setOperationalPoints(operationalPointsWithUniqueIds);
 
         // Check if there are saved manchettes in localStorage for the current timetable and path
@@ -76,7 +91,7 @@ const useGetProjectedTrainOperationalPoints = (
             PathProperties['operational_points']
           >;
         }
-        setFilteredOperationalPoints(operationalPointsWithUniqueIds);
+        setFilteredOperationalPoints(operationalPointsWithWeightedVias);
       }
     };
     getOperationalPoints();

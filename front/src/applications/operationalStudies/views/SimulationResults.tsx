@@ -122,19 +122,14 @@ const SimulationResults = ({
   }
 
   const updatePathProperties = (
-    pathProps: PathPropertiesFormatted | undefined,
-    updatedOperationalPoints: OperationalPoint[] | undefined
-  ): PathPropertiesFormatted | undefined => {
-    if (!pathProps || !updatedOperationalPoints) {
-      return undefined;
-    }
-    return {
-      ...pathProps,
-      operationalPoints: updatedOperationalPoints,
-    };
-  };
+    pathProps: PathPropertiesFormatted,
+    updatedOperationalPoints: OperationalPoint[]
+  ): PathPropertiesFormatted => ({
+    ...pathProps,
+    operationalPoints: updatedOperationalPoints,
+  });
 
-  const updatedPathProperties = updatePathProperties(pathProperties, projectedOperationalPoints);
+  const updatedPathProperties = updatePathProperties(pathProperties!, filteredOperationalPoints);
 
   return (
     <div className="simulation-results">
