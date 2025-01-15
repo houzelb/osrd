@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useCallback } from 'react';
 
 import cx from 'classnames';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { Virtualizer, type VirtualizerHandle } from 'virtua';
 
 import { MANAGE_TRAIN_SCHEDULE_TYPES } from 'applications/operationalStudies/consts';
 import type { Conflict, InfraState, TrainScheduleResult } from 'common/api/osrdEditoastApi';
@@ -61,27 +62,30 @@ const Timetable = ({
     setShowTrainDetails(!showTrainDetails);
   };
 
-  const removeAndUnselectTrains = (trainIds: number[]) => {
+  const removeAndUnselectTrains = useCallback((trainIds: number[]) => {
     removeTrains(trainIds);
     setSelectedTrainIds([]);
-  };
+  }, []);
 
   const toggleConflictsListExpanded = () => {
     setConflictsListExpanded(!conflictsListExpanded);
   };
 
-  const handleSelectTrain = (id: number) => {
-    const currentSelectedTrainIds = [...selectedTrainIds];
-    const index = currentSelectedTrainIds.indexOf(id);
+  const handleSelectTrain = useCallback(
+    (id: number) => {
+      const currentSelectedTrainIds = [...selectedTrainIds];
+      const index = currentSelectedTrainIds.indexOf(id);
 
-    if (index === -1) {
-      currentSelectedTrainIds.push(id);
-    } else {
-      currentSelectedTrainIds.splice(index, 1);
-    }
+      if (index === -1) {
+        currentSelectedTrainIds.push(id);
+      } else {
+        currentSelectedTrainIds.splice(index, 1);
+      }
 
-    setSelectedTrainIds(currentSelectedTrainIds);
-  };
+      setSelectedTrainIds(currentSelectedTrainIds);
+    },
+    [selectedTrainIds]
+  );
 
   const handleConflictClick = (conflict: Conflict) => {
     if (conflict.train_ids.length > 0) {
@@ -103,6 +107,8 @@ const Timetable = ({
       return show;
     });
   }, [currentDepartureDates]);
+
+  const VirtualizerRef = useRef<VirtualizerHandle>(null);
 
   return (
     <div className="scenario-timetable">
@@ -142,30 +148,32 @@ const Timetable = ({
           trainSchedules={trainSchedules}
           isInSelection={selectedTrainIds.length > 0}
         />
-        {displayedTrainSchedules.map((train: TrainScheduleWithDetails, index) => (
-          <div key={`timetable-train-card-${train.id}-${train.trainName}`}>
-            {showDepartureDates[index] && (
-              <div className="scenario-timetable-departure-date">
-                {currentDepartureDates[index]}
-              </div>
-            )}
-            <TimetableTrainCard
-              isInSelection={selectedTrainIds.includes(train.id)}
-              handleSelectTrain={handleSelectTrain}
-              train={train}
-              isSelected={infraState === 'CACHED' && selectedTrainId === train.id}
-              isModified={train.id === trainIdToEdit}
-              setDisplayTrainScheduleManagement={setDisplayTrainScheduleManagement}
-              upsertTrainSchedules={upsertTrainSchedules}
-              setTrainIdToEdit={setTrainIdToEdit}
-              removeTrains={removeAndUnselectTrains}
-              projectionPathIsUsed={
-                infraState === 'CACHED' && trainIdUsedForProjection === train.id
-              }
-              dtoImport={dtoImport}
-            />
-          </div>
-        ))}
+        <Virtualizer ref={VirtualizerRef} overscan={15}>
+          {displayedTrainSchedules.map((train: TrainScheduleWithDetails, index) => (
+            <div key={`timetable-train-card-${train.id}-${train.trainName}`}>
+              {showDepartureDates[index] && (
+                <div className="scenario-timetable-departure-date">
+                  {currentDepartureDates[index]}
+                </div>
+              )}
+              <TimetableTrainCard
+                isInSelection={selectedTrainIds.includes(train.id)}
+                handleSelectTrain={handleSelectTrain}
+                train={train}
+                isSelected={infraState === 'CACHED' && selectedTrainId === train.id}
+                isModified={train.id === trainIdToEdit}
+                setDisplayTrainScheduleManagement={setDisplayTrainScheduleManagement}
+                upsertTrainSchedules={upsertTrainSchedules}
+                setTrainIdToEdit={setTrainIdToEdit}
+                removeTrains={removeAndUnselectTrains}
+                projectionPathIsUsed={
+                  infraState === 'CACHED' && trainIdUsedForProjection === train.id
+                }
+                dtoImport={dtoImport}
+              />
+            </div>
+          ))}
+        </Virtualizer>
         <div
           className={cx('bottom-timetables-trains', {
             'empty-list': trainSchedulesWithDetails.length === 0,
