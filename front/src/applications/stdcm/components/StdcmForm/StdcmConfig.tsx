@@ -18,6 +18,7 @@ import { useStoreDataForRollingStockSelector } from 'modules/rollingStock/compon
 import NewMap from 'modules/trainschedule/components/ManageTrainSchedule/NewMap';
 import { type StdcmConfSliceActions, resetMargins } from 'reducers/osrdconf/stdcmConf';
 import type { StdcmConfSelectors } from 'reducers/osrdconf/stdcmConf/selectors';
+import type { OsrdStdcmConfState } from 'reducers/osrdconf/types';
 import { useAppDispatch } from 'store';
 
 import StdcmConsist from './StdcmConsist';
@@ -32,6 +33,12 @@ import { ArrivalTimeTypes, StdcmConfigErrorTypes } from '../../types';
 import checkStdcmConfigErrors from '../../utils/checkStdcmConfigErrors';
 import StdcmLoader from '../StdcmLoader';
 import StdcmWarningBox from '../StdcmWarningBox';
+
+declare global {
+  interface Window {
+    osrdStdcmConfState?: OsrdStdcmConfState;
+  }
+}
 
 /**
  * Inputs in different cards inside the StdcmConfig component come from the stdcm redux store.
@@ -59,7 +66,7 @@ const StdcmConfig = ({
 
   const { infra } = useInfraStatus();
   const dispatch = useAppDispatch();
-  const { updateStdcmPathStep, resetStdcmConfig } = useOsrdConfActions() as StdcmConfSliceActions;
+  const { updateStdcmPathStep, restoreStdcmConfig } = useOsrdConfActions() as StdcmConfSliceActions;
 
   const {
     getStdcmOrigin,
@@ -164,12 +171,9 @@ const StdcmConfig = ({
   }, [infra]);
 
   useEffect(() => {
-    const keepForm = localStorage.getItem('keepForm');
-
-    if (!keepForm) {
-      dispatch(resetStdcmConfig());
-    } else {
-      localStorage.removeItem('keepForm');
+    const state = window.osrdStdcmConfState;
+    if (state) {
+      dispatch(restoreStdcmConfig(state));
     }
   }, []);
 

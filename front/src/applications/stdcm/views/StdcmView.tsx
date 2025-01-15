@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 
 import { isEqual, isNil } from 'lodash';
+import { useSelector } from 'react-redux';
 
 import useStdcm from 'applications/stdcm/hooks/useStdcm';
 import { LoaderFill } from 'common/Loaders';
 import { useOsrdConfActions } from 'common/osrdContext';
 import type { StdcmConfSliceActions } from 'reducers/osrdconf/stdcmConf';
+import { getStdcmConf } from 'reducers/osrdconf/stdcmConf/selectors';
 import { useAppDispatch } from 'store';
 import { replaceElementAtIndex } from 'utils/array';
 
@@ -22,6 +24,7 @@ import type { StdcmSimulation } from '../types';
 const StdcmView = () => {
   // TODO : refacto. state useStdcm. Maybe we can merge some state together in order to reduce the number of refresh
   const currentSimulationInputs = useStdcmForm();
+  const stdcmConf = useSelector(getStdcmConf);
   const [simulationsList, setSimulationsList] = useState<StdcmSimulation[]>([]);
   const [selectedSimulationIndex, setSelectedSimulationIndex] = useState(-1);
   const [showStatusBanner, setShowStatusBanner] = useState(false);
@@ -62,9 +65,12 @@ const StdcmView = () => {
     }
   };
 
-  const openNewWindow = () => {
+  const openNewWindow = (keepForm: boolean) => {
     const newWindow = window.open(window.location.href, '_blank');
     if (newWindow) {
+      if (keepForm) {
+        newWindow.osrdStdcmConfState = stdcmConf;
+      }
       newWindow.onload = () => {
         newWindow.focus();
       };
@@ -75,14 +81,13 @@ const StdcmView = () => {
     setButtonsVisible(false);
     resetStdcmState();
 
-    openNewWindow();
+    openNewWindow(false);
   };
 
   const handleStartNewQueryWithData = () => {
     setButtonsVisible(false);
-    localStorage.setItem('keepForm', 'true');
 
-    openNewWindow();
+    openNewWindow(true);
   };
 
   const toggleHelpModule = () => setShowHelpModule((show) => !show);

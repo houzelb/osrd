@@ -62,6 +62,12 @@ export const stdcmConfSlice = createSlice({
       state.speedLimitByTag = stdcmConfInitialState.speedLimitByTag;
       state.linkedTrains = stdcmConfInitialState.linkedTrains;
     },
+    restoreStdcmConfig(
+      _state: Draft<OsrdStdcmConfState>,
+      action: PayloadAction<OsrdStdcmConfState>
+    ) {
+      return action.payload;
+    },
     updateTotalMass(
       state: Draft<OsrdStdcmConfState>,
       action: PayloadAction<OsrdStdcmConfState['totalMass']>
