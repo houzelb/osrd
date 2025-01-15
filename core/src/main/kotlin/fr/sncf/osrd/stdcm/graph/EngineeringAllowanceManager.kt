@@ -43,7 +43,7 @@ class EngineeringAllowanceManager(private val graph: STDCMGraph) {
         if (affectedEdges.isEmpty()) return false // No space to try the allowance
 
         val length = affectedEdges.map { it.length.distance }.sumDistances()
-        if (length > 20_000.meters) {
+        if (length > 50_000.meters) {
             // If the allowance area is large enough to reasonably stop and accelerate again, we
             // just accept the solution. This avoids computation on very large paths
             // (which can be quite time expensive)
