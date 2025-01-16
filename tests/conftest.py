@@ -132,7 +132,9 @@ class TestRollingStock:
 TestRollingStock.__test__ = False
 
 
-def create_rolling_stock(rolling_stock_json_path: Path, test_rolling_stocks: Optional[List[TestRollingStock]] = None):
+def create_rolling_stock(
+    rolling_stock_json_path: Path, test_rolling_stocks: Optional[List[TestRollingStock]] = None
+) -> List[int]:
     if test_rolling_stocks is None:
         payload = json.loads(rolling_stock_json_path.read_text())
         response = requests.post(f"{EDITOAST_URL}rolling_stock/", json=payload)
