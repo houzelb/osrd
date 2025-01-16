@@ -51,12 +51,12 @@ const useStdcmConsist = () => {
     maxSpeedTag?: string | null
   ) => {
     if (!totalMassChanged) {
-      const consistMass = Math.floor(kgToT((rollingStock?.mass ?? 0) + (towed?.mass ?? 0)));
+      const consistMass = Math.ceil(kgToT((rollingStock?.mass ?? 0) + (towed?.mass ?? 0)));
       dispatch(updateTotalMass(consistMass > 0 ? consistMass : undefined));
     }
 
     if (!totalLengthChanged) {
-      const consistLength = Math.floor((rollingStock?.length ?? 0) + (towed?.length ?? 0));
+      const consistLength = Math.ceil((rollingStock?.length ?? 0) + (towed?.length ?? 0));
       dispatch(updateTotalLength(consistLength > 0 ? consistLength : undefined));
     }
 

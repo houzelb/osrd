@@ -144,7 +144,7 @@ const StdcmConsist = ({ isDebugMode, consistErrors = {}, disabled = false }: Std
                   status: 'error',
                   tooltip: 'left',
                   message: t(consistErrors.totalMass, {
-                    low: Math.floor(
+                    low: Math.ceil(
                       kgToT((rollingStock?.mass ?? 0) + (towedRollingStock?.mass ?? 0))
                     ),
                     high: CONSIST_TOTAL_MASS_MAX,
@@ -168,7 +168,7 @@ const StdcmConsist = ({ isDebugMode, consistErrors = {}, disabled = false }: Std
                   status: 'error',
                   tooltip: 'left',
                   message: t(consistErrors.totalLength, {
-                    low: Math.floor((rollingStock?.length ?? 0) + (towedRollingStock?.length ?? 0)),
+                    low: Math.ceil((rollingStock?.length ?? 0) + (towedRollingStock?.length ?? 0)),
                     high: CONSIST_TOTAL_LENGTH_MAX,
                   }),
                 }

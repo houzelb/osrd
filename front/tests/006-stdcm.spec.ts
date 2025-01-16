@@ -35,7 +35,7 @@ test.describe('Verify train schedule elements and filters', () => {
   };
   const fastRollingStockPrefilledValues = {
     tonnage: '190',
-    length: '45',
+    length: '46',
     maxSpeed: '220',
   };
   const towedRollingStockPrefilledValues = {
