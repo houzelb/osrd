@@ -21,15 +21,22 @@ export const upsertMapWaypointsInOperationalPoints = (
   return path.reduce(
     (operationalPointsWithAllWaypoints, step, i) => {
       if ('uic' in step) {
-        const matchedOP = operationalPoints.find(
+        const matchedIndex = operationalPointsWithAllWaypoints.findIndex(
           (op) =>
             'uic' in step &&
             'secondary_code' in step &&
             step.uic === op.extensions?.identifier?.uic &&
             step.secondary_code === op.extensions?.sncf?.ch
         );
-        if (matchedOP)
-          operationalPointsWithAllWaypoints.push({ ...matchedOP, weight: HIGHEST_PRIORITY_WEIGHT });
+
+        if (matchedIndex !== -1) {
+          // Replace the operational point at its original index with updated weight
+          operationalPointsWithAllWaypoints[matchedIndex] = {
+            ...operationalPointsWithAllWaypoints[matchedIndex],
+            weight: HIGHEST_PRIORITY_WEIGHT,
+          };
+        }
+
         return operationalPointsWithAllWaypoints;
       }
 
