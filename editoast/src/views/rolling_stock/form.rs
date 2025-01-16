@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use editoast_schemas::rolling_stock::EffortCurves;
 use editoast_schemas::rolling_stock::EnergySource;
+use editoast_schemas::rolling_stock::EtcsBrakeParams;
 use editoast_schemas::rolling_stock::LoadingGaugeType;
 use editoast_schemas::rolling_stock::RollingResistance;
 use editoast_schemas::rolling_stock::RollingStockMetadata;
@@ -44,6 +45,7 @@ pub struct RollingStockForm {
     /// The time the train takes before actually using electrical power (in seconds). Is null if the train is not electric.
     #[schema(example = 5.0)]
     pub electrical_power_startup_time: Option<f64>,
+    pub etcs_brake_params: Option<EtcsBrakeParams>,
     /// The time it takes to raise this train's pantograph in seconds. Is null if the train is not electric.
     #[schema(example = 15.0)]
     pub raise_pantograph_time: Option<f64>,
@@ -67,6 +69,7 @@ impl From<RollingStockForm> for Changeset<RollingStockModel> {
             .startup_acceleration(rolling_stock.startup_acceleration)
             .comfort_acceleration(rolling_stock.comfort_acceleration)
             .const_gamma(rolling_stock.const_gamma)
+            .etcs_brake_params(rolling_stock.etcs_brake_params)
             .inertia_coefficient(rolling_stock.inertia_coefficient)
             .mass(rolling_stock.mass)
             .rolling_resistance(rolling_stock.rolling_resistance)
@@ -103,6 +106,7 @@ impl From<RollingStockModel> for RollingStockForm {
             startup_acceleration: value.startup_acceleration,
             comfort_acceleration: value.comfort_acceleration,
             const_gamma: value.const_gamma,
+            etcs_brake_params: value.etcs_brake_params,
             inertia_coefficient: value.inertia_coefficient,
             mass: value.mass,
             rolling_resistance: value.rolling_resistance,

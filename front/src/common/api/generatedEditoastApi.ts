@@ -3082,6 +3082,7 @@ export type RollingStockForm = {
   /** The time the train takes before actually using electrical power (in seconds). Is null if the train is not electric. */
   electrical_power_startup_time?: number | null;
   energy_sources?: EnergySource[];
+  etcs_brake_params?: EtcsBrakeParams | null;
   inertia_coefficient: number;
   length: number;
   loading_gauge: LoadingGaugeType;
