@@ -76,7 +76,7 @@ const useGetProjectedTrainOperationalPoints = (
             PathProperties['operational_points']
           >;
         }
-        setFilteredOperationalPoints(operationalPointsWithAllWaypoints);
+        setFilteredOperationalPoints(operationalPointsWithUniqueIds);
       }
     };
     getOperationalPoints();

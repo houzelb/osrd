@@ -5,6 +5,8 @@ import type { PathfindingResultSuccess, TrainScheduleResult } from 'common/api/o
 
 import type { OperationalPoint } from '../types';
 
+const HIGHEST_PRIORITY_WEIGHT = 100;
+
 /**
  * Check if the train path used waypoints added by map click and add them to the operational points
  */
@@ -15,7 +17,6 @@ export const upsertMapWaypointsInOperationalPoints = (
   t: TFunction
 ): OperationalPoint[] => {
   let waypointCounter = 1;
-  const HIGHEST_PRIORITY_WEIGHT = 100;
 
   return path.reduce(
     (operationalPointsWithAllWaypoints, step, i) => {
