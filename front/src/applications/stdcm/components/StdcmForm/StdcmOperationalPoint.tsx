@@ -147,7 +147,8 @@ const StdcmOperationalPoint = ({ location, pathStepId, disabled }: StdcmOperatio
   }, [location]);
 
   useEffect(() => {
-    if (location && searchResults.length > 0) {
+    const isLocationInResults = location && searchResults.some((pr) => pr.name === location?.name);
+    if (isLocationInResults) {
       updateChSuggestions(location.name);
     }
   }, [searchResults]);
