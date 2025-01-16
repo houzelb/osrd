@@ -25,7 +25,7 @@ export const validateTotalMass = ({
   const consistMassInTons = Math.floor(kgToT(tractionEngineMass + towedMass));
   const massLimit = towedMass ? consistMassInTons : tractionMassInTons;
 
-  if (totalMass < massLimit || totalMass >= CONSIST_TOTAL_MASS_MAX) {
+  if (totalMass < massLimit || totalMass > CONSIST_TOTAL_MASS_MAX) {
     return 'consist.errors.totalMass.range';
   }
 
@@ -51,7 +51,7 @@ export const validateTotalLength = ({
 
   const consistLength = Math.floor(tractionEngineLength + towedLength);
 
-  if (totalLength < consistLength || totalLength >= CONSIST_TOTAL_LENGTH_MAX) {
+  if (totalLength < consistLength || totalLength > CONSIST_TOTAL_LENGTH_MAX) {
     return 'consist.errors.totalLength.range';
   }
 
