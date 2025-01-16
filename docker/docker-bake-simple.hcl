@@ -24,10 +24,6 @@ target "base-front-dev" {
   tags = tags("front-dev")
 }
 
-target "base-front-nginx" {
-  tags = tags("front-nginx")
-}
-
 target "base-front-build" {
   tags = tags("front-build")
 }
