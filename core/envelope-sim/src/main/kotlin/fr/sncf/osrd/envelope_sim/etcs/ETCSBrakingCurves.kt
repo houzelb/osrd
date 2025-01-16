@@ -78,40 +78,6 @@ fun addBrakingCurvesAtEOAs(
                 beginPos
             )
         val indicationCurve = keepBrakingCurveUnderOverlay(fullIndicationCurve, envelope, beginPos)
-
-        if (endOfAuthority.offsetSVL != null && false) {
-            // TODO: Make ebd go until envelope.maxSpeed + deltaVbec(envelope.maxSpeed, minGrade,
-            // maxTractiveEffortCurve)
-            // so that ebi will intersect with mrsp
-            val ebdCurve =
-                computeBrakingCurve(
-                    context,
-                    envelope,
-                    beginPos,
-                    endOfAuthority.offsetSVL.distance.meters,
-                    targetSpeed,
-                    BrakingType.ETCS_EBD
-                )
-            val ebiCurve = computeEbiBrakingCurveFromEbd(context, ebdCurve, beginPos, targetSpeed)
-            val fullIndicationCurveSvl =
-                computeIndicationBrakingCurveFromRef(
-                    context,
-                    ebiCurve,
-                    BrakingCurveType.SBD,
-                    guiCurve,
-                    beginPos
-                )
-            val indicationCurveSvl =
-                keepBrakingCurveUnderOverlay(fullIndicationCurveSvl, envelope, beginPos)
-            // val intersectionVmin = indicationCurve.interpolateSpeed(vMin)
-            // TODO: return min of the 2 indication curves: indicationCurveEOA and
-            // indicationCurveSVL.
-            //  If the foot of the min curve is reached before EOA, follow the min curve until
-            // Constants.vMin,
-            //  then maintain speed at Constants.vMin, then follow indicationCurveEOA whose foot is
-            // the EOA.
-            // indicationCurve = min(indicationCurve, indicationCurveSvl)
-        }
         builder.addPart(indicationCurve)
         beginPos = targetPosition
     }

@@ -10,8 +10,6 @@ const val dvEbiMax = 15.0 / 3.6 // m/s
 const val vEbiMin = 110.0 / 3.6 // m/s
 const val vEbiMax = 210.0 / 3.6 // m/s
 
-const val vMin = 4.0 / 3.6 // m/s, corresponds to dvWarning, is used as a min ceiling speed for SVL
-
 // Estimated acceleration during tBerem, worst case scenario (aEst2 is between 0 and 0.4),
 // expressed in m/s²
 const val aEst2 = 0.4
