@@ -190,7 +190,10 @@ const RollingStockEditorForm = ({
     }
 
     setErrorMessage('');
-    const payload = rollingStockEditorQueryArg(validRollingStockForm, effortCurves!);
+    const payload: RollingStockForm = {
+      ...rollingStockEditorQueryArg(validRollingStockForm, effortCurves!),
+      etcs_brake_params: rollingStockData?.etcs_brake_params,
+    };
     openModal(
       <RollingStockEditorFormModal
         setAddOrEditState={setAddOrEditState}

@@ -3109,6 +3109,7 @@ export type RollingStockForm = {
     Duration in s */
   electrical_power_startup_time?: number | null;
   energy_sources?: EnergySource[];
+  etcs_brake_params?: EtcsBrakeParams | null;
   /** Ratio 1:1 */
   inertia_coefficient: number;
   /** Length in m */
