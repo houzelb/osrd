@@ -78,19 +78,6 @@ export async function extractNumberFromString(input: string): Promise<number> {
 export const readJsonFile = (path: string) => JSON.parse(fs.readFileSync(path, 'utf8'));
 
 /**
- * Click on the specified element and waits for a specified delay after the click.
- *
- * @param element - locator object representing the element to click.
- * @param delay - Optional. The delay in milliseconds to wait after clicking the element. Defaults to 500ms.
- *
- * @returns {Promise<void>} - A promise that resolves after the element is clicked and the delay has passed.
- */
-export async function clickWithDelay(element: Locator, delay = 500): Promise<void> {
-  await element.click();
-  await element.page().waitForTimeout(delay);
-}
-
-/**
  * Generic function to handle input fields.
  *
  * @param {Locator} inputField - The locator for the input field to interact with.
@@ -120,17 +107,18 @@ export function formatDateToDayMonthYear(dateString: string, OSRDLanguage: strin
   });
   return formattedDate.replace('.', '');
 }
+
 /**
  * Waits until the infrastructure state becomes 'CACHED' before proceeding to the next step.
- * The function polls the `infra.state` every 10 seconds, up to a total of 3 minutes.
+ * The function polls the `infra.state` every 10 seconds, up to a total of 60 seconds.
  * Displays the total time taken for the state to reach 'CACHED'.
  *
  * @param infraId - The ID of the infrastructure to retrieve and check.
- * @throws {Error} - Throws an error if the state does not become 'CACHED' within 5 minutes.
+ * @throws {Error} - Throws an error if the state does not become 'CACHED' within 60 seconds.
  * @returns {Promise<void>} - Resolves when the state is 'CACHED'.
  */
 export const waitForInfraStateToBeCached = async (infraId: number): Promise<void> => {
-  const maxRetries = 18; // Total attempts (3 minutes / 10 seconds)
+  const maxRetries = 6; // Total attempts (60 seconds / 10 seconds)
   const delay = 10000; // Delay in milliseconds (10 seconds)
   const startTime = Date.now(); // Record start time
 

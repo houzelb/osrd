@@ -92,9 +92,8 @@ test.describe('Times and Stops Tab Verification', () => {
 
       // Setup train configuration and schedule
       await operationalStudiesPage.clickOnAddTrainButton();
-      await operationalStudiesPage.setTrainScheduleName('Train-name-e2e-test');
-      await page.waitForTimeout(500); // Wait for any async actions to complete
       await operationalStudiesPage.setTrainStartTime('11:22:40');
+      await operationalStudiesPage.setTrainScheduleName('Train-name-e2e-test');
       await rollingStockPage.selectRollingStock(dualModeRollingStockName);
 
       // Perform route pathfinding

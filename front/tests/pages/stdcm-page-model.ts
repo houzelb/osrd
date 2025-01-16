@@ -12,6 +12,7 @@ import {
   VIA_STOP_TIMES,
   VIA_STOP_TYPES,
 } from '../assets/stdcm-const';
+import { DOWNLOAD_SIMULATION_TIMEOUT, STDCM_SIMULATION_TIMEOUT } from '../assets/timeout-const';
 import { logger } from '../logging-fixture';
 import { handleAndVerifyInput, readJsonFile } from '../utils';
 import HomePage from './home-page-model';
@@ -35,7 +36,6 @@ export interface ConsistFields {
   maxSpeed?: string;
   speedLimitTag?: string;
 }
-const EXPECT_TO_PASS_TIMEOUT = 90_000; // Since toPass ignores custom expect timeouts, this timeout is set to account for all actions within the function.
 const MINIMUM_SIMULATION_NUMBER = 1;
 class STDCMPage extends HomePage {
   readonly debugButton: Locator;
@@ -609,11 +609,11 @@ class STDCMPage extends HomePage {
 
   // Launch the simulation and check if simulation-related elements are visible
   async launchSimulation(): Promise<void> {
-    await this.launchSimulationButton.waitFor({ state: 'visible' });
+    await this.launchSimulationButton.waitFor();
     await expect(this.launchSimulationButton).toBeEnabled();
     await this.launchSimulationButton.click({ force: true });
     // Wait for simulation elements to load and validate their presence
-    await this.simulationList.waitFor({ timeout: 60_000 });
+    await this.simulationList.waitFor({ timeout: STDCM_SIMULATION_TIMEOUT });
     const simulationElements = await this.simulationList.all();
 
     if (simulationElements.length < MINIMUM_SIMULATION_NUMBER) {
@@ -679,22 +679,20 @@ class STDCMPage extends HomePage {
   }
 
   async downloadSimulation(browserName: string) {
-    await expect(async () => {
-      const downloadPromise = this.page.waitForEvent('download');
-      await this.downloadSimulationButton.dispatchEvent('click');
-      const download = await downloadPromise.catch(() => {
-        throw new Error('Download event was not triggered.');
-      });
-
-      // Verify filename and save the download
-      const suggestedFilename = download.suggestedFilename();
-      expect(suggestedFilename).toMatch(/^Stdcm.*\.pdf$/);
-      const downloadPath = `./tests/stdcm-results/${browserName}/${suggestedFilename}`;
-      await download.saveAs(downloadPath);
-      logger.info(`The PDF was successfully downloaded to: ${downloadPath}`);
-    }).toPass({
-      timeout: EXPECT_TO_PASS_TIMEOUT,
+    const downloadPromise = this.page.waitForEvent('download', {
+      timeout: DOWNLOAD_SIMULATION_TIMEOUT,
     });
+    await this.downloadSimulationButton.dispatchEvent('click');
+    const download = await downloadPromise.catch(() => {
+      throw new Error('Download event was not triggered.');
+    });
+
+    // Verify filename and save the download
+    const suggestedFilename = download.suggestedFilename();
+    expect(suggestedFilename).toMatch(/^Stdcm.*\.pdf$/);
+    const downloadPath = `./tests/stdcm-results/${browserName}/${suggestedFilename}`;
+    await download.saveAs(downloadPath);
+    logger.info(`The PDF was successfully downloaded to: ${downloadPath}`);
   }
 
   async startNewQuery() {

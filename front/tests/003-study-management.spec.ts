@@ -16,9 +16,11 @@ test.describe('Validate the Study creation workflow', () => {
   let studyPage: StudyPage;
   let project: Project;
   let study: Study;
+
   test.beforeAll(' Retrieve a project', async () => {
     project = await getProject();
   });
+
   test.beforeEach(async ({ page }) => {
     studyPage = new StudyPage(page);
   });

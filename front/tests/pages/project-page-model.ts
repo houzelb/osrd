@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
-import CommonPage from './common-page-model';
+import HomePage from './home-page-model';
 import { cleanText } from '../utils/dataNormalizer';
 
 // Define the type for project details
@@ -13,7 +13,7 @@ type ProjectDetails = {
   tags: string[];
 };
 
-class ProjectPage extends CommonPage {
+class ProjectPage extends HomePage {
   readonly projectNameLabel: Locator;
 
   readonly updateProjectButton: Locator;

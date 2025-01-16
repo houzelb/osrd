@@ -93,7 +93,7 @@ class OperationalStudiesPage extends CommonPage {
   async setTrainStartTime(departureTime: string) {
     const currentDate = new Date().toISOString().split('T')[0];
     const startTime = `${currentDate}T${departureTime}`;
-    await this.startTimeField.waitFor({ state: 'visible' });
+    await this.startTimeField.waitFor();
     await this.startTimeField.fill(startTime);
     await expect(this.startTimeField).toHaveValue(startTime);
   }
@@ -107,7 +107,7 @@ class OperationalStudiesPage extends CommonPage {
   }
 
   async checkPathfindingDistance(distance: string | RegExp) {
-    await this.page.waitForSelector('[data-testid="result-pathfinding-distance"]');
+    await this.resultPathfindingDistance.waitFor();
     await expect(this.resultPathfindingDistance).toHaveText(distance);
   }
 

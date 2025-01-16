@@ -26,6 +26,7 @@ test.describe('Verify train schedule elements and filters', () => {
   const NOT_HONORED_TRAINS = 3;
   const VALID_AND_HONORED_TRAINS = 14;
   const INVALID_AND_NOT_HONORED_TRAINS = 0;
+
   test.beforeAll('Fetch project, study and scenario with train schedule', async () => {
     project = await getProject(trainScheduleProjectName);
     study = await getStudy(project.id, trainScheduleStudyName);

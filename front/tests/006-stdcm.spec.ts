@@ -51,7 +51,7 @@ test.describe('Verify train schedule elements and filters', () => {
     // Retrieve OSRD language and navigate to STDCM page
     stdcmPage = new STDCMPage(page);
     await page.goto('/stdcm');
-    await page.waitForLoadState('load', { timeout: 30 * 1000 });
+    await page.waitForLoadState();
     await stdcmPage.removeViteOverlay();
 
     // Wait for infra to be in 'CACHED' state before proceeding
