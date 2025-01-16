@@ -141,7 +141,7 @@ services:
       retries: 6
 
   gateway:
-    image: ghcr.io/openrailassociation/osrd-edge/osrd-gateway:${TAG-dev}-standalone
+    image: ghcr.io/openrailassociation/osrd-edge/osrd-gateway:${TAG-dev}-${GATEWAY_FLAVOR-standalone}
     container_name: osrd-gateway
     build:
       context: gateway

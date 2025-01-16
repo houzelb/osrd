@@ -27,7 +27,7 @@ jobs:
           - [core-build, core]
           - [editoast, editoast-test]
           - [gateway-test, gateway-standalone, gateway-front]
-          - [front-build, front-tests, front-devel, front-nginx]
+          - [front-build, front-tests, front-devel]
           - [osrdyne, osrdyne-test]
     steps:
       - name: Checkout
@@ -900,12 +900,6 @@ jobs:
       # https://www.jameskerr.blog/posts/sharing-steps-in-github-action-workflows/
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Download built front-tests image
-        if: needs.build.outputs.output_method == 'artifact'
-        uses: actions/download-artifact@v4
-        with:
-          name: front-tests
-          path: .
       - name: Download built editoast image
         if: needs.build.outputs.output_method == 'artifact'
         uses: actions/download-artifact@v4
@@ -918,18 +912,6 @@ jobs:
         with:
           name: core
           path: .
-      - name: Download built gateway-standalone image
-        if: needs.build.outputs.output_method == 'artifact'
-        uses: actions/download-artifact@v4
-        with:
-          name: gateway-standalone
-          path: .
-      - name: Download built front-nginx image
-        if: needs.build.outputs.output_method == 'artifact'
-        uses: actions/download-artifact@v4
-        with:
-          name: front-nginx
-          path: .
       - name: Download built osrdyne image
         if: needs.build.outputs.output_method == 'artifact'
         uses: actions/download-artifact@v4
@@ -939,11 +921,8 @@ jobs:
       - name: Load built images
         if: needs.build.outputs.output_method == 'artifact'
         run: |
-          docker load --input ./osrd-front-tests.tar
           docker load --input ./osrd-editoast.tar
           docker load --input ./osrd-core.tar
-          docker load --input ./osrd-gateway-standalone.tar
-          docker load --input ./osrd-front-nginx.tar
           docker load --input ./osrd-osrdyne.tar
       - name: Install poetry
         run: pipx install 'poetry<2.0'
@@ -961,14 +940,13 @@ jobs:
         id: start_integration_worker
         run: |
           set -e
-          export OSRD_FRONT_MODE=nginx
           export TAG='${{ needs.build.outputs.stable_version }}'
 
           # Inside /docker/osrdyne.yml, replace core_image "osrd-core:dev" with "osrd-core:$TAG"
           # to match the version of the core image we just built inside osrdyne
           sed -i "s/osrd-core:dev/osrd-core:$TAG/" docker/osrdyne.yml
 
-          services='editoast osrdyne front core gateway'
+          services='editoast osrdyne core'
           composes='-f docker-compose.yml'
           docker compose $composes pull --policy missing $services
           docker compose $composes up --no-build -d $services jaeger
@@ -1029,17 +1007,11 @@ jobs:
         with:
           name: core
           path: .
-      - name: Download built gateway-standalone image
+      - name: Download built gateway-front image
         if: needs.build.outputs.output_method == 'artifact'
         uses: actions/download-artifact@v4
         with:
-          name: gateway-standalone
-          path: .
-      - name: Download built front-nginx image
-        if: needs.build.outputs.output_method == 'artifact'
-        uses: actions/download-artifact@v4
-        with:
-          name: front-nginx
+          name: gateway-front
           path: .
       - name: Download built osrdyne image
         if: needs.build.outputs.output_method == 'artifact'
@@ -1053,8 +1025,7 @@ jobs:
           docker load --input ./osrd-front-tests.tar
           docker load --input ./osrd-editoast.tar
           docker load --input ./osrd-core.tar
-          docker load --input ./osrd-gateway-standalone.tar
-          docker load --input ./osrd-front-nginx.tar
+          docker load --input ./osrd-gateway-front.tar
           docker load --input ./osrd-osrdyne.tar
 
       - name: Detect Playwright version
@@ -1079,14 +1050,14 @@ jobs:
         id: start_playwright_worker
         run: |
           set -e
-          export OSRD_FRONT_MODE=nginx
           export TAG='${{ needs.build.outputs.stable_version }}'
+          export GATEWAY_FLAVOR='front'
 
           # Inside /docker/osrdyne.yml, replace core_image "osrd-core:dev" with "osrd-core:$TAG"
           # to match the version of the core image we just built inside osrdyne
           sed -i "s/osrd-core:dev/osrd-core:$TAG/" docker/osrdyne.yml
 
-          services='editoast osrdyne front core gateway'
+          services='editoast osrdyne core gateway'
           composes='-f docker-compose.yml'
           docker compose $composes pull --policy missing $services
           docker compose $composes up --no-build -d $services jaeger
