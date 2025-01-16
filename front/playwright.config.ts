@@ -12,13 +12,13 @@ export default defineConfig({
   testDir: './tests',
 
   /* Maximum time one test can run for. */
-  timeout: process.env.CI ? 90 * 1000 : 180 * 1000, // 90 seconds in CI, otherwise 180 seconds
+  timeout: 90_000,
   expect: {
     toHaveScreenshot: { maxDiffPixelRatio: 0.02 },
     /**
      * Maximum time expect() should wait for the condition to be met.
      */
-    timeout: process.env.CI ? 10 * 1000 : 30 * 1000, // 10 seconds in CI, otherwise 30 seconds
+    timeout: 10_000,
   },
 
   /* Run tests in files in parallel */
@@ -28,15 +28,17 @@ export default defineConfig({
    * running 50% of the available workers when in CI.
    * Otherwise, run tests with a single worker.
    */
-  workers: process.env.CI ? '50%' : 1,
+  workers: process.env.CI ? '50%' : 2,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry up to 2 times on CI, and 1 time otherwise */
-  retries: process.env.CI ? 2 : 1,
+  retries: process.env.CI ? 1 : 1,
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
-    actionTimeout: 0,
+    /* Maximum time each navigation action can take */
+    navigationTimeout: 30_000,
+    /* Maximum time each action such as `click()` can take */
+    actionTimeout: 15_000,
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env.BASE_URL || 'http://localhost:4000',
 

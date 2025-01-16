@@ -1,9 +1,9 @@
 import { type Locator, type Page, expect } from '@playwright/test';
 
+import CommonPage from './common-page-model';
 import enTranslations from '../../public/locales/en/operationalStudies/scenario.json';
 import frTranslations from '../../public/locales/fr/operationalStudies/scenario.json';
-import { clickWithDelay } from '../utils';
-import CommonPage from './common-page-model';
+import { SIMULATION_RESULT_TIMEOUT } from '../assets/timeout-const';
 
 class OperationalStudiesTimetablePage extends CommonPage {
   readonly invalidTrainsMessage: Locator;
@@ -41,6 +41,8 @@ class OperationalStudiesTimetablePage extends CommonPage {
 
   readonly scenarioSideMenu: Locator;
 
+  readonly simulationResult: Locator;
+
   constructor(page: Page) {
     super(page);
     this.invalidTrainsMessage = page.getByTestId('invalid-trains-message');
@@ -61,22 +63,12 @@ class OperationalStudiesTimetablePage extends CommonPage {
     this.scenarioCollapseButton = page.getByTestId('scenario-collapse-button');
     this.timetableCollapseButton = page.getByTestId('timetable-collapse-button');
     this.scenarioSideMenu = page.getByTestId('scenario-sidemenu');
-  }
-
-  // Function to wait for an element to be visible and then assert its visibility
-  static async waitForElementVisibility(locator: Locator): Promise<void> {
-    await locator.waitFor({ state: 'visible', timeout: 30 * 1000 });
-    await expect(locator).toBeVisible();
+    this.simulationResult = page.locator('.simulation-results');
   }
 
   // Get the button locator of a train element.
   static getTrainButton(trainSelector: Locator): Locator {
     return trainSelector.getByTestId('scenario-timetable-train-button');
-  }
-
-  // Wait for the simulation results to be in the DOM
-  async waitForSimulationResults(): Promise<void> {
-    await this.page.waitForSelector('.simulation-results', { state: 'attached' });
   }
 
   // Verify that the message "The timetable contains invalid trains" is visible
@@ -94,10 +86,10 @@ class OperationalStudiesTimetablePage extends CommonPage {
 
   // Verify that simulation results are displayed
   async verifySimulationResultsVisibility(): Promise<void> {
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState();
 
     const simulationResultsLocators = [
-      // TODO: remove this commented code when the design of simationBar has been changed
+      // TODO: remove this commented code when the design of simulation Bar has been changed
       // this.simulationBar,
       this.manchetteSpaceTimeChart,
       this.speedSpaceChart,
@@ -106,9 +98,9 @@ class OperationalStudiesTimetablePage extends CommonPage {
       this.timesStopsDataSheet,
     ];
     await Promise.all(
-      simulationResultsLocators.map((simulationResultsLocator) =>
-        OperationalStudiesTimetablePage.waitForElementVisibility(simulationResultsLocator)
-      )
+      simulationResultsLocators.map(async (simulationResultsLocator) => {
+        await expect(simulationResultsLocator).toBeVisible();
+      })
     );
   }
 
@@ -151,7 +143,7 @@ class OperationalStudiesTimetablePage extends CommonPage {
 
   // Verify that the imported train number is correct
   async verifyTrainCount(trainCount: number): Promise<void> {
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState();
     await expect(this.timetableTrains).toHaveCount(trainCount);
   }
 
@@ -200,8 +192,8 @@ class OperationalStudiesTimetablePage extends CommonPage {
     const trainCount = await this.timetableTrains.count();
 
     for (let currentTrainIndex = 0; currentTrainIndex < trainCount; currentTrainIndex += 1) {
-      await this.page.waitForLoadState('networkidle');
-      await this.waitForSimulationResults();
+      await this.page.waitForLoadState();
+      await this.simulationResult.waitFor();
       const trainButton = OperationalStudiesTimetablePage.getTrainButton(
         this.timetableTrains.nth(currentTrainIndex)
       );
@@ -210,9 +202,8 @@ class OperationalStudiesTimetablePage extends CommonPage {
     }
   }
 
-  async verifyTimesStopsDataSheetVisibility(timeout = 60 * 1000): Promise<void> {
-    // Wait for the Times and Stops simulation dataSheet to be fully loaded with a specified timeout (default: 60 seconds)
-    await expect(this.timesStopsDataSheet).toBeVisible({ timeout });
+  async verifyTimesStopsDataSheetVisibility(): Promise<void> {
+    await expect(this.timesStopsDataSheet).toBeVisible({ timeout: SIMULATION_RESULT_TIMEOUT });
     await this.timesStopsDataSheet.scrollIntoViewIfNeeded();
   }
 
@@ -234,13 +225,13 @@ class OperationalStudiesTimetablePage extends CommonPage {
 
   async clickOnScenarioCollapseButton() {
     await expect(this.scenarioCollapseButton).toBeVisible();
-    await clickWithDelay(this.scenarioCollapseButton);
+    await this.scenarioCollapseButton.click();
     await expect(this.scenarioSideMenu).toBeHidden();
   }
 
   async clickOnTimetableCollapseButton() {
     await expect(this.timetableCollapseButton).toBeVisible();
-    await clickWithDelay(this.timetableCollapseButton);
+    await this.timetableCollapseButton.click();
     await expect(this.scenarioSideMenu).toBeVisible();
   }
 }

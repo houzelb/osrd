@@ -3,6 +3,7 @@ import { type Locator, type Page, expect } from '@playwright/test';
 import OperationalStudiesTimetablePage from './op-timetable-page-model';
 import enTranslations from '../../public/locales/en/timesStops.json';
 import frTranslations from '../../public/locales/fr/timesStops.json';
+import { LOAD_PAGE_TIMEOUT } from '../assets/timeout-const';
 import { normalizeData, type StationData } from '../utils/dataNormalizer';
 
 class OperationalStudiesOutputTablePage extends OperationalStudiesTimetablePage {
@@ -45,7 +46,7 @@ class OperationalStudiesOutputTablePage extends OperationalStudiesTimetablePage 
     // Iterate through each active row and extract data based on header mappings
     for (let rowIndex = 1; rowIndex < rowCount; rowIndex += 1) {
       const row = this.tableRows.nth(rowIndex);
-      await row.waitFor({ state: 'visible' });
+      await row.waitFor();
 
       // Extract cells from the current row
       const cells = row.locator('.dsg-cell.dsg-cell-disabled');
@@ -142,11 +143,10 @@ class OperationalStudiesOutputTablePage extends OperationalStudiesTimetablePage 
     expect(normalizedActualData).toEqual(normalizedExpectedData);
   }
 
-  // Wait for the Times and Stops simulation data sheet to be fully loaded with a specified timeout (default: 60 seconds)
-  async verifyTimesStopsDataSheetVisibility(timeout = 60 * 1000): Promise<void> {
-    await this.timesStopsDataSheet.waitFor({ state: 'visible', timeout });
-    await this.page.waitForTimeout(1000); // Short delay for stabilization
-    await this.timesStopsDataSheet.scrollIntoViewIfNeeded({ timeout });
+  // Wait for the Times and Stops simulation data sheet to be fully loaded
+  async verifyTimesStopsDataSheetVisibility(): Promise<void> {
+    await this.timesStopsDataSheet.waitFor({ timeout: LOAD_PAGE_TIMEOUT });
+    await this.timesStopsDataSheet.scrollIntoViewIfNeeded();
   }
 }
 
