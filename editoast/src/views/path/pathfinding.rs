@@ -476,8 +476,7 @@ pub mod tests {
                 "rolling_stock_supported_electrifications":[],
                 "rolling_stock_supported_signaling_systems":["BAL","BAPR"],
                 "rolling_stock_maximum_speed":22.00,
-                "rolling_stock_length":26.00,
-                "stop_at_next_signal":false
+                "rolling_stock_length":26.00
             }));
 
         let pathfinding_result: PathfindingResult =
@@ -522,8 +521,7 @@ pub mod tests {
                 "rolling_stock_supported_electrifications":[],
                 "rolling_stock_supported_signaling_systems":["BAL","BAPR"],
                 "rolling_stock_maximum_speed":22.00,
-                "rolling_stock_length":26.00,
-                "stop_at_next_signal": false
+                "rolling_stock_length":26.00
             }));
 
         let pathfinding_result: PathfindingResult =
@@ -585,8 +583,7 @@ pub mod tests {
                 "rolling_stock_supported_electrifications":[],
                 "rolling_stock_supported_signaling_systems":["BAL","BAPR"],
                 "rolling_stock_maximum_speed":22.00,
-                "rolling_stock_length":26.00,
-                "stop_at_next_signal":false
+                "rolling_stock_length":26.00
             }));
 
         let pathfinding_result: PathfindingResult =
