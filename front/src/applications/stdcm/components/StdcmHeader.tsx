@@ -38,8 +38,8 @@ const StdcmHeader = ({
           {t('stdcm:notificationTitle')}
         </span>
       </div>
-      {isSuperUser && (
-        <div className="stdcm-header__debug">
+      <div className="stdcm-header__debug">
+        {isSuperUser && (
           <button
             data-testid="stdcm-debug-button"
             type="button"
@@ -49,17 +49,17 @@ const StdcmHeader = ({
           >
             <Bug />
           </button>
-          <button
-            type="button"
-            data-testid="stdcm-help-button"
-            aria-label="stdcm-help"
-            className={cx('ml-4 px-3', { selected: showHelpModule })}
-            onClick={() => toggleHelpModule()}
-          >
-            {t('translation:common.help')}
-          </button>
-        </div>
-      )}
+        )}
+        <button
+          type="button"
+          data-testid="stdcm-help-button"
+          aria-label="stdcm-help"
+          className={cx('ml-4 px-3', { selected: showHelpModule })}
+          onClick={() => toggleHelpModule()}
+        >
+          {t('translation:common.help')}
+        </button>
+      </div>
     </div>
   );
 };
