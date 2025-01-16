@@ -11,7 +11,7 @@ import {
   getScenario,
   getProject,
 } from './api-setup';
-import { logger } from '../test-logger';
+import { logger } from '../logging-fixture';
 
 /**
  * Delete infrastructure by name if it exists.

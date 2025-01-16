@@ -9,10 +9,10 @@ import type {
 } from 'common/api/osrdEditoastApi';
 
 import { electricRollingStockName } from './assets/project-const';
+import test from './logging-fixture';
 import RoutePage from './pages/op-route-page-model';
 import OperationalStudiesPage from './pages/operational-studies-page-model';
 import RollingStockSelectorPage from './pages/rollingstock-selector-page-model';
-import test from './test-logger';
 import { waitForInfraStateToBeCached } from './utils';
 import { getInfra, getRollingStock } from './utils/api-setup';
 import createScenario from './utils/scenario';
@@ -20,6 +20,9 @@ import { deleteScenario } from './utils/teardown-utils';
 
 test.describe('Verify simulation configuration in operational studies', () => {
   test.slow();
+  let rollingstockPage: RollingStockSelectorPage;
+  let operationalStudiesPage: OperationalStudiesPage;
+  let routePage: RoutePage;
   let project: Project;
   let study: Study;
   let scenario: Scenario;
@@ -31,7 +34,13 @@ test.describe('Verify simulation configuration in operational studies', () => {
     infra = await getInfra();
   });
 
-  test.beforeEach('Set up the project, study, and scenario', async () => {
+  test.beforeEach('Set up the project, study, and scenario', async ({ page }) => {
+    [rollingstockPage, operationalStudiesPage, routePage] = [
+      new RollingStockSelectorPage(page),
+      new OperationalStudiesPage(page),
+      new RoutePage(page),
+    ];
+
     ({ project, study, scenario } = await createScenario());
   });
 
@@ -42,11 +51,6 @@ test.describe('Verify simulation configuration in operational studies', () => {
   /** *************** Test **************** */
   test('Pathfinding with rolling stock and composition code', async ({ page }) => {
     // Page models
-    const [rollingstockPage, operationalStudiesPage, routePage] = [
-      new RollingStockSelectorPage(page),
-      new OperationalStudiesPage(page),
-      new RoutePage(page),
-    ];
 
     // Navigate to the scenario page for the given project and study
     await page.goto(

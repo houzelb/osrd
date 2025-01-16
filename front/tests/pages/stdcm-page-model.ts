@@ -12,8 +12,9 @@ import {
   VIA_STOP_TIMES,
   VIA_STOP_TYPES,
 } from '../assets/stdcm-const';
-import { logger } from '../test-logger';
+import { logger } from '../logging-fixture';
 import { handleAndVerifyInput, readJsonFile } from '../utils';
+import HomePage from './home-page-model';
 
 interface TableRow {
   index: number;
@@ -36,9 +37,7 @@ export interface ConsistFields {
 }
 const EXPECT_TO_PASS_TIMEOUT = 90_000; // Since toPass ignores custom expect timeouts, this timeout is set to account for all actions within the function.
 const MINIMUM_SIMULATION_NUMBER = 1;
-class STDCMPage {
-  readonly page: Page;
-
+class STDCMPage extends HomePage {
   readonly debugButton: Locator;
 
   readonly notificationHeader: Locator;
@@ -160,7 +159,7 @@ class STDCMPage {
   readonly helpButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.notificationHeader = page.locator('#notification');
     this.debugButton = page.getByTestId('stdcm-debug-button');
     this.helpButton = page.getByTestId('stdcm-help-button');

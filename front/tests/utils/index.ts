@@ -4,7 +4,7 @@ import { type Locator, type Page, expect } from '@playwright/test';
 import { v4 as uuidv4 } from 'uuid';
 
 import { getInfraById } from './api-setup';
-import { logger } from '../test-logger';
+import { logger } from '../logging-fixture';
 
 /**
  * Fill the input field identified by ID or TestID with the specified value and verifies it.
@@ -89,6 +89,7 @@ export async function clickWithDelay(element: Locator, delay = 500): Promise<voi
   await element.click();
   await element.page().waitForTimeout(delay);
 }
+
 /**
  * Generic function to handle input fields.
  *

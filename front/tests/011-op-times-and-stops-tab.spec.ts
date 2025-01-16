@@ -3,13 +3,12 @@ import { expect } from '@playwright/test';
 import type { Infra, Project, Scenario, Study } from 'common/api/osrdEditoastApi';
 
 import { dualModeRollingStockName } from './assets/project-const';
-import HomePage from './pages/home-page-model';
+import test from './logging-fixture';
 import OperationalStudiesInputTablePage from './pages/op-input-table-page-model';
 import OperationalStudiesOutputTablePage from './pages/op-output-table-page-model';
 import RoutePage from './pages/op-route-page-model';
 import OperationalStudiesPage from './pages/operational-studies-page-model';
 import RollingStockSelectorPage from './pages/rollingstock-selector-page-model';
-import test from './test-logger';
 import { readJsonFile, waitForInfraStateToBeCached } from './utils';
 import { getInfra } from './utils/api-setup';
 import { cleanWhitespace, cleanWhitespaceInArray, type StationData } from './utils/dataNormalizer';
@@ -23,12 +22,15 @@ test.describe('Times and Stops Tab Verification', () => {
   test.slow();
   // Set viewport to ensure correct element visibility and interaction
   test.use({ viewport: { width: 1920, height: 1080 } });
-
+  let operationalStudiesPage: OperationalStudiesPage;
+  let rollingStockPage: RollingStockSelectorPage;
+  let routePage: RoutePage;
+  let opInputTablePage: OperationalStudiesInputTablePage;
+  let opOutputTablePage: OperationalStudiesOutputTablePage;
   let project: Project;
   let study: Study;
   let scenario: Scenario;
   let infra: Infra;
-  let OSRDLanguage: string;
 
   // Load test data for table inputs and expected results
   const initialInputsData: CellData[] = readJsonFile(
@@ -70,16 +72,13 @@ test.describe('Times and Stops Tab Verification', () => {
   test.beforeEach(
     'Navigate to Times and Stops tab with rolling stock and route set',
     async ({ page }) => {
-      const [operationalStudiesPage, routePage, rollingStockPage, homePage] = [
+      [operationalStudiesPage, routePage, rollingStockPage, opInputTablePage, opOutputTablePage] = [
         new OperationalStudiesPage(page),
         new RoutePage(page),
         new RollingStockSelectorPage(page),
-        new HomePage(page),
+        new OperationalStudiesInputTablePage(page),
+        new OperationalStudiesOutputTablePage(page),
       ];
-
-      await homePage.goToHomePage();
-      OSRDLanguage = await homePage.getOSRDLanguage();
-
       // Set up scenario for operational study
       ({ project, study, scenario } = await createScenario());
 
@@ -113,15 +112,9 @@ test.describe('Times and Stops Tab Verification', () => {
   });
 
   test('should correctly set and display times and stops tables', async ({ page }) => {
-    const [opInputTablePage, opOutputTablePage, operationalStudiesPage, routePage] = [
-      new OperationalStudiesInputTablePage(page),
-      new OperationalStudiesOutputTablePage(page),
-      new OperationalStudiesPage(page),
-      new RoutePage(page),
-    ];
-
     // Set translations based on selected language
-    const translations = OSRDLanguage === 'English' ? enTranslations : frTranslations;
+    const PROJECT_LANGUAGE = process.env.PROJECT_LANGUAGE || '';
+    const translations = PROJECT_LANGUAGE === 'English' ? enTranslations : frTranslations;
     const expectedColumnNames = cleanWhitespaceInArray([
       translations.name,
       translations.ch,
@@ -148,7 +141,7 @@ test.describe('Times and Stops Tab Verification', () => {
         cell.stationName,
         translatedHeader,
         cell.value,
-        OSRDLanguage,
+        PROJECT_LANGUAGE,
         cell.marginForm
       );
     }
@@ -177,17 +170,12 @@ test.describe('Times and Stops Tab Verification', () => {
 
     // Scroll and extract output table data for verification
     await scrollContainer(page, '.time-stop-outputs .time-stops-datasheet .dsg-container');
-    await opOutputTablePage.getOutputTableData(outputExpectedCellData, OSRDLanguage);
+    await opOutputTablePage.getOutputTableData(outputExpectedCellData, PROJECT_LANGUAGE);
   });
 
-  test('should correctly update and clear input table row', async ({ page }) => {
-    const [opInputTablePage, operationalStudiesPage, routePage] = [
-      new OperationalStudiesInputTablePage(page),
-      new OperationalStudiesPage(page),
-      new RoutePage(page),
-    ];
-
-    const translations = OSRDLanguage === 'English' ? enTranslations : frTranslations;
+  test('should correctly update and clear input table row', async () => {
+    const PROJECT_LANGUAGE = process.env.PROJECT_LANGUAGE || '';
+    const translations = PROJECT_LANGUAGE === 'English' ? enTranslations : frTranslations;
 
     // Fill table cells with initial input data
     for (const cell of initialInputsData) {
@@ -196,7 +184,7 @@ test.describe('Times and Stops Tab Verification', () => {
         cell.stationName,
         translatedHeader,
         cell.value,
-        OSRDLanguage,
+        PROJECT_LANGUAGE,
         cell.marginForm
       );
     }
@@ -211,7 +199,7 @@ test.describe('Times and Stops Tab Verification', () => {
         cell.stationName,
         translatedHeader,
         cell.value,
-        OSRDLanguage,
+        PROJECT_LANGUAGE,
         cell.marginForm
       );
     }
