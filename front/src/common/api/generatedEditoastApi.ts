@@ -1700,7 +1700,7 @@ export type PostTimetableByIdStdcmApiArg = {
     loading_gauge_type?: LoadingGaugeType | null;
     /** Can be a percentage `X%`, a time in minutes per 100 kilometer `Xmin/100km` */
     margin?: string | null;
-    /** Maximum speed of the consist in km/h */
+    /** Maximum speed of the consist in m/s */
     max_speed?: number | null;
     /** By how long we can shift the departure time in milliseconds
         Deprecated, first step data should be used instead */

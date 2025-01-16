@@ -9,6 +9,7 @@ use editoast_schemas::train_schedule::PathItem;
 use editoast_schemas::train_schedule::PathItemLocation;
 use itertools::Itertools;
 use serde::Deserialize;
+use serde::Deserializer;
 use serde::Serialize;
 use utoipa::ToSchema;
 use validator::Validate;
@@ -103,15 +104,60 @@ pub(super) struct Request {
     #[schema(value_type = Option<String>, example = json!(["5%", "2min/100km"]))]
     pub(super) margin: Option<MarginValue>,
     /// Total mass of the consist in kg
-    #[validate(range(exclusive_min = 0.0))]
+    #[serde(default, deserialize_with = "total_mass_parse")]
     pub(super) total_mass: Option<f64>,
     /// Total length of the consist in meters
-    #[validate(range(exclusive_min = 0.0))]
+    #[serde(default, deserialize_with = "total_length_parse")]
     pub(super) total_length: Option<f64>,
-    /// Maximum speed of the consist in km/h
-    #[validate(range(exclusive_min = 0.0))]
+    /// Maximum speed of the consist in m/s
+    #[serde(default, deserialize_with = "max_speed_parse")]
     pub(super) max_speed: Option<f64>,
     pub(super) loading_gauge_type: Option<LoadingGaugeType>,
+}
+
+fn range_parse<'de, D>(min: f64, max: f64, de: D) -> Result<Option<f64>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let value: Option<f64> = Deserialize::deserialize(de)?;
+    if let Some(val) = value {
+        if val < min || val > max {
+            return Err(serde::de::Error::custom(format!(
+                "Value must be between {} and {}",
+                min, max
+            )));
+        }
+    }
+    Ok(value)
+}
+
+pub fn total_mass_parse<'de, D>(de: D) -> Result<Option<f64>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    range_parse(20000.0, 10000000.0, de)
+}
+
+pub fn total_length_parse<'de, D>(de: D) -> Result<Option<f64>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    range_parse(5.0, 750.0, de)
+}
+
+pub fn max_speed_parse<'de, D>(de: D) -> Result<Option<f64>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let value: Option<f64> = Deserialize::deserialize(de)?;
+    if let Some(max_speed) = value {
+        if max_speed < 8.33 {
+            return Err(serde::de::Error::custom(
+                "Value must be greater than 8.33m/s",
+            ));
+        }
+    }
+    Ok(value)
 }
 
 impl Request {

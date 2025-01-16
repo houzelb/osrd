@@ -2793,7 +2793,7 @@ paths:
                 max_speed:
                   type: number
                   format: double
-                  description: Maximum speed of the consist in km/h
+                  description: Maximum speed of the consist in m/s
                   nullable: true
                 maximum_departure_delay:
                   type: integer
@@ -8978,7 +8978,7 @@ components:
         max_speed:
           type: number
           format: double
-          description: Maximum speed of the consist in km/h
+          description: Maximum speed of the consist in m/s
           nullable: true
         maximum_departure_delay:
           type: integer
