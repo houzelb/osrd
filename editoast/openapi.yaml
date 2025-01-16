@@ -9410,6 +9410,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EnergySource'
+        etcs_brake_params:
+          allOf:
+          - $ref: '#/components/schemas/EtcsBrakeParams'
+          nullable: true
         inertia_coefficient:
           type: number
           format: double
