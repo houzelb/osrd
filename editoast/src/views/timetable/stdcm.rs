@@ -216,11 +216,11 @@ async fn stdcm(
     //                           tA                     tB
     //       LMR Train           |----------------------|
     // Train 1            |--------------|
-    // Train 2      |------------|
-    //                                        |----------?   Train 3
-    // Train 4        |-------?
+    // Train 2   |------------|
+    //                                                      |----------?   Train 3
+    // Train 4      |-------?
     //                         Train 5  |---------?
-    //                                       |----------?   Train 6
+    //                                                        |----------?   Train 6
 
     // Step 1 (SQL Filter):
     // Trains that depart after the latest arrival time of the LMR train are excluded.
