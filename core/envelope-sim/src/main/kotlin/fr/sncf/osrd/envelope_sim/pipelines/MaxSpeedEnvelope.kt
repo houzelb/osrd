@@ -135,19 +135,17 @@ object MaxSpeedEnvelope {
         var envelope = curveWithDecelerations
         val stops = makeSimStops(context, stopPositions, envelope)
         envelope = addETCSStopBrakingCurves(etcsSimulator, context, envelope, stops)
-        envelope = addConstStopBrakingCurves(etcsSimulator, context, envelope, stops)
+        envelope = addConstStopBrakingCurves(context, envelope, stops)
         return envelope
     }
 
     /** Generate braking curves overlay at every stop position */
     private fun addConstStopBrakingCurves(
-        etcsSimulator: ETCSBrakingSimulator,
         context: EnvelopeSimContext,
         curveWithDecelerations: Envelope,
         stops: List<SimStop>,
     ): Envelope {
         var envelope = curveWithDecelerations
-        envelope = addETCSStopBrakingCurves(etcsSimulator, context, envelope, stops)
         for (stop in stops) {
             if (stop.isETCS) continue // Already handled
             val partBuilder = EnvelopePartBuilder()
