@@ -840,8 +840,8 @@ pub mod tests {
 
         assert_eq!(rolling_stock.name, rs_name);
         assert_eq!(
-            fast_rolling_stock_form.startup_time,
-            rolling_stock.startup_time
+            rolling_stock.startup_time,
+            fast_rolling_stock_form.startup_time.unwrap(),
         );
     }
 
@@ -1024,7 +1024,7 @@ pub mod tests {
 
         let rs_name = "fast_rolling_stock_name";
         let mut fast_rolling_stock_form = fast_rolling_stock_form(rs_name);
-        fast_rolling_stock_form.base_power_class = Some("".to_string());
+        fast_rolling_stock_form.base_power_class = Some(Some("".to_string()));
 
         let request = app.rolling_stock_create_request(&fast_rolling_stock_form);
 
