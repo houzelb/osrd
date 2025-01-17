@@ -74,6 +74,8 @@ struct PathfindingInput {
     /// Rolling stock length
     #[schema(value_type = f64)]
     rolling_stock_length: OrderedFloat<f64>,
+    /// Stops the train at next signal instead of on path item
+    stop_at_next_signal: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, ToSchema)]
@@ -328,6 +330,7 @@ fn build_pathfinding_request(
             .clone(),
         rolling_stock_maximum_speed: pathfinding_input.rolling_stock_maximum_speed.0,
         rolling_stock_length: pathfinding_input.rolling_stock_length.0,
+        stop_at_next_signal: pathfinding_input.stop_at_next_signal,
     })
 }
 
@@ -406,6 +409,7 @@ pub async fn pathfinding_from_train_batch(
                 .into_iter()
                 .map(|item| item.location)
                 .collect(),
+            stop_at_next_signal: train_schedule.options.stops_at_next_signal(),
         };
         to_compute.push(path_input);
         to_compute_index.push(index);

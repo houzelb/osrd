@@ -42,6 +42,8 @@ pub struct PathfindingRequest {
     pub rolling_stock_maximum_speed: f64,
     /// Rolling stock length in meters:
     pub rolling_stock_length: f64,
+    /// If the train should stop on the next signal instead of on the operational point
+    pub stop_at_next_signal: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, ToSchema)]

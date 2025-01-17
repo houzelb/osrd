@@ -18,6 +18,7 @@ import fr.sncf.osrd.stdcm.graph.extendLookaheadUntil
 import fr.sncf.osrd.stdcm.infra_exploration.initInfraExplorer
 import fr.sncf.osrd.utils.*
 import fr.sncf.osrd.utils.indexing.*
+import fr.sncf.osrd.utils.units.Distance.Companion.min
 import fr.sncf.osrd.utils.units.Length
 import fr.sncf.osrd.utils.units.Offset
 import fr.sncf.osrd.utils.units.meters
@@ -80,10 +81,25 @@ fun runPathfinding(
 ): PathfindingBlockResponse {
     // Parse the waypoints
     val waypoints = ArrayList<Collection<PathfindingEdgeLocationId<Block>>>()
-    for (step in request.pathItems) {
+    request.pathItems.forEachIndexed { stepIndex, step ->
         val allStarts = HashSet<PathfindingEdgeLocationId<Block>>()
         for (direction in Direction.entries) {
-            for (waypoint in step) allStarts.addAll(findWaypointBlocks(infra, waypoint, direction))
+            for (waypoint in step) {
+                val waypointBlocks = findWaypointBlocks(infra, waypoint, direction)
+                if (request.stopAtNextSignal && stepIndex != 0) {
+                    allStarts.addAll(
+                        waypointBlocks.map {
+                            findNextSignalBlockOnWaypointBlock(
+                                it,
+                                infra,
+                                request.rollingStockLength
+                            )
+                        }
+                    )
+                } else {
+                    allStarts.addAll(waypointBlocks)
+                }
+            }
         }
         waypoints.add(allStarts)
     }
@@ -368,4 +384,38 @@ private fun getBlockOffset(
     throw AssertionError(
         String.format("getBlockOffset: Track chunk %s not in block %s", trackChunkId, blockId)
     )
+}
+
+/**
+ * Returns the block of the signal next to a waypoint block.
+ *
+ * @param waypointBlock waypoint block.
+ * @param infra full infra.
+ * @param rollingStockLength length of the rolling stock.
+ * @return next signal block.
+ */
+fun findNextSignalBlockOnWaypointBlock(
+    waypointBlock: PathfindingEdgeLocationId<Block>,
+    infra: FullInfra,
+    rollingStockLength: Double
+): PathfindingEdgeLocationId<Block> {
+    val nextSignalOffset =
+        getNextSignalOffset(waypointBlock.edge, waypointBlock.offset, infra, rollingStockLength)
+    return PathfindingEdgeLocationId(waypointBlock.edge, nextSignalOffset)
+}
+
+private fun getNextSignalOffset(
+    blockId: BlockId,
+    blockOffset: Offset<Block>,
+    infra: FullInfra,
+    rollingStockLength: Double
+): Offset<Block> {
+    val signalsPositions = infra.blockInfra.getSignalsPositions(blockId)
+    val blockLength = infra.blockInfra.getBlockLength(blockId).distance
+    val nextSignalPosition = signalsPositions.firstOrNull { it.distance >= blockOffset.distance }
+
+    val minTailOffset = blockOffset.distance + rollingStockLength.meters
+    val maxHeadOffset = nextSignalPosition?.distance ?: blockLength
+
+    return Offset(min(minTailOffset, maxHeadOffset))
 }

@@ -170,11 +170,18 @@ class PowerRestrictionRanges(RootModel):
 
 
 class TrainScheduleOptions(BaseModel):
-    """Optional arguments for the standalone simulation."""
+    """Optional arguments :
+    - `ignore_electrical_profiles` : for the standalone simulation
+    - `stop_at_next_signal` : for dealing with stopped trains that overflow on switches during imports
+    """
 
     ignore_electrical_profiles: bool = Field(
         default=False,
         description="If true, the electrical profiles are ignored in the standalone simulation",
+    )
+    stop_at_next_signal: bool = Field(
+        default=False,
+        description="If true, the train will stop at the next signal instead of at the operational point",
     )
 
 
