@@ -20,6 +20,7 @@ internal fun internalBuildBlocks(
     val signalDelimiters = findSignalDelimiters(rawSignalingInfra, loadedSignalInfra)
     val detectorEntrySignals = makeDetectorEntrySignals(loadedSignalInfra, signalDelimiters)
     val missingSignalLogAggregator = LogAggregator({ logger.debug(it) })
+    val nonRouteDelimitingSignalLogAggregator = LogAggregator({ logger.debug(it) })
     val result =
         blockInfraBuilder(loadedSignalInfra, rawSignalingInfra) {
             // Step 2) iterate on zone paths along the route path.
@@ -106,12 +107,14 @@ internal fun internalBuildBlocks(
                         detectorEntrySignals,
                         sigModuleManager,
                         rawSignalingInfra,
-                        loadedSignalInfra
+                        loadedSignalInfra,
+                        nonRouteDelimitingSignalLogAggregator
                     )
                 }
             }
         }
     missingSignalLogAggregator.logAggregatedSummary()
+    nonRouteDelimitingSignalLogAggregator.logAggregatedSummary()
     return result
 }
 
@@ -354,7 +357,8 @@ private fun warnOnRouteEndingOnNonRouteDelimitingSignal(
     detectorSignals: IdxMap<DirDetectorId, IdxMap<SignalingSystemId, AssociatedSignal>>,
     sigModuleManager: InfraSigSystemManager,
     rawSignalingInfra: RawSignalingInfra,
-    loadedSignalInfra: LoadedSignalInfra
+    loadedSignalInfra: LoadedSignalInfra,
+    logAggregator: LogAggregator
 ) {
     val endSignals = detectorSignals[routeExitDet] ?: return
     for (associatedSignal in endSignals.values()) {
@@ -364,9 +368,9 @@ private fun warnOnRouteEndingOnNonRouteDelimitingSignal(
         val routeEndsWithRouteEndingSignal =
             sigModuleManager.isRouteDelimiter(signalingSystem, sigSettings)
         if (!routeEndsWithRouteEndingSignal) {
-            logger.debug {
+            logAggregator.registerError(
                 "Route ${rawSignalingInfra.getRouteName(route)} ends with non-route delimiting signal on signaling system ${signalingSystem}"
-            }
+            )
         }
     }
 }
