@@ -27,7 +27,7 @@ import type {
 import electricalProfileSet from '../assets/operationStudies/simulationSettings/electricalProfiles/electricalProfile.json';
 import { globalProjectName, globalStudyName, infrastructureName } from '../assets/project-const';
 import towedRollingStockData from '../assets/stdcm/towedRollingStock/towedRollingStock.json';
-import { logger } from '../test-logger';
+import { logger } from '../logging-fixture';
 
 /**
  * Initialize a new API request context with the base URL.

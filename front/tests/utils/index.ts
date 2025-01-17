@@ -4,7 +4,7 @@ import { type Locator, type Page, expect } from '@playwright/test';
 import { v4 as uuidv4 } from 'uuid';
 
 import { getInfraById } from './api-setup';
-import { logger } from '../test-logger';
+import { logger } from '../logging-fixture';
 
 /**
  * Fill the input field identified by ID or TestID with the specified value and verifies it.
@@ -77,18 +77,6 @@ export async function extractNumberFromString(input: string): Promise<number> {
  */
 export const readJsonFile = (path: string) => JSON.parse(fs.readFileSync(path, 'utf8'));
 
-/**
- * Click on the specified element and waits for a specified delay after the click.
- *
- * @param element - locator object representing the element to click.
- * @param delay - Optional. The delay in milliseconds to wait after clicking the element. Defaults to 500ms.
- *
- * @returns {Promise<void>} - A promise that resolves after the element is clicked and the delay has passed.
- */
-export async function clickWithDelay(element: Locator, delay = 500): Promise<void> {
-  await element.click();
-  await element.page().waitForTimeout(delay);
-}
 /**
  * Generic function to handle input fields.
  *

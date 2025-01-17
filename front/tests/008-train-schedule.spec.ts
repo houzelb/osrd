@@ -5,19 +5,18 @@ import {
   trainScheduleScenarioName,
   trainScheduleStudyName,
 } from './assets/project-const';
-import HomePage from './pages/home-page-model';
+import test from './logging-fixture';
 import OperationalStudiesTimetablePage from './pages/op-timetable-page-model';
-import test from './test-logger';
 import { waitForInfraStateToBeCached } from './utils';
 import { getInfra, getProject, getScenario, getStudy } from './utils/api-setup';
 
 test.describe('Verify train schedule elements and filters', () => {
   test.slow();
+  let opTimetablePage: OperationalStudiesTimetablePage;
   let project: Project;
   let study: Study;
   let scenario: Scenario;
   let infra: Infra;
-  let OSRDLanguage: string;
 
   // Constants for expected train counts
   const TOTAL_TRAINS = 21;
@@ -27,6 +26,7 @@ test.describe('Verify train schedule elements and filters', () => {
   const NOT_HONORED_TRAINS = 3;
   const VALID_AND_HONORED_TRAINS = 14;
   const INVALID_AND_NOT_HONORED_TRAINS = 0;
+
   test.beforeAll('Fetch project, study and scenario with train schedule', async () => {
     project = await getProject(trainScheduleProjectName);
     study = await getStudy(project.id, trainScheduleStudyName);
@@ -35,9 +35,7 @@ test.describe('Verify train schedule elements and filters', () => {
   });
 
   test.beforeEach('Navigate to scenario page before each test', async ({ page }) => {
-    const homePage = new HomePage(page);
-    await homePage.goToHomePage();
-    OSRDLanguage = await homePage.getOSRDLanguage();
+    opTimetablePage = new OperationalStudiesTimetablePage(page);
     await page.goto(
       `/operational-studies/projects/${project.id}/studies/${study.id}/scenarios/${scenario.id}`
     );
@@ -46,47 +44,54 @@ test.describe('Verify train schedule elements and filters', () => {
   });
 
   /** *************** Test 1 **************** */
-  test('Loading trains and verifying simulation result', async ({ page }) => {
-    const opTimetablePage = new OperationalStudiesTimetablePage(page);
-
+  test('Loading trains and verifying simulation result', async () => {
+    const PROJECT_LANGUAGE = process.env.PROJECT_LANGUAGE || '';
     // Verify train count, invalid train messages, and train simulation results
     await opTimetablePage.verifyTrainCount(TOTAL_TRAINS);
-    await opTimetablePage.verifyInvalidTrainsMessageVisibility(OSRDLanguage);
+    await opTimetablePage.verifyInvalidTrainsMessageVisibility(PROJECT_LANGUAGE);
     await opTimetablePage.checkSelectedTimetableTrain();
-    await opTimetablePage.filterValidityAndVerifyTrainCount(OSRDLanguage, 'Valid', VALID_TRAINS);
+    await opTimetablePage.filterValidityAndVerifyTrainCount(
+      PROJECT_LANGUAGE,
+      'Valid',
+      VALID_TRAINS
+    );
     await opTimetablePage.verifyEachTrainSimulation();
   });
 
   /** *************** Test 2 **************** */
-  test('Filtering imported trains', async ({ page }) => {
-    const opTimetablePage = new OperationalStudiesTimetablePage(page);
+  test('Filtering imported trains', async () => {
+    const PROJECT_LANGUAGE = process.env.PROJECT_LANGUAGE || '';
 
     // Verify train count and apply different filters for validity and honored status
     await opTimetablePage.verifyTrainCount(TOTAL_TRAINS);
     await opTimetablePage.filterValidityAndVerifyTrainCount(
-      OSRDLanguage,
+      PROJECT_LANGUAGE,
       'Invalid',
       INVALID_TRAINS
     );
-    await opTimetablePage.filterValidityAndVerifyTrainCount(OSRDLanguage, 'All', TOTAL_TRAINS);
-    await opTimetablePage.filterHonoredAndVerifyTrainCount(OSRDLanguage, 'Honored', HONORED_TRAINS);
+    await opTimetablePage.filterValidityAndVerifyTrainCount(PROJECT_LANGUAGE, 'All', TOTAL_TRAINS);
+    await opTimetablePage.filterHonoredAndVerifyTrainCount(
+      PROJECT_LANGUAGE,
+      'Honored',
+      HONORED_TRAINS
+    );
     await opTimetablePage.filterValidityAndVerifyTrainCount(
-      OSRDLanguage,
+      PROJECT_LANGUAGE,
       'Valid',
       VALID_AND_HONORED_TRAINS
     );
     await opTimetablePage.filterHonoredAndVerifyTrainCount(
-      OSRDLanguage,
+      PROJECT_LANGUAGE,
       'Not honored',
       NOT_HONORED_TRAINS
     );
     await opTimetablePage.filterValidityAndVerifyTrainCount(
-      OSRDLanguage,
+      PROJECT_LANGUAGE,
       'Invalid',
       INVALID_AND_NOT_HONORED_TRAINS
     );
-    await opTimetablePage.filterHonoredAndVerifyTrainCount(OSRDLanguage, 'All', INVALID_TRAINS);
-    await opTimetablePage.filterValidityAndVerifyTrainCount(OSRDLanguage, 'All', TOTAL_TRAINS);
+    await opTimetablePage.filterHonoredAndVerifyTrainCount(PROJECT_LANGUAGE, 'All', INVALID_TRAINS);
+    await opTimetablePage.filterValidityAndVerifyTrainCount(PROJECT_LANGUAGE, 'All', TOTAL_TRAINS);
 
     // Verify train composition filters with predefined filter codes and expected counts
     const compositionFilters = [
@@ -98,7 +103,7 @@ test.describe('Verify train schedule elements and filters', () => {
 
     for (const filter of compositionFilters) {
       await opTimetablePage.clickCodeCompoTrainFilterButton(
-        OSRDLanguage,
+        PROJECT_LANGUAGE,
         filter.code,
         filter.count
       );

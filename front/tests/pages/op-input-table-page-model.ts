@@ -61,7 +61,7 @@ class OperationalStudiesInputTablePage {
       .first();
     await rowLocator.waitFor({ state: 'attached' });
     const cell = rowLocator.locator('.dsg-cell').nth(columnIndex);
-    await cell.waitFor({ state: 'visible', timeout: 5000 });
+    await cell.waitFor();
     await cell.dblclick();
 
     // Fill the input field based on the presence of a placeholder
@@ -107,7 +107,7 @@ class OperationalStudiesInputTablePage {
 
     for (let rowIndex = 1; rowIndex < rowCount; rowIndex += 1) {
       const rowCells = this.tableRows.nth(rowIndex).locator('.dsg-cell .dsg-input');
-      await rowCells.first().waitFor({ state: 'visible', timeout: 5000 });
+      await rowCells.first().waitFor();
       const rowValues = await rowCells.evaluateAll((cells) =>
         cells.map((cell) => cell.getAttribute('value'))
       );

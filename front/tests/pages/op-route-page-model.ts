@@ -2,7 +2,6 @@ import { expect, type Locator, type Page } from '@playwright/test';
 
 import enTranslations from '../../public/locales/en/operationalStudies/manageTrainSchedule.json';
 import frTranslations from '../../public/locales/fr/operationalStudies/manageTrainSchedule.json';
-import { clickWithDelay } from '../utils';
 
 class RoutePage {
   readonly page: Page;
@@ -51,6 +50,8 @@ class RoutePage {
 
   readonly missingParamMessage: Locator;
 
+  readonly pathfindingLoader: Locator;
+
   constructor(page: Page) {
     this.page = page;
 
@@ -76,6 +77,7 @@ class RoutePage {
     this.viaModal = page.locator('.manage-vias-modal');
     this.closeViaModalButton = page.getByLabel('Close');
     this.missingParamMessage = page.getByTestId('missing-params-info');
+    this.pathfindingLoader = page.locator('.dots-loader');
   }
 
   // Get the name locator of a waypoint suggestion.
@@ -192,7 +194,7 @@ class RoutePage {
     const expectedDestinationTrigram =
       await this.getDestinationLocatorByTrigram(destinationTrigram).innerText();
     await this.clickSearchByTrigramSubmitButton();
-    await this.page.waitForSelector('.dots-loader', { state: 'hidden' });
+    await this.pathfindingLoader.waitFor({ state: 'hidden' });
     await expect(this.searchByTrigramContainer).not.toBeVisible();
     await expect(this.resultPathfindingDone).toBeVisible();
 
@@ -209,21 +211,20 @@ class RoutePage {
   async clickOnDeleteOPButtons(selectedLanguage: string) {
     // Ensure all buttons are rendered and visible before proceeding
     await Promise.all([
-      this.viaDeleteButton.waitFor({ state: 'visible' }),
-      this.originDeleteButton.waitFor({ state: 'visible' }),
-      this.destinationDeleteButton.waitFor({ state: 'visible' }),
+      this.viaDeleteButton.waitFor(),
+      this.originDeleteButton.waitFor(),
+      this.destinationDeleteButton.waitFor(),
     ]);
 
-    // Click the buttons sequentially with waits to ensure UI stability
-    await clickWithDelay(this.viaDeleteButton);
-    await clickWithDelay(this.originDeleteButton);
-    await clickWithDelay(this.destinationDeleteButton);
+    await this.viaDeleteButton.click();
+    await this.originDeleteButton.click();
+    await this.destinationDeleteButton.click();
     const translations = selectedLanguage === 'English' ? enTranslations : frTranslations;
     const expectedMessage = translations.pathfindingMissingParams.replace(
       ': {{missingElements}}.',
       ''
     );
-    await this.missingParamMessage.waitFor({ state: 'visible' });
+    await this.missingParamMessage.waitFor();
     const actualMessage = await this.missingParamMessage.innerText();
     expect(actualMessage).toContain(expectedMessage);
   }
@@ -231,7 +232,7 @@ class RoutePage {
   // Click the add buttons for the specified via names.
   async clickOnViaAddButtons(...viaNames: string[]) {
     for (const viaName of viaNames) {
-      await clickWithDelay(this.getAddButtonLocatorByViaName(viaName));
+      await this.getAddButtonLocatorByViaName(viaName).click();
       await expect(this.getDeleteButtonLocatorByViaName(viaName)).toBeVisible();
     }
   }

@@ -1,9 +1,9 @@
 import { expect } from '@playwright/test';
 
 import { dualModeRollingStockName, electricRollingStockName } from './assets/project-const';
+import test from './logging-fixture';
 import RollingstockEditorPage from './pages/rollingstock-editor-page-model';
 import RollingStockSelectorPage from './pages/rollingstock-selector-page-model';
-import test from './test-logger';
 import {
   generateUniqueName,
   verifyAndCheckInputById,
@@ -13,6 +13,8 @@ import {
 import { deleteRollingStocks } from './utils/teardown-utils';
 
 test.describe('Rollingstock editor page tests', () => {
+  let rollingStockEditorPage: RollingstockEditorPage;
+  let rollingStockSelectorPage: RollingStockSelectorPage;
   let uniqueRollingStockName: string;
   let uniqueUpdatedRollingStockName: string;
   let uniqueDeletedRollingStockName: string;
@@ -22,7 +24,11 @@ test.describe('Rollingstock editor page tests', () => {
   test.beforeEach(
     'Generate unique names and ensure all existing RS are deleted',
     async ({ page }) => {
-      const rollingStockEditorPage = new RollingstockEditorPage(page);
+      [rollingStockEditorPage, rollingStockSelectorPage] = [
+        new RollingstockEditorPage(page),
+        new RollingStockSelectorPage(page),
+      ];
+
       uniqueRollingStockName = generateUniqueName('RSN');
       uniqueUpdatedRollingStockName = generateUniqueName('U_RSN');
       uniqueDeletedRollingStockName = generateUniqueName('D_RSN');
@@ -41,7 +47,6 @@ test.describe('Rollingstock editor page tests', () => {
   /** *************** Test 1 **************** */
   test('Create a new rolling stock', async ({ page, browserName }) => {
     test.slow(browserName === 'webkit', 'This test is slow on Safari');
-    const rollingStockEditorPage = new RollingstockEditorPage(page);
 
     // Start the rolling stock creation process
     await rollingStockEditorPage.clickOnNewRollingstockButton();
@@ -106,7 +111,6 @@ test.describe('Rollingstock editor page tests', () => {
   /** *************** Test 2 **************** */
   test('Duplicate and modify a rolling stock', async ({ page, browserName }) => {
     test.slow(browserName === 'webkit', 'This test is slow on Safari');
-    const rollingStockEditorPage = new RollingstockEditorPage(page);
 
     // Select the existing electric rolling stock and duplicate it
     await rollingStockEditorPage.selectRollingStock(electricRollingStockName);
@@ -137,8 +141,6 @@ test.describe('Rollingstock editor page tests', () => {
 
   /** *************** Test 3 **************** */
   test('Duplicate and delete a rolling stock', async ({ page }) => {
-    const rollingStockEditorPage = new RollingstockEditorPage(page);
-    const rollingStockSelectorPage = new RollingStockSelectorPage(page);
     // Duplicate and change the name of the rolling stock
     await rollingStockEditorPage.selectRollingStock(electricRollingStockName);
     await rollingStockEditorPage.duplicateRollingStock();
@@ -160,9 +162,7 @@ test.describe('Rollingstock editor page tests', () => {
   });
 
   /** *************** Test 4 **************** */
-  test('Filtering rolling stocks', async ({ page }) => {
-    const rollingStockSelectorPage = new RollingStockSelectorPage(page);
-
+  test('Filtering rolling stocks', async () => {
     // Get the initial rolling stock count
     const initialRollingStockFoundNumber =
       await rollingStockSelectorPage.getRollingStockSearchNumber();
@@ -196,10 +196,7 @@ test.describe('Rollingstock editor page tests', () => {
   });
 
   /** *************** Test 5 **************** */
-  test('Search for a rolling stock', async ({ page }) => {
-    const rollingStockEditorPage = new RollingstockEditorPage(page);
-    const rollingStockSelectorPage = new RollingStockSelectorPage(page);
-
+  test('Search for a rolling stock', async () => {
     const initialRollingStockFoundNumber =
       await rollingStockSelectorPage.getRollingStockSearchNumber();
 

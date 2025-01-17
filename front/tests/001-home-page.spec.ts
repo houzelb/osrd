@@ -1,17 +1,16 @@
 import { expect } from '@playwright/test';
 
+import test from './logging-fixture';
 import HomePage from './pages/home-page-model';
-import test from './test-logger';
 import enTranslations from '../public/locales/en/home/home.json';
 import frTranslations from '../public/locales/fr/home/home.json';
 
 test.describe('Home page OSRD', () => {
   let homePage: HomePage;
-  let OSRDLanguage: string;
+
   test.beforeEach('Navigate to the home page', async ({ page }) => {
     homePage = new HomePage(page);
     await homePage.goToHomePage();
-    OSRDLanguage = await homePage.getOSRDLanguage();
   });
 
   test.afterEach('Returns to the home page', async () => {
@@ -20,8 +19,9 @@ test.describe('Home page OSRD', () => {
 
   /** *************** Test 1 **************** */
   test('Verify the links for different pages in Home Page', async () => {
+    const PROJECT_LANGUAGE = process.env.PROJECT_LANGUAGE || '';
     // Determine the correct translations based on the selected language
-    const translations = OSRDLanguage === 'English' ? enTranslations : frTranslations;
+    const translations = PROJECT_LANGUAGE === 'English' ? enTranslations : frTranslations;
 
     // List of expected links on the home page
     const expectedLinks = [

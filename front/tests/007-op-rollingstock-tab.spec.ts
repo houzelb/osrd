@@ -9,15 +9,17 @@ import type {
 } from 'common/api/osrdEditoastApi';
 
 import { dualModeRollingStockName, electricRollingStockName } from './assets/project-const';
+import test from './logging-fixture';
 import OperationalStudiesPage from './pages/operational-studies-page-model';
 import RollingStockSelectorPage from './pages/rollingstock-selector-page-model';
-import test from './test-logger';
 import { waitForInfraStateToBeCached } from './utils';
 import { getInfra, getRollingStock } from './utils/api-setup';
 import createScenario from './utils/scenario';
 import { deleteScenario } from './utils/teardown-utils';
 
 test.describe('Rolling stock Tab Verification', () => {
+  let operationalStudiesPage: OperationalStudiesPage;
+  let rollingStockSelector: RollingStockSelectorPage;
   let project: Project;
   let study: Study;
   let scenario: Scenario;
@@ -35,19 +37,19 @@ test.describe('Rolling stock Tab Verification', () => {
   });
 
   test.beforeEach('Navigate to the scenario page', async ({ page }) => {
+    [operationalStudiesPage, rollingStockSelector] = [
+      new OperationalStudiesPage(page),
+      new RollingStockSelectorPage(page),
+    ];
     await page.goto(
       `/operational-studies/projects/${project.id}/studies/${study.id}/scenarios/${scenario.id}`
     );
-    // Ensure infrastructure is loaded before each test
     // Wait for infra to be in 'CACHED' state before proceeding
     await waitForInfraStateToBeCached(infra.id);
   });
 
   /** *************** Test 1 **************** */
-  test('Select a rolling stock for operational study', async ({ page }) => {
-    const operationalStudiesPage = new OperationalStudiesPage(page);
-    const rollingStockSelector = new RollingStockSelectorPage(page);
-
+  test('Select a rolling stock for operational study', async () => {
     // Add a train and verify the presence of warnings
     await operationalStudiesPage.clickOnAddTrainButton();
     await operationalStudiesPage.verifyTabWarningPresence();
@@ -77,10 +79,7 @@ test.describe('Rolling stock Tab Verification', () => {
   });
 
   /** *************** Test 2 **************** */
-  test('Modify a rolling stock for operational study', async ({ page }) => {
-    const operationalStudiesPage = new OperationalStudiesPage(page);
-    const rollingStockSelector = new RollingStockSelectorPage(page);
-
+  test('Modify a rolling stock for operational study', async () => {
     // Add a train and select the electric rolling stock
     await operationalStudiesPage.clickOnAddTrainButton();
     await rollingStockSelector.openEmptyRollingStockSelector();

@@ -4,14 +4,15 @@ import type { ElectricalProfileSet, Project, Scenario, Study } from 'common/api/
 
 import scenarioData from './assets/operationStudies/scenario.json';
 import { infrastructureName } from './assets/project-const';
+import test from './logging-fixture';
 import ScenarioPage from './pages/scenario-page-model';
-import test from './test-logger';
 import { generateUniqueName } from './utils';
 import { deleteApiRequest, getProject, getStudy, setElectricalProfile } from './utils/api-setup';
 import createScenario from './utils/scenario';
 import { deleteScenario } from './utils/teardown-utils';
 
 test.describe('Validate the Scenario creation workflow', () => {
+  let scenarioPage: ScenarioPage;
   let project: Project;
   let study: Study;
   let scenario: Scenario;
@@ -27,10 +28,12 @@ test.describe('Validate the Scenario creation workflow', () => {
     await deleteApiRequest(`/api/electrical_profile_set/${electricalProfileSet.id}/`);
   });
 
+  test.beforeEach(async ({ page }) => {
+    scenarioPage = new ScenarioPage(page);
+  });
+
   /** *************** Test 1 **************** */
   test('Create a new scenario', async ({ page }) => {
-    const scenarioPage = new ScenarioPage(page);
-
     // Navigate to the study page for the selected project
     await page.goto(`/operational-studies/projects/${project.id}/studies/${study.id}`);
 
@@ -58,8 +61,6 @@ test.describe('Validate the Scenario creation workflow', () => {
   test('Update an existing scenario', async ({ page }) => {
     // Set up a scenario
     ({ project, study, scenario } = await createScenario());
-
-    const scenarioPage = new ScenarioPage(page);
 
     // Navigate to the specific scenario page
     await page.goto(`/operational-studies/projects/${project.id}/studies/${study.id}`);
@@ -98,8 +99,6 @@ test.describe('Validate the Scenario creation workflow', () => {
     // Set up a scenario
     ({ project, study, scenario } = await createScenario());
 
-    // Navigate to the specific scenario page
-    const scenarioPage = new ScenarioPage(page);
     // Navigate to the specific scenario page
     await page.goto(`/operational-studies/projects/${project.id}/studies/${study.id}`);
     await scenarioPage.openScenarioByTestId(scenario.name);
