@@ -5,7 +5,6 @@ import type { Position } from 'geojson';
 import type { Map } from 'maplibre-gl';
 import { Marker } from 'react-map-gl/maplibre';
 
-import { useScenarioContext } from 'applications/operationalStudies/hooks/useScenarioContext';
 import destinationSVG from 'assets/pictures/destination.svg';
 import stdcmDestination from 'assets/pictures/mapMarkers/destination.svg';
 import stdcmVia from 'assets/pictures/mapMarkers/intermediate-point.svg';
@@ -16,6 +15,9 @@ import type { PathItemLocation, TrackSection } from 'common/api/osrdEditoastApi'
 import { matchPathStepAndOp } from 'modules/pathfinding/utils';
 
 import type { SuggestedOP } from '../types';
+import useCachedTrackSections from 'applications/operationalStudies/hooks/useCachedTrackSections';
+import { useOsrdConfSelectors } from 'common/osrdContext';
+import { useSelector } from 'react-redux';
 
 export type MarkerInformation = {
   name?: string;
@@ -26,7 +28,7 @@ export type MarkerInformation = {
     trackName: string;
     trackNumber: number;
   };
-};
+} & PathItemLocation;
 
 enum MARKER_TYPE {
   ORIGIN = 'origin',
@@ -78,13 +80,11 @@ const extractMarkerInformation = (
 ): MarkerProperties[] =>
   pathSteps
     .map((pathStep, index): MarkerProperties | null => {
-      const matchingOp = suggestedOP.find((op) =>
-        matchPathStepAndOp(pathStep as PathItemLocation, op)
-      );
+      const matchingOp = suggestedOP.find((op) => matchPathStepAndOp(pathStep, op));
 
       if (!matchingOp) return null;
 
-      if (pathStep && pathStep.coordinates) {
+      if (pathStep.coordinates) {
         if (index === 0) {
           return {
             coordinates: pathStep.coordinates,
@@ -124,7 +124,10 @@ const ItineraryMarkers = ({
   pathStepsAndSuggestedOPs,
   showStdcmAssets,
 }: ItineraryMarkersProps) => {
-  const { getTrackSectionsByIds } = useScenarioContext();
+  const { getInfraID } = useOsrdConfSelectors();
+  const infraId = useSelector(getInfraID);
+  if (!infraId) return;
+  const { getTrackSectionsByIds } = useCachedTrackSections(infraId);
 
   const markersInformation = useMemo(
     () =>
