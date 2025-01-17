@@ -6,6 +6,8 @@ import { initReactI18next } from 'react-i18next';
 // Official languages codes to use from IANA
 // https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
 
+const version = encodeURIComponent(import.meta.env.VITE_OSRD_GIT_DESCRIBE);
+
 i18n
   .use(Backend)
   .use(initReactI18next)
@@ -19,6 +21,9 @@ i18n
     },
     react: {
       useSuspense: false,
+    },
+    backend: {
+      loadPath: `/locales/{{lng}}/{{ns}}.json?v=${version}`,
     },
   });
 
