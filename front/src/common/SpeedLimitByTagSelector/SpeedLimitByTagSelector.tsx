@@ -49,7 +49,8 @@ export default function SpeedLimitByTagSelector({
           id="speed-limit-by-tag-selector"
           value={speedLimitByTag || ''}
           label={t('speedLimitByTagAbbrev')}
-          placeholder={showPlaceholder ? t('noSpeedLimitByTag') : undefined}
+          //The placeHolder is only displayed in operationalStudies and in debug mode in stdcm
+          placeholder={showPlaceHolder ? t('noSpeedLimitByTag') : undefined}
           onChange={(e) => {
             if (e) {
               dispatchUpdateSpeedLimitByTag(e);

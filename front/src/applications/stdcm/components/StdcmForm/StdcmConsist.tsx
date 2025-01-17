@@ -220,7 +220,7 @@ const StdcmConsist = ({
           selectedSpeedLimitByTag={speedLimitByTag}
           speedLimitsByTags={speedLimitsByTags}
           dispatchUpdateSpeedLimitByTag={onSpeedLimitByTagChange}
-          showPlaceholder={isDebugMode}
+          showPlaceHolder={isDebugMode}
         />
         <Input
           id="maxSpeed"
