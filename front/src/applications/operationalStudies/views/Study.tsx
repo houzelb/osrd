@@ -232,14 +232,14 @@ const Study = () => {
                 />
                 <DateBox
                   date={study.expected_end_date ? new Date(study.expected_end_date) : null}
-                  className="estimatedend"
-                  translation="estimatedend"
+                  className="expected-end"
+                  translation="expectedEnd"
                   withoutTime
                 />
                 <DateBox
                   date={study.actual_end_date ? new Date(study.actual_end_date) : null}
-                  className="realend"
-                  translation="realend"
+                  className="real-end"
+                  translation="realEnd"
                   withoutTime
                 />
                 <DateBox
@@ -288,13 +288,10 @@ const Study = () => {
                         study.state && (
                           <StateStep
                             key={nextId()}
-                            projectID={study.project.id}
-                            studyID={study.id}
+                            study={study}
                             number={idx + 1}
-                            studyName={study.name}
                             state={state}
                             done={idx <= studyStates.indexOf(study.state as StudyState)}
-                            tags={study.tags}
                           />
                         )
                     )}

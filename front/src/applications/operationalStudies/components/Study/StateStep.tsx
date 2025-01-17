@@ -2,29 +2,18 @@ import cx from 'classnames';
 import { useTranslation } from 'react-i18next';
 
 import type { StudyState } from 'applications/operationalStudies/consts';
-import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
+import { osrdEditoastApi, type StudyResponse } from 'common/api/osrdEditoastApi';
 import { setSuccess } from 'reducers/main';
 import { useAppDispatch } from 'store';
 
 type Props = {
-  projectID: number;
-  studyID: number;
+  study: StudyResponse;
   number: number;
-  studyName: string;
   state: StudyState;
   done: boolean;
-  tags: string[];
 };
 
-export default function StateStep({
-  projectID,
-  studyID,
-  number,
-  studyName,
-  state,
-  done,
-  tags,
-}: Props) {
+export default function StateStep({ study, number, state, done }: Props) {
   const { t } = useTranslation('operationalStudies/study');
   const dispatch = useAppDispatch();
   const [patchStudy] =
@@ -32,15 +21,17 @@ export default function StateStep({
 
   const changeStudyState = async () => {
     try {
+      const actual_end_date =
+        state === 'finish' ? new Date().toISOString().split('T')[0] : study.actual_end_date;
       await patchStudy({
-        projectId: projectID,
-        studyId: studyID,
-        studyPatchForm: { name: studyName, state, tags },
+        projectId: study.project.id,
+        studyId: study.id,
+        studyPatchForm: { actual_end_date, state },
       });
       dispatch(
         setSuccess({
           title: t('studyUpdated'),
-          text: t('studyUpdatedDetails', { name: studyName }),
+          text: t('studyUpdatedDetails', { name: study.name }),
         })
       );
     } catch (error) {
