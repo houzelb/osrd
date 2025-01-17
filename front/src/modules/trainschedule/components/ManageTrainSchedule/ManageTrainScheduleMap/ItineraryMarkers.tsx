@@ -94,16 +94,7 @@ const extractMarkerInformation = (
             pathStep,
           };
         }
-        if (index > 0 && index < pathSteps.length - 1) {
-          return {
-            coordinates: pathStep.coordinates,
-            type: MARKER_TYPE.VIA,
-            imageSource: showStdcmAssets ? stdcmVia : viaSVG,
-            index,
-            op: matchingOp,
-            pathStep,
-          };
-        }
+
         if (index === pathSteps.length - 1) {
           return {
             coordinates: pathStep.coordinates,
@@ -113,6 +104,15 @@ const extractMarkerInformation = (
             pathStep,
           };
         }
+
+        return {
+          coordinates: pathStep.coordinates,
+          type: MARKER_TYPE.VIA,
+          imageSource: showStdcmAssets ? stdcmVia : viaSVG,
+          index,
+          op: matchingOp,
+          pathStep,
+        };
       }
       return null;
     })
