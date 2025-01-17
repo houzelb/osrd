@@ -186,8 +186,7 @@ class STDCMPostProcessing(private val graph: STDCMGraph) {
 
         // Add time to the previous stop, or delay the departure time accordingly.
         // We prefer delaying the departure time when possible.
-        val addedDepartureDelay =
-            min(actualStopAddedTime, timeData.maxDepartureDelayingWithoutConflict)
+        val addedDepartureDelay = min(actualStopAddedTime, timeData.maxFirstDepartureDelaying)
         timeData = timeData.copy(departureTime = timeData.departureTime + addedDepartureDelay)
         actualStopAddedTime -= addedDepartureDelay
 
