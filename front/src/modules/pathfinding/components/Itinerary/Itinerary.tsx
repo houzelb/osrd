@@ -73,7 +73,30 @@ const Itinerary = () => {
 
   const inverseOD = () => {
     notifyRestrictionResetWarning();
-    const newPathSteps = [...pathSteps].reverse();
+
+    // Reverse start and end of margins, in prevision of reversing the list of path steps
+    const newMargins: (string | undefined)[] = [];
+    let prevMargin: string | undefined;
+    pathSteps.forEach((pathStep, index) => {
+      if (pathStep?.theoreticalMargin || index === pathSteps.length - 1) {
+        newMargins.push(prevMargin);
+        prevMargin = pathStep?.theoreticalMargin;
+      } else {
+        newMargins.push(undefined);
+      }
+    });
+
+    const newPathSteps = pathSteps
+      .map((pathStep, index) =>
+        pathStep
+          ? {
+              ...pathStep,
+              arrival: null, // Remove arrival times set as they may become incoherent when reversing
+              theoreticalMargin: newMargins[index],
+            }
+          : null
+      )
+      .reverse();
     launchPathfinding(newPathSteps);
   };
 
