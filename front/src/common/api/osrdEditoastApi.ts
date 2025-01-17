@@ -42,24 +42,115 @@ const osrdEditoastApi = generatedEditoastApi.enhanceEndpoints({
       // we don't want to invalidate the trainschedule tag here to prevent multiple calls
       invalidatesTags: ['timetable', 'scenarios'],
     },
-    // Invalidate the children count and last update timestamp
+
+    // Project handling
+    getProjects: {
+      providesTags: (result) => [
+        'projects',
+        { type: 'projects', id: 'LIST' },
+        ...(result?.results || []).map((project) => ({
+          type: 'projects' as const,
+          id: project.id,
+        })),
+      ],
+    },
+    getProjectsByProjectId: {
+      providesTags: (_result, _error, args) => [
+        'projects',
+        { type: 'projects', id: args.projectId },
+      ],
+    },
+    postProjects: {
+      invalidatesTags: [{ type: 'projects', id: 'LIST' }],
+    },
+    patchProjectsByProjectId: {
+      invalidatesTags: (_result, _error, args) => [
+        { type: 'projects', id: 'LIST' },
+        { type: 'projects', id: args.projectId },
+      ],
+    },
+    deleteProjectsByProjectId: {
+      invalidatesTags: [{ type: 'projects', id: 'LIST' }],
+    },
+
+    // Studies handling
+    getProjectsByProjectIdStudies: {
+      providesTags: (result) => [
+        'studies',
+        { type: 'studies', id: 'LIST' },
+        ...(result?.results || []).map(({ id }) => ({
+          type: 'studies' as const,
+          id,
+        })),
+      ],
+    },
+    getProjectsByProjectIdStudiesAndStudyId: {
+      providesTags: (_result, _error, args) => ['studies', { type: 'studies', id: args.studyId }],
+    },
     postProjectsByProjectIdStudies: {
-      invalidatesTags: ['studies', 'projects'],
+      invalidatesTags: (_result, _error, args) => [
+        { type: 'projects', id: args.projectId },
+        { type: 'studies', id: 'LIST' },
+      ],
     },
     patchProjectsByProjectIdStudiesAndStudyId: {
-      invalidatesTags: ['studies', 'projects'],
+      invalidatesTags: (_result, _error, args) => [
+        { type: 'projects', id: args.projectId },
+        { type: 'studies', id: 'LIST' },
+        { type: 'studies', id: args.studyId },
+      ],
     },
     deleteProjectsByProjectIdStudiesAndStudyId: {
-      invalidatesTags: ['studies', 'projects'],
+      invalidatesTags: (_result, _error, args) => [
+        { type: 'projects', id: args.projectId },
+        { type: 'studies', id: 'LIST' },
+      ],
+    },
+
+    // Scenari handling
+    getProjectsByProjectIdStudiesAndStudyIdScenarios: {
+      providesTags: (result) => [
+        'scenarios',
+        { type: 'scenarios', id: 'LIST' },
+        ...(result?.results || []).map(({ id }) => ({
+          type: 'scenarios' as const,
+          id,
+        })),
+      ],
+    },
+    getProjectsByProjectIdStudiesAndStudyIdScenariosScenarioId: {
+      providesTags: (_result, _error, args) => [
+        'scenarios',
+        { type: 'scenarios', id: args.scenarioId },
+      ],
     },
     postProjectsByProjectIdStudiesAndStudyIdScenarios: {
-      invalidatesTags: ['scenarios', 'studies', 'projects'],
+      invalidatesTags: (_result, _error, args) => [
+        { type: 'projects', id: 'LIST' },
+        { type: 'projects', id: args.projectId },
+        { type: 'studies', id: 'LIST' },
+        { type: 'studies', id: args.studyId },
+        { type: 'scenarios', id: 'LIST' },
+      ],
     },
     patchProjectsByProjectIdStudiesAndStudyIdScenariosScenarioId: {
-      invalidatesTags: ['scenarios', 'studies', 'projects'],
+      invalidatesTags: (_result, _error, args) => [
+        { type: 'projects', id: 'LIST' },
+        { type: 'projects', id: args.projectId },
+        { type: 'studies', id: 'LIST' },
+        { type: 'studies', id: args.studyId },
+        { type: 'scenarios', id: 'LIST' },
+        { type: 'scenarios', id: args.scenarioId },
+      ],
     },
     deleteProjectsByProjectIdStudiesAndStudyIdScenariosScenarioId: {
-      invalidatesTags: ['scenarios', 'studies', 'projects'],
+      invalidatesTags: (_result, _error, args) => [
+        { type: 'projects', id: 'LIST' },
+        { type: 'projects', id: args.projectId },
+        { type: 'studies', id: 'LIST' },
+        { type: 'studies', id: args.studyId },
+        { type: 'scenarios', id: 'LIST' },
+      ],
     },
   },
 });
