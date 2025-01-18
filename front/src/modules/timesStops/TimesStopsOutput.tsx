@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import cx from 'classnames';
 
 import type {
@@ -5,6 +7,7 @@ import type {
   SimulationResponseSuccess,
 } from 'applications/operationalStudies/types';
 import type { PathfindingResultSuccess, TrainScheduleResult } from 'common/api/osrdEditoastApi';
+import { getUniqueOperationalPoints } from 'modules/pathfinding/utils';
 import type { TrainScheduleWithDetails } from 'modules/trainschedule/components/Timetable/types';
 import { NO_BREAK_SPACE } from 'utils/strings';
 
@@ -36,9 +39,24 @@ const TimesStopsOutput = ({
     selectedTrainSchedule,
     path
   );
+
+  const mergedOperationalPoints = useMemo(() => {
+    if (!enrichedOperationalPoints) return [];
+
+    return getUniqueOperationalPoints(
+      enrichedOperationalPoints,
+      (op) => `${op.opId}-${path?.path_item_positions}`,
+      (previousOP, nextOP) => {
+        if (previousOP.trackName !== nextOP.trackName) {
+          previousOP.trackName = `${previousOP.trackName}/${nextOP.trackName}`;
+        }
+      }
+    );
+  }, [enrichedOperationalPoints]);
+
   return (
     <TimesStops
-      rows={enrichedOperationalPoints}
+      rows={mergedOperationalPoints}
       tableType={TableType.Output}
       cellClassName={({ rowData: rowData_, columnId }) => {
         const rowData = rowData_ as TimesStopsRow;

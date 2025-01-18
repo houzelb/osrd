@@ -17,6 +17,7 @@ import { useOsrdConfActions, useOsrdConfSelectors } from 'common/osrdContext';
 import {
   formatSuggestedOperationalPoints,
   getPathfindingQuery,
+  getUniqueOperationalPoints,
   matchPathStepAndOp,
 } from 'modules/pathfinding/utils';
 import { useStoreDataForRollingStockSelector } from 'modules/rollingStock/components/RollingStockSelector/useStoreDataForRollingStockSelector';
@@ -122,10 +123,20 @@ const usePathfinding = (
       pathResult.length
     );
 
+    const mergedOperationalPoints = getUniqueOperationalPoints(
+      suggestedOperationalPoints,
+      (op) => `${op.opId}-${op.positionOnPath}`,
+      (previousOP, nextOP) => {
+        if (previousOP.trackName !== nextOP.trackName) {
+          previousOP.trackName = `${previousOP.trackName}/${nextOP.trackName}`;
+        }
+      }
+    );
+
     // We update existing pathsteps with coordinates, positionOnPath and kp corresponding to the new pathfinding result
     const updatedPathSteps: (PathStep | null)[] = pathStepsInput.map((step, i) => {
       if (!step) return step;
-      const correspondingOp = suggestedOperationalPoints.find((suggestedOp) =>
+      const correspondingOp = mergedOperationalPoints.find((suggestedOp) =>
         matchPathStepAndOp(step, suggestedOp)
       );
 
@@ -161,7 +172,7 @@ const usePathfinding = (
     setPathProperties({
       electrifications,
       geometry,
-      suggestedOperationalPoints,
+      suggestedOperationalPoints: mergedOperationalPoints,
       length: pathResult.length,
       trackSectionRanges: pathResult.track_section_ranges,
       incompatibleConstraints,
