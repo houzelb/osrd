@@ -165,7 +165,7 @@ describe('updatePathStepsFrom', () => {
           secondary_code: 'BV',
           name: '87747337',
           arrival: null,
-          stopFor: '0',
+          stopFor: Duration.zero,
         },
       ];
       const pathFindingResult = {
@@ -212,7 +212,7 @@ describe('updatePathStepsFrom', () => {
           secondary_code: 'BV',
           name: 'Voreppe',
           arrival: null,
-          stopFor: '0',
+          stopFor: Duration.zero,
           kp: '117+422',
           positionOnPath: 13116000,
           coordinates: [5.631369628448958, 45.29094364381627],

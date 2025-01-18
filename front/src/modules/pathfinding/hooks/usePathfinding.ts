@@ -25,6 +25,7 @@ import { setFailure, setWarning } from 'reducers/main';
 import type { PathStep } from 'reducers/osrdconf/types';
 import { useAppDispatch } from 'store';
 import { isEmptyArray } from 'utils/array';
+import { Duration } from 'utils/duration';
 import { castErrorToFailure } from 'utils/error';
 
 import useInfraStatus from './useInfraStatus';
@@ -131,7 +132,8 @@ const usePathfinding = (
 
       const theoreticalMargin = i === 0 ? step.theoreticalMargin || '0%' : step.theoreticalMargin;
 
-      const stopFor = i === pathStepsInput.length - 1 && !step.stopFor ? '0' : step.stopFor;
+      const stopFor =
+        i === pathStepsInput.length - 1 && !step.stopFor ? Duration.zero : step.stopFor;
 
       return {
         ...step,

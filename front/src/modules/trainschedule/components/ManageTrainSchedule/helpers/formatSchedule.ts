@@ -1,8 +1,7 @@
-import { compact, isNaN, isNil } from 'lodash';
+import { compact } from 'lodash';
 
 import type { TrainScheduleBase } from 'common/api/osrdEditoastApi';
 import type { PathStep } from 'reducers/osrdconf/types';
-import { formatDurationAsISO8601 } from 'utils/timeManipulation';
 
 const formatSchedule = (pathSteps: PathStep[]): TrainScheduleBase['schedule'] => {
   const schedules = pathSteps.map((step) => {
@@ -12,10 +11,7 @@ const formatSchedule = (pathSteps: PathStep[]): TrainScheduleBase['schedule'] =>
         arrival: step.arrival?.toISOString() ?? undefined,
         locked: step.locked,
         reception_signal: step.receptionSignal,
-        stop_for:
-          isNil(step.stopFor) || isNaN(Number(step.stopFor))
-            ? undefined
-            : formatDurationAsISO8601(Number(step.stopFor)),
+        stop_for: step.stopFor?.toISOString() ?? undefined,
       };
     }
     return undefined;
