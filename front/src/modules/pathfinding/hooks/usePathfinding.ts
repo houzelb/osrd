@@ -93,7 +93,6 @@ const usePathfinding = (
       launchPathfinding(updatedPathSteps);
     } else {
       setError(t('missingPathSteps'));
-      dispatch(setFailure({ name: t('pathfindingError'), message: t('missingPathSteps') }));
     }
   };
 
