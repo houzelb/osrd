@@ -23,7 +23,7 @@ export type SuggestedOP = {
   deleted?: boolean;
   arrival?: Duration | null; // value asked by user, number of seconds since departure
   locked?: boolean;
-  stopFor?: string | null; // value asked by user
+  stopFor?: Duration | null; // value asked by user
   theoreticalMargin?: string; // value asked by user
   theoreticalMarginSeconds?: string;
   calculatedMargin?: string;

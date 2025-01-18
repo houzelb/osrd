@@ -4,7 +4,7 @@ import nextId from 'react-id-generator';
 import type { ImportedTrainSchedule } from 'applications/operationalStudies/types';
 import type { TrainScheduleBase } from 'common/api/osrdEditoastApi';
 import { formatToIsoDate } from 'utils/date';
-import { calculateTimeDifferenceInSeconds, formatDurationAsISO8601 } from 'utils/timeManipulation';
+import { Duration } from 'utils/duration';
 
 export function generateTrainSchedulesPayloads(
   trains: ImportedTrainSchedule[],
@@ -18,6 +18,8 @@ export function generateTrainSchedulesPayloads(
       console.warn(`Skipping train ${train.trainNumber} due to invalid first step UIC`);
       return payloads; // Skip this train
     }
+
+    const departureTime = new Date(train.departureTime);
 
     const { path, schedule } = train.steps.reduce(
       (acc, step, index) => {
@@ -37,13 +39,10 @@ export function generateTrainSchedulesPayloads(
 
         // Skip first step, handle time differences
         if (index !== 0) {
-          const timeDifferenceInSeconds = calculateTimeDifferenceInSeconds(
-            train.departureTime,
-            step.arrivalTime
-          );
+          const arrivalTime = new Date(step.arrivalTime);
           const schedulePoint: NonNullable<TrainScheduleBase['schedule']>[number] = {
             at: stepId,
-            arrival: formatDurationAsISO8601(timeDifferenceInSeconds),
+            arrival: Duration.subtractDate(arrivalTime, departureTime).toISOString(),
             stop_for: step.duration ? `PT${step.duration}S` : undefined,
           };
           acc.schedule.push(schedulePoint);

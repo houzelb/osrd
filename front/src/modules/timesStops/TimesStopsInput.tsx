@@ -12,6 +12,8 @@ import type { SuggestedOP } from 'modules/trainschedule/components/ManageTrainSc
 import type { OperationalStudiesConfSliceActions } from 'reducers/osrdconf/operationalStudiesConf';
 import type { PathStep } from 'reducers/osrdconf/types';
 import { useAppDispatch } from 'store';
+import { Duration } from 'utils/duration';
+import { sec2ms } from 'utils/timeManipulation';
 
 import {
   durationSinceStartTime,
@@ -119,11 +121,12 @@ const TimesStopsInput = ({
           (row, index) =>
             !isEqual(normalizeNullablesInRow(row), normalizeNullablesInRow(rows[index]))
         )
-        .map(({ shortSlipDistance, onStopSignal, arrival, departure, ...row }) => ({
+        .map(({ shortSlipDistance, onStopSignal, arrival, departure, stopFor, ...row }) => ({
           ...row,
           arrival: durationSinceStartTime(startTime, arrival),
           departure: durationSinceStartTime(startTime, departure),
           receptionSignal: onStopSignalToReceptionSignal(onStopSignal, shortSlipDistance),
+          stopFor: stopFor ? new Duration(sec2ms(Number(stopFor))) : null,
         }));
       dispatch(upsertSeveralViasFromSuggestedOP(newVias));
     },

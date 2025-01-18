@@ -33,7 +33,7 @@ describe('formatSchedule', () => {
           name: 'V',
           positionOnPath: 13116000,
           arrival: Duration.parse('PT60S'),
-          stopFor: '0',
+          stopFor: Duration.zero,
           locked: false,
           receptionSignal: 'OPEN',
         },
@@ -45,7 +45,7 @@ describe('formatSchedule', () => {
           at: 'id332',
           locked: false,
           reception_signal: 'OPEN',
-          stop_for: 'PT0S',
+          stop_for: 'P0D',
         },
       ]);
     });
