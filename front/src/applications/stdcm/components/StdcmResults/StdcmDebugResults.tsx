@@ -4,8 +4,9 @@ import { useSelector } from 'react-redux';
 
 import { STDCM_TRAIN_ID } from 'applications/stdcm/consts';
 import useProjectedTrainsForStdcm from 'applications/stdcm/hooks/useProjectedTrainsForStdcm';
-import type { StdcmResultsOutput } from 'applications/stdcm/types';
-import { osrdEditoastApi, type TrackRange } from 'common/api/osrdEditoastApi';
+import type { StdcmSimulationOutputs } from 'applications/stdcm/types';
+import { hasResults } from 'applications/stdcm/utils/simulationOutputUtils';
+import { osrdEditoastApi } from 'common/api/osrdEditoastApi';
 import { useOsrdConfSelectors } from 'common/osrdContext';
 import ResizableSection from 'common/ResizableSection';
 import i18n from 'i18n';
@@ -20,16 +21,13 @@ const HANDLE_TAB_RESIZE_HEIGHT = 20;
 const MANCHETTE_HEIGHT_DIFF = 100;
 
 type StdcmDebugResultsProps = {
-  pathTrackRanges: TrackRange[];
-  simulationOutputs: StdcmResultsOutput;
+  simulationOutputs?: StdcmSimulationOutputs;
 };
 
-const StdcmDebugResults = ({
-  pathTrackRanges,
-  simulationOutputs: { pathProperties, results, speedSpaceChartData },
-}: StdcmDebugResultsProps) => {
+const StdcmDebugResults = ({ simulationOutputs }: StdcmDebugResultsProps) => {
   const { getWorkScheduleGroupId } = useOsrdConfSelectors() as StdcmConfSelectors;
   const workScheduleGroupId = useSelector(getWorkScheduleGroupId);
+  const successfulSimulation = hasResults(simulationOutputs) ? simulationOutputs : undefined;
 
   const [speedSpaceChartContainerHeight, setSpeedSpaceChartContainerHeight] =
     useState(SPEED_SPACE_CHART_HEIGHT);
@@ -39,46 +37,53 @@ const StdcmDebugResults = ({
     MANCHETTE_WITH_SPACE_TIME_CHART_DEFAULT_HEIGHT
   );
 
-  const projectedData = useProjectedTrainsForStdcm(results);
+  const projectedData = useProjectedTrainsForStdcm(successfulSimulation?.results);
 
   const { data: workSchedules } = osrdEditoastApi.endpoints.postWorkSchedulesProjectPath.useQuery(
     {
       body: {
-        path_track_ranges: pathTrackRanges,
+        path_track_ranges: successfulSimulation?.results.path.track_section_ranges || [],
         work_schedule_group_id: workScheduleGroupId!,
       },
     },
-    { skip: !workScheduleGroupId }
+    { skip: !workScheduleGroupId || !successfulSimulation }
   );
+
+  if (!successfulSimulation) return null;
+  const { pathProperties, results, speedSpaceChartData } = successfulSimulation;
 
   return (
     <>
-      {projectedData && pathProperties.manchetteOperationalPoints && (
-        <ResizableSection
-          height={manchetteWithSpaceTimeChartHeight}
-          setHeight={setManchetteWithSpaceTimeChartHeight}
-          minHeight={MANCHETTE_WITH_SPACE_TIME_CHART_DEFAULT_HEIGHT}
-        >
-          <div
-            className="osrd-simulation-container mb-2"
-            style={{
-              height: manchetteWithSpaceTimeChartHeight,
-            }}
+      {projectedData &&
+        projectedData?.spaceTimeData.length > 0 &&
+        pathProperties.manchetteOperationalPoints && (
+          <ResizableSection
+            height={manchetteWithSpaceTimeChartHeight}
+            setHeight={setManchetteWithSpaceTimeChartHeight}
+            minHeight={MANCHETTE_WITH_SPACE_TIME_CHART_DEFAULT_HEIGHT}
           >
-            <p className="mt-2 mb-3 ml-4 font-weight-bold">{tWithoutPrefix('spaceTimeGraphic')}</p>
-            <div className="chart-container mt-2">
-              <ManchetteWithSpaceTimeChartWrapper
-                operationalPoints={pathProperties.manchetteOperationalPoints}
-                projectPathTrainResult={projectedData.spaceTimeData}
-                selectedTrainScheduleId={STDCM_TRAIN_ID}
-                workSchedules={workSchedules}
-                projectionLoaderData={projectedData.projectionLoaderData}
-                height={manchetteWithSpaceTimeChartHeight - MANCHETTE_HEIGHT_DIFF}
-              />
+            <div
+              className="osrd-simulation-container mb-2"
+              style={{
+                height: manchetteWithSpaceTimeChartHeight,
+              }}
+            >
+              <p className="mt-2 mb-3 ml-4 font-weight-bold">
+                {tWithoutPrefix('spaceTimeGraphic')}
+              </p>
+              <div className="chart-container mt-2">
+                <ManchetteWithSpaceTimeChartWrapper
+                  operationalPoints={pathProperties.manchetteOperationalPoints}
+                  projectPathTrainResult={projectedData.spaceTimeData}
+                  selectedTrainScheduleId={STDCM_TRAIN_ID}
+                  workSchedules={workSchedules}
+                  projectionLoaderData={projectedData.projectionLoaderData}
+                  height={manchetteWithSpaceTimeChartHeight - MANCHETTE_HEIGHT_DIFF}
+                />
+              </div>
             </div>
-          </div>
-        </ResizableSection>
-      )}
+          </ResizableSection>
+        )}
 
       <div className="osrd-simulation-container my-2 speedspacechart-container">
         <div
