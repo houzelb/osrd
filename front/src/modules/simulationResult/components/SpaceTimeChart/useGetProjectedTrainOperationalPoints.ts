@@ -13,7 +13,6 @@ import {
   type TrainScheduleResult,
 } from 'common/api/osrdEditoastApi';
 import { useOsrdConfSelectors } from 'common/osrdContext';
-import { isStation } from 'modules/pathfinding/utils';
 
 const useGetProjectedTrainOperationalPoints = (
   trainScheduleUsedForProjection?: TrainScheduleResult,
@@ -76,12 +75,6 @@ const useGetProjectedTrainOperationalPoints = (
           operationalPointsWithUniqueIds = JSON.parse(stringifiedSavedWaypoints) as NonNullable<
             PathProperties['operational_points']
           >;
-        } else {
-          // If the manchette hasn't been saved, we want to display by default only
-          // the waypoints with CH BV/00/'' and the ones added by map click
-          operationalPointsWithUniqueIds = operationalPointsWithUniqueIds.filter((op) =>
-            op.extensions?.sncf ? isStation(op.extensions.sncf.ch) : true
-          );
         }
         setFilteredOperationalPoints(operationalPointsWithUniqueIds);
       }
