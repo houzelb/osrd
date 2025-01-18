@@ -300,15 +300,17 @@ const StdcmConfig = ({
         </div>
 
         <div className="osrd-config-item-container osrd-config-item-container-map stdcm-map">
-          <NewMap
-            id="stdcm-map-config"
-            hideAttribution
-            hideItinerary
-            preventPointSelection
-            pathGeometry={pathfinding?.geometry}
-            showStdcmAssets
-            simulationPathSteps={markersInfo}
-          />
+          {infra && (
+            <NewMap
+              id="stdcm-map-config"
+              hideAttribution
+              hideItinerary
+              preventPointSelection
+              pathGeometry={pathfinding?.geometry}
+              showStdcmAssets
+              simulationPathSteps={markersInfo}
+            />
+          )}
         </div>
       </div>
     </div>

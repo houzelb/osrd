@@ -102,7 +102,12 @@ const ManageTrainSchedule = ({ trainIdToEdit }: ManageTrainScheduleProps) => {
         <div className="floating-itinerary">
           <Itinerary />
         </div>
-        <Map pathProperties={pathProperties} simulationPathSteps={compact(pathSteps)}>
+
+        <Map
+          pathProperties={pathProperties}
+          simulationPathSteps={compact(pathSteps)}
+          pathStepsAndSuggestedOPs={pathStepsAndSuggestedOPs}
+        >
           <IncompatibleConstraints pathProperties={pathProperties} />
         </Map>
       </div>

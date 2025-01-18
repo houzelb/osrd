@@ -46,7 +46,7 @@ import ItineraryLayer from './ManageTrainScheduleMap/ItineraryLayer';
 import ItineraryMarkers, {
   type MarkerInformation,
 } from './ManageTrainScheduleMap/ItineraryMarkers';
-import type { FeatureInfoClick } from './types';
+import type { FeatureInfoClick, SuggestedOP } from './types';
 
 type MapProps = {
   pathProperties?: ManageTrainSchedulePathProperties;
@@ -57,6 +57,7 @@ type MapProps = {
   preventPointSelection?: boolean;
   mapId?: string;
   simulationPathSteps: MarkerInformation[];
+  pathStepsAndSuggestedOPs?: SuggestedOP[];
   showStdcmAssets?: boolean;
   isFeasible?: boolean;
 };
@@ -70,6 +71,7 @@ const Map = ({
   preventPointSelection = false,
   mapId = 'map-container',
   simulationPathSteps,
+  pathStepsAndSuggestedOPs,
   showStdcmAssets = false,
   isFeasible = true,
   children,
@@ -336,6 +338,7 @@ const Map = ({
         {mapRef.current && (
           <ItineraryMarkers
             simulationPathSteps={simulationPathSteps}
+            pathStepsAndSuggestedOPs={pathStepsAndSuggestedOPs}
             map={mapRef.current.getMap()}
             showStdcmAssets={showStdcmAssets}
           />
