@@ -2119,6 +2119,7 @@ export type OperationalPoint = {
     } | null;
   };
   id: string;
+  is_station?: boolean;
   parts: OperationalPointPart[];
   weight?: number | null;
 };
