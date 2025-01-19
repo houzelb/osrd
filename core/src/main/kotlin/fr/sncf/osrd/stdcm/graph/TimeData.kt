@@ -90,8 +90,13 @@ data class TimeData(
         val nextEarliestReachableTime =
             earliestReachableTime + extraTravelTime + (extraStopTime ?: 0.0)
         var timeOfNextConflict = timeOfNextConflictAtLocation
-        if (maxAdditionalStopTime != null)
+        if (maxAdditionalStopTime != null) {
+            // We could have added a `min(timeOfNextConflict, ...)`,
+            // but we're specifically not interested in what happens before
+            // the stop. Engineering margins and other delay constraints
+            // would stop at the stop and ignore anything before.
             timeOfNextConflict = nextEarliestReachableTime + maxAdditionalStopTime
+        }
         if (extraStopTime != null) {
             val stopDataCopy = newStopData.toMutableList()
             stopDataCopy.add(
