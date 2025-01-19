@@ -16,3 +16,8 @@ To add a primitive to the existing switch_types, you need to modify these 3 file
 If you want to contribute to this service you need:
 
 - [Poetry](https://python-poetry.org/) a python package manager.
+
+## Version
+
+Version increments follow https://semver.org.
+Please update `project.version` and `tool.poetry.version` in `pyproject.toml` when changing osrd-schemas interface.
