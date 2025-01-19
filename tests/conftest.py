@@ -13,6 +13,21 @@ from tests.services import EDITOAST_URL
 from tests.utils.timetable import create_scenario
 
 
+_old_raise_for_status = requests.Response.raise_for_status
+
+
+def raise_for_status_logging_body(response: requests.Response):
+    try:
+        return _old_raise_for_status(response)
+    except requests.exceptions.HTTPError as e:
+        print("HTTPError occured on {response.request.method} {response.request.url}")
+        print(response.text)
+        raise e
+
+
+requests.Response.raise_for_status = raise_for_status_logging_body
+
+
 def _load_generated_infra(name: str) -> int:
     infra_path = Path(__file__).parent / f"data/infras/{name}/infra.json"
     with infra_path.open() as json_infra:
